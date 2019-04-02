@@ -3,6 +3,7 @@ def main():
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
 
+    #print informations about the objects
     for obj in objs:
         App.Console.PrintMessage(str(obj.TypeId) + " - ")
         App.Console.PrintMessage(str(obj.Name) + "\n")
@@ -10,14 +11,17 @@ def main():
             App.Console.PrintMessage("Childs\n")
             App.Console.PrintMessage("   - " + str(child.TypeId) + " - ")
             App.Console.PrintMessage(str(child.Name) + "\n")
-            pass
         for parent in obj.InList:
             App.Console.PrintMessage("Parent\n")
             App.Console.PrintMessage("   -" + str(parent.TypeId) + " - ")
             App.Console.PrintMessage("   -" + str(parent.Name) + "\n\n\n")
-            pass
-    pass
-pass
+
+    #get the first layer
+    for obj in objs:
+        if obj.InList == []: #no parents
+            firstLayer.append(obj)
+
+    App.Console.PrintMessage("\n\n" + str(firstLayer[0].TypeId) + "\n\n")
 
 def createPovrayCode(fcObj):
     pass
