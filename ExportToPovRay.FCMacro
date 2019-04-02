@@ -1,0 +1,25 @@
+def main():
+    firstLayer = []
+    doc = FreeCAD.ActiveDocument
+    objs = doc.Objects
+
+    for obj in objs:
+        App.Console.PrintMessage(str(obj.TypeId) + " - ")
+        App.Console.PrintMessage(str(obj.Name) + "\n")
+        for child in obj.OutList:
+            App.Console.PrintMessage("Childs\n")
+            App.Console.PrintMessage("   - " + str(child.TypeId) + " - ")
+            App.Console.PrintMessage(str(child.Name) + "\n")
+            pass
+        for parent in obj.InList:
+            App.Console.PrintMessage("Parent\n")
+            App.Console.PrintMessage("   -" + str(parent.TypeId) + " - ")
+            App.Console.PrintMessage("   -" + str(parent.Name) + "\n\n\n")
+            pass
+    pass
+pass
+
+def createPovrayCode(fcObj):
+    pass
+
+main()
