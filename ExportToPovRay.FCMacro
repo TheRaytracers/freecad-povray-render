@@ -2,6 +2,7 @@ def main():
     firstLayer = []
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
+    finalPovCode = ""
 
     #print informations about the objects
     for obj in objs:
@@ -21,11 +22,14 @@ def main():
         if obj.InList == []: #no parents
             firstLayer.append(obj)
     for obj in firstLayer:
-        createPovrayCode(obj)
+        finalPovCode += createPovrayCode(obj)
 
-    App.Console.PrintMessage("\n\n" + str(firstLayer[0].TypeId) + "\n\n")
+    #App.Console.PrintMessage("\n\n" + str(firstLayer[0].TypeId) + "\n\n")
+    App.Console.PrintMessage("\n\n" + finalPovCode)
 
 def createPovrayCode(fcObj): #returns the povray code for the object
+    povCode = ""
+
     if fcObj.TypeId == "Part::Box": #no childs
         x1 = fcObj.Placement.Base.x
         y1 = fcObj.Placement.Base.y
@@ -43,6 +47,18 @@ def createPovrayCode(fcObj): #returns the povray code for the object
                         scale <1.0, 1.0, 1.0> }
                     }\n\n"""
         povBox += pigment;
-        App.Console.PrintMessage(povBox)
+        povCode = povBox
+        #App.Console.PrintMessage(povBox)
+
+    elif fcObj.TypeId == "Part::Cut":
+        childs = fcObj.OutList
+        povCut = "difference{"
+        for child in childs:
+            povCut += createPovrayCode(child)
+
+        povCut += "}"
+        povCode = povCut
+
+    return povCode
 
 main()
