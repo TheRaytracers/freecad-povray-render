@@ -77,11 +77,11 @@ def createPovrayCode(fcObj): #returns the povray code for the object
 
     if fcObj.TypeId == "Part::Box": #no childs
         x1 = fcObj.Placement.Base.x
-        y1 = fcObj.Placement.Base.y
-        z1 = fcObj.Placement.Base.z
+        z1 = fcObj.Placement.Base.y
+        y1 = fcObj.Placement.Base.z
         x2 = fcObj.Placement.Base.x + int(fcObj.Length)
-        y2 = fcObj.Placement.Base.y + int(fcObj.Width)
-        z2 = fcObj.Placement.Base.z + int(fcObj.Height)
+        z2 = fcObj.Placement.Base.y + int(fcObj.Width)
+        y2 = fcObj.Placement.Base.z + int(fcObj.Height)
 
         povBox = "box{ <"
         povBox += str(x1) + "," + str(y1) + "," + str(z1) + ">, <" + str(x2) + "," + str(y2) + "," + str(z2) + ">\n"
@@ -97,8 +97,8 @@ def createPovrayCode(fcObj): #returns the povray code for the object
 
     elif fcObj.TypeId == "Part::Sphere":
         x = fcObj.Placement.Base.x
-        y = fcObj.Placement.Base.y
-        z = fcObj.Placement.Base.z
+        z = fcObj.Placement.Base.y
+        y = fcObj.Placement.Base.z
         radius = int(fcObj.Radius)
 
         povSphere = "sphere{ <"
