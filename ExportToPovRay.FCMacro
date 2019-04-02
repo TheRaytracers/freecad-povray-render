@@ -68,6 +68,15 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povFusion += "}"
         povCode = povFusion
 
+    elif fcObj.TypeId == "Part::MultiCommon":
+        childs = fcObj.OutList
+        povCommon = "intersection{"
+        for child in childs:
+            povCommon += createPovrayCode(child)
+
+        povCommon += "}"
+        povCode = povCommon
+
     return povCode
 
 main()
