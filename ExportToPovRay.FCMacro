@@ -95,6 +95,20 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povCode = povBox
         #App.Console.PrintMessage(povBox)
 
+    elif fcObj.TypeId == "Part::Sphere":
+        x = fcObj.Placement.Base.x
+        y = fcObj.Placement.Base.y
+        z = fcObj.Placement.Base.z
+        radius = int(fcObj.Radius)
+
+        povSphere = "sphere{ <"
+        povSphere += str(x) + "," + str(y) + "," + str(z) + "> " + str(radius)
+        pigment = "\npigment{color rgb<1,0.6,0>}\n"
+        povSphere += pigment
+        povSphere += "\n}"
+        #App.Console.PrintMessage(povSphere)
+        povCode = povSphere
+
     elif fcObj.TypeId == "Part::Cut":
         childs = fcObj.OutList
         povCut = "difference{"
