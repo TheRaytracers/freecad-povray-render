@@ -59,6 +59,15 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povCut += "}"
         povCode = povCut
 
+    elif fcObj.TypeId == "Part::MultiFuse":
+        childs = fcObj.OutList
+        povFusion = "union{"
+        for child in childs:
+            povFusion += createPovrayCode(child)
+
+        povFusion += "}"
+        povCode = povFusion
+
     return povCode
 
 main()
