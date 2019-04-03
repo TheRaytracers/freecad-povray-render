@@ -139,7 +139,14 @@ def createPovrayCode(fcObj): #returns the povray code for the object
     return povCode
 
 def writeFile(povText):
-    file = open("/home/otto/Downloads/povTest.pov", "w")
+    try:
+        file = open("/home/otto/Downloads/povTest.pov", "w")
+    except:
+        App.Console.PrintMessage("file: /home/otto/Downloads/povTest.pov - not found")
+        try:
+            file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
+        except:
+            App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
     file.write(povText)
     file.close()
 
