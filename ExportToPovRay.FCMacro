@@ -113,17 +113,10 @@ def createPovrayCode(fcObj): #returns the povray code for the object
                         scale <1.0, 1.0, 1.0>
                     }\n\n"""
 
-        eulerRot = fcObj.Placement.Rotation.toEuler()
-        App.Console.PrintMessage(str(eulerRot) + "\n")
-        eulerRot = [eulerRot[2], eulerRot[0], eulerRot[1]] #convert axis to povray axis
-        rotX = -eulerRot[0]
-        rotY = -eulerRot[1]
-        rotZ = -eulerRot[2]
-        App.Console.PrintMessage(str(rotX) + "\n" + str(rotY) + "\n" + str(rotZ) + "\n")
-
         rotate = "translate -<" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
-        rotate += "\nrotate <" + str(rotX) + "," + str(rotY) + "," + str(rotZ) + ">\n"
+        rotate += getRot(fcObj)
         rotate += "translate <" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
+
         povBox += pigment
         povBox += rotate
         povBox += "\n}\n\n"
@@ -171,6 +164,19 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povCode = povCommon
 
     return povCode
+
+def getRot(fcObj):
+    eulerRot = fcObj.Placement.Rotation.toEuler()
+    App.Console.PrintMessage(str(eulerRot) + "\n")
+    eulerRot = [eulerRot[2], eulerRot[0], eulerRot[1]] #convert axis to povray axis
+    rotX = -eulerRot[0]
+    rotY = -eulerRot[1]
+    rotZ = -eulerRot[2]
+    App.Console.PrintMessage(str(rotX) + "\n" + str(rotY) + "\n" + str(rotZ) + "\n")
+
+    rotate = "\nrotate <" + str(rotX) + "," + str(rotY) + "," + str(rotZ) + ">\n"
+
+    return rotate
 
 def writeFile(povText):
     fileName = getFileName()
