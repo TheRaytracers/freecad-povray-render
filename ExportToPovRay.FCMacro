@@ -82,7 +82,7 @@ def main():
 def createPovrayCode(fcObj): #returns the povray code for the object
     povCode = ""
 
-    if fcObj.TypeId == "Part::Box": #no childs
+    if fcObj.TypeId == "Part::Box": #Box
         x1 = fcObj.Placement.Base.x
         z1 = fcObj.Placement.Base.y
         y1 = fcObj.Placement.Base.z
@@ -96,13 +96,20 @@ def createPovrayCode(fcObj): #returns the povray code for the object
                     pigment{ checker
                         color rgb<1,1,1>
                         color rgb<1,1,1>*0
-                        scale <1.0, 1.0, 1.0> }
+                        scale <1.0, 1.0, 1.0>
                     }\n\n"""
-        povBox += pigment;
+
+        rotate = "translate -<" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
+        rotate += getRot(fcObj)
+        rotate += "translate <" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
+
+        povBox += pigment
+        povBox += rotate
+        povBox += "\n}\n\n"
         povCode = povBox
         #App.Console.PrintMessage(povBox)
 
-    elif fcObj.TypeId == "Part::Sphere":
+    elif fcObj.TypeId == "Part::Sphere": # Sphere
         x = fcObj.Placement.Base.x
         z = fcObj.Placement.Base.y
         y = fcObj.Placement.Base.z
@@ -113,10 +120,9 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         pigment = "\npigment{color rgb<1,0.6,0>}\n"
         povSphere += pigment
         povSphere += "\n}"
-        #App.Console.PrintMessage(povSphere)
         povCode = povSphere
 
-    elif fcObj.TypeId == "Part::Cut":
+    elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
         povCut = "difference{"
         for child in childs:
@@ -125,7 +131,7 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povCut += "}"
         povCode = povCut
 
-    elif fcObj.TypeId == "Part::MultiFuse":
+    elif fcObj.TypeId == "Part::MultiFuse": #Fusion
         childs = fcObj.OutList
         povFusion = "union{"
         for child in childs:
@@ -134,7 +140,7 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povFusion += "}"
         povCode = povFusion
 
-    elif fcObj.TypeId == "Part::MultiCommon":
+    elif fcObj.TypeId == "Part::MultiCommon": #Common
         childs = fcObj.OutList
         povCommon = "intersection{"
         for child in childs:
@@ -144,6 +150,19 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povCode = povCommon
 
     return povCode
+
+def getRot(fcObj):
+    eulerRot = fcObj.Placement.Rotation.toEuler()
+    App.Console.PrintMessage(str(eulerRot) + "\n")
+    eulerRot = [eulerRot[2], eulerRot[0], eulerRot[1]] #convert axis to povray axis
+    rotX = -eulerRot[0]
+    rotY = -eulerRot[1]
+    rotZ = -eulerRot[2]
+    App.Console.PrintMessage(str(rotX) + "\n" + str(rotY) + "\n" + str(rotZ) + "\n")
+
+    rotate = "\nrotate <" + str(rotX) + "," + str(rotY) + "," + str(rotZ) + ">\n"
+
+    return rotate
 
 def writeFile(povText):
     fileName = getFileName()
