@@ -6,7 +6,7 @@ def main():
     firstLayer = []
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
-    
+
     finalPovCode = """
     #version 3.6; // 3.7
     global_settings{assumed_gamma 1.0}
@@ -17,25 +17,25 @@ def main():
     //------------------------------------------
     // camera ----------------------------------
     """
-    
+
     cam = FreeCADGui.ActiveDocument.ActiveView.getCameraNode()
     rotCamera=Base.Rotation(*cam.orientation.getValue().getValue())
     position=Base.Vector(*cam.position.getValue().getValue())
     distance=cam.focalDistance.getValue()
     vec=rotCamera.multVec(Base.Vector(0,0,-1))
     lookat=position+vec*distance
-    
+
     PovCam="camera {\n"
     PovCam += "     location <" + str(position[0]) + "," + str(position[2]) + "," + str(position[1]) + ">\n"
     PovCam += "     look_at <" + str(lookat[0]) + "," + str(lookat[2]) + "," + str(lookat[1]) + ">\n"
     PovCam += "     angle 55\n"
     PovCam += "    }\n"
     finalPovCode += PovCam
-    
+
     finalPovCode += """
     // sun -------------------------------------
     light_source{<1500,3000,-2500> color White}
-    
+
     // background ------------------------------
     sky_sphere {
       pigment {
@@ -48,7 +48,7 @@ def main():
         translate -1
         }
        emission rgb <0.8,0.8,1>
-      }  
+      }
     //------------------------------------------
     // objects in scene ------------------------
     """
@@ -191,7 +191,21 @@ def writeFile(povText):
         file.close()
 
 def getFileName():
-    fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', '/home/otto/Dokumente', "PovRay Files (*.pov)")
+    try:
+        file = open("/home/otto/Downloads/povTest.pov", "w")
+        defaultPath = "/home/otto/Downloads/povTest.pov"
+    except:
+        App.Console.PrintMessage("file: /home/otto/Downloads/povTest.pov - not found")
+        try:
+            file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
+            defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
+        except:
+            App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
+            defaultPath = "/home/"
+    file.close()
+
+
+    fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
     if fileName:
         App.Console.PrintMessage(str(fileName[0]) + "\n\n")
         return str(fileName[0])
