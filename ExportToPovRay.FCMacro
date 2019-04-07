@@ -142,6 +142,12 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         for child in childs:
             povCut += createPovrayCode(child)
 
+        x = fcObj.Placement.Base.x
+        z = fcObj.Placement.Base.y
+        y = fcObj.Placement.Base.z
+        rotate = getRot(fcObj)
+        rotate += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
+        povCut += rotate
         povCut += "}"
         povCode = povCut
 
@@ -151,6 +157,13 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         for child in childs:
             povFusion += createPovrayCode(child)
 
+        x = fcObj.Placement.Base.x
+        z = fcObj.Placement.Base.y
+        y = fcObj.Placement.Base.z
+        rotate = getRot(fcObj)
+        rotate += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
+
+        povFusion += rotate
         povFusion += "}"
         povCode = povFusion
 
@@ -160,6 +173,12 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         for child in childs:
             povCommon += createPovrayCode(child)
 
+        x = fcObj.Placement.Base.x
+        z = fcObj.Placement.Base.y
+        y = fcObj.Placement.Base.z
+        rotate = getRot(fcObj)
+        rotate += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
+        povCommon += rotate
         povCommon += "}"
         povCode = povCommon
 
