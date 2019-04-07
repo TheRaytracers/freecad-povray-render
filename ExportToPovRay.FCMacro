@@ -1,7 +1,12 @@
+from PySide import QtGui
+from pivy import coin
+from FreeCAD import Base
+
 def main():
     firstLayer = []
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
+    
     finalPovCode = """
     #version 3.6; // 3.7
     global_settings{assumed_gamma 1.0}
@@ -11,37 +16,39 @@ def main():
     #include "textures.inc"
     //------------------------------------------
     // camera ----------------------------------
-    camera{ location  <50.0 , 50.0 ,-50.0>
-            look_at   <0.0 , 1.0 , 0.0>
-            right x*image_width/image_height
-            angle 75 }
+    """
+    
+    cam = FreeCADGui.ActiveDocument.ActiveView.getCameraNode()
+    rotCamera=Base.Rotation(*cam.orientation.getValue().getValue())
+    position=Base.Vector(*cam.position.getValue().getValue())
+    distance=cam.focalDistance.getValue()
+    vec=rotCamera.multVec(Base.Vector(0,0,-1))
+    lookat=position+vec*distance
+    
+    PovCam="camera {\n"
+    PovCam += "     location <" + str(position[0]) + "," + str(position[2]) + "," + str(position[1]) + ">\n"
+    PovCam += "     look_at <" + str(lookat[0]) + "," + str(lookat[2]) + "," + str(lookat[1]) + ">\n"
+    PovCam += "     angle 55\n"
+    PovCam += "    }\n"
+    finalPovCode += PovCam
+    
+    finalPovCode += """
     // sun -------------------------------------
     light_source{<1500,3000,-2500> color White}
-    // sky -------------------------------------
-    plane{ <0,1,0>,1 hollow
-           texture{
-             pigment{ bozo turbulence 0.92
-               color_map{
-                     [0.00 rgb<0.05,0.15,0.45>]
-                     [0.50 rgb<0.05,0.15,0.45>]
-                     [0.70 rgb<1,1,1>        ]
-                     [0.85 rgb<0.2,0.2,0.2>  ]
-                     [1.00 rgb<0.5,0.5,0.5>  ]
-                           } //
-               scale<1,1,1.5>*2.5
-               translate<0,0,0>
-               } // end of pigment
-             finish {ambient 1 diffuse 0}
-            } // end of texture
-           scale 10000}
-    // ground ----------------------------------
-    plane{ <0,1,0>, 0
-           texture{
-              pigment{ color rgb<0.22,0.45,0>}
-              normal { bumps 0.75 scale 0.015 }
-              finish { phong 0.1 }
-           } // end of texture
-         } // end of plane
+    
+    // background ------------------------------
+    sky_sphere {
+      pigment {
+        gradient y
+          color_map {
+            [ 0.5  color CornflowerBlue ]
+            [ 1.0  color MidnightBlue ]
+            }
+        scale 2
+        translate -1
+        }
+       emission rgb <0.8,0.8,1>
+      }  
     //------------------------------------------
     // objects in scene ------------------------
     """
