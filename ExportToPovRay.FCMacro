@@ -146,15 +146,19 @@ def createPovrayCode(fcObj): #returns the povray code for the object
     return povCode
 
 def writeFile(povText):
-    try:
-        file = open("/home/otto/Downloads/povTest.pov", "w")
-    except:
-        App.Console.PrintMessage("file: /home/otto/Downloads/povTest.pov - not found")
-        try:
-            file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
-        except:
-            App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
-    file.write(povText)
-    file.close()
+    fileName = getFileName()
+    if fileName != -1:
+        file = open(fileName, "w")
+        file.write(povText)
+        file.close()
+
+def getFileName():
+    fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', '/home/otto/Dokumente', "PovRay Files (*.pov)")
+    if fileName:
+        App.Console.PrintMessage(str(fileName[0]) + "\n\n")
+        return str(fileName[0])
+    else:
+        return -1
+
 
 main()
