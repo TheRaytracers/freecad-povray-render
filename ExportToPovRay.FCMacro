@@ -92,18 +92,12 @@ def createPovrayCode(fcObj): #returns the povray code for the object
 
         povBox = "box{ <"
         povBox += str(x1) + "," + str(y1) + "," + str(z1) + ">, <" + str(x2) + "," + str(y2) + "," + str(z2) + ">\n"
-        pigment = """
-                    pigment{ checker
-                        color rgb<1,1,1>
-                        color rgb<1,1,1>*0
-                        scale <1.0, 1.0, 1.0>
-                    }\n\n"""
-
+        
         rotate = "translate -<" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
         rotate += getRot(fcObj)
         rotate += "translate <" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
 
-        povBox += pigment
+        povBox += getPigment(fcObj)
         povBox += rotate
         povBox += "\n}\n\n"
         povCode = povBox
@@ -117,8 +111,8 @@ def createPovrayCode(fcObj): #returns the povray code for the object
 
         povSphere = "sphere{ <"
         povSphere += str(x) + "," + str(y) + "," + str(z) + "> " + str(radius)
-        pigment = "\npigment{color rgb<1,0.6,0>}\n"
-        povSphere += pigment
+        
+        povSphere += getPigment(fcObj)
         povSphere += "\n}"
         povCode = povSphere
 
@@ -127,7 +121,7 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povCut = "difference{"
         for child in childs:
             povCut += createPovrayCode(child)
-
+        povCut += getPigment(fcObj)
         povCut += "}"
         povCode = povCut
 
@@ -136,7 +130,7 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povFusion = "union{"
         for child in childs:
             povFusion += createPovrayCode(child)
-
+        povFusion += getPigment(fcObj)
         povFusion += "}"
         povCode = povFusion
 
@@ -145,7 +139,7 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povCommon = "intersection{"
         for child in childs:
             povCommon += createPovrayCode(child)
-
+        povCommon += getPigment(fcObj)
         povCommon += "}"
         povCode = povCommon
 
@@ -163,6 +157,11 @@ def getRot(fcObj):
     rotate = "\nrotate <" + str(rotX) + "," + str(rotY) + "," + str(rotZ) + ">\n"
 
     return rotate
+    
+def getPigment(fcObj):
+    appObject = FreeCADGui.ActiveDocument.getObject(fcObj.Name)
+    pigment = "\npigment{color rgb<" + str(appObject.ShapeColor[0]) + "," + str(appObject.ShapeColor[1]) + "," + str(appObject.ShapeColor[2]) +  ">}\n"
+    return pigment
 
 def writeFile(povText):
     fileName = getFileName()
