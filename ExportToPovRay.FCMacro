@@ -167,19 +167,24 @@ def createPovrayCode(fcObj): #returns the povray code for the object
 def getRot(fcObj):
     eulerRot = fcObj.Placement.Rotation.toEuler()
     App.Console.PrintMessage(str(eulerRot) + "\n")
-    eulerRot = [eulerRot[2], eulerRot[0], eulerRot[1]] #convert axis to povray axis
-    rotX = -eulerRot[0]
-    rotY = -eulerRot[1]
-    rotZ = -eulerRot[2]
-    App.Console.PrintMessage(str(rotX) + "\n" + str(rotY) + "\n" + str(rotZ) + "\n")
-
-    rotate = "\nrotate <" + str(rotX) + "," + str(rotY) + "," + str(rotZ) + ">\n"
-
+    rotate =""
+    if eulerRot[0] == 0 and eulerRot[1] == 0:
+        if eulerRot[2] != 0:
+            rotate += "\nrotate <0,0," + str(-eulerRot[2]) + ">\n"
+    else:
+        rotate = "\nrotate <0," + str(-eulerRot[0]) + ",0>\n"
+        rotate += "rotate <" + str(-eulerRot[1]) + ",0,0>\n"
+        rotate += "rotate <0,0," + str(-eulerRot[2]) + ">\n"
     return rotate
     
 def getPigment(fcObj):
     appObject = FreeCADGui.ActiveDocument.getObject(fcObj.Name)
-    pigment = "\npigment{color rgb<" + str(appObject.ShapeColor[0]) + "," + str(appObject.ShapeColor[1]) + "," + str(appObject.ShapeColor[2]) +  ">}\n"
+    transparency = ""
+    if appObject.Transparency != 0:
+        transparency += " filter " + str(appObject.Transparency / float(100))
+    pigment = "\npigment{color rgb<"
+    pigment += "{0:1.3f},{1:1.3f},{2:1.3f}".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
+    pigment += ">" + transparency + "}\n"
     return pigment
 
 def writeFile(povText):
