@@ -26,9 +26,10 @@ def main():
     lookat=position+vec*distance
 
     PovCam="camera {\n"
-    PovCam += "     location <" + str(position[0]) + "," + str(position[2]) + "," + str(position[1]) + ">\n"
+    PovCam += "     location <" + str(position[0]) + "," + str(position[2]) + "," + str(-position[1]) + ">\n"
     PovCam += "     look_at <" + str(lookat[0]) + "," + str(lookat[2]) + "," + str(lookat[1]) + ">\n"
     PovCam += "     angle 55\n"
+    PovCam += "     right  <-1.33,0,0>\n"
     PovCam += "    }\n"
     finalPovCode += PovCam
 
@@ -84,15 +85,15 @@ def createPovrayCode(fcObj): #returns the povray code for the object
 
     if fcObj.TypeId == "Part::Box": #Box
         x1 = fcObj.Placement.Base.x
-        z1 = fcObj.Placement.Base.y
-        y1 = fcObj.Placement.Base.z
+        z1 = fcObj.Placement.Base.z
+        y1 = fcObj.Placement.Base.y
         x2 = fcObj.Placement.Base.x + int(fcObj.Length)
-        z2 = fcObj.Placement.Base.y + int(fcObj.Width)
-        y2 = fcObj.Placement.Base.z + int(fcObj.Height)
+        y2 = fcObj.Placement.Base.y + int(fcObj.Width)
+        z2 = fcObj.Placement.Base.z + int(fcObj.Height)
 
         povBox = "box{ <"
         povBox += str(x1) + "," + str(y1) + "," + str(z1) + ">, <" + str(x2) + "," + str(y2) + "," + str(z2) + ">\n"
-        
+
         rotate = "translate -<" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
         rotate += getRot(fcObj)
         rotate += "translate <" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
@@ -105,13 +106,13 @@ def createPovrayCode(fcObj): #returns the povray code for the object
 
     elif fcObj.TypeId == "Part::Sphere": # Sphere
         x = fcObj.Placement.Base.x
-        z = fcObj.Placement.Base.y
-        y = fcObj.Placement.Base.z
+        y = fcObj.Placement.Base.y
+        z = fcObj.Placement.Base.z
         radius = int(fcObj.Radius)
 
         povSphere = "sphere{ <"
         povSphere += str(x) + "," + str(y) + "," + str(z) + "> " + str(radius)
-        
+
         povSphere += getPigment(fcObj)
         povSphere += "\n}"
         povCode = povSphere
@@ -123,8 +124,8 @@ def createPovrayCode(fcObj): #returns the povray code for the object
             povCut += createPovrayCode(child)
         povCut += getPigment(fcObj)
         x = fcObj.Placement.Base.x
-        z = fcObj.Placement.Base.y
-        y = fcObj.Placement.Base.z
+        y = fcObj.Placement.Base.y
+        z = fcObj.Placement.Base.z
         rotate = getRot(fcObj)
         rotate += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
         povCut += rotate
@@ -138,8 +139,8 @@ def createPovrayCode(fcObj): #returns the povray code for the object
             povFusion += createPovrayCode(child)
         povFusion += getPigment(fcObj)
         x = fcObj.Placement.Base.x
-        z = fcObj.Placement.Base.y
-        y = fcObj.Placement.Base.z
+        y = fcObj.Placement.Base.y
+        z = fcObj.Placement.Base.z
         rotate = getRot(fcObj)
         rotate += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
 
@@ -154,8 +155,8 @@ def createPovrayCode(fcObj): #returns the povray code for the object
             povCommon += createPovrayCode(child)
         povCommon += getPigment(fcObj)
         x = fcObj.Placement.Base.x
-        z = fcObj.Placement.Base.y
-        y = fcObj.Placement.Base.z
+        y = fcObj.Placement.Base.y
+        z = fcObj.Placement.Base.z
         rotate = getRot(fcObj)
         rotate += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
         povCommon += rotate
@@ -170,13 +171,13 @@ def getRot(fcObj):
     rotate =""
     if eulerRot[0] == 0 and eulerRot[1] == 0:
         if eulerRot[2] != 0:
-            rotate += "\nrotate <0,0," + str(-eulerRot[2]) + ">\n"
+            rotate += "\nrotate <0, " + str(-eulerRot[2]) + ", 0>\n"
     else:
-        rotate = "\nrotate <0," + str(-eulerRot[0]) + ",0>\n"
-        rotate += "rotate <" + str(-eulerRot[1]) + ",0,0>\n"
-        rotate += "rotate <0,0," + str(-eulerRot[2]) + ">\n"
+        rotate = "\nrotate <0, 0, " + str(-eulerRot[0]) + ">\n"
+        rotate += "rotate <" + str(-eulerRot[1]) + ", 0, 0>\n"
+        rotate += "rotate <0, " + str(-eulerRot[2]) + ", 0>\n"
     return rotate
-    
+
 def getPigment(fcObj):
     appObject = FreeCADGui.ActiveDocument.getObject(fcObj.Name)
     transparency = ""
