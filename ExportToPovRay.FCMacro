@@ -26,8 +26,8 @@ def main():
     lookat=position+vec*distance
 
     PovCam="camera {\n"
-    PovCam += "     location <" + str(position[0]) + "," + str(position[2]) + "," + str(-position[1]) + ">\n"
-    PovCam += "     look_at <" + str(lookat[0]) + "," + str(lookat[2]) + "," + str(lookat[1]) + ">\n"
+    PovCam += "     location <" + str(position[0]) + "," + str(position[1]) + "," + str(-position[2]) + ">\n"
+    PovCam += "     look_at <" + str(lookat[0]) + "," + str(lookat[1]) + "," + str(lookat[2]) + ">\n"
     PovCam += "     angle 55\n"
     PovCam += "     right  <-1.33,0,0>\n"
     PovCam += "    }\n"
