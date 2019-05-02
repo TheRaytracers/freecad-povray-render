@@ -1,6 +1,7 @@
 from PySide import QtGui
 from pivy import coin
 from FreeCAD import Base
+import os
 
 def main():
     firstLayer = []
@@ -79,6 +80,8 @@ def main():
     #App.Console.PrintMessage("\n\n" + str(firstLayer[0].TypeId) + "\n\n")
     App.Console.PrintMessage("\n\n" + finalPovCode)
     writeFile(finalPovCode)
+
+    App.Console.PrintMessage("Done")
 
 def createPovrayCode(fcObj): #returns the povray code for the object
     povCode = ""
@@ -194,6 +197,10 @@ def writeFile(povText):
         file = open(fileName, "w")
         file.write(povText)
         file.close()
+        openPovRay(fileName)
+
+def openPovRay(path):
+    os.system("povray " + path + " &")
 
 def getFileName():
     try:
