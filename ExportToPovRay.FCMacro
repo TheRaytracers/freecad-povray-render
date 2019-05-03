@@ -25,9 +25,21 @@ def main():
     distance=cam.focalDistance.getValue()
     vec=rotCamera.multVec(Base.Vector(0,0,-1))
     lookat=position+vec*distance
+    
+    view = Gui.ActiveDocument.ActiveView.viewPosition()
+    EulRot=view.Rotation.toEuler()
+    
+    
+    
 
     PovCam="camera {\n"
-    PovCam += "     location <" + str(position[0]) + "," + str(position[1]) + "," + str(-position[2]) + ">\n"
+    #PovCam += "     location <0, 0, 0>\n"
+    #PovCam += "     direction < 1, 0, 0>\n"
+    #PovCam += "     up    < 0, 1, 0>\n"
+    #PovCam += "     right   < 1, 0, 0>\n"
+    PovCam += "    location <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
+    #PovCam +=  "    rotate <" + str(EulRot[0]) + ", " + str(EulRot[1]) + ", " + str(EulRot[2]) + ">\n"
+    #PovCam += "     translate <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
     PovCam += "     look_at <" + str(lookat[0]) + "," + str(lookat[1]) + "," + str(lookat[2]) + ">\n"
     PovCam += "     angle 55\n"
     PovCam += "     right  <-1.33,0,0>\n"
@@ -94,18 +106,13 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         y2 = fcObj.Placement.Base.y + int(fcObj.Width)
         z2 = fcObj.Placement.Base.z + int(fcObj.Height)
 
-        povBox = "box{ <"
-        povBox += str(x1) + "," + str(y1) + "," + str(z1) + ">, <" + str(x2) + "," + str(y2) + "," + str(z2) + ">\n"
-
-        rotate = "translate -<" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
-        rotate += getRot(fcObj)
-        rotate += "translate <" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
-
+        povBox = "box{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">\n"
+        povBox += getRot(fcObj)
+        povBox += "translate <" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
         povBox += getPigment(fcObj)
-        povBox += rotate
         povBox += "\n}\n\n"
         povCode = povBox
-        #App.Console.PrintMessage(povBox)
+        
 
     elif fcObj.TypeId == "Part::Sphere": # Sphere
         x = fcObj.Placement.Base.x
@@ -170,15 +177,9 @@ def createPovrayCode(fcObj): #returns the povray code for the object
 
 def getRot(fcObj):
     eulerRot = fcObj.Placement.Rotation.toEuler()
-    App.Console.PrintMessage(str(eulerRot) + "\n")
     rotate =""
-    if eulerRot[0] == 0 and eulerRot[1] == 0:
-        if eulerRot[2] != 0:
-            rotate += "\nrotate <0, " + str(-eulerRot[2]) + ", 0>\n"
-    else:
-        rotate = "\nrotate <0, 0, " + str(-eulerRot[0]) + ">\n"
-        rotate += "rotate <" + str(-eulerRot[1]) + ", 0, 0>\n"
-        rotate += "rotate <0, " + str(-eulerRot[2]) + ", 0>\n"
+    if eulerRot[0] != 0 or eulerRot[1] != 0 or eulerRot[2] != 0:
+        rotate = "\nrotate <" + str(eulerRot[0]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[2]) + ">\n"
     return rotate
 
 def getPigment(fcObj):
