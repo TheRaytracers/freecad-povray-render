@@ -25,12 +25,12 @@ def main():
     distance=cam.focalDistance.getValue()
     vec=rotCamera.multVec(Base.Vector(0,0,-1))
     lookat=position+vec*distance
-    
+
     view = Gui.ActiveDocument.ActiveView.viewPosition()
     EulRot=view.Rotation.toEuler()
-    
-    
-    
+
+
+
 
     PovCam="camera {\n"
     #PovCam += "     location <0, 0, 0>\n"
@@ -112,7 +112,7 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povBox += getPigment(fcObj)
         povBox += "\n}\n\n"
         povCode = povBox
-        
+
 
     elif fcObj.TypeId == "Part::Sphere": # Sphere
         x = fcObj.Placement.Base.x
@@ -202,6 +202,7 @@ def writeFile(povText):
 
 def openPovRay(path):
     os.system("povray " + path + " &")
+    os.system("xviewer " + path + " &")
 
 def getFileName():
     try:
