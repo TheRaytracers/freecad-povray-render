@@ -183,7 +183,7 @@ def getRot(fcObj):
     eulerRot = fcObj.Placement.Rotation.toEuler()
     rotate =""
     if eulerRot[0] != 0 or eulerRot[1] != 0 or eulerRot[2] != 0:
-        rotate = "\nrotate <" + str(eulerRot[0]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[2]) + ">\n"
+        rotate = "\nrotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
     return rotate
 
 def getPigment(fcObj):
