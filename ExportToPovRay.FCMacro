@@ -8,16 +8,16 @@ def main():
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
 
-    finalPovCode = """
-    #version 3.6; // 3.7
-    global_settings{assumed_gamma 1.0}
-    #default{ finish{ ambient 0.1 diffuse 0.9 }}
-    //------------------------------------------
-    #include "colors.inc"
-    #include "textures.inc"
-    //------------------------------------------
-    // camera ----------------------------------
-    """
+    finalPovCode = """#version 3.6; // 3.7
+global_settings{assumed_gamma 1.0}
+#default{ finish{ ambient 0.1 diffuse 0.9 }}
+//------------------------------------------
+#include "colors.inc"
+#include "textures.inc"
+//------------------------------------------
+// camera ----------------------------------
+
+"""
 
     cam = FreeCADGui.ActiveDocument.ActiveView.getCameraNode()
     rotCamera=Base.Rotation(*cam.orientation.getValue().getValue())
@@ -33,39 +33,43 @@ def main():
 
 
     PovCam="camera {\n"
-    #PovCam += "     location <0, 0, 0>\n"
-    #PovCam += "     direction < 1, 0, 0>\n"
-    #PovCam += "     up    < 0, 1, 0>\n"
-    #PovCam += "     right   < 1, 0, 0>\n"
+    #PovCam += "    location <0, 0, 0>\n"
+    #PovCam += "    direction < 1, 0, 0>\n"
+    #PovCam += "    up    < 0, 1, 0>\n"
+    #PovCam += "    right   < 1, 0, 0>\n"
     PovCam += "    location <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
-    #PovCam +=  "    rotate <" + str(EulRot[0]) + ", " + str(EulRot[1]) + ", " + str(EulRot[2]) + ">\n"
-    #PovCam += "     translate <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
-    PovCam += "     look_at <" + str(lookat[0]) + "," + str(lookat[1]) + "," + str(lookat[2]) + ">\n"
-    PovCam += "     angle 55\n"
-    PovCam += "     right  <-1.33,0,0>\n"
-    PovCam += "    }\n"
+    #PovCam += "    rotate <" + str(EulRot[0]) + ", " + str(EulRot[1]) + ", " + str(EulRot[2]) + ">\n"
+    #PovCam += "    translate <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
+    PovCam += "    look_at <" + str(lookat[0]) + "," + str(lookat[1]) + "," + str(lookat[2]) + ">\n"
+    PovCam += "    angle 55\n"
+    PovCam += "    right  <-1.33,0,0>\n"
+    PovCam += "}\n"
     finalPovCode += PovCam
 
     finalPovCode += """
-    // sun -------------------------------------
-    light_source{<1500,3000,-2500> color White}
+// sun -------------------------------------
+light_source{<1500,3000,-2500> color White}
 
-    // background ------------------------------
-    sky_sphere {
-      pigment {
-        gradient y
-          color_map {
-            [ 0.5  color CornflowerBlue ]
-            [ 1.0  color MidnightBlue ]
-            }
-        scale 2
-        translate -1
+// background ------------------------------
+sky_sphere {
+  pigment {
+    gradient y
+      color_map {
+        [ 0.5  color CornflowerBlue ]
+        [ 1.0  color MidnightBlue ]
         }
-       emission rgb <0.8,0.8,1>
-      }
-    //------------------------------------------
-    // objects in scene ------------------------
-    """
+    scale 2
+    translate -1
+    }
+   emission rgb <0.8,0.8,1>
+  }
+//------------------------------------------
+
+
+// objects in scene ------------------------
+
+
+"""
 
     #print informations about the objects
     for obj in objs:
