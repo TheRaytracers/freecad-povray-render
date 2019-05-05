@@ -26,10 +26,7 @@ def main():
 
     view = Gui.ActiveDocument.ActiveView.viewPosition()
     EulRot=view.Rotation.toEuler()
-
-
-
-
+    
     PovCam="camera {\n"
     #PovCam += "    location <0, 0, 0>\n"
     #PovCam += "    direction < 1, 0, 0>\n"
@@ -205,8 +202,8 @@ def writeFile(povText):
         openPovRay(fileName)
 
 def openPovRay(path):
-    os.system("povray " + path + " &")
-    os.system("xviewer " + path + " &")
+    os.system("povray " + path + " +P &")
+    
 
 def getFileName():
     try:
