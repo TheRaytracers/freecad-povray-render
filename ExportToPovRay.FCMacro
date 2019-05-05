@@ -8,6 +8,7 @@ def main():
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
 
+
     finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.1 diffuse 0.9 }}\n"
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
@@ -20,18 +21,18 @@ def main():
     distance=cam.focalDistance.getValue()
     vec=rotCamera.multVec(Base.Vector(0,0,-1))
     lookat=position+vec*distance
-    
+
     view = Gui.ActiveDocument.ActiveView.viewPosition()
     EulRot=view.Rotation.toEuler()
-    
-    
-    
+
+
+
 
     PovCam="camera {\n"
-    #PovCam += "     location <0, 0, 0>\n"
-    #PovCam += "     direction < 1, 0, 0>\n"
-    #PovCam += "     up    < 0, 1, 0>\n"
-    #PovCam += "     right   < 1, 0, 0>\n"
+    #PovCam += "    location <0, 0, 0>\n"
+    #PovCam += "    direction < 1, 0, 0>\n"
+    #PovCam += "    up    < 0, 1, 0>\n"
+    #PovCam += "    right   < 1, 0, 0>\n"
     PovCam += "    location <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
     PovCam += "    sky <0,0,1>\n"
     #PovCam +=  "    rotate <" + str(EulRot[0]) + ", " + str(EulRot[1]) + ", " + str(EulRot[2]) + ">\n"
@@ -43,25 +44,29 @@ def main():
     finalPovCode += PovCam
 
     finalPovCode += """
-    // sun -------------------------------------
-    light_source{<1500,3000,-2500> color White}
+// sun -------------------------------------
+light_source{<1500,3000,-2500> color White}
 
-    // background ------------------------------
-    sky_sphere {
-      pigment {
-        gradient y
-          color_map {
-            [ 0.5  color CornflowerBlue ]
-            [ 1.0  color MidnightBlue ]
-            }
-        scale 2
-        translate -1
+// background ------------------------------
+sky_sphere {
+  pigment {
+    gradient y
+      color_map {
+        [ 0.5  color CornflowerBlue ]
+        [ 1.0  color MidnightBlue ]
         }
-       emission rgb <0.8,0.8,1>
-      }
-    //------------------------------------------
-    // objects in scene ------------------------
-    """
+    scale 2
+    translate -1
+    }
+   emission rgb <0.8,0.8,1>
+  }
+//------------------------------------------
+
+
+// objects in scene ------------------------
+
+
+"""
 
     #print informations about the objects
     for obj in objs:
@@ -108,7 +113,7 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povBox += getPigment(fcObj)
         povBox += "\n}\n\n"
         povCode = povBox
-        
+
 
     elif fcObj.TypeId == "Part::Sphere": # Sphere
         x = fcObj.Placement.Base.x
@@ -175,7 +180,7 @@ def getRot(fcObj):
     eulerRot = fcObj.Placement.Rotation.toEuler()
     rotate =""
     if eulerRot[0] != 0 or eulerRot[1] != 0 or eulerRot[2] != 0:
-        rotate = "\nrotate <" + str(eulerRot[0]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[2]) + ">\n"
+        rotate = "\nrotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
     return rotate
 
 def getPigment(fcObj):
@@ -198,6 +203,7 @@ def writeFile(povText):
 
 def openPovRay(path):
     os.system("povray " + path + " &")
+    os.system("xviewer " + path + " &")
 
 def getFileName():
     try:
