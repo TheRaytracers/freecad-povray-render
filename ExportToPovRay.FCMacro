@@ -8,16 +8,11 @@ def main():
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
 
-    finalPovCode = """
-    #version 3.6; // 3.7
-    global_settings{assumed_gamma 1.0}
-    #default{ finish{ ambient 0.1 diffuse 0.9 }}
-    //------------------------------------------
-    #include "colors.inc"
-    #include "textures.inc"
-    //------------------------------------------
-    // camera ----------------------------------
-    """
+    finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.1 diffuse 0.9 }}\n"
+    finalPovCode += "//------------------------------------------\n"
+    finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
+    finalPovCode += "//------------------------------------------\n"
+    finalPovCode += "// camera ----------------------------------\n"
 
     cam = FreeCADGui.ActiveDocument.ActiveView.getCameraNode()
     rotCamera=Base.Rotation(*cam.orientation.getValue().getValue())
@@ -38,6 +33,7 @@ def main():
     #PovCam += "     up    < 0, 1, 0>\n"
     #PovCam += "     right   < 1, 0, 0>\n"
     PovCam += "    location <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
+    PovCam += "    sky <0,0,1>\n"
     #PovCam +=  "    rotate <" + str(EulRot[0]) + ", " + str(EulRot[1]) + ", " + str(EulRot[2]) + ">\n"
     #PovCam += "     translate <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
     PovCam += "     look_at <" + str(lookat[0]) + "," + str(lookat[1]) + "," + str(lookat[2]) + ">\n"
