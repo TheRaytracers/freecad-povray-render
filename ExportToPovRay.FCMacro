@@ -13,7 +13,16 @@ def main():
     finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.1 diffuse 0.9 }}\n"
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
-    finalPovCode += "#include \"userChanges.inc\"\n"
+
+    fileName = getFileName(True)
+    if fileName != -1:
+        file = open(fileName, "r")
+        incContent = file.read()
+        App.Console.PrintMessage(incContent)
+        finalPovCode += "\n#include \"" + fileName + "\"\n"
+    else:
+        incContent = ""
+
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "// camera ----------------------------------\n"
 
@@ -89,7 +98,7 @@ sky_sphere {
 
     #create the povray code
     for obj in firstLayer:
-        finalPovCode += createPovrayCode(obj)
+        finalPovCode += createPovrayCode(obj, incContent)
 
     #App.Console.PrintMessage("\n\n" + str(firstLayer[0].TypeId) + "\n\n")
     App.Console.PrintMessage("\n\n" + finalPovCode)
@@ -97,13 +106,8 @@ sky_sphere {
 
     App.Console.PrintMessage("Done")
 
-def createPovrayCode(fcObj): #returns the povray code for the object
+def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     povCode = ""
-    fileName = getFileName(True)
-    if fileName != -1:
-        file = open(fileName, "r")
-        incContent = file.read()
-        App.Console.PrintMessage(incContent)
 
     if fcObj.TypeId == "Part::Box": #Box
         x1 = fcObj.Placement.Base.x
@@ -134,16 +138,25 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povSphere = "sphere{ <"
         povSphere += str(x) + "," + str(y) + "," + str(z) + "> " + str(radius)
 
-        povSphere += getPigment(fcObj)
+        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
+            povSphere += getPigment(fcObj)
+        else:
+            povSphere += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
         povSphere += "\n}"
+
         povCode = povSphere
 
     elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
         povCut = "difference{"
         for child in childs:
-            povCut += createPovrayCode(child)
-        povCut += getPigment(fcObj)
+            povCut += createPovrayCode(child, incContent)
+
+        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
+            povCut += getPigment(fcObj)
+        else:
+            povCut += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+
         x = fcObj.Placement.Base.x
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
@@ -157,8 +170,13 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         childs = fcObj.OutList
         povFusion = "union{"
         for child in childs:
-            povFusion += createPovrayCode(child)
-        povFusion += getPigment(fcObj)
+            povFusion += createPovrayCode(child, incContent)
+
+        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
+            povFusion += getPigment(fcObj)
+        else:
+            povFusion += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+
         x = fcObj.Placement.Base.x
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
@@ -173,8 +191,13 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         childs = fcObj.OutList
         povCommon = "intersection{"
         for child in childs:
-            povCommon += createPovrayCode(child)
-        povCommon += getPigment(fcObj)
+            povCommon += createPovrayCode(child, incContent)
+
+        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
+            povCommon += getPigment(fcObj)
+        else:
+            povCommon += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+
         x = fcObj.Placement.Base.x
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
