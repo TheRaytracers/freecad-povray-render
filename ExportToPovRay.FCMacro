@@ -13,6 +13,7 @@ def main():
     finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.1 diffuse 0.9 }}\n"
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
+    finalPovCode += "#include \"userChanges.inc\"\n"
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "// camera ----------------------------------\n"
 
@@ -26,7 +27,7 @@ def main():
 
     view = Gui.ActiveDocument.ActiveView.viewPosition()
     EulRot=view.Rotation.toEuler()
-    
+
     PovCam="camera {\n"
     #PovCam += "    location <0, 0, 0>\n"
     #PovCam += "    direction < 1, 0, 0>\n"
@@ -98,6 +99,11 @@ sky_sphere {
 
 def createPovrayCode(fcObj): #returns the povray code for the object
     povCode = ""
+    fileName = getFileName(True)
+    if fileName != -1:
+        file = open(fileName, "r")
+        incContent = file.read()
+        App.Console.PrintMessage(incContent)
 
     if fcObj.TypeId == "Part::Box": #Box
         x1 = fcObj.Placement.Base.x
@@ -110,7 +116,11 @@ def createPovrayCode(fcObj): #returns the povray code for the object
         povBox = "box{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">\n"
         povBox += getRot(fcObj)
         povBox += "translate <" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
-        povBox += getPigment(fcObj)
+        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
+            povBox += getPigment(fcObj)
+        else:
+            povBox += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+
         povBox += "\n}\n\n"
         povCode = povBox
 
@@ -203,9 +213,9 @@ def writeFile(povText):
 
 def openPovRay(path):
     os.system("povray " + path + " +P &")
-    
 
-def getFileName():
+
+def getFileName(inc = False):
     try:
         file = open("/home/otto/Downloads/povTest.pov", "w")
         defaultPath = "/home/otto/Downloads/povTest.pov"
@@ -219,8 +229,11 @@ def getFileName():
             defaultPath = "/home/"
     file.close()
 
+    if inc == True:
+        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.inc file', defaultPath, "PovRay Include Files (*.inc)")
+    else:
+        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
 
-    fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
     if fileName:
         App.Console.PrintMessage(str(fileName[0]) + "\n\n")
         return str(fileName[0])
