@@ -1,5 +1,5 @@
 from PySide import QtGui
-from pivy import coin
+#from pivy import coin
 from FreeCAD import Base
 import os
 
@@ -8,67 +8,61 @@ def main():
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
 
-
-
     finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.1 diffuse 0.9 }}\n"
     finalPovCode += "//------------------------------------------\n"
-    finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
-    finalPovCode += "//------------------------------------------\n"
     finalPovCode += "// camera ----------------------------------\n"
+    
+    CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
+    EulerCam = CamOri.toEuler()
 
-
-    cam = FreeCADGui.ActiveDocument.ActiveView.getCameraNode()
-    rotCamera=Base.Rotation(*cam.orientation.getValue().getValue())
-    position=Base.Vector(*cam.position.getValue().getValue())
-    distance=cam.focalDistance.getValue()
-    vec=rotCamera.multVec(Base.Vector(0,0,-1))
-    lookat=position+vec*distance
-
-    view = Gui.ActiveDocument.ActiveView.viewPosition()
-    EulRot=view.Rotation.toEuler()
+    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
     
     PovCam="camera {\n"
-    #PovCam += "    location <0, 0, 0>\n"
-    #PovCam += "    direction < 1, 0, 0>\n"
-    #PovCam += "    up    < 0, 1, 0>\n"
-    #PovCam += "    right   < 1, 0, 0>\n"
-    PovCam += "    location <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
-
-    PovCam += "    sky <0,0,1>\n"
-    #PovCam +=  "    rotate <" + str(EulRot[0]) + ", " + str(EulRot[1]) + ", " + str(EulRot[2]) + ">\n"
-    #PovCam += "     translate <" + str(position[0]) + ", " + str(position[1]) + ", " + str(position[2]) + ">\n"
-    PovCam += "     look_at <" + str(lookat[0]) + "," + str(lookat[1]) + "," + str(lookat[2]) + ">\n"
+    PovCam += "     location <0, 0, 0>\n"
+    PovCam += "     direction < 0, 1, 0>\n"
+    PovCam += "     up    < 0, 0, 1>\n"
+    PovCam += "     right   < 1.33, 0, 0>\n"
+    PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
+    PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
     PovCam += "     angle 55\n"
-    PovCam += "     right  <-1.33,0,0>\n"
     PovCam += "    }\n"
     finalPovCode += PovCam
 
-    finalPovCode += """
-// sun -------------------------------------
-light_source{<1500,3000,-2500> color White}
+    finalPovCode += "// sun -------------------------------------\n"
+    finalPovCode += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
+    
+    bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
+    bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
+    bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
+    bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
 
-// background ------------------------------
-sky_sphere {
-  pigment {
-    gradient y
-      color_map {
-        [ 0.5  color CornflowerBlue ]
-        [ 1.0  color MidnightBlue ]
-        }
-    scale 2
-    translate -1
-    }
-   emission rgb <0.8,0.8,1>
-  }
-//------------------------------------------
+    finalPovCode += "// background ------------------------------\n"
+    finalPovCode += "sky_sphere {\n  pigment {\n"
+    
+    if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
+        finalPovCode += " color rgb" + uintColorToRGB(bgColor1)
+        
+    elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):    
+        finalPovCode += "   gradient z\n"
+        finalPovCode += "   color_map {\n"
+        finalPovCode += "        [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+        finalPovCode += "        [ 0.20  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
+            finalPovCode += "        [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
+        finalPovCode += "        [ 0.60  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+        finalPovCode += "        [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+        finalPovCode += "       }\n"
+        finalPovCode += "   scale 2\n"
+        finalPovCode += "   translate -1\n"
+        finalPovCode += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
+        
+   
+    finalPovCode += "   }\n}\n"
+#   emission rgb <0.8,0.8,1>
+    finalPovCode += "//------------------------------------------\n"
+    finalPovCode += "// objects in scene ------------------------\n"
 
-
-// objects in scene ------------------------
-
-
-"""
-
-    #print informations about the objects
+#print informations about the objects
     for obj in objs:
         App.Console.PrintMessage(str(obj.TypeId) + " - ")
         App.Console.PrintMessage(str(obj.Name) + "\n")
@@ -192,6 +186,13 @@ def getPigment(fcObj):
     pigment += "{0:1.3f},{1:1.3f},{2:1.3f}".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
     pigment += ">" + transparency + "}\n"
     return pigment
+    
+def uintColorToRGB(uintColor):
+    Blue = (uintColor >> 8) & 255
+    Green = (uintColor >> 16) & 255
+    Red = (uintColor >> 24) & 255
+    rgbString = "<{0:1.3f},{1:1.3f},{2:1.3f}>".format(Red/float(256),Green/float(256),Blue/float(256))
+    return rgbString
 
 def writeFile(povText):
     fileName = getFileName()
