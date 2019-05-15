@@ -120,10 +120,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povBox = "box{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">\n"
         povBox += getRot(fcObj)
         povBox += "translate <" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
-        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
-            povBox += getPigment(fcObj)
-        else:
-            povBox += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+        povBox += getPigment(fcObj, incContent)
 
         povBox += "\n}\n\n"
         povCode = povBox
@@ -138,10 +135,8 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povSphere = "sphere{ <"
         povSphere += str(x) + "," + str(y) + "," + str(z) + "> " + str(radius)
 
-        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
-            povSphere += getPigment(fcObj)
-        else:
-            povSphere += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+        povSphere += getPigment(fcObj, incContent)
+
         povSphere += "\n}"
 
         povCode = povSphere
@@ -152,10 +147,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         for child in childs:
             povCut += createPovrayCode(child, incContent)
 
-        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
-            povCut += getPigment(fcObj)
-        else:
-            povCut += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+        povCut += getPigment(fcObj, incContent)
 
         x = fcObj.Placement.Base.x
         y = fcObj.Placement.Base.y
@@ -172,10 +164,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         for child in childs:
             povFusion += createPovrayCode(child, incContent)
 
-        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
-            povFusion += getPigment(fcObj)
-        else:
-            povFusion += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+        povFusion += getPigment(fcObj, incContent)
 
         x = fcObj.Placement.Base.x
         y = fcObj.Placement.Base.y
@@ -193,10 +182,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         for child in childs:
             povCommon += createPovrayCode(child, incContent)
 
-        if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
-            povCommon += getPigment(fcObj)
-        else:
-            povCommon += "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+        povCommon += getPigment(fcObj, incContent)
 
         x = fcObj.Placement.Base.x
         y = fcObj.Placement.Base.y
@@ -216,14 +202,19 @@ def getRot(fcObj):
         rotate = "\nrotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
     return rotate
 
-def getPigment(fcObj):
+def getPigment(fcObj, incContent):
     appObject = FreeCADGui.ActiveDocument.getObject(fcObj.Name)
-    transparency = ""
-    if appObject.Transparency != 0:
-        transparency += " filter " + str(appObject.Transparency / float(100))
-    pigment = "\npigment{color rgb<"
-    pigment += "{0:1.3f},{1:1.3f},{2:1.3f}".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
-    pigment += ">" + transparency + "}\n"
+
+    if incContent.find("#declare " + fcObj.Label + "_pigment") == -1:
+        transparency = ""
+        if appObject.Transparency != 0:
+            transparency += " filter " + str(appObject.Transparency / float(100))
+        pigment = "\npigment{color rgb<"
+        pigment += "{0:1.3f},{1:1.3f},{2:1.3f}".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
+        pigment += ">" + transparency + "}\n"
+    else:
+        pigment = "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
+
     return pigment
 
 def writeFile(povText):
