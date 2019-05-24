@@ -12,14 +12,16 @@ def main():
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
-    fileName = getFileName(True)
+    fileName = getFileName()
     if fileName != -1:
-        file = open(fileName, "r")
+        incPath = fileName.replace(".pov", ".inc")
+        file = open(incPath, "r")
         incContent = file.read()
         App.Console.PrintMessage(incContent)
-        finalPovCode += "\n#include \"" + fileName + "\"\n"
+        finalPovCode += "\n#include \"" + incPath + "\"\n"
     else:
-        incContent = ""
+        #incContent = ""
+        return 0
 
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "// camera ----------------------------------\n"
@@ -98,7 +100,7 @@ def main():
 
     #App.Console.PrintMessage("\n\n" + str(firstLayer[0].TypeId) + "\n\n")
     App.Console.PrintMessage("\n\n" + finalPovCode)
-    writeFile(finalPovCode)
+    writeFile(finalPovCode, fileName)
 
     App.Console.PrintMessage("Done")
 
@@ -220,8 +222,7 @@ def uintColorToRGB(uintColor):
     rgbString = "<{0:1.3f},{1:1.3f},{2:1.3f}>".format(Red/float(256),Green/float(256),Blue/float(256))
     return rgbString
 
-def writeFile(povText):
-    fileName = getFileName()
+def writeFile(povText, fileName):
     if fileName != -1:
         file = open(fileName, "w")
         file.write(povText)
