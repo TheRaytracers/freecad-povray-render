@@ -14,15 +14,25 @@ def main():
 
     fileName = getFileName()
     if fileName != -1:
+        try:
+            file = open(fileName, "r")
+            file.close()
+        except:
+            return -1
+
         incPath = fileName.replace(".pov", ".inc")
-        file = open(incPath, "r")
-        incContent = file.read()
-        file.close()
+
+        try:
+            file = open(incPath, "r")
+            incContent = file.read()
+            file.close()
+        except:
+            incContent = ""
+
         App.Console.PrintMessage(incContent)
         finalPovCode += "\n#include \"" + incPath + "\"\n"
     else:
-        #incContent = ""
-        return 0
+        return -1
 
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "// camera ----------------------------------\n"
@@ -224,11 +234,13 @@ def uintColorToRGB(uintColor):
     return rgbString
 
 def writeFile(povText, fileName):
-    if fileName != -1:
+    try:
         file = open(fileName, "w")
         file.write(povText)
         file.close()
         openPovRay(fileName)
+    except:
+        return -1
 
 def openPovRay(path):
     os.system("povray " + path + " +P &")
