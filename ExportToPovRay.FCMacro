@@ -17,6 +17,7 @@ def main():
         incPath = fileName.replace(".pov", ".inc")
         file = open(incPath, "r")
         incContent = file.read()
+        file.close()
         App.Console.PrintMessage(incContent)
         finalPovCode += "\n#include \"" + incPath + "\"\n"
     else:
