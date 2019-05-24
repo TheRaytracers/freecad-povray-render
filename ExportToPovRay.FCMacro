@@ -26,11 +26,11 @@ def main():
             file = open(incPath, "r")
             incContent = file.read()
             file.close()
+            finalPovCode += "\n#include \"" + incPath + "\"\n"
         except:
             incContent = ""
 
         App.Console.PrintMessage(incContent)
-        finalPovCode += "\n#include \"" + incPath + "\"\n"
     else:
         return -1
 
