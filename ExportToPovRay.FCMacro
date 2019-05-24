@@ -233,7 +233,7 @@ def openPovRay(path):
     os.system("povray " + path + " +P &")
 
 
-def getFileName(inc = False):
+def getFileName():
     try:
         file = open("/home/otto/Downloads/povTest.pov", "w")
         defaultPath = "/home/otto/Downloads/povTest.pov"
@@ -247,10 +247,7 @@ def getFileName(inc = False):
             defaultPath = "/home/"
     file.close()
 
-    if inc == True:
-        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.inc file', defaultPath, "PovRay Include Files (*.inc)")
-    else:
-        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
+    fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
 
     if fileName:
         App.Console.PrintMessage(str(fileName[0]) + "\n\n")
