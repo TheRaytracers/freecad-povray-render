@@ -156,9 +156,9 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         z = fcObj.Placement.Base.z
 
         r1 = fcObj.Radius1.Value
-        c1 = "<" + str(x) + ", " + str(y) + ", " + str(z) + ">"
+        c1 = "<0, 0, 0>"
         r2 = fcObj.Radius2.Value
-        c2 = "<" + str(x) + ", " + str(y) + ", " + str(z + fcObj.Height.Value) + ">"
+        c2 = "<0, 0, " + str(fcObj.Height.Value) + ">"
 
         povCone = "cone {\n"
         povCone += c1 + ", " + str(r1) + "\n"
@@ -178,8 +178,8 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         z = fcObj.Placement.Base.z
 
         r = fcObj.Radius.Value
-        baseP = "<" + str(x) + ", " + str(y) + ", " + str(z) + ">"
-        CapP = "<" + str(x) + ", " + str(y) + ", " + str(z + fcObj.Height.Value) + ">"
+        baseP = "<0, 0, 0>"
+        CapP = "<0, 0, " + str(fcObj.Height.Value) + ">"
 
         povCylinder = "cylinder {\n"
         povCylinder += baseP + ", " + CapP + ", " + str(r) + "\n"
