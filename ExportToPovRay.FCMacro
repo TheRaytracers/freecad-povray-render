@@ -172,7 +172,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povCode += povCone
 
-    elif fcObj.TypeId == "Part::Cylinder":
+    elif fcObj.TypeId == "Part::Cylinder": #Cylinder
         x = fcObj.Placement.Base.x
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
@@ -191,6 +191,25 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povCylinder += "}\n"
 
         povCode += povCylinder
+
+    elif fcObj.TypeId == "Part::Torus": #Torus
+        x = fcObj.Placement.Base.x
+        y = fcObj.Placement.Base.y
+        z = fcObj.Placement.Base.z
+
+        r1 = fcObj.Radius1.Value
+        r2 = fcObj.Radius2.Value
+
+        povTorus = "torus {\n"
+        povTorus += str(r1) + ", " + str(r2) + "\n"
+
+        povTorus += getRot(fcObj)
+        povTorus += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
+        povTorus += getPigment(fcObj, incContent)
+
+        povTorus += "}\n"
+
+        povCode += povTorus
 
     elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
@@ -248,9 +267,13 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
 def getRot(fcObj):
     eulerRot = fcObj.Placement.Rotation.toEuler()
-    rotate =""
-    if eulerRot[0] != 0 or eulerRot[1] != 0 or eulerRot[2] != 0:
-        rotate = "\nrotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
+    rotate = ""
+    if fcObj.TypeId != "Part::Torus":
+        if eulerRot[0] != 0 or eulerRot[1] != 0 or eulerRot[2] != 0:
+            rotate = "\nrotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
+    else:
+        if eulerRot[0] != 0 or eulerRot[1] != 0 or (eulerRot[2] != 90 and eulerRot[2] != 89.99999999999999):
+            rotate = "\nrotate <" + str(eulerRot[2] + 90) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
     return rotate
 
 def getPigment(fcObj, incContent):
