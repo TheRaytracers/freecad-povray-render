@@ -141,14 +141,36 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         z = fcObj.Placement.Base.z
         radius = int(fcObj.Radius)
 
-        povSphere = "sphere{ <"
-        povSphere += str(x) + "," + str(y) + "," + str(z) + "> " + str(radius)
+        povSphere = "sphere { <"
+        povSphere += str(x) + ", " + str(y) + ", " + str(z) + "> " + str(radius)
 
         povSphere += getPigment(fcObj, incContent)
 
         povSphere += "\n}"
 
         povCode = povSphere
+
+    elif fcObj.TypeId == "Part::Cone": #Cone
+        x = fcObj.Placement.Base.x
+        y = fcObj.Placement.Base.y
+        z = fcObj.Placement.Base.z
+
+        r1 = fcObj.Radius1.Value
+        c1 = "<" + str(x) + ", " + str(y) + ", " + str(z) + ">"
+        r2 = fcObj.Radius2.Value
+        c2 = "<" + str(x) + ", " + str(y) + ", " + str(z + fcObj.Height.Value) + ">"
+
+        povCone = "cone {\n"
+        povCone += c1 + ", " + str(r1) + "\n"
+        povCone += c2 + ", " + str(r2) + "\n\n"
+
+        povCone += getRot(fcObj)
+        povCone += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
+        povCone += getPigment(fcObj, incContent)
+
+        povCone += "}\n"
+
+        povCode += povCone
 
     elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
