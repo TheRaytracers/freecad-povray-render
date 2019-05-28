@@ -1,9 +1,12 @@
 from PySide import QtGui
-#from pivy import coin
 from FreeCAD import Base
 import os
+from PySide import QtCore, QtGui
+
 
 def main():
+    showWarning("FreeCAD has a bug, so it can be, that some objects of your model has a false rotation!\nWe hope the FreeCAD team fix this bug soon.")
+
     firstLayer = []
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
@@ -310,7 +313,6 @@ def writeFile(povText, fileName):
 def openPovRay(path):
     os.system("povray " + path + " +P &")
 
-
 def getFileName():
     try:
         file = open("/home/otto/Downloads/povTest.pov", "w")
@@ -333,5 +335,10 @@ def getFileName():
     else:
         return -1
 
+def showWarning(msg):
+    # First argument is the icon used: QtGui.QMessageBox.{NoIcon, Information, Warning, Critical, Question}
+    dialog = QtGui.QMessageBox(QtGui.QMessageBox.Warning, "Warning", msg)
+    dialog.setWindowModality(QtCore.Qt.ApplicationModal)
+    dialog.exec_()
 
 main()
