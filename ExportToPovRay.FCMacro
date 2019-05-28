@@ -86,12 +86,15 @@ def main():
 
 
     finalPovCode += "   }\n}\n"
-#   emission rgb <0.8,0.8,1>
+    #emission rgb <0.8,0.8,1>
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "// objects in scene ------------------------\n"
 
-#print informations about the objects
+    noCSG = False
+    #print informations about the objects
     for obj in objs:
+        if obj.TypeId.find("Part::") == -1 :
+            noCSG = True
         App.Console.PrintMessage(str(obj.TypeId) + " - ")
         App.Console.PrintMessage(str(obj.Name) + "\n")
         for child in obj.OutList:
@@ -102,6 +105,9 @@ def main():
             App.Console.PrintMessage("Parent\n")
             App.Console.PrintMessage("   -" + str(parent.TypeId) + " - ")
             App.Console.PrintMessage("   -" + str(parent.Name) + "\n\n\n")
+
+    if noCSG == True:
+        showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
 
     #get the first layer
     for obj in objs:
