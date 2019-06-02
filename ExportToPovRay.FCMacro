@@ -23,7 +23,7 @@ def main():
         except:
             return -1
 
-        incPath = fileName.replace(".pov", ".inc")
+        incPath = fileName[:-3] + "inc"
 
         try:
             file = open(incPath, "r")
