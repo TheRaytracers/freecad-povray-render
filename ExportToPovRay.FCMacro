@@ -187,10 +187,10 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
 
-        r1 = fcObj.Radius1.Value
+        r1 = fcObj.Radius1.getValueAs("mm").Value
         c1 = "<0, 0, 0>"
-        r2 = fcObj.Radius2.Value
-        c2 = "<0, 0, " + str(fcObj.Height.Value) + ">"
+        r2 = fcObj.Radius2.getValueAs("mm").Value
+        c2 = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
 
         povCone = "cone {\n"
         povCone += c1 + ", " + str(r1) + "\n"
@@ -209,9 +209,9 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
 
-        r = fcObj.Radius.Value
+        r = fcObj.Radius.getValueAs("mm").Value
         baseP = "<0, 0, 0>"
-        CapP = "<0, 0, " + str(fcObj.Height.Value) + ">"
+        CapP = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
 
         povCylinder = "cylinder {\n"
         povCylinder += baseP + ", " + CapP + ", " + str(r) + "\n"
@@ -229,8 +229,8 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
 
-        r1 = fcObj.Radius1.Value
-        r2 = fcObj.Radius2.Value
+        r1 = fcObj.Radius1.getValueAs("mm").Value
+        r2 = fcObj.Radius2.getValueAs("mm").Value
 
         povTorus = "torus {\n"
         povTorus += str(r1) + ", " + str(r2) + "\n"
