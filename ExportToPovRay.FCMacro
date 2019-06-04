@@ -91,7 +91,7 @@ def main():
     finalPovCode += "// objects in scene ------------------------\n"
 
     noCSG = False
-    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Cut", "Part::MultiFuse", "Part::MultiCommon"]
+    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Cut", "Part::MultiFuse", "Part::MultiCommon"]
     #print informations about the objects
     for obj in objs:
         if not obj.TypeId in supportedObjs :
@@ -123,7 +123,7 @@ def main():
     App.Console.PrintMessage("\n\n" + finalPovCode)
     writeFile(finalPovCode, fileName)
 
-    App.Console.PrintMessage("Done")
+    App.Console.PrintMessage("\n\n\nDone")
 
 def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     povCode = ""
@@ -160,6 +160,28 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povCode = povSphere
 
+    elif fcObj.TypeId == "Part::Ellipsoid": # Ellipsoid
+        x = fcObj.Placement.Base.x
+        y = fcObj.Placement.Base.y
+        z = fcObj.Placement.Base.z
+        r1 = fcObj.Radius1.getValueAs("mm").Value
+        r2 = fcObj.Radius2.getValueAs("mm").Value
+        r3 = fcObj.Radius3.getValueAs("mm").Value
+
+        povSphere = "sphere { <0, 0, 0> 1\n"
+
+        povSphere += "\nscale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n"
+
+        povSphere += getRot(fcObj)
+
+        povSphere += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">\n"
+
+        povSphere += getPigment(fcObj, incContent)
+
+        povSphere += "\n}"
+
+        povCode = povSphere
+
     elif fcObj.TypeId == "Part::Cone": #Cone
         x = fcObj.Placement.Base.x
         y = fcObj.Placement.Base.y
@@ -175,7 +197,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povCone += c2 + ", " + str(r2) + "\n\n"
 
         povCone += getRot(fcObj)
-        povCone += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
+        povCone += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">\n"
         povCone += getPigment(fcObj, incContent)
 
         povCone += "}\n"
@@ -195,7 +217,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povCylinder += baseP + ", " + CapP + ", " + str(r) + "\n"
 
         povCylinder += getRot(fcObj)
-        povCylinder += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
+        povCylinder += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">\n"
         povCylinder += getPigment(fcObj, incContent)
 
         povCylinder += "}\n"
@@ -214,7 +236,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povTorus += str(r1) + ", " + str(r2) + "\n"
 
         povTorus += getRot(fcObj)
-        povTorus += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
+        povTorus += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">\n"
         povTorus += getPigment(fcObj, incContent)
 
         povTorus += "}\n"
@@ -294,7 +316,7 @@ def getPigment(fcObj, incContent):
         if appObject.Transparency != 0:
             transparency += " filter " + str(appObject.Transparency / float(100))
         pigment = "\npigment{color rgb<"
-        pigment += "{0:1.3f},{1:1.3f},{2:1.3f}".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
+        pigment += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
         pigment += ">" + transparency + "}\n"
     else:
         pigment = "\npigment {\n" + fcObj.Label + "_pigment\n}\n"
