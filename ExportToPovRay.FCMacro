@@ -91,9 +91,10 @@ def main():
     finalPovCode += "// objects in scene ------------------------\n"
 
     noCSG = False
+    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Cut", "Part::MultiFuse", "Part::MultiCommon"]
     #print informations about the objects
     for obj in objs:
-        if obj.TypeId.find("Part::") == -1 :
+        if not obj.TypeId in supportedObjs :
             noCSG = True
         App.Console.PrintMessage(str(obj.TypeId) + " - ")
         App.Console.PrintMessage(str(obj.Name) + "\n")
