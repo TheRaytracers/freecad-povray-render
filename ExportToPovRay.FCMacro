@@ -209,7 +209,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povCode = povCommon
     else:
-        return povCone
+        return povCode
 
     povCode += "\n"
     rotation = getRot(fcObj)
