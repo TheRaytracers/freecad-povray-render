@@ -11,7 +11,7 @@ def main():
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
 
-    finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.1 diffuse 0.9 }}\n"
+    finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.2 diffuse 0.9 }}\n"
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
@@ -311,16 +311,42 @@ def getRot(fcObj):
 
 def getPigment(fcObj, incContent):
     appObject = FreeCADGui.ActiveDocument.getObject(fcObj.Name)
+    material = ""
     transparency = ""
+    finish = ""
+    ambient = ""
+    emission = ""
+    phong = ""
     if appObject.Transparency != 0:
         transparency += " filter " + str(appObject.Transparency / float(100))
     pigment = "\npigment{color rgb<"
     pigment += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
     pigment += ">" + transparency + "}\n"
+    material += pigment
+    if appObject.ShapeMaterial.AmbientColor != (0.20000000298023224,0.20000000298023224,0.20000000298023224,0):
+        ambient += "ambient rgb<"
+        ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.AmbientColor[0],appObject.ShapeMaterial.AmbientColor[1],appObject.ShapeMaterial.AmbientColor[2])
+        ambient += "> "
+    if appObject.ShapeMaterial.EmissiveColor != (0,0,0,0):
+        emission += "emission rgb<"
+        emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.EmissiveColor[0],appObject.ShapeMaterial.EmissiveColor[1],appObject.ShapeMaterial.EmissiveColor[2])
+        emission += "> "
+    if appObject.ShapeMaterial.SpecularColor != (0,0,0,0):
+        phong += "phong "
+        phong += "{0:1.2f}".format((appObject.ShapeMaterial.SpecularColor[0]+appObject.ShapeMaterial.SpecularColor[1]+appObject.ShapeMaterial.SpecularColor[2])/3)
+        phong += " phong_size "
+        phong += str(appObject.ShapeMaterial.Shininess * 50)
+        phong += " "
+    if ambient != "" or emission != "" or  phong != "":    
+        finish = "finish {"
+        finish += ambient
+        finish += emission
+        finish += phong
+        finish += "}\n"
+    material += finish
     if incContent.find("#declare " + fcObj.Label + "_material") != -1:
-        pigment = "\nmaterial {" + fcObj.Label + "_material}\n"
-
-    return pigment
+        material = "\nmaterial {" + fcObj.Label + "_material}\n"
+    return material
 
 def uintColorToRGB(uintColor):
     Blue = (uintColor >> 8) & 255
