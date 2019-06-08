@@ -130,185 +130,105 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     povCode = ""
 
     if fcObj.TypeId == "Part::Box": #Box
-        x1 = fcObj.Placement.Base.x
-        z1 = fcObj.Placement.Base.z
-        y1 = fcObj.Placement.Base.y
-        x2 = fcObj.Placement.Base.x + int(fcObj.Length)
-        y2 = fcObj.Placement.Base.y + int(fcObj.Width)
-        z2 = fcObj.Placement.Base.z + int(fcObj.Height)
-
         povBox = "box{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">\n"
-        povBox += getRot(fcObj)
-        povBox += "translate <" + str(x1) + "," + str(y1) + "," + str(z1) + ">\n"
-        povBox += getPigment(fcObj, incContent)
-
-        povBox += "\n}\n\n"
         povCode = povBox
 
-
     elif fcObj.TypeId == "Part::Sphere": # Sphere
-        x = fcObj.Placement.Base.x
-        y = fcObj.Placement.Base.y
-        z = fcObj.Placement.Base.z
         radius = int(fcObj.Radius)
 
         povSphere = "sphere { <0, 0, 0> " + str(radius) + "\n"
 
-        povSphere += getRot(fcObj)
-        povSphere += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
-
-        povSphere += getPigment(fcObj, incContent)
-
-        povSphere += "\n}"
-
         povCode = povSphere
 
     elif fcObj.TypeId == "Part::Ellipsoid": # Ellipsoid
-        x = fcObj.Placement.Base.x
-        y = fcObj.Placement.Base.y
-        z = fcObj.Placement.Base.z
         r1 = fcObj.Radius1.getValueAs("mm").Value
         r2 = fcObj.Radius2.getValueAs("mm").Value
         r3 = fcObj.Radius3.getValueAs("mm").Value
 
         povSphere = "sphere { <0, 0, 0> 1\n"
 
-        povSphere += "\nscale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n"
-
-        povSphere += getRot(fcObj)
-
-        povSphere += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">\n"
-
-        povSphere += getPigment(fcObj, incContent)
-
-        povSphere += "\n}"
+        povSphere += "scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n\n"
 
         povCode = povSphere
 
     elif fcObj.TypeId == "Part::Cone": #Cone
-        x = fcObj.Placement.Base.x
-        y = fcObj.Placement.Base.y
-        z = fcObj.Placement.Base.z
-
         r1 = fcObj.Radius1.getValueAs("mm").Value
         c1 = "<0, 0, 0>"
         r2 = fcObj.Radius2.getValueAs("mm").Value
         c2 = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
 
-        povCone = "cone {\n"
+        povCone = "cone {"
         povCone += c1 + ", " + str(r1) + "\n"
         povCone += c2 + ", " + str(r2) + "\n\n"
-
-        povCone += getRot(fcObj)
-        povCone += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">\n"
-        povCone += getPigment(fcObj, incContent)
-
-        povCone += "}\n"
 
         povCode += povCone
 
     elif fcObj.TypeId == "Part::Cylinder": #Cylinder
-        x = fcObj.Placement.Base.x
-        y = fcObj.Placement.Base.y
-        z = fcObj.Placement.Base.z
-
         r = fcObj.Radius.getValueAs("mm").Value
         baseP = "<0, 0, 0>"
         CapP = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
 
-        povCylinder = "cylinder {\n"
+        povCylinder = "cylinder {"
         povCylinder += baseP + ", " + CapP + ", " + str(r) + "\n"
-
-        povCylinder += getRot(fcObj)
-        povCylinder += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">\n"
-        povCylinder += getPigment(fcObj, incContent)
-
-        povCylinder += "}\n"
 
         povCode += povCylinder
 
     elif fcObj.TypeId == "Part::Torus": #Torus
-        x = fcObj.Placement.Base.x
-        y = fcObj.Placement.Base.y
-        z = fcObj.Placement.Base.z
-
         r1 = fcObj.Radius1.getValueAs("mm").Value
         r2 = fcObj.Radius2.getValueAs("mm").Value
 
-        povTorus = "torus {\n"
+        povTorus = "torus {"
         povTorus += str(r1) + ", " + str(r2) + "\n"
-
-        povTorus += getRot(fcObj)
-        povTorus += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">\n"
-        povTorus += getPigment(fcObj, incContent)
-
-        povTorus += "}\n"
 
         povCode += povTorus
 
     elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
-        povCut = "difference{"
+        povCut = "difference {\n"
         for child in childs:
             povCut += createPovrayCode(child, incContent)
 
-        povCut += getPigment(fcObj, incContent)
-
-        x = fcObj.Placement.Base.x
-        y = fcObj.Placement.Base.y
-        z = fcObj.Placement.Base.z
-        rotate = getRot(fcObj)
-        rotate += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
-        povCut += rotate
-        povCut += "}"
         povCode = povCut
 
     elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse": #Fusion
         childs = fcObj.OutList
-        povFusion = "union{"
+        povFusion = "union {\n"
         for child in childs:
             povFusion += createPovrayCode(child, incContent)
 
-        povFusion += getPigment(fcObj, incContent)
-
-        x = fcObj.Placement.Base.x
-        y = fcObj.Placement.Base.y
-        z = fcObj.Placement.Base.z
-        rotate = getRot(fcObj)
-        rotate += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
-
-        povFusion += rotate
-        povFusion += "}"
         povCode = povFusion
 
     elif fcObj.TypeId == "Part::MultiCommon" or fcObj.TypeId == "Part::Common": #Common
         childs = fcObj.OutList
-        povCommon = "intersection{"
+        povCommon = "intersection {\n"
         for child in childs:
             povCommon += createPovrayCode(child, incContent)
 
-        povCommon += getPigment(fcObj, incContent)
-
-        x = fcObj.Placement.Base.x
-        y = fcObj.Placement.Base.y
-        z = fcObj.Placement.Base.z
-        rotate = getRot(fcObj)
-        rotate += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
-        povCommon += rotate
-        povCommon += "}"
         povCode = povCommon
 
+    povCode += getRot(fcObj) + "\n"
+    povCode += getTranslation(fcObj) + "\n"
+    povCode += getPigment(fcObj, incContent) + "\n"
+    povCode += "}\n\n"
     return povCode
+
+def getTranslation(fcObj):
+    x = fcObj.Placement.Base.x
+    y = fcObj.Placement.Base.y
+    z = fcObj.Placement.Base.z
+    translation = "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">"
+
+    return translation
 
 def getRot(fcObj):
     eulerRot = fcObj.Placement.Rotation.toEuler()
     rotate = ""
     if fcObj.TypeId != "Part::Torus":
         if eulerRot[0] != 0 or eulerRot[1] != 0 or eulerRot[2] != 0:
-            rotate = "\nrotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
+            rotate = "rotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">"
     else:
         if eulerRot[0] != 0 or eulerRot[1] != 0 or (eulerRot[2] != 90 and eulerRot[2] != 89.99999999999999):
-            rotate = "\nrotate <" + str(eulerRot[2] + 90) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
+            rotate = "rotate <" + str(eulerRot[2] + 90) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">"
     return rotate
 
 def getPigment(fcObj, incContent):
