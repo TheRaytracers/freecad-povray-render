@@ -152,8 +152,10 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         z = fcObj.Placement.Base.z
         radius = int(fcObj.Radius)
 
-        povSphere = "sphere { <"
-        povSphere += str(x) + ", " + str(y) + ", " + str(z) + "> " + str(radius)
+        povSphere = "sphere { <0, 0, 0> " + str(radius) + "\n"
+
+        povSphere += getRot(fcObj)
+        povSphere += "translate <" + str(x) + "," + str(y) + "," + str(z) + ">\n"
 
         povSphere += getPigment(fcObj, incContent)
 
@@ -337,7 +339,7 @@ def getPigment(fcObj, incContent):
         phong += " phong_size "
         phong += str(appObject.ShapeMaterial.Shininess * 50)
         phong += " "
-    if ambient != "" or emission != "" or  phong != "":    
+    if ambient != "" or emission != "" or  phong != "":
         finish = "finish {"
         finish += ambient
         finish += emission
