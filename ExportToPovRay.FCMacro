@@ -147,7 +147,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povSphere = "\nsphere { <0, 0, 0> 1\n"
 
-        povSphere += "scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n"
+        povSphere += "    scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n"
 
         povCode = povSphere
 
@@ -158,7 +158,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         c2 = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
 
         povCone = "\ncone { "
-        povCone += c1 + ", " + str(r1) + "\n"
+        povCone += c1 + ", " + str(r1) + "\n    "
         povCone += c2 + ", " + str(r2) + "\n"
 
         povCode += povCone
