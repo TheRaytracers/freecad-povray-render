@@ -130,13 +130,13 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     povCode = ""
 
     if fcObj.TypeId == "Part::Box": #Box
-        povBox = "box{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">\n"
+        povBox = "\nbox{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">\n"
         povCode = povBox
 
     elif fcObj.TypeId == "Part::Sphere": # Sphere
         radius = int(fcObj.Radius)
 
-        povSphere = "sphere { <0, 0, 0> " + str(radius) + "\n"
+        povSphere = "\nsphere { <0, 0, 0> " + str(radius) + "\n"
 
         povCode = povSphere
 
@@ -145,7 +145,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         r2 = fcObj.Radius2.getValueAs("mm").Value
         r3 = fcObj.Radius3.getValueAs("mm").Value
 
-        povSphere = "sphere { <0, 0, 0> 1\n"
+        povSphere = "\nsphere { <0, 0, 0> 1\n"
 
         povSphere += "scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n\n"
 
@@ -157,7 +157,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         r2 = fcObj.Radius2.getValueAs("mm").Value
         c2 = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
 
-        povCone = "cone {"
+        povCone = "\ncone {"
         povCone += c1 + ", " + str(r1) + "\n"
         povCone += c2 + ", " + str(r2) + "\n\n"
 
@@ -168,7 +168,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         baseP = "<0, 0, 0>"
         CapP = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
 
-        povCylinder = "cylinder {"
+        povCylinder = "\ncylinder {"
         povCylinder += baseP + ", " + CapP + ", " + str(r) + "\n"
 
         povCode += povCylinder
@@ -177,39 +177,42 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         r1 = fcObj.Radius1.getValueAs("mm").Value
         r2 = fcObj.Radius2.getValueAs("mm").Value
 
-        povTorus = "torus {"
+        povTorus = "\ntorus {"
         povTorus += str(r1) + ", " + str(r2) + "\n"
 
         povCode += povTorus
 
     elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
-        povCut = "difference {\n"
+        povCut = "\ndifference {\n"
         for child in childs:
-            povCut += createPovrayCode(child, incContent)
+            childCode = createPovrayCode(child, incContent)
+            povCut += childCode.replace("\n", "\n    ");
 
         povCode = povCut
 
     elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse": #Fusion
         childs = fcObj.OutList
-        povFusion = "union {\n"
+        povFusion = "\nunion {\n"
         for child in childs:
-            povFusion += createPovrayCode(child, incContent)
+            childCode = createPovrayCode(child, incContent)
+            povFusion += childCode.replace("\n", "\n    ");
 
         povCode = povFusion
 
     elif fcObj.TypeId == "Part::MultiCommon" or fcObj.TypeId == "Part::Common": #Common
         childs = fcObj.OutList
-        povCommon = "intersection {\n"
+        povCommon = "\nintersection {\n"
         for child in childs:
-            povCommon += createPovrayCode(child, incContent)
+            childCode = createPovrayCode(child, incContent)
+            povCommon += childCode.replace("\n", "\n    ");
 
         povCode = povCommon
 
-    povCode += getRot(fcObj) + "\n"
-    povCode += getTranslation(fcObj) + "\n"
-    povCode += getPigment(fcObj, incContent) + "\n"
-    povCode += "}\n\n"
+    povCode += "    " + getRot(fcObj) + "\n"
+    povCode += "    " + getTranslation(fcObj) + "\n"
+    povCode += "    " + getPigment(fcObj, incContent) + "\n"
+    povCode += "}\n"
     return povCode
 
 def getTranslation(fcObj):
@@ -225,10 +228,10 @@ def getRot(fcObj):
     rotate = ""
     if fcObj.TypeId != "Part::Torus":
         if eulerRot[0] != 0 or eulerRot[1] != 0 or eulerRot[2] != 0:
-            rotate = "rotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">"
+            rotate = "rotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
     else:
         if eulerRot[0] != 0 or eulerRot[1] != 0 or (eulerRot[2] != 90 and eulerRot[2] != 89.99999999999999):
-            rotate = "rotate <" + str(eulerRot[2] + 90) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">"
+            rotate = "rotate <" + str(eulerRot[2] + 90) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
     return rotate
 
 def getPigment(fcObj, incContent):
@@ -241,7 +244,7 @@ def getPigment(fcObj, incContent):
     phong = ""
     if appObject.Transparency != 0:
         transparency += " filter " + str(appObject.Transparency / float(100))
-    pigment = "\npigment{color rgb<"
+    pigment = "pigment{color rgb<"
     pigment += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
     pigment += ">" + transparency + "}\n"
     material += pigment
