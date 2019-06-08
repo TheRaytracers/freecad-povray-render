@@ -130,13 +130,13 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     povCode = ""
 
     if fcObj.TypeId == "Part::Box": #Box
-        povBox = "\nbox{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">\n"
+        povBox = "\nbox{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">"
         povCode = povBox
 
     elif fcObj.TypeId == "Part::Sphere": # Sphere
         radius = int(fcObj.Radius)
 
-        povSphere = "\nsphere { <0, 0, 0> " + str(radius) + "\n"
+        povSphere = "\nsphere { <0, 0, 0> " + str(radius)
 
         povCode = povSphere
 
@@ -147,7 +147,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povSphere = "\nsphere { <0, 0, 0> 1\n"
 
-        povSphere += "scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n\n"
+        povSphere += "scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n"
 
         povCode = povSphere
 
@@ -157,9 +157,9 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         r2 = fcObj.Radius2.getValueAs("mm").Value
         c2 = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
 
-        povCone = "\ncone {"
+        povCone = "\ncone { "
         povCone += c1 + ", " + str(r1) + "\n"
-        povCone += c2 + ", " + str(r2) + "\n\n"
+        povCone += c2 + ", " + str(r2) + "\n"
 
         povCode += povCone
 
@@ -168,8 +168,8 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         baseP = "<0, 0, 0>"
         CapP = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
 
-        povCylinder = "\ncylinder {"
-        povCylinder += baseP + ", " + CapP + ", " + str(r) + "\n"
+        povCylinder = "\ncylinder { "
+        povCylinder += baseP + ", " + CapP + ", " + str(r)
 
         povCode += povCylinder
 
@@ -177,8 +177,8 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         r1 = fcObj.Radius1.getValueAs("mm").Value
         r2 = fcObj.Radius2.getValueAs("mm").Value
 
-        povTorus = "\ntorus {"
-        povTorus += str(r1) + ", " + str(r2) + "\n"
+        povTorus = "\ntorus { "
+        povTorus += str(r1) + ", " + str(r2)
 
         povCode += povTorus
 
@@ -208,18 +208,29 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
             povCommon += childCode.replace("\n", "\n    ");
 
         povCode = povCommon
+    else:
+        return povCone
 
-    povCode += "    " + getRot(fcObj) + "\n"
-    povCode += "    " + getTranslation(fcObj) + "\n"
-    povCode += "    " + getPigment(fcObj, incContent) + "\n"
+    povCode += "\n"
+    rotation = getRot(fcObj)
+    if rotation != "":
+        povCode += "    " + rotation + "\n"
+
+    translation = getTranslation(fcObj)
+    if translation != "":
+        povCode += "    " + getTranslation(fcObj) + "\n"
+
+    povCode += "    " + getPigment(fcObj, incContent)
     povCode += "}\n"
     return povCode
 
 def getTranslation(fcObj):
+    translation = ""
     x = fcObj.Placement.Base.x
     y = fcObj.Placement.Base.y
     z = fcObj.Placement.Base.z
-    translation = "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">"
+    if x != 0 or y != 0 or z != 0:
+        translation += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">"
 
     return translation
 
@@ -228,10 +239,10 @@ def getRot(fcObj):
     rotate = ""
     if fcObj.TypeId != "Part::Torus":
         if eulerRot[0] != 0 or eulerRot[1] != 0 or eulerRot[2] != 0:
-            rotate = "rotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
+            rotate = "rotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">"
     else:
         if eulerRot[0] != 0 or eulerRot[1] != 0 or (eulerRot[2] != 90 and eulerRot[2] != 89.99999999999999):
-            rotate = "rotate <" + str(eulerRot[2] + 90) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">\n"
+            rotate = "rotate <" + str(eulerRot[2] + 90) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">"
     return rotate
 
 def getPigment(fcObj, incContent):
