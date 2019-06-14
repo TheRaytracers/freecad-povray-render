@@ -1,7 +1,7 @@
 # User Documentation
 ## Installation
 Download the macro here: [link]  
-Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Settings / General for your path. Under Linux you have often this path:  
+Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path. Under Linux you have often this path:  
 `/home/USERNAME/.FreeCAD/Macro/`  
 
 ## Use the Macro
@@ -54,8 +54,11 @@ Go to Macro/Macros… and start the installed macro by double clicking on it.
 
 The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sphere, cone, torus and ellipsoid
 
-### Draft
-Nothing
-
-### PartDesign Workbench
-Nothing
+### Other
+- [x] Color
+- [x] Background (you can change the background under Edit/Preferences/Display/Colors/Background Color)
+- [x] Transparency
+- [x] AmbientColor
+- [x] EmissiveColor
+- [x] SpecularColor
+- [x] Shininess

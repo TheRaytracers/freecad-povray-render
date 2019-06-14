@@ -1,15 +1,15 @@
 # Macro for exporting a FreeCAD model to POVray
 
 Das ExportToPovRay Makro soll möglichst alle soliden CSG Objekte aus
-der FreeCAD part workbench in eine entsprechende POVray
+der FreeCAD part Workbench in eine entsprechende POVray
 Szenenbeschreibung konvertieren. Dabei wird der Objektbaum mit seinen
 boolschen Operationen in der Povray Datei abgebildet.
 Der User soll anschießend die POVray Datei abändern können, so daß die
 umfangreichen Möglichkeiten von POVray für eine fotorealiste Darstellung
 genutzt werden können (Texturen, Lichteffekte u.ä.)
 Oberstes Prinzip ist dabei, die POVray Datei so übersichtlich zu halten,
-daß Objekte schnell auffindbar sind.
-Ein zweites wichtiges Prinzip ist "what you see is what you get"
+dass Objekte schnell auffindbar sind.
+Ein zweites wichtiges Prinzip ist "what you see is what you get".
 Das Renderergebnis sieht der jeweiligen Ansicht im FreeCAD Gui so
 ähnlich wie möglich (Kameraperspektive, Hintergrund, Objektfarben...).
 Da eine vollständige Übernahme aller FreeCAD Konstruktionsmöglichkeiten
