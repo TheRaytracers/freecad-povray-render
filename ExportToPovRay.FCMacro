@@ -21,9 +21,11 @@ def main():
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
     fileName = getFileName()
-    if fileName != -1:
+    App.Console.PrintMessage("\n" + fileName + "\n")
+
+    if fileName != -1 and fileName != "" and fileName != " ":
         try:
-            file = open(fileName, "r")
+            file = open(fileName, "w+")
             file.close()
         except:
             return -1
@@ -40,6 +42,7 @@ def main():
 
         App.Console.PrintMessage(incContent)
     else:
+        App.Console.PrintMessage("Canceled")
         return -1
 
     finalPovCode += "//------------------------------------------\n"
@@ -240,14 +243,18 @@ def getTranslation(fcObj):
     return translation
 
 def getRot(fcObj):
-    eulerRot = fcObj.Placement.Rotation.toEuler()
     rotate = ""
-    if fcObj.TypeId != "Part::Torus":
-        if eulerRot[0] != 0 or eulerRot[1] != 0 or eulerRot[2] != 0:
-            rotate = "rotate <" + str(eulerRot[2]) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">"
-    else:
-        if eulerRot[0] != 0 or eulerRot[1] != 0 or (eulerRot[2] != 90 and eulerRot[2] != 89.99999999999999):
-            rotate = "rotate <" + str(eulerRot[2] + 90) + ", " + str(eulerRot[1])+ ", "  + str(eulerRot[0]) + ">"
+    eulerRot = fcObj.Placement.Rotation.toEuler()
+    x = eulerRot[2]
+    y = eulerRot[1]
+    z = eulerRot[0]
+
+    if fcObj.TypeId == "Part::Torus":
+        x += 90
+
+    if x != 0 or y != 0 or z != 0:
+        rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">"
+
     return rotate
 
 def getPigment(fcObj, incContent):
@@ -299,7 +306,7 @@ def uintColorToRGB(uintColor):
 
 def writeFile(povText, fileName):
     try:
-        file = open(fileName, "w")
+        file = open(fileName, "w+")
         file.write(povText)
         file.close()
         openPovRay(fileName)
