@@ -14,9 +14,9 @@ def main():
     objs = doc.Objects
 
     finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.2 diffuse 0.9 }}\n"
-    
+
     finalPovCode += "#default{pigment{rgb "+ uintColorToRGB(DefaultShapeColor) + "}}\n"
-    
+
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
@@ -135,18 +135,18 @@ def main():
     App.Console.PrintMessage("\n\n\nDone")
 
 def createPovrayCode(fcObj, incContent): #returns the povray code for the object
-    povCode = ""
+    povCode = "\n//----- " + fcObj.Label + " -----"
 
     if fcObj.TypeId == "Part::Box": #Box
         povBox = "\nbox{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">"
-        povCode = povBox
+        povCode += povBox
 
     elif fcObj.TypeId == "Part::Sphere": # Sphere
         radius = int(fcObj.Radius)
 
         povSphere = "\nsphere { <0, 0, 0> " + str(radius)
 
-        povCode = povSphere
+        povCode += povSphere
 
     elif fcObj.TypeId == "Part::Ellipsoid": # Ellipsoid
         r1 = fcObj.Radius1.getValueAs("mm").Value
@@ -157,7 +157,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povSphere += "    scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n"
 
-        povCode = povSphere
+        povCode += povSphere
 
     elif fcObj.TypeId == "Part::Cone": #Cone
         r1 = fcObj.Radius1.getValueAs("mm").Value
@@ -197,7 +197,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
             childCode = createPovrayCode(child, incContent)
             povCut += childCode.replace("\n", "\n    ");
 
-        povCode = povCut
+        povCode += povCut
 
     elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse": #Fusion
         childs = fcObj.OutList
@@ -206,7 +206,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
             childCode = createPovrayCode(child, incContent)
             povFusion += childCode.replace("\n", "\n    ");
 
-        povCode = povFusion
+        povCode += povFusion
 
     elif fcObj.TypeId == "Part::MultiCommon" or fcObj.TypeId == "Part::Common": #Common
         childs = fcObj.OutList
@@ -215,9 +215,10 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
             childCode = createPovrayCode(child, incContent)
             povCommon += childCode.replace("\n", "\n    ");
 
-        povCode = povCommon
+        povCode += povCommon
+
     else:
-        return povCode
+        return ""
 
     povCode += "\n"
     rotation = getRot(fcObj)
@@ -228,7 +229,10 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     if translation != "":
         povCode += "    " + getTranslation(fcObj) + "\n"
 
-    povCode += "    " + getPigment(fcObj, incContent)
+    pigment = getPigment(fcObj, incContent)
+    if pigment != "":
+        povCode += "    " + pigment + "\n"
+
     povCode += "}\n"
     return povCode
 
