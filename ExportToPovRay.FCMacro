@@ -3,6 +3,8 @@ from FreeCAD import Base
 import os
 from PySide import QtCore, QtGui
 
+DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
+
 
 def main():
     showWarning("FreeCAD has a bug, so it can be, that some objects of your model has a false rotation!\nWe hope the FreeCAD team fix this bug soon.")
@@ -12,6 +14,9 @@ def main():
     objs = doc.Objects
 
     finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.2 diffuse 0.9 }}\n"
+    
+    finalPovCode += "#default{pigment{rgb "+ uintColorToRGB(DefaultShapeColor) + "}}\n"
+    
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
@@ -255,6 +260,7 @@ def getRot(fcObj):
 def getPigment(fcObj, incContent):
     appObject = FreeCADGui.ActiveDocument.getObject(fcObj.Name)
     material = ""
+    pigment = ""
     transparency = ""
     finish = ""
     ambient = ""
@@ -262,9 +268,9 @@ def getPigment(fcObj, incContent):
     phong = ""
     if appObject.Transparency != 0:
         transparency += " filter " + str(appObject.Transparency / float(100))
-    pigment = "pigment{color rgb<"
-    pigment += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
-    pigment += ">" + transparency + "}\n"
+    ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
+    if transparency != "" or ShapeColorRGB != uintColorToRGB(DefaultShapeColor):
+        pigment += "pigment{color rgb" + ShapeColorRGB + transparency + "}\n"
     material += pigment
     if appObject.ShapeMaterial.AmbientColor != (0.20000000298023224,0.20000000298023224,0.20000000298023224,0):
         ambient += "ambient rgb<"
@@ -295,7 +301,7 @@ def uintColorToRGB(uintColor):
     Blue = (uintColor >> 8) & 255
     Green = (uintColor >> 16) & 255
     Red = (uintColor >> 24) & 255
-    rgbString = "<{0:1.3f},{1:1.3f},{2:1.3f}>".format(Red/float(256),Green/float(256),Blue/float(256))
+    rgbString = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(Red/float(255),Green/float(255),Blue/float(255))
     return rgbString
 
 def writeFile(povText, fileName):
