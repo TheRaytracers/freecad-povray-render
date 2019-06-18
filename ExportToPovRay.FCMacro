@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from PySide import QtGui
 from FreeCAD import Base
 import os
@@ -5,7 +7,7 @@ from PySide import QtCore, QtGui
 
 DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
-def startExport(povPath):
+def startExport(povPath, width, height):
     showWarning("FreeCAD has a bug, so it can be, that some objects of your model has a false rotation!\nWe hope the FreeCAD team fix this bug soon.")
 
     firstLayer = []
@@ -131,6 +133,7 @@ def startExport(povPath):
     #App.Console.PrintMessage("\n\n" + str(firstLayer[0].TypeId) + "\n\n")
     App.Console.PrintMessage("\n\n" + finalPovCode)
     writeFile(finalPovCode, fileName)
+    openPovRay(fileName, width, height)
 
     App.Console.PrintMessage("\n\n\nDone")
 
@@ -313,12 +316,12 @@ def writeFile(povText, fileName):
         file = open(fileName, "w+")
         file.write(povText)
         file.close()
-        openPovRay(fileName)
     except:
         return -1
 
-def openPovRay(path):
-    os.system("povray " + path + " +P &")
+def openPovRay(path, width, height):
+    terminalInput = "povray " + str(path) + " +P Width=" + str(width) + " Height=" + str(height)
+    os.system(terminalInput)
 
 def getFileName():
     try:
@@ -356,6 +359,7 @@ class GUI(QtGui.QDialog):
     def initUI(self):
         self.setWindowTitle("Export to POVray")
 
+        #pov file selection
         self.pathLineEdit = QtGui.QLineEdit()
         self.pathLineEdit.setPlaceholderText("Path to .pov file")
         self.pathLineEdit.textChanged.connect(self.updatePovPath)
@@ -367,8 +371,30 @@ class GUI(QtGui.QDialog):
         self.horizLayout1.addWidget(self.pathLineEdit)
         self.horizLayout1.addWidget(self.openFileDialogButton)
 
-        self.pathGroup = QtGui.QGroupBox()
+        self.pathGroup = QtGui.QGroupBox(".pov File Selection")
         self.pathGroup.setLayout(self.horizLayout1)
+
+        #Width & Height of rendered image
+        self.imageWidthLabel = QtGui.QLabel("Width")
+        self.imageWidth = QtGui.QSpinBox()
+        self.imageWidth.setMinimum(1)
+        self.imageWidth.setMaximum(999999)
+        self.imageWidth.setSuffix(" px")
+        self.imageWidth.setValue(800)
+        self.imageHeightLabel = QtGui.QLabel("Height")
+        self.imageHeight = QtGui.QSpinBox()
+        self.imageHeight.setMinimum(1)
+        self.imageHeight.setMaximum(999999)
+        self.imageHeight.setSuffix(" px")
+        self.imageHeight.setValue(600)
+
+        self.vertLayout1 = QtGui.QVBoxLayout()
+        self.vertLayout1.addWidget(self.imageWidthLabel)
+        self.vertLayout1.addWidget(self.imageWidth)
+        self.vertLayout1.addWidget(self.imageHeightLabel)
+        self.vertLayout1.addWidget(self.imageHeight)
+        self.WHImageGroup = QtGui.QGroupBox("Width and Height of Image")
+        self.WHImageGroup.setLayout(self.vertLayout1)
 
         self.cancelButton = QtGui.QPushButton('Cancel')
         self.cancelButton.clicked.connect(self.onCancel)
@@ -379,6 +405,7 @@ class GUI(QtGui.QDialog):
 
         self.mainLayout = QtGui.QVBoxLayout()
         self.mainLayout.addWidget(self.pathGroup)
+        self.mainLayout.addWidget(self.WHImageGroup)
         self.mainLayout.addWidget(self.cancelButton)
         self.mainLayout.addWidget(self.okButton)
         self.setLayout(self.mainLayout)
@@ -404,7 +431,6 @@ class GUI(QtGui.QDialog):
     def updatePovPath(self):
         App.Console.PrintMessage("updatePovPath")
         self.povPath = self.pathLineEdit.text()
-
 
     def openFileDialog(self):
         try:
@@ -433,7 +459,7 @@ class GUI(QtGui.QDialog):
     def onOk(self):
         self.result = "OK"
         self.close()
-        startExport(self.povPath)
+        startExport(self.povPath, self.imageWidth.value(), self.imageHeight.value())
 
 dialog = GUI()
 dialog.exec_()
