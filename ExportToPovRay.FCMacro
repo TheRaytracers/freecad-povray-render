@@ -5,8 +5,7 @@ from PySide import QtCore, QtGui
 
 DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
-
-def main():
+def startExport(povPath):
     showWarning("FreeCAD has a bug, so it can be, that some objects of your model has a false rotation!\nWe hope the FreeCAD team fix this bug soon.")
 
     firstLayer = []
@@ -20,7 +19,8 @@ def main():
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
-    fileName = getFileName()
+    #fileName = getFileName()
+    fileName = povPath
     App.Console.PrintMessage("\n" + fileName + "\n")
 
     if fileName != -1 and fileName != "" and fileName != " ":
@@ -348,4 +348,92 @@ def showWarning(msg):
     dialog.setWindowModality(QtCore.Qt.ApplicationModal)
     dialog.exec_()
 
-main()
+class GUI(QtGui.QDialog):
+    def __init__(self):
+        super(GUI, self).__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle("Export to POVray")
+
+        self.pathLineEdit = QtGui.QLineEdit()
+        self.pathLineEdit.setPlaceholderText("Path to .pov file")
+        self.pathLineEdit.textChanged.connect(self.updatePovPath)
+
+        self.openFileDialogButton = QtGui.QPushButton('Open pov File')
+        self.openFileDialogButton.clicked.connect(self.openFileDialog)
+
+        self.horizLayout1 = QtGui.QHBoxLayout()
+        self.horizLayout1.addWidget(self.pathLineEdit)
+        self.horizLayout1.addWidget(self.openFileDialogButton)
+
+        self.pathGroup = QtGui.QGroupBox()
+        self.pathGroup.setLayout(self.horizLayout1)
+
+        self.cancelButton = QtGui.QPushButton('Cancel')
+        self.cancelButton.clicked.connect(self.onCancel)
+
+        self.okButton = QtGui.QPushButton('OK')
+        self.okButton.clicked.connect(self.onOk)
+        self.okButton.setAutoDefault(True)
+
+        self.mainLayout = QtGui.QVBoxLayout()
+        self.mainLayout.addWidget(self.pathGroup)
+        self.mainLayout.addWidget(self.cancelButton)
+        self.mainLayout.addWidget(self.okButton)
+        self.setLayout(self.mainLayout)
+
+        try:
+            file = open("/home/otto/Downloads/povTest.pov", "w")
+            defaultPath = "/home/otto/Downloads/povTest.pov"
+        except:
+            App.Console.PrintMessage("file: /home/otto/Downloads/povTest.pov - not found")
+            try:
+                file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
+                defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
+            except:
+                App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
+                defaultPath = "/home/"
+        file.close()
+        self.povPath = defaultPath
+        self.pathLineEdit.setText(self.povPath)
+
+
+        self.show()
+
+    def updatePovPath(self):
+        App.Console.PrintMessage("updatePovPath")
+        self.povPath = self.pathLineEdit.text()
+
+
+    def openFileDialog(self):
+        try:
+            file = open("/home/otto/Downloads/povTest.pov", "w")
+            defaultPath = "/home/otto/Downloads/povTest.pov"
+        except:
+            App.Console.PrintMessage("file: /home/otto/Downloads/povTest.pov - not found")
+            try:
+                file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
+                defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
+            except:
+                App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
+                defaultPath = "/home/"
+        file.close()
+
+        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
+
+        if fileName:
+            App.Console.PrintMessage(str(fileName[0]) + "\n\n")
+            self.povPath = str(fileName[0])
+
+    def onCancel(self):
+        self.result = "Canceled"
+        self.close()
+
+    def onOk(self):
+        self.result = "OK"
+        self.close()
+        startExport(self.povPath)
+
+dialog = GUI()
+dialog.exec_()
