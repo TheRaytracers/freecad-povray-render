@@ -349,19 +349,19 @@ def showWarning(msg):
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Warning, "Warning", msg)
     dialog.setWindowModality(QtCore.Qt.ApplicationModal)
     dialog.exec_()
-    
+
 def stringCorrection(inputString):
-    utfString=inputString.encode("utf8","replace")     # conversion from ??? to utf8
-    uniString=utfString.decode("utf8","replace")       # conversion from utf8 to unicode
-    uniString = uniString.replace(u"Ä","AE")           # replacement of german "Umlaute"
-    uniString = uniString.replace(u"ä","ae")
-    uniString = uniString.replace(u"Ü","UE")
-    uniString = uniString.replace(u"ü","ue")
-    uniString = uniString.replace(u"Ö","OE")
-    uniString = uniString.replace(u"ö","oe")
-    uniString = uniString.replace(u"ß","ss")
-    uniString = uniString.replace(" ","_")
-    outString=uniString.encode("ASCII","replace")      # conversio to ASCII for POV-Ray compatibility
+    utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
+    uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
+    uniString = uniString.replace(u"Ä", "AE")           # replacement of german "Umlaute"
+    uniString = uniString.replace(u"ä", "ae")
+    uniString = uniString.replace(u"Ü", "UE")
+    uniString = uniString.replace(u"ü", "ue")
+    uniString = uniString.replace(u"Ö", "OE")
+    uniString = uniString.replace(u"ö", "oe")
+    uniString = uniString.replace(u"ß", "ss")
+    uniString = uniString.replace(" ", "_")
+    outString = uniString.encode("ASCII", "replace")      # conversio to ASCII for POV-Ray compatibility
     return outString
 
 main()
