@@ -4,10 +4,11 @@ from PySide import QtGui
 from FreeCAD import Base
 import os
 from PySide import QtCore, QtGui
+import math
 
 DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
-def startExport(povPath, width, height):
+def startExport(povPath, width, height, repRot, expFcView):
     showWarning("FreeCAD has a bug, so it can be, that some objects of your model has a false rotation!\nWe hope the FreeCAD team fix this bug soon.")
 
     firstLayer = []
@@ -120,6 +121,14 @@ def startExport(povPath, width, height):
 
     if noCSG == True:
         showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
+
+    #repair rotation
+    if repRot:
+        repairRot(objs)
+
+    #export FreeCAD view
+    if expFcView:
+        exportFcView(fileName[:-4] + "_FC-View.png")
 
     #get the first layer
     for obj in objs:
@@ -351,6 +360,21 @@ def showWarning(msg):
     dialog.setWindowModality(QtCore.Qt.ApplicationModal)
     dialog.exec_()
 
+def repairRot(objs):
+    for obj in objs:
+        ObjLocation = obj.Placement
+        posX = ObjLocation.Base.x
+        posY = ObjLocation.Base.y
+        posZ = ObjLocation.Base.z
+        rotX = ObjLocation.Rotation.Axis[0]
+        rotY = ObjLocation.Rotation.Axis[1]
+        rotZ = ObjLocation.Rotation.Axis[2]
+        rotAngle = math.degrees(ObjLocation.Rotation.Angle)
+        obj.Placement = App.Placement(App.Vector(posX, posY, posZ), App.Rotation(App.Vector(rotX, rotY, rotZ), rotAngle), App.Vector(0, 0, 0))
+
+def exportFcView(path):
+    Gui.ActiveDocument.ActiveView.saveImage(path)
+
 class GUI(QtGui.QDialog):
     def __init__(self):
         super(GUI, self).__init__()
@@ -396,6 +420,16 @@ class GUI(QtGui.QDialog):
         self.WHImageGroup = QtGui.QGroupBox("Width and Height of Image")
         self.WHImageGroup.setLayout(self.vertLayout1)
 
+        #Options
+        self.repRot = QtGui.QCheckBox("Repair Rotation")
+        self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
+
+        self.vertLayout2 = QtGui.QVBoxLayout()
+        self.vertLayout2.addWidget(self.repRot)
+        self.vertLayout2.addWidget(self.expFcView)
+        self.optionGroups = QtGui.QGroupBox("Options")
+        self.optionGroups.setLayout(self.vertLayout2)
+
         self.cancelButton = QtGui.QPushButton('Cancel')
         self.cancelButton.clicked.connect(self.onCancel)
 
@@ -406,6 +440,7 @@ class GUI(QtGui.QDialog):
         self.mainLayout = QtGui.QVBoxLayout()
         self.mainLayout.addWidget(self.pathGroup)
         self.mainLayout.addWidget(self.WHImageGroup)
+        self.mainLayout.addWidget(self.optionGroups)
         self.mainLayout.addWidget(self.cancelButton)
         self.mainLayout.addWidget(self.okButton)
         self.setLayout(self.mainLayout)
@@ -454,7 +489,7 @@ class GUI(QtGui.QDialog):
     def onOk(self):
         self.result = "OK"
         self.close()
-        startExport(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value())
+        startExport(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value(), self.repRot.isChecked(), self.expFcView.isChecked())
 
 dialog = GUI()
 dialog.exec_()
