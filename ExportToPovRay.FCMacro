@@ -466,8 +466,22 @@ class GUI(QtGui.QDialog):
         self.mainLayout.addWidget(self.optionGroups)
         self.mainLayout.addWidget(self.cancelButton)
         self.mainLayout.addWidget(self.okButton)
-        self.setLayout(self.mainLayout)
 
+        #create macro group
+        self.macroGroup = QtGui.QGroupBox("")
+        self.macroGroup.setLayout(self.mainLayout)
+
+        #crate help group
+        self.helpLabel = QtGui.QLabel("some help")
+
+        #create tabs
+        self.tabs = QtGui.QTabWidget(self)
+        self.tabs.addTab(self.macroGroup, "Macro")
+        self.tabs.addTab(self.helpLabel, "Help")
+
+        self.wrapLayout = QtGui.QVBoxLayout()
+        self.wrapLayout.addWidget(self.tabs)
+        self.setLayout(self.wrapLayout)
         self.show()
 
     def setDefaultValues(self):
