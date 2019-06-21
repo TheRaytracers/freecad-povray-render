@@ -4,11 +4,11 @@ from PySide import QtGui
 from FreeCAD import Base
 import os
 from PySide import QtCore, QtGui
+import math
 
 DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
-
-def main():
+def startExport(povPath, width, height, repRot, expFcView):
     showWarning("FreeCAD has a bug, so it can be, that some objects of your model has a false rotation!\nWe hope the FreeCAD team fix this bug soon.")
 
     firstLayer = []
@@ -22,7 +22,8 @@ def main():
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
-    fileName = getFileName()
+    #fileName = getFileName()
+    fileName = povPath
     App.Console.PrintMessage("\n" + fileName + "\n")
 
     if fileName != -1 and fileName != "" and fileName != " ":
@@ -121,6 +122,14 @@ def main():
     if noCSG == True:
         showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
 
+    #repair rotation
+    if repRot:
+        repairRot(objs)
+
+    #export FreeCAD view
+    if expFcView:
+        exportFcView(fileName[:-4] + "_FC-View.png")
+
     #get the first layer
     for obj in objs:
         if obj.InList == []: #no parents
@@ -133,6 +142,7 @@ def main():
     #App.Console.PrintMessage("\n\n" + str(firstLayer[0].TypeId) + "\n\n")
     App.Console.PrintMessage("\n\n" + finalPovCode)
     writeFile(finalPovCode, fileName)
+    openPovRay(fileName, width, height)
 
     App.Console.PrintMessage("\n\n\nDone")
 
@@ -315,12 +325,12 @@ def writeFile(povText, fileName):
         file = open(fileName, "w+")
         file.write(povText)
         file.close()
-        openPovRay(fileName)
     except:
         return -1
 
-def openPovRay(path):
-    os.system("povray " + path + " +P &")
+def openPovRay(path, width, height):
+    terminalInput = "povray " + str(path) + " +P Width=" + str(width) + " Height=" + str(height)
+    os.system(terminalInput)
 
 def getFileName():
     try:
@@ -364,4 +374,167 @@ def stringCorrection(inputString):
     outString = uniString.encode("ASCII", "replace")      # conversio to ASCII for POV-Ray compatibility
     return outString
 
-main()
+def repairRot(objs):
+    for obj in objs:
+        ObjLocation = obj.Placement
+        posX = ObjLocation.Base.x
+        posY = ObjLocation.Base.y
+        posZ = ObjLocation.Base.z
+        rotX = ObjLocation.Rotation.Axis[0]
+        rotY = ObjLocation.Rotation.Axis[1]
+        rotZ = ObjLocation.Rotation.Axis[2]
+        rotAngle = math.degrees(ObjLocation.Rotation.Angle)
+        obj.Placement = App.Placement(App.Vector(posX, posY, posZ), App.Rotation(App.Vector(rotX, rotY, rotZ), rotAngle), App.Vector(0, 0, 0))
+
+def exportFcView(path):
+    Gui.ActiveDocument.ActiveView.saveImage(path)
+
+def isAscii(string):
+    return all(ord(c) < 128 for c in string)
+
+class GUI(QtGui.QDialog):
+    def __init__(self):
+        super(GUI, self).__init__()
+        self.initUI()
+        self.setDefaultValues()
+
+    def initUI(self):
+        self.setWindowTitle("Export to POVray")
+
+        #pov file selection
+        self.pathLineEdit = QtGui.QLineEdit()
+        self.pathLineEdit.setPlaceholderText("Path to .pov file")
+        self.pathLineEdit.setFixedWidth(300)
+        self.pathLineEdit.textChanged.connect(self.checkPath)
+
+        self.openFileDialogButton = QtGui.QPushButton('Open pov File')
+        self.openFileDialogButton.clicked.connect(self.openFileDialog)
+
+        self.warnLabel = QtGui.QLabel("")
+        self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
+
+        self.horizLayout1 = QtGui.QGridLayout()
+        self.horizLayout1.addWidget(self.pathLineEdit, 0, 0)
+        self.horizLayout1.addWidget(self.openFileDialogButton, 0, 1)
+        self.horizLayout1.addWidget(self.warnLabel, 1, 0, 1, 2)
+
+        self.pathGroup = QtGui.QGroupBox(".pov File Selection")
+        self.pathGroup.setLayout(self.horizLayout1)
+
+        #Width & Height of rendered image
+        self.imageWidthLabel = QtGui.QLabel("Width")
+        self.imageWidth = QtGui.QSpinBox()
+        self.imageWidth.setMinimum(1)
+        self.imageWidth.setMaximum(999999)
+        self.imageWidth.setSuffix(" px")
+        self.imageWidth.setValue(800)
+        self.imageHeightLabel = QtGui.QLabel("Height")
+        self.imageHeight = QtGui.QSpinBox()
+        self.imageHeight.setMinimum(1)
+        self.imageHeight.setMaximum(999999)
+        self.imageHeight.setSuffix(" px")
+        self.imageHeight.setValue(600)
+
+        self.vertLayout1 = QtGui.QVBoxLayout()
+        self.vertLayout1.addWidget(self.imageWidthLabel)
+        self.vertLayout1.addWidget(self.imageWidth)
+        self.vertLayout1.addWidget(self.imageHeightLabel)
+        self.vertLayout1.addWidget(self.imageHeight)
+        self.WHImageGroup = QtGui.QGroupBox("Width and Height of Image")
+        self.WHImageGroup.setLayout(self.vertLayout1)
+
+        #Options
+        self.repRot = QtGui.QCheckBox("Repair Rotation")
+        self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
+
+        self.vertLayout2 = QtGui.QVBoxLayout()
+        self.vertLayout2.addWidget(self.repRot)
+        self.vertLayout2.addWidget(self.expFcView)
+        self.optionGroups = QtGui.QGroupBox("Options")
+        self.optionGroups.setLayout(self.vertLayout2)
+
+        self.cancelButton = QtGui.QPushButton('Cancel')
+        self.cancelButton.clicked.connect(self.onCancel)
+
+        self.okButton = QtGui.QPushButton('OK')
+        self.okButton.clicked.connect(self.onOk)
+        self.okButton.setAutoDefault(True)
+
+        self.mainLayout = QtGui.QVBoxLayout()
+        self.mainLayout.addWidget(self.pathGroup)
+        self.mainLayout.addWidget(self.WHImageGroup)
+        self.mainLayout.addWidget(self.optionGroups)
+        self.mainLayout.addWidget(self.cancelButton)
+        self.mainLayout.addWidget(self.okButton)
+
+        #create macro group
+        self.macroGroup = QtGui.QGroupBox("")
+        self.macroGroup.setLayout(self.mainLayout)
+
+        #crate help group
+        self.helpLabel = QtGui.QLabel("some help")
+
+        #create tabs
+        self.tabs = QtGui.QTabWidget(self)
+        self.tabs.addTab(self.macroGroup, "Macro")
+        self.tabs.addTab(self.helpLabel, "Help")
+
+        self.wrapLayout = QtGui.QVBoxLayout()
+        self.wrapLayout.addWidget(self.tabs)
+        self.setLayout(self.wrapLayout)
+        self.show()
+
+    def setDefaultValues(self):
+        try:
+            file = open("/home/otto/Downloads/povTest.pov", "w")
+            defaultPath = "/home/otto/Downloads/povTest.pov"
+        except:
+            App.Console.PrintMessage("file: /home/otto/Downloads/povTest.pov - not found")
+            try:
+                file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
+                defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
+            except:
+                App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
+                defaultPath = "/home/"
+        file.close()
+        self.pathLineEdit.setText(defaultPath)
+
+    def openFileDialog(self):
+        try:
+            file = open("/home/otto/Downloads/povTest.pov", "w")
+            defaultPath = "/home/otto/Downloads/povTest.pov"
+        except:
+            App.Console.PrintMessage("file: /home/otto/Downloads/povTest.pov - not found")
+            try:
+                file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
+                defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
+            except:
+                App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
+                defaultPath = "/home/"
+        file.close()
+
+        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
+
+        if fileName:
+            App.Console.PrintMessage(str(fileName[0]) + "\n\n")
+            self.pathLineEdit.setText(str(fileName[0]))
+
+    def checkPath(self, path):
+        if path.find(" ") == -1 and isAscii(path) == True:
+            self.okButton.setEnabled(True)
+            self.warnLabel.setText("")
+        else:
+            self.okButton.setEnabled(False)
+            self.warnLabel.setText("Your Path contains a space or a mutated vowel")
+
+    def onCancel(self):
+        self.result = "Canceled"
+        self.close()
+
+    def onOk(self):
+        self.result = "OK"
+        self.close()
+        startExport(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value(), self.repRot.isChecked(), self.expFcView.isChecked())
+
+dialog = GUI()
+dialog.exec_()
