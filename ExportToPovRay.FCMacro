@@ -359,7 +359,7 @@ def showWarning(msg):
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Warning, "Warning", msg)
     dialog.setWindowModality(QtCore.Qt.ApplicationModal)
     dialog.exec_()
-    
+
 def stringCorrection(inputString):
     utfString=inputString.encode("utf8","replace")     # conversion from ??? to utf8
     uniString=utfString.decode("utf8","replace")       # conversion from utf8 to unicode
@@ -389,6 +389,9 @@ def repairRot(objs):
 def exportFcView(path):
     Gui.ActiveDocument.ActiveView.saveImage(path)
 
+def isAscii(string):
+    return all(ord(c) < 128 for c in string)
+
 class GUI(QtGui.QDialog):
     def __init__(self):
         super(GUI, self).__init__()
@@ -401,13 +404,19 @@ class GUI(QtGui.QDialog):
         #pov file selection
         self.pathLineEdit = QtGui.QLineEdit()
         self.pathLineEdit.setPlaceholderText("Path to .pov file")
+        self.pathLineEdit.setFixedWidth(300)
+        self.pathLineEdit.textChanged.connect(self.checkPath)
 
         self.openFileDialogButton = QtGui.QPushButton('Open pov File')
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
 
-        self.horizLayout1 = QtGui.QHBoxLayout()
-        self.horizLayout1.addWidget(self.pathLineEdit)
-        self.horizLayout1.addWidget(self.openFileDialogButton)
+        self.warnLabel = QtGui.QLabel("")
+        self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
+
+        self.horizLayout1 = QtGui.QGridLayout()
+        self.horizLayout1.addWidget(self.pathLineEdit, 0, 0)
+        self.horizLayout1.addWidget(self.openFileDialogButton, 0, 1)
+        self.horizLayout1.addWidget(self.warnLabel, 1, 0, 1, 2)
 
         self.pathGroup = QtGui.QGroupBox(".pov File Selection")
         self.pathGroup.setLayout(self.horizLayout1)
@@ -495,6 +504,14 @@ class GUI(QtGui.QDialog):
         if fileName:
             App.Console.PrintMessage(str(fileName[0]) + "\n\n")
             self.pathLineEdit.setText(str(fileName[0]))
+
+    def checkPath(self, path):
+        if path.find(" ") == -1 and isAscii(path) == True:
+            self.okButton.setEnabled(True)
+            self.warnLabel.setText("")
+        else:
+            self.okButton.setEnabled(False)
+            self.warnLabel.setText("Your Path contains a space or a mutated vowel")
 
     def onCancel(self):
         self.result = "Canceled"
