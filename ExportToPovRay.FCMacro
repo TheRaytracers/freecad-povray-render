@@ -22,13 +22,14 @@ def startExport(povPath, width, height, repRot, expFcView):
 
     #fileName = getFileName()
     fileName = povPath
-    App.Console.PrintMessage("\n" + fileName + "\n")
 
     if fileName != -1 and fileName != "" and fileName != " ":
         try:
             file = open(fileName, "w+")
             file.close()
+            App.Console.PrintMessage("\n\nPath to pov File: " + fileName + "\n")
         except:
+            App.Console.PrintError("Can't open the pov file\n\n")
             return -1
 
         incPath = fileName[:-3] + "inc"
@@ -38,12 +39,11 @@ def startExport(povPath, width, height, repRot, expFcView):
             incContent = file.read()
             file.close()
             finalPovCode += "\n#include \"" + incPath + "\"\n"
+            App.Console.PrintMessage("Content of the inc file:\n" + incContent + "\n\n")
         except:
             incContent = ""
-
-        App.Console.PrintMessage(incContent)
     else:
-        App.Console.PrintMessage("Canceled")
+        App.Console.PrintMessage("\n\nCanceled\n\n")
         return -1
 
     finalPovCode += "//------------------------------------------\n"
@@ -103,6 +103,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     noCSG = False
     supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common"]
     #print informations about the objects
+    App.Console.PrintMessage("The object model:\n")
     for obj in objs:
         if not obj.TypeId in supportedObjs :
             noCSG = True
@@ -116,6 +117,8 @@ def startExport(povPath, width, height, repRot, expFcView):
             App.Console.PrintMessage("Parent\n")
             App.Console.PrintMessage("   -" + str(parent.TypeId) + " - ")
             App.Console.PrintMessage("   -" + str(parent.Name) + "\n\n\n")
+
+    App.Console.PrintMessage("\n\n")
 
     if noCSG == True:
         showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
@@ -137,12 +140,11 @@ def startExport(povPath, width, height, repRot, expFcView):
     for obj in firstLayer:
         finalPovCode += createPovrayCode(obj, incContent)
 
-    #App.Console.PrintMessage("\n\n" + str(firstLayer[0].TypeId) + "\n\n")
-    App.Console.PrintMessage("\n\n" + finalPovCode)
+    App.Console.PrintMessage("The final code for POVray:\n" + finalPovCode + "\n\n")
     writeFile(finalPovCode, fileName)
     openPovRay(fileName, width, height)
 
-    App.Console.PrintMessage("\n\n\nDone")
+    App.Console.PrintMessage("\nDone\n")
 
 def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     povCode = "\n//----- " + stringCorrection(fcObj.Label) + " -----"
@@ -487,12 +489,10 @@ class GUI(QtGui.QDialog):
             file = open("/home/otto/Downloads/povTest.pov", "w")
             defaultPath = "/home/otto/Downloads/povTest.pov"
         except:
-            App.Console.PrintMessage("file: /home/otto/Downloads/povTest.pov - not found")
             try:
                 file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
                 defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
             except:
-                App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
                 defaultPath = "/home/"
         file.close()
         self.pathLineEdit.setText(defaultPath)
@@ -515,22 +515,20 @@ class GUI(QtGui.QDialog):
             file = open("/home/otto/Downloads/povTest.pov", "w")
             defaultPath = "/home/otto/Downloads/povTest.pov"
         except:
-            App.Console.PrintMessage("file: /home/otto/Downloads/povTest.pov - not found")
             try:
                 file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
                 defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
             except:
-                App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
                 defaultPath = "/home/"
         file.close()
 
         fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
 
         if fileName:
-            App.Console.PrintMessage(str(fileName[0]) + "\n\n")
             self.pathLineEdit.setText(str(fileName[0]))
 
     def checkPath(self, path):
+        #App.Console.PrintWarning(path)
         if path.find(" ") == -1 and isAscii(path) == True:
             self.okButton.setEnabled(True)
             self.warnLabel.setText("")
@@ -541,6 +539,7 @@ class GUI(QtGui.QDialog):
     def onCancel(self):
         self.result = "Canceled"
         self.close()
+        App.PrintMessage("\n\nCanceled\n\n")
 
     def onOk(self):
         self.result = "OK"
