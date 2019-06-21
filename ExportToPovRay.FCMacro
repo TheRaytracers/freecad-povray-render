@@ -9,8 +9,6 @@ import math
 DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
 def startExport(povPath, width, height, repRot, expFcView):
-    showWarning("FreeCAD has a bug, so it can be, that some objects of your model has a false rotation!\nWe hope the FreeCAD team fix this bug soon.")
-
     firstLayer = []
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
@@ -472,7 +470,7 @@ class GUI(QtGui.QDialog):
         self.macroGroup.setLayout(self.mainLayout)
 
         #crate help group
-        self.helpLabel = QtGui.QLabel("some help")
+        self.helpLabel = QtGui.QLabel("")
 
         #create tabs
         self.tabs = QtGui.QTabWidget(self)
@@ -498,6 +496,19 @@ class GUI(QtGui.QDialog):
                 defaultPath = "/home/"
         file.close()
         self.pathLineEdit.setText(defaultPath)
+
+        helpText = """<h3>Pov File Selection</h3>
+        Select the pov file by type the path into the text field or click on the 'Open pov File' button and select the name of the pov file
+        <h3>Width and Height of the Image</h3>
+        Select the width and height of the rendered image in pixels
+        <h3>Options</h3>
+        <h5>Repair Rotation</h5>
+        FreeCAD has a bug, so it can be, that some objects of your model has a false rotation!\nWe hope the FreeCAD team fix this bug soon.
+        <h5>Export FreeCAD View</h5>
+        Export the current view in FreeCAD like with Tools/Save Picture…
+        <br><br><br>
+        For more information look in our <a href='https://gitlab.com/usbhub/exporttopovray/blob/master/doc/index.md'>Wiki</a>"""
+        self.helpLabel.setText(helpText)
 
     def openFileDialog(self):
         try:
