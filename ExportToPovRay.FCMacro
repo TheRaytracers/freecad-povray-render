@@ -475,6 +475,27 @@ class GUI(QtGui.QDialog):
         file.close()
         self.pathLineEdit.setText(defaultPath)
 
+        #get saved input
+        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
+        settings.beginGroup("userInput")
+        path = settings.value("path", self.pathLineEdit.text())
+        width = settings.value("width", self.imageWidth.value())
+        height = settings.value("height", self.imageHeight.value())
+        repRot = settings.value("repRot", self.repRot.isChecked())
+        expFcView = settings.value("expFcView", self.expFcView.isChecked())
+        settings.endGroup()
+
+        if path is not None:
+            self.pathLineEdit.setText(path)
+        if width is not None:
+            self.imageWidth.setValue(width)
+        if height is not None:
+            self.imageHeight.setValue(height)
+        if repRot is not None and repRot == True:
+            self.repRot.setCheckState(QtCore.Qt.CheckState(2))
+        if expFcView is not None and expFcView == True:
+            self.expFcView.setCheckState(QtCore.Qt.CheckState(2))
+
         helpText = """<h3>Pov File Selection</h3>
         Select the pov file by type the path into the text field or click on the 'Open pov File' button and select the name of the pov file
         <h3>Width and Height of the Image</h3>
@@ -514,14 +535,26 @@ class GUI(QtGui.QDialog):
             self.okButton.setEnabled(False)
             self.warnLabel.setText("Your Path contains a space or a mutated vowel")
 
+    def saveInput(self):
+        App.Console.PrintWarning("save input")
+        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
+        settings.beginGroup("userInput")
+        settings.setValue("path", self.pathLineEdit.text())
+        settings.setValue("width", self.imageWidth.value())
+        settings.setValue("height", self.imageHeight.value())
+        settings.setValue("repRot", self.repRot.isChecked())
+        settings.setValue("expFcView", self.expFcView.isChecked())
+        settings.endGroup()
+
     def onCancel(self):
         self.result = "Canceled"
         self.close()
-        App.PrintMessage("\n\nCanceled\n\n")
+        App.Console.PrintMessage("\n\nCanceled\n\n")
 
     def onOk(self):
         self.result = "OK"
         self.close()
+        self.saveInput()
         startExport(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value(), self.repRot.isChecked(), self.expFcView.isChecked())
 
 dialog = GUI()
