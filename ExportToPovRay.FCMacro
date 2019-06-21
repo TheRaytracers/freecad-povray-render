@@ -355,6 +355,7 @@ class GUI(QtGui.QDialog):
     def __init__(self):
         super(GUI, self).__init__()
         self.initUI()
+        self.setDefaultValues()
 
     def initUI(self):
         self.setWindowTitle("Export to POVray")
@@ -409,6 +410,9 @@ class GUI(QtGui.QDialog):
         self.mainLayout.addWidget(self.okButton)
         self.setLayout(self.mainLayout)
 
+        self.show()
+
+    def setDefaultValues(self):
         try:
             file = open("/home/otto/Downloads/povTest.pov", "w")
             defaultPath = "/home/otto/Downloads/povTest.pov"
@@ -422,9 +426,6 @@ class GUI(QtGui.QDialog):
                 defaultPath = "/home/"
         file.close()
         self.pathLineEdit.setText(defaultPath)
-
-
-        self.show()
 
     def openFileDialog(self):
         try:
