@@ -362,7 +362,6 @@ class GUI(QtGui.QDialog):
         #pov file selection
         self.pathLineEdit = QtGui.QLineEdit()
         self.pathLineEdit.setPlaceholderText("Path to .pov file")
-        self.pathLineEdit.textChanged.connect(self.updatePovPath)
 
         self.openFileDialogButton = QtGui.QPushButton('Open pov File')
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
@@ -422,15 +421,10 @@ class GUI(QtGui.QDialog):
                 App.Console.PrintMessage("file: /home/andreas/FreeCAD-POV/povTest.pov - not found")
                 defaultPath = "/home/"
         file.close()
-        self.povPath = defaultPath
-        self.pathLineEdit.setText(self.povPath)
+        self.pathLineEdit.setText(defaultPath)
 
 
         self.show()
-
-    def updatePovPath(self):
-        App.Console.PrintMessage("updatePovPath")
-        self.povPath = self.pathLineEdit.text()
 
     def openFileDialog(self):
         try:
@@ -450,7 +444,7 @@ class GUI(QtGui.QDialog):
 
         if fileName:
             App.Console.PrintMessage(str(fileName[0]) + "\n\n")
-            self.povPath = str(fileName[0])
+            self.pathLineEdit.setText(str(fileName[0]))
 
     def onCancel(self):
         self.result = "Canceled"
@@ -459,7 +453,7 @@ class GUI(QtGui.QDialog):
     def onOk(self):
         self.result = "OK"
         self.close()
-        startExport(self.povPath, self.imageWidth.value(), self.imageHeight.value())
+        startExport(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value())
 
 dialog = GUI()
 dialog.exec_()
