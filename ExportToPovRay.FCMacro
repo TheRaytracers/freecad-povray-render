@@ -129,7 +129,7 @@ def startExport(povPath, width, height, repRot, expFcView):
 
     #export FreeCAD view
     if expFcView:
-        exportFcView(fileName[:-4] + "_FC-View.png")
+        exportFcView(fileName[:-4] + "_FC-View.png",width,height)
 
     #get the first layer
     for obj in objs:
@@ -364,8 +364,8 @@ def repairRot(objs):
         rotAngle = math.degrees(ObjLocation.Rotation.Angle)
         obj.Placement = App.Placement(App.Vector(posX, posY, posZ), App.Rotation(App.Vector(rotX, rotY, rotZ), rotAngle), App.Vector(0, 0, 0))
 
-def exportFcView(path):
-    Gui.ActiveDocument.ActiveView.saveImage(path)
+def exportFcView(path,width,height):
+    Gui.ActiveDocument.ActiveView.saveImage(path,width,height)
 
 def isAscii(string):
     return all(ord(c) < 128 for c in string)
