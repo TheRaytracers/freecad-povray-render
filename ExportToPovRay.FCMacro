@@ -341,7 +341,7 @@ def showWarning(msg):
 def stringCorrection(inputString):
     utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
     uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
-    uniString = uniString.replace(u"Ä", "AE")           # replacement of german "Umlaute"
+    uniString = uniString.replace(u"Ä", "AE")             # replacement of german "Umlaute"
     uniString = uniString.replace(u"ä", "ae")
     uniString = uniString.replace(u"Ü", "UE")
     uniString = uniString.replace(u"ü", "ue")
@@ -349,7 +349,7 @@ def stringCorrection(inputString):
     uniString = uniString.replace(u"ö", "oe")
     uniString = uniString.replace(u"ß", "ss")
     uniString = uniString.replace(" ", "_")
-    outString = uniString.encode("ASCII", "replace")      # conversio to ASCII for POV-Ray compatibility
+    outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
     return outString
 
 def repairRot(objs):
@@ -479,8 +479,8 @@ class GUI(QtGui.QDialog):
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
         settings.beginGroup("userInput")
         path = settings.value("path", self.pathLineEdit.text())
-        width = settings.value("width", self.imageWidth.value())
-        height = settings.value("height", self.imageHeight.value())
+        width = int(settings.value("width", self.imageWidth.value()))
+        height = int(settings.value("height", self.imageHeight.value()))
         repRot = settings.value("repRot", self.repRot.isChecked())
         expFcView = settings.value("expFcView", self.expFcView.isChecked())
         settings.endGroup()
