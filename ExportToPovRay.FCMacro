@@ -497,25 +497,29 @@ class GUI(QtGui.QDialog):
             self.expFcView.setCheckState(QtCore.Qt.CheckState(2))
 
         helpText = """
+        <style>
+        div { margin: 15;}
+        </style>
+        <div>
         <h3>General</h3>
-        This macro exports solid CSG primitives to POV-Ray.<br>
+        <p>This macro exports solid CSG primitives to POV-Ray.<br>
         The resulting POV code is readable and intended for further editing.<br>    
         You can add user defined material for each object in a <br>
-        seperate .inc file that won't be overwritten.
+        seperate .inc file that won't be overwritten.</p>
         <h3>Pov File Selection</h3>
-        Select the pov file by typing the path into the text field or choose a .pov file <br>
+        <p>Select the pov file by typing the path into the text field or choose a .pov file <br>
         with the 'Open pov File' button.<br>
-        Be careful not to use spaces or special chars in pathname for POV-Ray compatibility.
+        Be careful not to use spaces or special chars in pathname for POV-Ray compatibility.</p>
         <h3>Width and Height of the Image</h3>
-        Select the width and height in pixels of the image to be rendered with POV-Ray.
+        <p>Select the width and height in pixels of the image to be rendered with POV-Ray.</p>
         <h3>Options</h3>
         <h5>Repair Rotation</h5>
-        Use this option if objects in your scene appear in a wrong rotation.<br>
-        This is a workaround for a FreeCAD bug.
+        <p>Use this option if objects in your scene appear in a wrong rotation.<br>
+        This is a workaround for a FreeCAD bug.</p>
         <h5>Export FreeCAD View</h5>
-        Export the current FreeCAD view in the same size as the image rendered by POV-Ray
-        <br><br><br>
-        For more information look in our <a href='https://gitlab.com/usbhub/exporttopovray/blob/master/doc/index.md'>Wiki</a>"""
+        <p>Export the current FreeCAD view in the same size as the image rendered by POV-Ray<br></p>
+        <p>For more information look in our <a href='https://gitlab.com/usbhub/exporttopovray/blob/master/doc/index.md'>Wiki</a></p>
+        </div>"""
         self.helpLabel.setText(helpText)
 
     def openFileDialog(self):
