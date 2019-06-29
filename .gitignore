@@ -3,5 +3,5 @@
 !.gitignore
 !README.md
 !CSG FreeCAD POVray.ods
-!doc/*
-!Examples/*
+!doc/**
+!Examples/**
