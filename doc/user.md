@@ -1,6 +1,6 @@
 # User Documentation
 ## Installation
-Download the macro here: [link]  
+Download the macro here: [link] or install it via the addon manager  
 Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path. Under Linux you have often this path:  
 `/home/USERNAME/.FreeCAD/Macro/`  
 
@@ -35,6 +35,9 @@ If you want to change the texture of `Box001` to `White_Marble` you have to add 
   }
 }
 ```
+
+### Add objects
+If you want to add POVray objects (e.g. a second lamp or a super torus) you can do this also with the inc file. Just add the POVray object to the inc file and restart the macro. Now POVray also renders your own object which is defined in the inc file.
 
 <a name="startTheMacro"></a>
 ## Start the Macro
