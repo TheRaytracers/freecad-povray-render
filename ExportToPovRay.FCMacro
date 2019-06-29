@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from PySide import QtGui
 from FreeCAD import Base
 import os
 from PySide import QtCore, QtGui
@@ -283,7 +282,7 @@ def getPigment(fcObj, incContent):
     emission = ""
     phong = ""
     if appObject.Transparency != 0:
-        transparency += " filter " + str(appObject.Transparency / float(100))
+        transparency += " transmit " + str(appObject.Transparency / float(100))
     ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
     if transparency != "" or ShapeColorRGB != uintColorToRGB(DefaultShapeColor):
         pigment += "pigment{color rgb" + ShapeColorRGB + transparency + "}\n"
@@ -503,7 +502,7 @@ class GUI(QtGui.QDialog):
         <div>
         <h3>General</h3>
         <p>This macro exports solid CSG primitives to POV-Ray.<br>
-        The resulting POV code is readable and intended for further editing.<br>    
+        The resulting POV code is readable and intended for further editing.<br>
         You can add user defined material for each object in a <br>
         seperate .inc file that won't be overwritten.</p>
         <h3>Pov File Selection</h3>
