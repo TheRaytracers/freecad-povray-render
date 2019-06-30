@@ -66,8 +66,12 @@ def startExport(povPath, width, height, repRot, expFcView):
     finalPovCode += PovCam
 
     finalPovCode += "// sun -------------------------------------\n"
+    secondLight = False
+    if incContent.find("light_source") != -1:
+        secondLight = True
+        finalPovCode += "//"
     #finalPovCode += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
-    finalPovCode += "light_source{<" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + "> color rgb<0.5,0.5,0.5>}\n"
+    finalPovCode += "light_source { <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + "> color rgb<0.5,0.5,0.5> }\n"
 
     bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
     bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
