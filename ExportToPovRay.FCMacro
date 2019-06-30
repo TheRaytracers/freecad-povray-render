@@ -45,71 +45,18 @@ def startExport(povPath, width, height, repRot, expFcView):
         App.Console.PrintMessage("\n\nCanceled\n\n")
         return -1
 
-    finalPovCode += "//------------------------------------------\n"
+    finalPovCode += "\n//------------------------------------------\n"
     finalPovCode += "// camera ----------------------------------\n"
+    finalPovCode += getCam(width, height, incContent)
 
-    CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
-    EulerCam = CamOri.toEuler()
+    finalPovCode += "\n// sun -------------------------------------\n"
+    finalPovCode += getLight(incContent)
 
-    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
+    finalPovCode += "\n// background ------------------------------\n"
+    finalPovCode += getBackground()
 
-    incCamera = False
-    if incContent.find("camera") != -1:
-        incCamera = True
-        PovCam += "/*"
-
-    PovCam="camera {\n"
-    PovCam += "     location <0, 0, 0>\n"
-    PovCam += "     direction < 0, 1, 0>\n"
-    PovCam += "     up    < 0, 0, 1>\n"
-    #PovCam += "     right   < 1.33, 0, 0>\n"
-    PovCam += "     right   <" + "{0:1.2f}".format(width/float(height)) + ", 0, 0>\n"
-    PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
-    PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
-    PovCam += "     angle 55\n"
-    PovCam += "    }\n"
-    if incCamera:
-        PovCam += "*/\n"
-        
-    finalPovCode += PovCam
-
-    finalPovCode += "// sun -------------------------------------\n"
-    secondLight = False
-    if incContent.find("light_source") != -1:
-        secondLight = True
-        finalPovCode += "//"
-    #finalPovCode += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
-    finalPovCode += "light_source { <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + "> color rgb<0.5,0.5,0.5> }\n"
-
-    bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
-    bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
-    bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
-    bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
-
-    finalPovCode += "// background ------------------------------\n"
-    finalPovCode += "sky_sphere {\n  pigment {\n"
-
-    if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
-        finalPovCode += " color rgb" + uintColorToRGB(bgColor1)
-
-    elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
-        finalPovCode += "   gradient z\n"
-        finalPovCode += "   color_map {\n"
-        finalPovCode += "        [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
-        finalPovCode += "        [ 0.20  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
-        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
-            finalPovCode += "        [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
-        finalPovCode += "        [ 0.60  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
-        finalPovCode += "        [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
-        finalPovCode += "       }\n"
-        finalPovCode += "   scale 2\n"
-        finalPovCode += "   translate -1\n"
-        finalPovCode += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
-
-
-    finalPovCode += "   }\n}\n"
     #emission rgb <0.8,0.8,1>
-    finalPovCode += "//------------------------------------------\n"
+    finalPovCode += "\n//------------------------------------------\n"
     finalPovCode += "// objects in scene ------------------------\n"
 
     noCSG = False
@@ -157,6 +104,73 @@ def startExport(povPath, width, height, repRot, expFcView):
     openPovRay(fileName, width, height)
 
     App.Console.PrintMessage("\nDone\n")
+
+def getLight(incContent, CamPos = Gui.ActiveDocument.ActiveView.viewPosition()):
+    povLight = ""
+    secondLight = False
+    if incContent.find("light_source") != -1:
+        secondLight = True
+        povLight += "//"
+    #povLight += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
+    povLight += "light_source { <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + "> color rgb<0.5,0.5,0.5> }\n"
+
+    return povLight
+
+def getBackground(EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()):
+    povBg = ""
+    bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
+    bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
+    bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
+    bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
+
+    povBg += "sky_sphere {\n  pigment {\n"
+
+    if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
+        povBg += " color rgb" + uintColorToRGB(bgColor1)
+
+    elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
+        povBg += "   gradient z\n"
+        povBg += "   color_map {\n"
+        povBg += "        [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+        povBg += "        [ 0.20  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
+            povBg += "        [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
+        povBg += "        [ 0.60  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+        povBg += "        [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+        povBg += "       }\n"
+        povBg += "   scale 2\n"
+        povBg += "   translate -1\n"
+        povBg += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
+
+
+    povBg += "   }\n}\n"
+    return povBg
+
+def getCam(width, height, incContent):
+    CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
+    EulerCam = CamOri.toEuler()
+
+    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
+
+    incCamera = False
+    if incContent.find("camera") != -1:
+        incCamera = True
+        PovCam += "/*"
+
+    PovCam = "camera {\n"
+    PovCam += "     location <0, 0, 0>\n"
+    PovCam += "     direction < 0, 1, 0>\n"
+    PovCam += "     up    < 0, 0, 1>\n"
+    #PovCam += "     right   < 1.33, 0, 0>\n"
+    PovCam += "     right   <" + "{0:1.2f}".format(width/float(height)) + ", 0, 0>\n"
+    PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
+    PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
+    PovCam += "     angle 55\n"
+    PovCam += "    }\n"
+    if incCamera:
+        PovCam += "*/\n"
+
+    return PovCam
 
 def delComments(code):
     #delete big comments
