@@ -204,34 +204,34 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
         povCut = "\ndifference {\n"
-        for child in childs: #add the indents
-            childCode = createPovrayCode(child, incContent)
-            povCut += childCode.replace("\n", "\n    ");
+        for child in childs:
+            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            povCut += childCode.replace("\n", "\n    ") #add the indents
 
         povCode += povCut
 
     elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse": #Fusion
         childs = fcObj.OutList
         povFusion = "\nunion {\n"
-        for child in childs: #add the indents
-            childCode = createPovrayCode(child, incContent)
-            povFusion += childCode.replace("\n", "\n    ");
+        for child in childs:
+            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            povFusion += childCode.replace("\n", "\n    ") #add the indents
 
         povCode += povFusion
 
     elif fcObj.TypeId == "Part::MultiCommon" or fcObj.TypeId == "Part::Common": #Common
         childs = fcObj.OutList
         povCommon = "\nintersection {\n"
-        for child in childs: #add the indents
-            childCode = createPovrayCode(child, incContent)
-            povCommon += childCode.replace("\n", "\n    ");
+        for child in childs:
+            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            povCommon += childCode.replace("\n", "\n    ") #add the indents
 
         povCode += povCommon
 
     elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
         childs = fcObj.OutList
         for child in childs:
-            childCode = createPovrayCode(child, incContent)
+            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
             povCode += childCode
         return povCode
 
