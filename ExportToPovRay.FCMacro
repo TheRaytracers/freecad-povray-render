@@ -100,7 +100,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     finalPovCode += "// objects in scene ------------------------\n"
 
     noCSG = False
-    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common"]
+    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
     #print informations about the objects
     App.Console.PrintMessage("The object model:\n")
     for obj in objs:
@@ -227,6 +227,13 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
             povCommon += childCode.replace("\n", "\n    ");
 
         povCode += povCommon
+
+    elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
+        childs = fcObj.OutList
+        for child in childs:
+            childCode = createPovrayCode(child, incContent)
+            povCode += childCode
+        return povCode
 
     else: #not a supported object
         return ""
