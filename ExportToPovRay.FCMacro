@@ -349,11 +349,11 @@ def showWarning(msg):
 def stringCorrection(inputString): #change a utf-8 string to a ASCII string
     utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
     uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
-    uniString = uniString.replace(u"Ä", "AE")             # replacement of german "Umlaute"
+    uniString = uniString.replace(u"Ä", "Ae")             # replacement of german "Umlaute"
     uniString = uniString.replace(u"ä", "ae")
-    uniString = uniString.replace(u"Ü", "UE")
+    uniString = uniString.replace(u"Ü", "Ue")
     uniString = uniString.replace(u"ü", "ue")
-    uniString = uniString.replace(u"Ö", "OE")
+    uniString = uniString.replace(u"Ö", "Oe")
     uniString = uniString.replace(u"ö", "oe")
     uniString = uniString.replace(u"ß", "ss")
     uniString = uniString.replace(" ", "_")
