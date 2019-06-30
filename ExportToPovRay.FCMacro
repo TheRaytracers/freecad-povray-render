@@ -146,7 +146,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     App.Console.PrintMessage("\nDone\n")
 
 def createPovrayCode(fcObj, incContent): #returns the povray code for the object
-    povCode = "\n//----- " + stringCorrection(fcObj.Label) + " -----"
+    povCode = "\n//----- " + stringCorrection(fcObj.Label) + " -----" #add the name of the object
 
     if fcObj.TypeId == "Part::Box": #Box
         povBox = "\nbox{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">"
@@ -204,7 +204,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
         povCut = "\ndifference {\n"
-        for child in childs:
+        for child in childs: #add the indents
             childCode = createPovrayCode(child, incContent)
             povCut += childCode.replace("\n", "\n    ");
 
@@ -213,7 +213,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse": #Fusion
         childs = fcObj.OutList
         povFusion = "\nunion {\n"
-        for child in childs:
+        for child in childs: #add the indents
             childCode = createPovrayCode(child, incContent)
             povFusion += childCode.replace("\n", "\n    ");
 
@@ -222,26 +222,26 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     elif fcObj.TypeId == "Part::MultiCommon" or fcObj.TypeId == "Part::Common": #Common
         childs = fcObj.OutList
         povCommon = "\nintersection {\n"
-        for child in childs:
+        for child in childs: #add the indents
             childCode = createPovrayCode(child, incContent)
             povCommon += childCode.replace("\n", "\n    ");
 
         povCode += povCommon
 
-    else:
+    else: #not a supported object
         return ""
 
     povCode += "\n"
     rotation = getRot(fcObj)
-    if rotation != "":
+    if rotation != "": #test if the object is rotated
         povCode += "    " + rotation + "\n"
 
     translation = getTranslation(fcObj)
-    if translation != "":
+    if translation != "": #test if the object is translated
         povCode += "    " + getTranslation(fcObj) + "\n"
 
     pigment = getPigment(fcObj, incContent)
-    if pigment != "":
+    if pigment != "": #test if the object has the standard pigment
         povCode += "    " + pigment + "\n"
 
     povCode += "}\n"
@@ -249,26 +249,26 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
 def getTranslation(fcObj):
     translation = ""
-    x = fcObj.Placement.Base.x
+    x = fcObj.Placement.Base.x #get the position in every axis
     y = fcObj.Placement.Base.y
     z = fcObj.Placement.Base.z
-    if x != 0 or y != 0 or z != 0:
-        translation += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">"
+    if x != 0 or y != 0 or z != 0: #test whether the position is 0,0,0
+        translation += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">" #create translation vector
 
     return translation
 
 def getRot(fcObj):
     rotate = ""
-    eulerRot = fcObj.Placement.Rotation.toEuler()
-    x = eulerRot[2]
+    eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
+    x = eulerRot[2] #get rotation in every axis
     y = eulerRot[1]
     z = eulerRot[0]
 
-    if fcObj.TypeId == "Part::Torus":
+    if fcObj.TypeId == "Part::Torus": #if fcObj is a torus is is necessary to rotate it in x axis
         x += 90
 
     if x != 0 or y != 0 or z != 0:
-        rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">"
+        rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create roation vector
 
     return rotate
 
@@ -320,24 +320,26 @@ def uintColorToRGB(uintColor):
     return rgbString
 
 def writeFile(povText, fileName):
+    #povText: the code for POVray
+    #fileName: path to pov file
     try:
-        file = open(fileName, "w+")
-        file.write(povText)
-        file.close()
+        file = open(fileName, "w+") #open file
+        file.write(povText) #write code
+        file.close() #close file
     except:
         return -1
 
 def openPovRay(path, width, height):
-    terminalInput = "povray " + str(path) + " +P Width=" + str(width) + " Height=" + str(height)
-    os.system(terminalInput)
+    terminalInput = "povray " + str(path) + " +P Width=" + str(width) + " Height=" + str(height) #create the string to start POVray
+    os.system(terminalInput) #put terminalInput to the console
 
 def showWarning(msg):
-    # First argument is the icon used: QtGui.QMessageBox.{NoIcon, Information, Warning, Critical, Question}
+    #msg: message to show
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Warning, "Warning", msg)
     dialog.setWindowModality(QtCore.Qt.ApplicationModal)
     dialog.exec_()
 
-def stringCorrection(inputString):
+def stringCorrection(inputString): #change a utf-8 string to a ASCII string
     utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
     uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
     uniString = uniString.replace(u"Ä", "AE")             # replacement of german "Umlaute"
@@ -363,10 +365,10 @@ def repairRot(objs):
         rotAngle = math.degrees(ObjLocation.Rotation.Angle)
         obj.Placement = App.Placement(App.Vector(posX, posY, posZ), App.Rotation(App.Vector(rotX, rotY, rotZ), rotAngle), App.Vector(0, 0, 0))
 
-def exportFcView(path,width,height):
-    Gui.ActiveDocument.ActiveView.saveImage(path,width,height)
+def exportFcView(path, width, height): #export the current FreeCAD view like Tools / Save Picture...
+    Gui.ActiveDocument.ActiveView.saveImage(path, width, height)
 
-def isAscii(string):
+def isAscii(string): #test whether the string is a ASCII string
     return all(ord(c) < 128 for c in string)
 
 class GUI(QtGui.QDialog):
