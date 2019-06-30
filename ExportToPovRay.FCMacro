@@ -53,6 +53,11 @@ def startExport(povPath, width, height, repRot, expFcView):
 
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
 
+    incCamera = False
+    if incContent.find("camera") != -1:
+        incCamera = True
+        PovCam += "/*"
+
     PovCam="camera {\n"
     PovCam += "     location <0, 0, 0>\n"
     PovCam += "     direction < 0, 1, 0>\n"
@@ -63,6 +68,9 @@ def startExport(povPath, width, height, repRot, expFcView):
     PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
     PovCam += "     angle 55\n"
     PovCam += "    }\n"
+    if incCamera:
+        PovCam += "*/\n"
+        
     finalPovCode += PovCam
 
     finalPovCode += "// sun -------------------------------------\n"
