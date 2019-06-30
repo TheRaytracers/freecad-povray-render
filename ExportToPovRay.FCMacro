@@ -362,15 +362,16 @@ def stringCorrection(inputString): #change a utf-8 string to a ASCII string
 
 def repairRot(objs):
     for obj in objs:
-        ObjLocation = obj.Placement
-        posX = ObjLocation.Base.x
-        posY = ObjLocation.Base.y
-        posZ = ObjLocation.Base.z
-        rotX = ObjLocation.Rotation.Axis[0]
-        rotY = ObjLocation.Rotation.Axis[1]
-        rotZ = ObjLocation.Rotation.Axis[2]
-        rotAngle = math.degrees(ObjLocation.Rotation.Angle)
-        obj.Placement = App.Placement(App.Vector(posX, posY, posZ), App.Rotation(App.Vector(rotX, rotY, rotZ), rotAngle), App.Vector(0, 0, 0))
+        if hasattr(obj, 'Placement'):
+            ObjLocation = obj.Placement
+            posX = ObjLocation.Base.x
+            posY = ObjLocation.Base.y
+            posZ = ObjLocation.Base.z
+            rotX = ObjLocation.Rotation.Axis[0]
+            rotY = ObjLocation.Rotation.Axis[1]
+            rotZ = ObjLocation.Rotation.Axis[2]
+            rotAngle = math.degrees(ObjLocation.Rotation.Angle)
+            obj.Placement = App.Placement(App.Vector(posX, posY, posZ), App.Rotation(App.Vector(rotX, rotY, rotZ), rotAngle), App.Vector(0, 0, 0))
 
 def exportFcView(path, width, height): #export the current FreeCAD view like Tools / Save Picture...
     Gui.ActiveDocument.ActiveView.saveImage(path, width, height)
