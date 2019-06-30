@@ -45,7 +45,8 @@ If you want to change the texture of `Box001` to `White_Marble` you have to add 
 ```
 
 ### Add objects
-If you want to add POVray objects (e.g. a second lamp or a super torus) you can do this also with the inc file. Just add the POVray object to the inc file and restart the macro. Now POVray also renders your own object which is defined in the inc file.
+If you want to add POVray objects (e.g. a second lamp or a super torus) you can do this also with the inc file. Just add the POVray object to the inc file and restart the macro. Now POVray also renders your own object which is defined in the inc file.  
+The macro will comment out the camera / light source if you defined another in the inc file.
 
 <a name="startTheMacro"></a>
 ## Start the Macro
