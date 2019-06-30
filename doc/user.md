@@ -7,6 +7,14 @@ Now you have to put the .FCMacro file in your macro directory. You cant look und
 ## Use the Macro
 The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. POVray opens a windows with the rendering result. To close this window, click on the windows.
 
+### Tips & Tricks
+* If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
+![FreeCAD before cutting](img/tipsAndTricks/01_FC.png "FreeCAD before cutting")
+![POVray before cutting](img/tipsAndTricks/01_PR.png "POVray before cutting")
+![FreeCAD after cutting](img/tipsAndTricks/02_FC.png "FreeCAD after cutting")
+![POVray after cutting](img/tipsAndTricks/02_PR.png "POVray after cutting")
+To avoid this, the part to be removed should be slightly larger than the other part.
+
 ## Make changes
 If you want to change the texture / pigment / finish / etc. you have to create a file with the same name as the pov file in directory of your pov file. Change the ending to `inc`. To example
 ```
