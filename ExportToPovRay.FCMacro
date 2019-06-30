@@ -522,6 +522,7 @@ class GUI(QtGui.QDialog):
         <p>For more information look in our <a href='https://gitlab.com/usbhub/exporttopovray/blob/master/doc/index.md'>Wiki</a></p>
         </div>"""
         self.helpLabel.setText(helpText)
+        self.helpLabel.setOpenExternalLinks(True)
 
     def openFileDialog(self):
         try:
