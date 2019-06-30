@@ -38,6 +38,7 @@ def startExport(povPath, width, height, repRot, expFcView):
             file.close()
             finalPovCode += "\n#include \"" + incPath + "\"\n"
             App.Console.PrintMessage("Content of the inc file:\n" + incContent + "\n\n")
+            incContent = delComments(incContent)
         except:
             incContent = ""
     else:
@@ -144,6 +145,30 @@ def startExport(povPath, width, height, repRot, expFcView):
     openPovRay(fileName, width, height)
 
     App.Console.PrintMessage("\nDone\n")
+
+def delComments(code):
+    #delete big comments
+    while code.find("/*") is not -1:
+        comStart = code.find("/*")
+        comEnd = code.find("*/", comStart + 2)
+
+        if comEnd is -1:
+            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is an unclodes multi line comment.\n")
+            return
+        code = code[0:comStart] + code[comEnd + 2:]
+
+    #delete little comments
+    while code.find("//") is not -1:
+        comStart = code.find("//")
+        comEnd = code.find("\n", comStart + 2)
+
+        if comEnd is -1:
+            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is a misstake in a one line comment")
+            return
+        code = code[0:comStart] + code[comEnd:]
+
+    #App.Console.PrintMessage("Content of the inc file:333\n" + incContent + "\n\n")
+    return code
 
 def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     povCode = "\n//----- " + stringCorrection(fcObj.Label) + " -----" #add the name of the object
