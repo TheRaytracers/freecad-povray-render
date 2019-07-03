@@ -1,8 +1,11 @@
 # User Documentation
 ## Installation
 Download the macro here: [link] or install it via the addon manager  
-Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path. Under Linux you have often this path:  
-`/home/USERNAME/.FreeCAD/Macro/`  
+Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path.
+### Standard Macro Paths 
+* Linux: `/home/USERNAME/.FreeCAD/Macro/`  
+* Windows: `C:\Users\otto\AppData\Roaming\FreeCAD\Macro/`
+* Mac: `XXX`
 
 ## Use the Macro
 The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. POVray opens a windows with the rendering result. To close this window, click on the windows.
