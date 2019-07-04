@@ -151,6 +151,12 @@ def getCam(width, height, incContent):
     EulerCam = CamOri.toEuler()
 
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
+    
+    AspectRatio = width/float(height)
+    if AspectRatio <= 1:
+        CamAngle = 45
+    else: 
+        CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
 
     incCamera = False
     if incContent.find("camera") != -1:
@@ -161,10 +167,10 @@ def getCam(width, height, incContent):
     PovCam += "     location <0, 0, 0>\n"
     PovCam += "     direction < 0, 1, 0>\n"
     PovCam += "     up    < 0, 0, 1>\n"
-    PovCam += "     right   <" + "{0:1.2f}".format(width/float(height)) + ", 0, 0>\n"
+    PovCam += "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
     PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
     PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
-    PovCam += "     angle 57.5\n"
+    PovCam += "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
     PovCam += "    }\n"
     if incCamera:
         PovCam += "*/\n"
