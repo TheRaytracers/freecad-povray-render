@@ -10,7 +10,11 @@ Now you have to put the .FCMacro file in your macro directory. You cant look und
 ## Use the Macro
 The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. POVray opens a windows with the rendering result. To close this window, click on the windows.
 
-### Tips & Tricks
+<a name="startTheMacro"></a>
+## Start the Macro
+Go to Macro/Macros… and start the installed macro by double clicking on it.
+
+## Tips & Tricks
 * If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
 ![FreeCAD before cutting](img/tipsAndTricks/01_FC.png "FreeCAD before cutting")
 ![POVray before cutting](img/tipsAndTricks/01_PR.png "POVray before cutting")
@@ -78,10 +82,6 @@ global_settings {
 Replace MODE with the one of the modes above.
 
 For more information please visit the [POVray wiki](http://wiki.povray.org/content/HowTo:Use_radiosity).
-
-<a name="startTheMacro"></a>
-## Start the Macro
-Go to Macro/Macros… and start the installed macro by double clicking on it.
 
 ## Supported Objects
 ### Part Workbench
