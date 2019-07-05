@@ -4,6 +4,7 @@ from FreeCAD import Base
 import os
 from PySide import QtCore, QtGui
 import math
+import MeshPart
 
 DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
@@ -289,21 +290,19 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     else: #not a supported object
         shape = fcObj.Shape
         mesh = 0
-        if fcObj.isDerivedFrom("Mesh::Feature"):
+
+        if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
             mesh = fcObj.Mesh
         else:
-            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = 0.5, Relative = True)
+            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = shape.BoundBox.DiagonalLength / 1000, AngularDeflection = 0.5, Relative = True)
 
         if not mesh:
             return ""
 
-        App.Console.PrintError(hasattr(fcObj, "Group"))
-        App.Console.PrintWarning(mesh)
-        App.Console.PrintError(shape)
-
         #create mesh2 object
         povMesh = ""
         povMesh += "\nmesh2 {\n    vertex_vectors {\n"
+
         #create vertex_vectors
         numOfVertex = len(mesh.Topology[0])
         povMesh += "        " + str(numOfVertex)
@@ -336,7 +335,14 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
             povCode += "    " + pigment + "\n"
 
         povCode += "}\n"
-        return povCode
+
+        if fcObj.TypeId == "Part::FeaturePython":
+            childs = fcObj.OutList
+            for child in childs:
+                childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+                povCode += childCode
+
+        return povCode #return because the mesh may not translated and rotated
 
     povCode += "\n"
     rotation = getRot(fcObj)
