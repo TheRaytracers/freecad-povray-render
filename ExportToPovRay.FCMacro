@@ -82,7 +82,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     if noCSG == True:
         #showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
         pass
-        
+
     #repair rotation
     if repRot:
         repairRot(objs)
@@ -306,7 +306,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povMesh += "\nmesh2 {\n    vertex_vectors {\n"
         #create vertex_vectors
         numOfVertex = len(mesh.Topology[0])
-        povMesh += "    " + str(numOfVertex)
+        povMesh += "        " + str(numOfVertex)
 
         for point in mesh.Topology[0]:
             povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
@@ -314,7 +314,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         #create normal vectors
         povMesh += "    normal_vectors {\n"
-        povMesh += "    " + str(numOfVertex)
+        povMesh += "        " + str(numOfVertex)
 
         for point in mesh.getPointNormals():
             povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
@@ -323,13 +323,20 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         #create face_indices
         povMesh += "    face_indices {\n"
         numOfTriangles = len(mesh.Topology[1])
-        povMesh += "    " + str(numOfTriangles)
+        povMesh += "        " + str(numOfTriangles)
 
         for triangle in mesh.Topology[1]:
             povMesh += ",\n        <" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
         povMesh += "    }\n\n"
 
         povCode += povMesh
+
+        pigment = getPigment(fcObj, incContent)
+        if pigment != "": #test if the object has the standard pigment
+            povCode += "    " + pigment + "\n"
+
+        povCode += "}\n"
+        return povCode
 
     povCode += "\n"
     rotation = getRot(fcObj)
