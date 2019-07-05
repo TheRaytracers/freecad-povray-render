@@ -80,7 +80,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     App.Console.PrintMessage("\n\n")
 
     if noCSG == True:
-        showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
+        #showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
 
     #repair rotation
     if repRot:
@@ -286,7 +286,41 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         return povCode
 
     else: #not a supported object
-        return ""
+        shape = fcObj.Shape
+        mesh = 0
+        if fcObj.isDerivedFrom("Mesh::Feature"):
+            mesh = fcObj.Mesh
+        else:
+            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = 0.5, Relative = True)
+
+        if not mesh:
+            return ""
+
+        App.Console.PrintError(hasattr(fcObj, "Group"))
+        App.Console.PrintWarning(mesh)
+        App.Console.PrintError(shape)
+
+        #create mesh2 object
+        povMesh = ""
+        povMesh += "\nmesh2 {\n    vertex_vectors {\n"
+        #create vertex_vectors
+        numOfVertex = len(mesh.Topology[0])
+        povMesh += "    " + str(numOfVertex)
+
+        for point in mesh.Topology[0]:
+            povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
+        povMesh += "    }\n\n"
+
+        #create face_indices
+        povMesh += "    face_indices {\n"
+        numOfTriangles = len(mesh.Topology[1])
+        povMesh += "    " + str(numOfTriangles)
+
+        for triangle in mesh.Topology[1]:
+            povMesh += ",\n        <" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
+        povMesh += "    }\n\n"
+
+        povCode += povMesh
 
     povCode += "\n"
     rotation = getRot(fcObj)
