@@ -81,7 +81,8 @@ def startExport(povPath, width, height, repRot, expFcView):
 
     if noCSG == True:
         #showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
-
+        pass
+        
     #repair rotation
     if repRot:
         repairRot(objs)
@@ -308,6 +309,14 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povMesh += "    " + str(numOfVertex)
 
         for point in mesh.Topology[0]:
+            povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
+        povMesh += "    }\n\n"
+
+        #create normal vectors
+        povMesh += "    normal_vectors {\n"
+        povMesh += "    " + str(numOfVertex)
+
+        for point in mesh.getPointNormals():
             povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
         povMesh += "    }\n\n"
 
