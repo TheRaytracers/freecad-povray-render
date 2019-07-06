@@ -152,21 +152,34 @@ def getBackground():
 def getCam(width, height, incContent):
     CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
     EulerCam = CamOri.toEuler()
-
+    CamType = Gui.ActiveDocument.ActiveView.getCameraType()
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
 
     AspectRatio = width/float(height)
-    if AspectRatio <= 1:
-        CamAngle = 45
-    else:
-        CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
+    
 
     incCamera = False
     if incContent.find("camera") != -1:
         incCamera = True
         PovCam += "/*"
-
+        
+    PovCamType = ""
+    if CamType == "Perspective":
+        if AspectRatio <= 1:
+            CamAngle = 45
+        else:
+            CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
+        App.Console.PrintMessage("Perspektivische Kamera\n")
+    elif CamType == "Orthographic":
+        PovCamType = "orthographic\n"
+        CamAngle = 175
+        App.Console.PrintMessage("Orthografische Kamera\n")
+    else:
+        App.Console.PrintMessage("unbekannte Kamera\n")
+        
+        
     PovCam = "camera {\n"
+    PovCam += PovCamType
     PovCam += "     location <0, 0, 0>\n"
     PovCam += "     direction < 0, 1, 0>\n"
     PovCam += "     up    < 0, 0, 1>\n"
