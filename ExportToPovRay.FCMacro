@@ -294,7 +294,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
             mesh = fcObj.Mesh
         else:
-            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = shape.BoundBox.DiagonalLength / 1000, AngularDeflection = 0.5, Relative = True)
+            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = 0.1, Relative = True)
 
         if not mesh:
             return ""
@@ -308,14 +308,6 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povMesh += "        " + str(numOfVertex)
 
         for point in mesh.Topology[0]:
-            povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
-        povMesh += "    }\n\n"
-
-        #create normal vectors
-        povMesh += "    normal_vectors {\n"
-        povMesh += "        " + str(numOfVertex)
-
-        for point in mesh.getPointNormals():
             povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
         povMesh += "    }\n\n"
 
