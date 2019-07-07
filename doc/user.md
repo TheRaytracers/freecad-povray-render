@@ -1,13 +1,20 @@
 # User Documentation
 ## Installation
 Download the macro here: [link] or install it via the addon manager  
-Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path. Under Linux you have often this path:  
-`/home/USERNAME/.FreeCAD/Macro/`  
+Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path.
+### Standard Macro Paths
+* Linux: `/home/USERNAME/.FreeCAD/Macro/`  
+* Windows: `C:\Users\otto\AppData\Roaming\FreeCAD\Macro/`
+* Mac: `XXX`
 
 ## Use the Macro
 The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. POVray opens a windows with the rendering result. To close this window, click on the windows.
 
-### Tips & Tricks
+<a name="startTheMacro"></a>
+## Start the Macro
+Go to Macro/Macros… and start the installed macro by double clicking on it.
+
+## Tips & Tricks
 * If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
 ![FreeCAD before cutting](img/tipsAndTricks/01_FC.png "FreeCAD before cutting")
 ![POVray before cutting](img/tipsAndTricks/01_PR.png "POVray before cutting")
@@ -45,12 +52,36 @@ If you want to change the texture of `Box001` to `White_Marble` you have to add 
 ```
 
 ### Add objects
-If you want to add POVray objects (e.g. a second lamp or a super torus) you can do this also with the inc file. Just add the POVray object to the inc file and restart the macro. Now POVray also renders your own object which is defined in the inc file.  
+If you want to add POVray objects (e.g. another lamp or a super torus) you can do this also with the inc file. Just add the POVray object to the inc file and restart the macro. Now POVray also renders your own object which is defined in the inc file.  
 The macro will comment out the camera / light source if you defined another in the inc file.
 
-<a name="startTheMacro"></a>
-## Start the Macro
-Go to Macro/Macros… and start the installed macro by double clicking on it.
+### Use Radiosity
+If you want to use [radiosity](https://en.wikipedia.org/wiki/Radiosity_(computer_graphics)) in your rendering, you have to add this information in the inc file.  
+POVray knows many different modes:
+* Radiosity_Default
+* Radiosity_Debug
+* Radiosity_Fast
+* Radiosity_Normal
+* Radiosity_2Bounce
+* Radiosity_Final
+* Radiosity_OutdoorLQ
+* Radiosity_OutdoorHQ
+* Radiosity_OutdoorLight
+* Radiosity_IndoorLQ
+* Radiosity_IndoorHQ
+
+To use radiosity add these lines to your inc file:
+```
+#include “rad_def.inc”
+global_settings {
+   radiosity {
+      Rad_Settings(MODE, off, off)
+   }
+}
+```
+Replace MODE with the one of the modes above.
+
+For more information please visit the [POVray wiki](http://wiki.povray.org/content/HowTo:Use_radiosity).
 
 ## Supported Objects
 ### Part Workbench

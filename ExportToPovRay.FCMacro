@@ -107,9 +107,11 @@ def startExport(povPath, width, height, repRot, expFcView):
 
     App.Console.PrintMessage("\nDone\n")
 
-def getLight(incContent, CamPos = Gui.ActiveDocument.ActiveView.viewPosition()):
+def getLight(incContent):
     povLight = ""
     secondLight = False
+    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
+
     if incContent.find("light_source") != -1:
         secondLight = True
         povLight += "//"
@@ -118,7 +120,8 @@ def getLight(incContent, CamPos = Gui.ActiveDocument.ActiveView.viewPosition()):
 
     return povLight
 
-def getBackground(EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()):
+def getBackground():
+    EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
     povBg = ""
     bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
     bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
@@ -154,6 +157,12 @@ def getCam(width, height, incContent):
 
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
 
+    AspectRatio = width/float(height)
+    if AspectRatio <= 1:
+        CamAngle = 45
+    else:
+        CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
+
     incCamera = False
     if incContent.find("camera") != -1:
         incCamera = True
@@ -163,10 +172,10 @@ def getCam(width, height, incContent):
     PovCam += "     location <0, 0, 0>\n"
     PovCam += "     direction < 0, 1, 0>\n"
     PovCam += "     up    < 0, 0, 1>\n"
-    PovCam += "     right   <" + "{0:1.2f}".format(width/float(height)) + ", 0, 0>\n"
+    PovCam += "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
     PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
     PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
-    PovCam += "     angle 57.5\n"
+    PovCam += "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
     PovCam += "    }\n"
     if incCamera:
         PovCam += "*/\n"
@@ -447,7 +456,7 @@ def showWarning(msg):
     dialog.setWindowModality(QtCore.Qt.ApplicationModal)
     dialog.exec_()
 
-def stringCorrection(inputString): #change a utf-8 string to a ASCII string
+def stringCorrection(inputString): #change a utf-8 string to an ASCII string
     utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
     uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
     uniString = uniString.replace(u"Ä", "Ae")             # replacement of german "Umlaute"
@@ -477,7 +486,7 @@ def repairRot(objs):
 def exportFcView(path, width, height): #export the current FreeCAD view like Tools / Save Picture...
     Gui.ActiveDocument.ActiveView.saveImage(path, width, height)
 
-def isAscii(string): #test whether the string is a ASCII string
+def isAscii(string): #test whether the string is an ASCII string
     return all(ord(c) < 128 for c in string)
 
 class GUI(QtGui.QDialog):
@@ -681,5 +690,16 @@ class GUI(QtGui.QDialog):
         self.saveInput()
         startExport(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value(), self.repRot.isChecked(), self.expFcView.isChecked())
 
-dialog = GUI()
-dialog.exec_()
+def main():
+    #print FreeCAD.ActiveDocument
+
+    try:
+        viewPos = Gui.ActiveDocument.ActiveView.viewPosition()
+    except:
+        App.Console.PrintWarning("No document opened\n")
+        return -1
+
+    dialog = GUI()
+    dialog.exec_()
+
+main()
