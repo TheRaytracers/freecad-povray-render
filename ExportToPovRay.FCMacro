@@ -164,15 +164,29 @@ def getCam(width, height, incContent):
         PovCam += "/*"
         
     PovCamType = ""
+    PovCamAngle = ""
+    PovCamUp = ""
+    PovCamRight = ""
+    
     if CamType == "Perspective":
+        PovCamUp = "     up    < 0, 0, 1>\n"
+        PovCamRight = "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
         if AspectRatio <= 1:
             CamAngle = 45
         else:
             CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
+        PovCamAngle = "     angle " + "{0:1.2f}".format(CamAngle) + "\n"    
         App.Console.PrintMessage("Perspektivische Kamera\n")
     elif CamType == "Orthographic":
-        PovCamType = "orthographic\n"
-        CamAngle = 175
+        if AspectRatio >= 1:
+            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            right = up*AspectRatio
+        else:
+            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            up = right/AspectRatio
+        PovCamType = "      orthographic\n"
+        PovCamUp = "     up    < 0, 0, " + "{0:1.2f}".format(up) + ">\n"
+        PovCamRight = "     right   <" + "{0:1.2f}".format(right) +", 0, 0>\n"
         App.Console.PrintMessage("Orthografische Kamera\n")
     else:
         App.Console.PrintMessage("unbekannte Kamera\n")
@@ -182,11 +196,11 @@ def getCam(width, height, incContent):
     PovCam += PovCamType
     PovCam += "     location <0, 0, 0>\n"
     PovCam += "     direction < 0, 1, 0>\n"
-    PovCam += "     up    < 0, 0, 1>\n"
-    PovCam += "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
+    PovCam += PovCamUp
+    PovCam += PovCamRight
     PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
     PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
-    PovCam += "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
+    PovCam += PovCamAngle
     PovCam += "    }\n"
     if incCamera:
         PovCam += "*/\n"
