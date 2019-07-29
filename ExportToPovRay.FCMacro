@@ -60,7 +60,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     finalPovCode += "// objects in scene ------------------------\n"
 
     noCSG = False
-    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
+    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
     #print informations about the objects
     App.Console.PrintMessage("The object model:\n")
     for obj in objs:
@@ -156,18 +156,18 @@ def getCam(width, height, incContent):
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
 
     AspectRatio = width/float(height)
-    
+
 
     incCamera = False
     if incContent.find("camera") != -1:
         incCamera = True
         PovCam += "/*"
-        
+
     PovCamType = ""
     PovCamAngle = ""
     PovCamUp = ""
     PovCamRight = ""
-    
+
     if CamType == "Perspective":
         PovCamUp = "     up    < 0, 0, 1>\n"
         PovCamRight = "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
@@ -175,7 +175,7 @@ def getCam(width, height, incContent):
             CamAngle = 45
         else:
             CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
-        PovCamAngle = "     angle " + "{0:1.2f}".format(CamAngle) + "\n"    
+        PovCamAngle = "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
         App.Console.PrintMessage("Perspektivische Kamera\n")
     elif CamType == "Orthographic":
         if AspectRatio >= 1:
@@ -190,8 +190,8 @@ def getCam(width, height, incContent):
         App.Console.PrintMessage("Orthografische Kamera\n")
     else:
         App.Console.PrintMessage("unbekannte Kamera\n")
-        
-        
+
+
     PovCam = "camera {\n"
     PovCam += PovCamType
     PovCam += "     location <0, 0, 0>\n"
@@ -286,6 +286,15 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povTorus += str(r1) + ", " + str(r2)
 
         povCode += povTorus
+
+    elif fcObj.TypeId == "Part::Plane": #Plane
+        width = fcObj.Width.getValueAs("mm").Value
+        length = fcObj.Length.getValueAs("mm").Value
+
+        povPlane = "\npolygon {\n"
+        povPlane += "    4, <0, 0>, <" + str(length) + ", 0>, <" + str(length) + ", " + str(width) + ">, <0, " + str(width) + ">"
+
+        povCode += povPlane
 
     elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
