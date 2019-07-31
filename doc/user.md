@@ -91,8 +91,8 @@ For more information please visit the [POVray wiki](http://wiki.povray.org/conte
 - [x] Cone
 - [x] Torus
 - [x] Ellipsoid
+- [x] Plane
 - [ ] Wedge
-- [ ] Plane
 - [ ] Prism
 
 The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sphere, cone, torus and ellipsoid
