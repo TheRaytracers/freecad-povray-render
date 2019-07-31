@@ -1,46 +1,55 @@
 # Macro for exporting a FreeCAD model to POVray
 
+The export macro is intended to export the FreeCAD model structure with their equivalent in POVray.
+In contrast to other solutions for exporting FreeCAD models to POVray, this macro tries to make the file clearly and easy to edit. For that, t doesn't create meshes, it moves the tree structure with the boolean operations into a POVray file.  
+Until now, the macro only supports objects from the Part Workbench.
+
+To give the user the full control, you can define extra things or another surface as in FreeCAD (Please visit the [Wiki](doc/user.md) for more information).
+
+
+## Installation
+Download the macro here: [link] or install it via the addon manager  
+Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path.
+### Standard Macro Paths
+* Linux: `/home/USERNAME/.FreeCAD/Macro/`  
+* Windows: `C:\Users\otto\AppData\Roaming\FreeCAD\Macro/`
+* Mac: `XXX`
+
+## Usage
+The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. POVray opens a windows with the rendering result. To close this window, click on the windows.
+
+<a name="startTheMacro"></a>
+### Start the Macro
+Go to Macro/Macros… and start the installed macro by double clicking on it.
+
+### More Features
+The macro supports a lot more. Please visit our [wiki for users](doc/user.md) for further information about features like using all POVray features or creating custom materials.
+
+## Supported Objects
+### Part Workbench
+- [x] Cube
+- [x] Cylinder
+- [x] Sphere
+- [x] Cone
+- [x] Torus
+- [x] Ellipsoid
+- [x] Plane
+- [ ] Wedge
+- [ ] Prism
+
+The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sphere, cone, torus and ellipsoid
+
+### Other
+- [x] Color
+- [x] Background (you can change the background under Edit/Preferences/Display/Colors/Background Color)
+- [x] Transparency
+- [x] AmbientColor
+- [x] EmissiveColor
+- [x] SpecularColor
+- [x] Shininess
+
 ## Wiki
-Here is the wiki for the macro: [Wiki](doc/index.md)
+For the full documentation, please visit our [Wiki](doc/index.md)
 
----
-
-Das ExportToPovRay Makro soll möglichst alle soliden CSG Objekte aus
-der FreeCAD part Workbench in eine entsprechende POVray
-Szenenbeschreibung konvertieren. Dabei wird der Objektbaum mit seinen
-boolschen Operationen in der Povray Datei abgebildet.
-Der User soll anschießend die POVray Datei abändern können, so daß die
-umfangreichen Möglichkeiten von POVray für eine fotorealiste Darstellung
-genutzt werden können (Texturen, Lichteffekte u.ä.)
-Oberstes Prinzip ist dabei, die POVray Datei so übersichtlich zu halten,
-dass Objekte schnell auffindbar sind.
-Ein zweites wichtiges Prinzip ist "what you see is what you get".
-Das Renderergebnis sieht der jeweiligen Ansicht im FreeCAD Gui so
-ähnlich wie möglich (Kameraperspektive, Hintergrund, Objektfarben...).
-Da eine vollständige Übernahme aller FreeCAD Konstruktionsmöglichkeiten
-zu aufwändig wäre, beschränkt sich das Makro zunächst auf CSG-Objekte -
-Diese Limitierung ist für den User aber klar nachvollziehbar - entweder
-durch eine gute Dokumentation oder aber im Programm z.B. durch farbliche
-Markierung von übernommenen Objekten im Objektbaum.
-
----
-
-The ExportToPovRay macro is intended to export as many solid CSG objects as possible from
-of the FreeCAD Part workbench into a corresponding POVray
-Convert scene description. The object tree with its
-Boolean operations in the Povray file.
-The user should then be able to modify the POVray file so that the
-extensive possibilities of POVray for a photorealistic display
-can be used (textures, light effects, etc.)
-The main principle is to keep the POVray file as clear as possible,
-that objects can be found quickly.
-A second important principle is "what you see is what you get".
-The render result of the respective view in FreeCAD Gui looks like this
-as possible (camera perspective, background, object colors...).
-Since a complete transfer of all FreeCAD construction possibilities is possible
-would be too complex, the macro is initially limited to CSG objects -
-However, this limitation is clearly comprehensible for the user - either
-through a good documentation or in the program e.g. through colored
-Selection of transferred objects in the object tree.
-
-Translated with www.DeepL.com/Translator
+## Contributing
+You want to contribute? Thank you, please look to our [wiki for developers](doc/developer.md).
