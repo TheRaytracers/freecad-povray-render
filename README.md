@@ -48,6 +48,13 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 - [x] SpecularColor
 - [x] Shininess
 
+## Advantages over the Raytracing Workbench
+* You can use **all** POVray features
+* The macro is easier to use
+* WYSIWYG
+* The macro is written in Python, so it is easier for expansion
+* The macro reproduces the tree structure and doesn't create gigantic meshs → Better understanding and editing of the file
+
 ## Wiki
 For the full documentation, please visit our [Wiki](doc/index.md)
 
