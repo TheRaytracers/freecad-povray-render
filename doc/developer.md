@@ -1,4 +1,25 @@
 # Developer Documentation
+
+## The Goal of the Project
+The ExportToPovRay macro is intended to export as many solid CSG objects as possible from
+of the FreeCAD Part workbench into a corresponding POVray
+Convert scene description. The object tree with its
+Boolean operations in the Povray file.  
+The user should be able to modify the POVray file so that the
+extensive possibilities of POVray for a photorealistic display
+can be used (textures, light effects, etc.)  
+The main principle is to keep the POVray file as clear as possible,
+that objects can be found quickly.
+A second important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y**ou **G**et).
+The render result of the respective view in FreeCAD Gui looks like this
+as possible (camera perspective, background, object colors…).  
+
+Since a complete transfer of all FreeCAD construction possibilities is possible
+would be too complex, the macro is initially limited to CSG objects -
+However, this limitation is clearly comprehensible for the user - either
+through a good documentation or in the program e.g. through colored
+selection of transferred objects in the object tree.
+
 ## Skeletal structure of the macro
 The macro works in this order:
 1. Open the dialog and get the parameters from the user
