@@ -623,7 +623,7 @@ class GUI(QtGui.QDialog):
 
         fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
 
-        if fileName:
+        if fileName and fileName != (u'', u''):
             self.pathLineEdit.setText(str(fileName[0]))
 
     def checkPath(self, path):
