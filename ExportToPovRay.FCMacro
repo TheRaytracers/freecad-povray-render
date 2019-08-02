@@ -619,7 +619,7 @@ class GUI(QtGui.QDialog):
         self.helpLabel.setOpenExternalLinks(True)
 
     def openFileDialog(self):
-        defaultPath = "/home/"
+        defaultPath = self.pathLineEdit.text()
 
         fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
 
