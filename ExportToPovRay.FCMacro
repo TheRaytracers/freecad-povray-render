@@ -627,12 +627,15 @@ class GUI(QtGui.QDialog):
             self.pathLineEdit.setText(str(fileName[0]))
 
     def checkPath(self, path):
-        if path.find(" ") == -1 and isAscii(path) == True:
+        if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:] == ".pov":
             self.okButton.setEnabled(True)
             self.warnLabel.setText("")
         else:
             self.okButton.setEnabled(False)
-            self.warnLabel.setText("Your Path contains a space or a mutated vowel")
+            if path == "":
+                self.warnLabel.setText("Please type a path or get one with clicking on 'Open pov File'")
+            else:
+                self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .pov file")
 
     def saveInput(self):
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
