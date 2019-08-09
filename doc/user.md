@@ -7,14 +7,14 @@ Now you have to put the .FCMacro file in your macro directory. You cant look und
 * Windows: `C:\Users\otto\AppData\Roaming\FreeCAD\Macro/`
 * Mac: `XXX`
 
-## Use the Macro
+## Usage
 The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. POVray opens a windows with the rendering result. To close this window, click on the windows.
 
 <a name="startTheMacro"></a>
-## Start the Macro
+### Start the Macro
 Go to Macro/Macros… and start the installed macro by double clicking on it.
 
-## Tips & Tricks
+### Tips & Tricks
 * If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
 ![FreeCAD before cutting](img/tipsAndTricks/01_FC.png "FreeCAD before cutting")
 ![POVray before cutting](img/tipsAndTricks/01_PR.png "POVray before cutting")
@@ -22,7 +22,7 @@ Go to Macro/Macros… and start the installed macro by double clicking on it.
 ![POVray after cutting](img/tipsAndTricks/02_PR.png "POVray after cutting")
 To avoid this, the part to be removed should be slightly larger than the other part.
 
-## Make changes
+### Make changes
 If you want to change the texture / pigment / finish / etc. you have to create a file with the same name as the pov file in directory of your pov file. Change the ending to `inc`. To example
 ```
 pov file: myPOVrayFile.pov
@@ -51,11 +51,11 @@ If you want to change the texture of `Box001` to `White_Marble` you have to add 
 }
 ```
 
-### Add objects
+#### Add objects
 If you want to add POVray objects (e.g. another lamp or a super torus) you can do this also with the inc file. Just add the POVray object to the inc file and restart the macro. Now POVray also renders your own object which is defined in the inc file.  
 The macro will comment out the camera / light source if you defined another in the inc file.
 
-### Use Radiosity
+#### Use Radiosity
 If you want to use [radiosity](https://en.wikipedia.org/wiki/Radiosity_(computer_graphics)) in your rendering, you have to add this information in the inc file.  
 POVray knows many different modes:
 * Radiosity_Default
@@ -91,8 +91,8 @@ For more information please visit the [POVray wiki](http://wiki.povray.org/conte
 - [x] Cone
 - [x] Torus
 - [x] Ellipsoid
+- [x] Plane
 - [ ] Wedge
-- [ ] Plane
 - [ ] Prism
 
 The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sphere, cone, torus and ellipsoid

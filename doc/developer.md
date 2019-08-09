@@ -1,26 +1,51 @@
 # Developer Documentation
+
+## The Goal of the Project
+The ExportToPovRay macro is intended to export as many solid CSG objects as possible from
+of the FreeCAD Part workbench into a corresponding POVray
+Convert scene description. The object tree with its
+Boolean operations in the Povray file.  
+The user should be able to modify the POVray file so that the
+extensive possibilities of POVray for a photorealistic display
+can be used (textures, light effects, etc.)  
+The main principle is to keep the POVray file as clear as possible,
+that objects can be found quickly.
+A second important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y**ou **G**et).
+The render result of the respective view in FreeCAD Gui looks like this
+as possible (camera perspective, background, object colors…).  
+
+Since a complete transfer of all FreeCAD construction possibilities is possible
+would be too complex, the macro is initially limited to CSG objects -
+However, this limitation is clearly comprehensible for the user - either
+through a good documentation or in the program e.g. through colored
+selection of transferred objects in the object tree.
+
 ## Skeletal structure of the macro
 The macro works in this order:
+1. Open the dialog and get the parameters from the user
 1. Create the skeletal structure of the POVray file
-1. Ask for the file and try if the pov and inc file exists
+1. Try if the pov and inc file exists
 1. Add [global settings](#globalsettings) to the .pov file
 1. Add the [camera](#camera)
 1. Add the [lightsource](#lightsource)
 1. Add the [background](#background)
 1. Add the [objects from the scene](#objectsFromScene)
-2. transform the object
-2. add texture properties from FreeCAD or user declaration from .inc file
+  1. create the basing object
+  1. rotate the object
+  1. transform the object
+  1. add texture properties from FreeCAD or user declaration from .inc file
 1. Write the pov file
 1. Start POVray
 
-## General
+## General Characteristics
 * The macro uses a right handed koordinate system like FreeCAD (specified in [camera](#camera))
+* All objects are created at <0, 0, 0> and translated later to the right position (see [Characteristics](#characteristics))
 
 <a name="globalsettings"></a>
 ## Global settings
-First some global settings are added to the .pov file.
+First, some global settings are added to the .pov file.
 The important one is the standard object color from the settings dialog.
-In objects with standard color and texture the `getPigment()` function will skip color and finish declaration of the pov object. 
+In objects with standard color and texture the `getPigment()` function will skip color and finish declaration of the pov object.
 
 <a name="camera"></a>
 ## Camera
@@ -33,10 +58,21 @@ The lightsource position is the same as the camera position
 <a name="background"></a>
 ## Background
 All FreeCAD background color modes from the settings dialog are supported.
-The color(s) are mapped on the POV-Ray sky-sphere and afterwards the skysphere is rotated in the camera direction to fit the horizon
+The color(s) are mapped on the POVray sky-sphere and afterwards the skysphere is rotated in the camera direction to fit the horizon
 
 <a name="objectsFromScene"></a>
 ## Objects from Scene
 First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovrayCode()` which creates the real POVray code. The `main()` function calls it for every object in the `firstLayer`. `createPovrayCode()` calls itself for every child, so a recursive function.
 
+<a name="characteristics"></a>
+### Characteristics
+The macro creates all objects at <0, 0, 0> and translates the object later. The reason for that is, that POVray rotates a object independent of the position around <0, 0, 0>, FreeCAD rotates relative to the object.
+
 ### createPovrayCode()
+1. The variable povCode will initialised with the label / name of the object.
+1. Add the basing POVray object to povCode but don't close the object
+1. Add the rotation to the POVray object
+1. Add the translation to the POVray object
+1. Add the look to the POVray object
+1. Close the POVray object by adding a `}`
+1. Return the created code

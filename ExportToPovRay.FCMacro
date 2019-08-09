@@ -604,16 +604,7 @@ class GUI(QtGui.QDialog):
         self.show()
 
     def setDefaultValues(self):
-        try:
-            file = open("/home/otto/Downloads/povTest.pov", "w")
-            defaultPath = "/home/otto/Downloads/povTest.pov"
-        except:
-            try:
-                file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
-                defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
-            except:
-                defaultPath = "/home/"
-        file.close()
+        defaultPath = "/home/"
         self.pathLineEdit.setText(defaultPath)
 
         #get saved input
@@ -665,33 +656,25 @@ class GUI(QtGui.QDialog):
         self.helpLabel.setOpenExternalLinks(True)
 
     def openFileDialog(self):
-        try:
-            file = open("/home/otto/Downloads/povTest.pov", "w")
-            defaultPath = "/home/otto/Downloads/povTest.pov"
-        except:
-            try:
-                file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
-                defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
-            except:
-                defaultPath = "/home/"
-        file.close()
+        defaultPath = self.pathLineEdit.text()
 
         fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
 
-        if fileName:
+        if fileName and fileName != (u'', u''):
             self.pathLineEdit.setText(str(fileName[0]))
 
     def checkPath(self, path):
-        #App.Console.PrintWarning(path)
-        if path.find(" ") == -1 and isAscii(path) == True:
+        if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:] == ".pov":
             self.okButton.setEnabled(True)
             self.warnLabel.setText("")
         else:
             self.okButton.setEnabled(False)
-            self.warnLabel.setText("Your Path contains a space or a mutated vowel")
+            if path == "":
+                self.warnLabel.setText("Please type a path or get one with clicking on 'Open pov File'")
+            else:
+                self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .pov file")
 
     def saveInput(self):
-        App.Console.PrintWarning("save input")
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
         settings.beginGroup("userInput")
         settings.setValue("path", self.pathLineEdit.text())
