@@ -53,7 +53,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     finalPovCode += getLight(incContent)
 
     finalPovCode += "\n// background ------------------------------\n"
-    finalPovCode += getBackground()
+    finalPovCode += getBackground(width, height)
 
     #emission rgb <0.8,0.8,1>
     finalPovCode += "\n//------------------------------------------\n"
@@ -118,16 +118,55 @@ def getLight(incContent):
 
     return povLight
 
-def getBackground():
+def getBackground(width, height):
+    CamType = Gui.ActiveDocument.ActiveView.getCameraType()
+    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
     EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
     povBg = ""
     bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
     bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
     bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
     bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
-
+    ViewDir = Gui.ActiveDocument.ActiveView.getViewDirection()
+    
+    AspectRatio = width/float(height)
+    
+    
+    
+    if CamType == "Orthographic":
+        if AspectRatio >= 1:
+            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            right = up*AspectRatio
+        else:
+            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            up = right/AspectRatio
+        povBg = "\npolygon {\n"
+        povBg += "    4, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
+        povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2) + ">\n"
+        povBg += "    pigment{"
+        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
+            povBg += " color rgb" + uintColorToRGB(bgColor1) + "}\n"
+        elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
+            povBg += "\n       gradient y\n"
+            povBg += "       color_map {\n"
+            povBg += "          [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+            povBg += "          [ 0.05  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+            if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
+                povBg += "          [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
+            povBg += "          [ 0.95  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "          [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "         }\n"
+            povBg += "        scale<1," + str(up) + ",1>\n"
+            povBg += "        translate<0," + str(-up/2) + ",0>\n"
+            povBg += "       }\n"
+        #color rgb<0,0,1>}\n"
+        povBg += "    finish{ambient 1 diffuse 0}\n"
+        povBg += "    rotate<" + str(EulerCam[2]) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
+        povBg += "    translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
+        povBg += "    translate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
+        povBg += "   }\n"
+                
     povBg += "sky_sphere {\n  pigment {\n"
-
     if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
         povBg += " color rgb" + uintColorToRGB(bgColor1)
 
@@ -135,18 +174,16 @@ def getBackground():
         povBg += "   gradient z\n"
         povBg += "   color_map {\n"
         povBg += "        [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
-        povBg += "        [ 0.20  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+        povBg += "        [ 0.30  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
         if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
             povBg += "        [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
-        povBg += "        [ 0.60  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+        povBg += "        [ 0.70  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
         povBg += "        [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
         povBg += "       }\n"
         povBg += "   scale 2\n"
         povBg += "   translate -1\n"
         povBg += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
-
-
-    povBg += "   }\n}\n"
+        povBg += "   }\n}\n"
     return povBg
 
 def getCam(width, height, incContent):
