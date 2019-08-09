@@ -183,7 +183,7 @@ def getBackground(width, height):
         povBg += "   scale 2\n"
         povBg += "   translate -1\n"
         povBg += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
-        povBg += "   }\n}\n"
+    povBg += "   }\n}\n"
     return povBg
 
 def getCam(width, height, incContent):
