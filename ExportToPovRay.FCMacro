@@ -62,7 +62,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     noCSG = False
     supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
     #print informations about the objects
-    App.Console.PrintMessage("The object model:\n")
+    #App.Console.PrintMessage("The object model:\n")
     for obj in objs:
         if not obj.TypeId in supportedObjs :
             noCSG = True
@@ -90,16 +90,18 @@ def startExport(povPath, width, height, repRot, expFcView):
     if expFcView:
         exportFcView(fileName[:-4] + "_FC-View.png",width,height)
 
-    #get the first layer
+    #get the first layer and check visibility of parent objects
     for obj in objs:
         if obj.InList == []: #no parents
-            firstLayer.append(obj)
+            guiObject = Gui.ActiveDocument.getObject(obj.Name)
+            if guiObject.getPropertyByName("Visibility"):
+                firstLayer.append(obj)
 
     #create the povray code
     for obj in firstLayer:
         finalPovCode += createPovrayCode(obj, incContent)
 
-    App.Console.PrintMessage("The final code for POVray:\n" + finalPovCode + "\n\n")
+    #App.Console.PrintMessage("The final code for POVray:\n" + finalPovCode + "\n\n")
     writeFile(finalPovCode, fileName)
     openPovRay(fileName, width, height)
 
@@ -122,7 +124,6 @@ def getBackground(width, height):
     CamType = Gui.ActiveDocument.ActiveView.getCameraType()
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
     EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
-    povBg = ""
     bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
     bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
     bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
@@ -130,8 +131,7 @@ def getBackground(width, height):
     ViewDir = Gui.ActiveDocument.ActiveView.getViewDirection()
     
     AspectRatio = width/float(height)
-    
-    
+    povBg = ""
     
     if CamType == "Orthographic":
         if AspectRatio >= 1:
@@ -194,7 +194,6 @@ def getCam(width, height, incContent):
 
     AspectRatio = width/float(height)
 
-
     incCamera = False
     if incContent.find("camera") != -1:
         incCamera = True
@@ -251,7 +250,7 @@ def delComments(code):
         comEnd = code.find("*/", comStart + 2)
 
         if comEnd is -1:
-            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is an unclodes multi line comment.\n")
+            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is an unclosed multi line comment.\n")
             return
         code = code[0:comStart] + code[comEnd + 2:]
 
