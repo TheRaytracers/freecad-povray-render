@@ -25,7 +25,7 @@ def startExport(povPath, width, height, repRot, expFcView):
         try:
             file = open(fileName, "w+")
             file.close()
-            App.Console.PrintMessage("\n\nPath to pov File: " + fileName + "\n")
+            App.Console.PrintMessage("\n\nPath to *.pov File: " + fileName + "\n")
         except:
             App.Console.PrintError("Can't open the pov file\n\n")
             return -1
@@ -37,7 +37,7 @@ def startExport(povPath, width, height, repRot, expFcView):
             incContent = file.read()
             file.close()
             finalPovCode += "\n#include \"" + incPath + "\"\n"
-            App.Console.PrintMessage("Content of the inc file:\n" + incContent + "\n\n")
+            App.Console.PrintMessage("Include file found: " + incPath + "\n")
             incContent = delComments(incContent)
         except:
             incContent = ""
@@ -59,28 +59,8 @@ def startExport(povPath, width, height, repRot, expFcView):
     finalPovCode += "\n//------------------------------------------\n"
     finalPovCode += "// objects in scene ------------------------\n"
 
-    noCSG = False
-    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
-    #print informations about the objects
-    #App.Console.PrintMessage("The object model:\n")
-    for obj in objs:
-        if not obj.TypeId in supportedObjs :
-            noCSG = True
-        App.Console.PrintMessage(str(obj.TypeId) + " - ")
-        App.Console.PrintMessage(str(obj.Name) + "\n")
-        for child in obj.OutList:
-            App.Console.PrintMessage("Childs\n")
-            App.Console.PrintMessage("   - " + str(child.TypeId) + " - ")
-            App.Console.PrintMessage(str(child.Name) + "\n")
-        for parent in obj.InList:
-            App.Console.PrintMessage("Parent\n")
-            App.Console.PrintMessage("   -" + str(parent.TypeId) + " - ")
-            App.Console.PrintMessage("   -" + str(parent.Name) + "\n\n\n")
-
-    App.Console.PrintMessage("\n\n")
-
-    if noCSG == True:
-        showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
+    App.Console.PrintMessage(getStatistics(objs))
+      
 
     #repair rotation
     if repRot:
@@ -101,11 +81,29 @@ def startExport(povPath, width, height, repRot, expFcView):
     for obj in firstLayer:
         finalPovCode += createPovrayCode(obj, incContent)
 
-    #App.Console.PrintMessage("The final code for POVray:\n" + finalPovCode + "\n\n")
     writeFile(finalPovCode, fileName)
     openPovRay(fileName, width, height)
 
-    App.Console.PrintMessage("\nDone\n")
+    
+def getStatistics(objs):
+    statistics = ""
+    noCsgCount = 0
+    CsgCount = 0
+    ParentCount = 0
+    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
+    for obj in objs:
+        if not obj.TypeId in supportedObjs :
+            noCsgCount = noCsgCount + 1
+        else:
+            CsgCount = CsgCount +1
+        if obj.InList == []:
+            ParentCount = ParentCount +1
+    statistics += str(ParentCount) + " parent objects found in highest layer\n"
+    statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
+    if noCsgCount != 0: 
+        statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
+        statistics += "The macro won't render these parts.\n"     # replace when meshes are supported
+    return statistics  
 
 def getLight(incContent):
     povLight = ""
@@ -194,15 +192,18 @@ def getCam(width, height, incContent):
 
     AspectRatio = width/float(height)
 
+    CamComment = ""
     incCamera = False
     if incContent.find("camera") != -1:
         incCamera = True
         PovCam += "/*"
+        CamComment += "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
 
     PovCamType = ""
     PovCamAngle = ""
     PovCamUp = ""
     PovCamRight = ""
+    
 
     if CamType == "Perspective":
         PovCamUp = "     up    < 0, 0, 1>\n"
@@ -212,7 +213,7 @@ def getCam(width, height, incContent):
         else:
             CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
         PovCamAngle = "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
-        App.Console.PrintMessage("Perspektivische Kamera\n")
+        CamComment += "Perspective Camera\n"
     elif CamType == "Orthographic":
         if AspectRatio >= 1:
             up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
@@ -223,9 +224,9 @@ def getCam(width, height, incContent):
         PovCamType = "      orthographic\n"
         PovCamUp = "     up    < 0, 0, " + "{0:1.2f}".format(up) + ">\n"
         PovCamRight = "     right   <" + "{0:1.2f}".format(right) +", 0, 0>\n"
-        App.Console.PrintMessage("Orthografische Kamera\n")
+        CamComment += "Orthographic camera\n"
     else:
-        App.Console.PrintMessage("unbekannte Kamera\n")
+        CamComment += "Unknown camera type - rudimentary camera statement will be used\n"
 
 
     PovCam = "camera {\n"
@@ -240,6 +241,8 @@ def getCam(width, height, incContent):
     PovCam += "    }\n"
     if incCamera:
         PovCam += "*/\n"
+    
+    App.Console.PrintMessage(CamComment)
 
     return PovCam
 
@@ -263,8 +266,6 @@ def delComments(code):
             App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is a misstake in a one line comment")
             return
         code = code[0:comStart] + code[comEnd:]
-
-    #App.Console.PrintMessage("Content of the inc file:333\n" + incContent + "\n\n")
     return code
 
 def createPovrayCode(fcObj, incContent): #returns the povray code for the object
