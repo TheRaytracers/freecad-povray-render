@@ -26,7 +26,7 @@ def startExport(povPath, width, height, repRot, expFcView):
         try:
             file = open(fileName, "w+")
             file.close()
-            App.Console.PrintMessage("\n\nPath to pov File: " + fileName + "\n")
+            App.Console.PrintMessage("\n\nPath to *.pov File: " + fileName + "\n")
         except:
             App.Console.PrintError("Can't open the pov file\n\n")
             return -1
@@ -38,7 +38,7 @@ def startExport(povPath, width, height, repRot, expFcView):
             incContent = file.read()
             file.close()
             finalPovCode += "\n#include \"" + incPath + "\"\n"
-            App.Console.PrintMessage("Content of the inc file:\n" + incContent + "\n\n")
+            App.Console.PrintMessage("Include file found: " + incPath + "\n")
             incContent = delComments(incContent)
         except:
             incContent = ""
@@ -54,35 +54,14 @@ def startExport(povPath, width, height, repRot, expFcView):
     finalPovCode += getLight(incContent)
 
     finalPovCode += "\n// background ------------------------------\n"
-    finalPovCode += getBackground()
+    finalPovCode += getBackground(width, height)
 
     #emission rgb <0.8,0.8,1>
     finalPovCode += "\n//------------------------------------------\n"
     finalPovCode += "// objects in scene ------------------------\n"
 
-    noCSG = False
-    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
-    #print informations about the objects
-    App.Console.PrintMessage("The object model:\n")
-    for obj in objs:
-        if not obj.TypeId in supportedObjs :
-            noCSG = True
-        App.Console.PrintMessage(str(obj.TypeId) + " - ")
-        App.Console.PrintMessage(str(obj.Name) + "\n")
-        for child in obj.OutList:
-            App.Console.PrintMessage("Childs\n")
-            App.Console.PrintMessage("   - " + str(child.TypeId) + " - ")
-            App.Console.PrintMessage(str(child.Name) + "\n")
-        for parent in obj.InList:
-            App.Console.PrintMessage("Parent\n")
-            App.Console.PrintMessage("   -" + str(parent.TypeId) + " - ")
-            App.Console.PrintMessage("   -" + str(parent.Name) + "\n\n\n")
+    App.Console.PrintMessage(getStatistics(objs))
 
-    App.Console.PrintMessage("\n\n")
-
-    if noCSG == True:
-        #showWarning("Your model contains objects which aren't from the part workbench. The macro won't render this parts.")
-        pass
 
     #repair rotation
     if repRot:
@@ -92,20 +71,40 @@ def startExport(povPath, width, height, repRot, expFcView):
     if expFcView:
         exportFcView(fileName[:-4] + "_FC-View.png",width,height)
 
-    #get the first layer
+    #get the first layer and check visibility of parent objects
     for obj in objs:
         if obj.InList == []: #no parents
-            firstLayer.append(obj)
+            guiObject = Gui.ActiveDocument.getObject(obj.Name)
+            if guiObject.getPropertyByName("Visibility"):
+                firstLayer.append(obj)
 
     #create the povray code
     for obj in firstLayer:
         finalPovCode += createPovrayCode(obj, incContent)
 
-    App.Console.PrintMessage("The final code for POVray:\n" + finalPovCode + "\n\n")
     writeFile(finalPovCode, fileName)
     openPovRay(fileName, width, height)
 
-    App.Console.PrintMessage("\nDone\n")
+
+def getStatistics(objs):
+    statistics = ""
+    noCsgCount = 0
+    CsgCount = 0
+    ParentCount = 0
+    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
+    for obj in objs:
+        if not obj.TypeId in supportedObjs :
+            noCsgCount = noCsgCount + 1
+        else:
+            CsgCount = CsgCount +1
+        if obj.InList == []:
+            ParentCount = ParentCount +1
+    statistics += str(ParentCount) + " parent objects found in highest layer\n"
+    statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
+    if noCsgCount != 0:
+        statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
+        statistics += "The macro won't render these parts.\n"     # replace when meshes are supported
+    return statistics
 
 def getLight(incContent):
     povLight = ""
@@ -120,16 +119,53 @@ def getLight(incContent):
 
     return povLight
 
-def getBackground():
+def getBackground(width, height):
+    CamType = Gui.ActiveDocument.ActiveView.getCameraType()
+    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
     EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
-    povBg = ""
     bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
     bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
     bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
     bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
+    ViewDir = Gui.ActiveDocument.ActiveView.getViewDirection()
 
-    povBg += "sky_sphere {\n  pigment {\n"
+    AspectRatio = width/float(height)
+    povBg = ""
 
+    if CamType == "Orthographic":
+        if AspectRatio >= 1:
+            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            right = up*AspectRatio
+        else:
+            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            up = right/AspectRatio
+        povBg = "\npolygon {\n"
+        povBg += "    4, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
+        povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2) + ">\n"
+        povBg += "    pigment{"
+        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
+            povBg += " color rgb" + uintColorToRGB(bgColor1) + "}\n"
+        elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
+            povBg += "\n       gradient y\n"
+            povBg += "       color_map {\n"
+            povBg += "          [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+            povBg += "          [ 0.05  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+            if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
+                povBg += "          [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
+            povBg += "          [ 0.95  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "          [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "         }\n"
+            povBg += "        scale<1," + str(up) + ",1>\n"
+            povBg += "        translate<0," + str(-up/2) + ",0>\n"
+            povBg += "       }\n"
+        #color rgb<0,0,1>}\n"
+        povBg += "    finish{ambient 1 diffuse 0}\n"
+        povBg += "    rotate<" + str(EulerCam[2]) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
+        povBg += "    translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
+        povBg += "    translate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
+        povBg += "   }\n"
+
+    povBg += "sky_sphere {\n   pigment {\n"
     if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
         povBg += " color rgb" + uintColorToRGB(bgColor1)
 
@@ -137,48 +173,79 @@ def getBackground():
         povBg += "   gradient z\n"
         povBg += "   color_map {\n"
         povBg += "        [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
-        povBg += "        [ 0.20  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+        povBg += "        [ 0.30  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
         if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
             povBg += "        [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
-        povBg += "        [ 0.60  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+        povBg += "        [ 0.70  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
         povBg += "        [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
         povBg += "       }\n"
         povBg += "   scale 2\n"
         povBg += "   translate -1\n"
         povBg += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
-
-
     povBg += "   }\n}\n"
     return povBg
 
 def getCam(width, height, incContent):
     CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
     EulerCam = CamOri.toEuler()
-
+    CamType = Gui.ActiveDocument.ActiveView.getCameraType()
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
 
     AspectRatio = width/float(height)
-    if AspectRatio <= 1:
-        CamAngle = 45
-    else:
-        CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
 
+    PovCam = ""
+    CamComment = ""
     incCamera = False
     if incContent.find("camera") != -1:
         incCamera = True
         PovCam += "/*"
 
-    PovCam = "camera {\n"
+
+    PovCamType = ""
+    PovCamAngle = ""
+    PovCamUp = ""
+    PovCamRight = ""
+
+
+    if CamType == "Perspective":
+        PovCamUp = "     up    < 0, 0, 1>\n"
+        PovCamRight = "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
+        if AspectRatio <= 1:
+            CamAngle = 45
+        else:
+            CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
+        PovCamAngle = "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
+        CamComment += "Perspective Camera\n"
+    elif CamType == "Orthographic":
+        if AspectRatio >= 1:
+            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            right = up*AspectRatio
+        else:
+            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            up = right/AspectRatio
+        PovCamType = "      orthographic\n"
+        PovCamUp = "     up    < 0, 0, " + "{0:1.2f}".format(up) + ">\n"
+        PovCamRight = "     right   <" + "{0:1.2f}".format(right) +", 0, 0>\n"
+        CamComment += "Orthographic camera\n"
+    else:
+        CamComment += "Unknown camera type - rudimentary camera statement will be used\n"
+
+
+    PovCam += "camera {\n"
+    PovCam += PovCamType
     PovCam += "     location <0, 0, 0>\n"
     PovCam += "     direction < 0, 1, 0>\n"
-    PovCam += "     up    < 0, 0, 1>\n"
-    PovCam += "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
+    PovCam += PovCamUp
+    PovCam += PovCamRight
     PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
     PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
-    PovCam += "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
+    PovCam += PovCamAngle
     PovCam += "    }\n"
     if incCamera:
         PovCam += "*/\n"
+        CamComment = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
+
+    App.Console.PrintMessage(CamComment)
 
     return PovCam
 
@@ -189,7 +256,7 @@ def delComments(code):
         comEnd = code.find("*/", comStart + 2)
 
         if comEnd is -1:
-            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is an unclodes multi line comment.\n")
+            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is an unclosed multi line comment.\n")
             return
         code = code[0:comStart] + code[comEnd + 2:]
 
@@ -202,8 +269,6 @@ def delComments(code):
             App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is a misstake in a one line comment")
             return
         code = code[0:comStart] + code[comEnd:]
-
-    #App.Console.PrintMessage("Content of the inc file:333\n" + incContent + "\n\n")
     return code
 
 def createPovrayCode(fcObj, incContent): #returns the povray code for the object
@@ -214,7 +279,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povCode += povBox
 
     elif fcObj.TypeId == "Part::Sphere": # Sphere
-        radius = int(fcObj.Radius)
+        radius = fcObj.Radius.getValueAs("mm")
 
         povSphere = "\nsphere { <0, 0, 0> " + str(radius)
 
@@ -227,7 +292,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povSphere = "\nsphere { <0, 0, 0> 1\n"
 
-        povSphere += "    scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n"
+        povSphere += "    scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">"
 
         povCode += povSphere
 
@@ -239,7 +304,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povCone = "\ncone { "
         povCone += c1 + ", " + str(r1) + "\n    "
-        povCone += c2 + ", " + str(r2) + "\n"
+        povCone += c2 + ", " + str(r2)
 
         povCode += povCone
 
@@ -261,6 +326,15 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povTorus += str(r1) + ", " + str(r2)
 
         povCode += povTorus
+
+    elif fcObj.TypeId == "Part::Plane": #Plane
+        width = fcObj.Width.getValueAs("mm").Value
+        length = fcObj.Length.getValueAs("mm").Value
+
+        povPlane = "\npolygon { "
+        povPlane += "4, <0, 0>, <" + str(length) + ", 0>, <" + str(length) + ", " + str(width) + ">, <0, " + str(width) + ">"
+
+        povCode += povPlane
 
     elif fcObj.TypeId == "Part::Cut":  #Cut
         childs = fcObj.OutList
@@ -582,16 +656,7 @@ class GUI(QtGui.QDialog):
         self.show()
 
     def setDefaultValues(self):
-        try:
-            file = open("/home/otto/Downloads/povTest.pov", "w")
-            defaultPath = "/home/otto/Downloads/povTest.pov"
-        except:
-            try:
-                file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
-                defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
-            except:
-                defaultPath = "/home/"
-        file.close()
+        defaultPath = "/home/"
         self.pathLineEdit.setText(defaultPath)
 
         #get saved input
@@ -643,33 +708,25 @@ class GUI(QtGui.QDialog):
         self.helpLabel.setOpenExternalLinks(True)
 
     def openFileDialog(self):
-        try:
-            file = open("/home/otto/Downloads/povTest.pov", "w")
-            defaultPath = "/home/otto/Downloads/povTest.pov"
-        except:
-            try:
-                file = open("/home/andreas/FreeCAD-POV/povTest.pov", "w")
-                defaultPath = "/home/andreas/FreeCAD-POV/povTest.pov"
-            except:
-                defaultPath = "/home/"
-        file.close()
+        defaultPath = self.pathLineEdit.text()
 
         fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
 
-        if fileName:
+        if fileName and fileName != (u'', u''):
             self.pathLineEdit.setText(str(fileName[0]))
 
     def checkPath(self, path):
-        #App.Console.PrintWarning(path)
-        if path.find(" ") == -1 and isAscii(path) == True:
+        if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:] == ".pov":
             self.okButton.setEnabled(True)
             self.warnLabel.setText("")
         else:
             self.okButton.setEnabled(False)
-            self.warnLabel.setText("Your Path contains a space or a mutated vowel")
+            if path == "":
+                self.warnLabel.setText("Please type a path or get one with clicking on 'Open pov File'")
+            else:
+                self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .pov file")
 
     def saveInput(self):
-        App.Console.PrintWarning("save input")
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
         settings.beginGroup("userInput")
         settings.setValue("path", self.pathLineEdit.text())
