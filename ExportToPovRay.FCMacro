@@ -164,7 +164,7 @@ def getBackground(width, height):
         povBg += "    translate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
         povBg += "   }\n"
                 
-    povBg += "sky_sphere {\n  pigment {\n"
+    povBg += "sky_sphere {\n   pigment {\n"
     if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
         povBg += " color rgb" + uintColorToRGB(bgColor1)
 
@@ -192,12 +192,13 @@ def getCam(width, height, incContent):
 
     AspectRatio = width/float(height)
 
+    PovCam = ""
     CamComment = ""
     incCamera = False
     if incContent.find("camera") != -1:
         incCamera = True
         PovCam += "/*"
-        CamComment += "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
+        
 
     PovCamType = ""
     PovCamAngle = ""
@@ -229,7 +230,7 @@ def getCam(width, height, incContent):
         CamComment += "Unknown camera type - rudimentary camera statement will be used\n"
 
 
-    PovCam = "camera {\n"
+    PovCam += "camera {\n"
     PovCam += PovCamType
     PovCam += "     location <0, 0, 0>\n"
     PovCam += "     direction < 0, 1, 0>\n"
@@ -241,6 +242,7 @@ def getCam(width, height, incContent):
     PovCam += "    }\n"
     if incCamera:
         PovCam += "*/\n"
+        CamComment = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
     
     App.Console.PrintMessage(CamComment)
 
@@ -276,7 +278,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         povCode += povBox
 
     elif fcObj.TypeId == "Part::Sphere": # Sphere
-        radius = int(fcObj.Radius)
+        radius = fcObj.Radius.getValueAs("mm")
 
         povSphere = "\nsphere { <0, 0, 0> " + str(radius)
 
@@ -289,7 +291,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povSphere = "\nsphere { <0, 0, 0> 1\n"
 
-        povSphere += "    scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">\n"
+        povSphere += "    scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">"
 
         povCode += povSphere
 
@@ -301,7 +303,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
 
         povCone = "\ncone { "
         povCone += c1 + ", " + str(r1) + "\n    "
-        povCone += c2 + ", " + str(r2) + "\n"
+        povCone += c2 + ", " + str(r2)
 
         povCode += povCone
 
@@ -328,8 +330,8 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         width = fcObj.Width.getValueAs("mm").Value
         length = fcObj.Length.getValueAs("mm").Value
 
-        povPlane = "\npolygon {\n"
-        povPlane += "    4, <0, 0>, <" + str(length) + ", 0>, <" + str(length) + ", " + str(width) + ">, <0, " + str(width) + ">"
+        povPlane = "\npolygon { "
+        povPlane += "4, <0, 0>, <" + str(length) + ", 0>, <" + str(length) + ", " + str(width) + ">, <0, " + str(width) + ">"
 
         povCode += povPlane
 
