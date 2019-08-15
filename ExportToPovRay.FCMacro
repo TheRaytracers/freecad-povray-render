@@ -80,7 +80,7 @@ def startExport(povPath, width, height, repRot, expFcView):
 
     #create the povray code
     for obj in firstLayer:
-        finalPovCode += createPovrayCode(obj, incContent)
+        finalPovCode += createPovrayCode(obj, incContent, width, height)
 
     writeFile(finalPovCode, fileName)
     openPovRay(fileName, width, height)
@@ -271,7 +271,7 @@ def delComments(code):
         code = code[0:comStart] + code[comEnd:]
     return code
 
-def createPovrayCode(fcObj, incContent): #returns the povray code for the object
+def createPovrayCode(fcObj, incContent, width, height): #returns the povray code for the object
     povCode = "\n//----- " + stringCorrection(fcObj.Label) + " -----" #add the name of the object
 
     if fcObj.TypeId == "Part::Box": #Box
@@ -340,7 +340,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         childs = fcObj.OutList
         povCut = "\ndifference {\n"
         for child in childs:
-            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            childCode = createPovrayCode(child, incContent, width, height) #call createPovrayCode for the child
             povCut += childCode.replace("\n", "\n    ") #add the indents
 
         povCode += povCut
@@ -349,7 +349,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         childs = fcObj.OutList
         povFusion = "\nunion {\n"
         for child in childs:
-            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            childCode = createPovrayCode(child, incContent, width, height) #call createPovrayCode for the child
             povFusion += childCode.replace("\n", "\n    ") #add the indents
 
         povCode += povFusion
@@ -358,7 +358,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         childs = fcObj.OutList
         povCommon = "\nintersection {\n"
         for child in childs:
-            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            childCode = createPovrayCode(child, incContent, width, height) #call createPovrayCode for the child
             povCommon += childCode.replace("\n", "\n    ") #add the indents
 
         povCode += povCommon
@@ -366,7 +366,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
         childs = fcObj.OutList
         for child in childs:
-            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            childCode = createPovrayCode(child, incContent, width, height) #call createPovrayCode for the child
             povCode += childCode
         return povCode
 
@@ -377,7 +377,14 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
             mesh = fcObj.Mesh
         else:
-            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = 0.1, Relative = True)
+            distanceCam = fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2
+            pictureSize = (width + height) / 2
+            linearDeflection = (distanceCam / pictureSize) * 0.03
+            App.Console.PrintMessage(str(distanceCam) + "\n")
+            App.Console.PrintMessage(str(pictureSize) + "\n")
+            App.Console.PrintMessage(str(linearDeflection) + "\n")
+            #linearDeflection = 0.1
+            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = linearDeflection, AngularDeflection = 0.5, Relative = True)
 
         if not mesh:
             return ""
@@ -417,7 +424,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         if fcObj.TypeId == "Part::FeaturePython":
             childs = fcObj.OutList
             for child in childs:
-                childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+                childCode = createPovrayCode(child, incContent, width, height) #call createPovrayCode for the child
                 povCode += childCode
 
         return povCode #return because the mesh may not translated and rotated
