@@ -103,7 +103,6 @@ def getStatistics(objs):
     statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
     if noCsgCount != 0:
         statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
-        statistics += "The macro won't render these parts.\n"     # replace when meshes are supported
     return statistics
 
 def getLight(incContent):

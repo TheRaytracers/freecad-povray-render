@@ -84,6 +84,8 @@ Replace MODE with the one of the modes above.
 For more information please visit the [POVray wiki](http://wiki.povray.org/content/HowTo:Use_radiosity).
 
 ## Supported Objects
+The macro simulates objects which aren't supported already with a mesh. The meshes are in an extra file with the name `name_meshes.inc`.
+
 ### Part Workbench
 - [x] Cube
 - [x] Cylinder
