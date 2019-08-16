@@ -72,7 +72,7 @@ POVray knows many different modes:
 
 To use radiosity add these lines to your inc file:
 ```
-#include “rad_def.inc”
+#include "rad_def.inc"
 global_settings {
    radiosity {
       Rad_Settings(MODE, off, off)
