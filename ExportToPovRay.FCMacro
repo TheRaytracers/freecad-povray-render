@@ -4,6 +4,7 @@ from FreeCAD import Base
 import os
 from PySide import QtCore, QtGui
 import math
+import MeshPart
 
 DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
@@ -12,17 +13,41 @@ def startExport(povPath, width, height, repRot, expFcView):
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
 
+    statistics = getStatistics(objs)
+    App.Console.PrintMessage(statistics[0])
+
+    #clear old mesh file
+    if statistics[1]:
+        meshFile = open(povPath[:-4] + "_meshes.inc", "w")
+
+    #repair rotation
+    if repRot:
+        repairRot(objs)
+
+    #export FreeCAD view
+    if expFcView:
+        exportFcView(fileName[:-4] + "_FC-View.png", width, height)
+
+    #get the first layer and check visibility of parent objects
+    for obj in objs:
+        if obj.InList == []: #no parents
+            guiObject = Gui.ActiveDocument.getObject(obj.Name)
+            if guiObject.getPropertyByName("Visibility"):
+                firstLayer.append(obj)
+
     finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.2 diffuse 0.9 }}\n"
 
-    finalPovCode += "#default{pigment{rgb "+ uintColorToRGB(DefaultShapeColor) + "}}\n"
+    finalPovCode += "#default{pigment{rgb " + uintColorToRGB(DefaultShapeColor) + "}}\n"
 
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
+    finalPovCode += "#include \"" + povPath[:-4] + "_meshes.inc\"\n"
+
     fileName = povPath
 
-    if fileName != -1 and fileName != "" and fileName != " ":
-        try:
+    if fileName != -1 and fileName != "" and fileName != " ": #is there a file name
+        try: #try to open pov file
             file = open(fileName, "w+")
             file.close()
             App.Console.PrintMessage("\n\nPath to *.pov File: " + fileName + "\n")
@@ -32,7 +57,7 @@ def startExport(povPath, width, height, repRot, expFcView):
 
         incPath = fileName[:-3] + "inc"
 
-        try:
+        try: #try to open inc file
             file = open(incPath, "r")
             incContent = file.read()
             file.close()
@@ -59,27 +84,14 @@ def startExport(povPath, width, height, repRot, expFcView):
     finalPovCode += "\n//------------------------------------------\n"
     finalPovCode += "// objects in scene ------------------------\n"
 
-    App.Console.PrintMessage(getStatistics(objs))
-
-
-    #repair rotation
-    if repRot:
-        repairRot(objs)
-
-    #export FreeCAD view
-    if expFcView:
-        exportFcView(fileName[:-4] + "_FC-View.png",width,height)
-
-    #get the first layer and check visibility of parent objects
-    for obj in objs:
-        if obj.InList == []: #no parents
-            guiObject = Gui.ActiveDocument.getObject(obj.Name)
-            if guiObject.getPropertyByName("Visibility"):
-                firstLayer.append(obj)
-
     #create the povray code
-    for obj in firstLayer:
-        finalPovCode += createPovrayCode(obj, incContent)
+    if statistics[1]:
+        for obj in firstLayer:
+            finalPovCode += createPovrayCode(obj, incContent, width, height, meshFile)
+        meshFile.close()
+    else:
+        for obj in firstLayer:
+            finalPovCode += createPovrayCode(obj, incContent, width, height)
 
     writeFile(finalPovCode, fileName)
     openPovRay(fileName, width, height)
@@ -102,8 +114,7 @@ def getStatistics(objs):
     statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
     if noCsgCount != 0:
         statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
-        statistics += "The macro won't render these parts.\n"     # replace when meshes are supported
-    return statistics
+    return [statistics, noCsgCount]
 
 def getLight(incContent):
     povLight = ""
@@ -270,7 +281,7 @@ def delComments(code):
         code = code[0:comStart] + code[comEnd:]
     return code
 
-def createPovrayCode(fcObj, incContent): #returns the povray code for the object
+def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns the povray code for the object
     povCode = "\n//----- " + stringCorrection(fcObj.Label) + " -----" #add the name of the object
 
     if fcObj.TypeId == "Part::Box": #Box
@@ -339,7 +350,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         childs = fcObj.OutList
         povCut = "\ndifference {\n"
         for child in childs:
-            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
             povCut += childCode.replace("\n", "\n    ") #add the indents
 
         povCode += povCut
@@ -348,7 +359,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         childs = fcObj.OutList
         povFusion = "\nunion {\n"
         for child in childs:
-            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
             povFusion += childCode.replace("\n", "\n    ") #add the indents
 
         povCode += povFusion
@@ -357,7 +368,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         childs = fcObj.OutList
         povCommon = "\nintersection {\n"
         for child in childs:
-            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
             povCommon += childCode.replace("\n", "\n    ") #add the indents
 
         povCode += povCommon
@@ -365,12 +376,70 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
     elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
         childs = fcObj.OutList
         for child in childs:
-            childCode = createPovrayCode(child, incContent) #call createPovrayCode for the child
+            childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
             povCode += childCode
         return povCode
 
     else: #not a supported object
-        return ""
+        shape = fcObj.Shape
+        mesh = 0
+
+        if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
+            mesh = fcObj.Mesh
+        else:
+            distanceCam = fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2
+            pictureSize = (width + height) / 2
+            angularDeflection = (distanceCam / pictureSize) * 2.5
+            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+
+        if not mesh:
+            return ""
+
+        #create mesh2 object
+        povMesh = "#declare " + stringCorrection(fcObj.Label) + "_mesh ="
+        povMesh += "\nmesh2 {\n    vertex_vectors {\n"
+
+        #create vertex_vectors
+        numOfVertex = len(mesh.Topology[0])
+        povMesh += "        " + str(numOfVertex)
+
+        for point in mesh.Topology[0]:
+            povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
+        povMesh += "    }\n\n"
+
+        #create face_indices
+        povMesh += "    face_indices {\n"
+        numOfTriangles = len(mesh.Topology[1])
+        povMesh += "        " + str(numOfTriangles)
+
+        for triangle in mesh.Topology[1]:
+            povMesh += ",\n        <" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
+        povMesh += "    }\n\n"
+
+        #add inside vector
+        povMesh += "    inside_vector <1, 1, 1>\n"
+
+        povMesh += "}\n\n"
+
+        #povCode += povMesh
+        #write mesh in inc file
+        meshFile.write(povMesh)
+
+        #return pov code
+        povCode += "\nobject { " + stringCorrection(fcObj.Label) + "_mesh\n"
+        pigment = getPigment(fcObj, incContent)
+        if pigment != "": #test if the object has the standard pigment
+            povCode += "    " + pigment + "\n"
+
+        povCode += "}\n"
+
+        if fcObj.TypeId == "Part::FeaturePython":
+            childs = fcObj.OutList
+            for child in childs:
+                childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
+                povCode += childCode
+
+        return povCode #return because the mesh may not translated and rotated
 
     povCode += "\n"
     rotation = getRot(fcObj)
