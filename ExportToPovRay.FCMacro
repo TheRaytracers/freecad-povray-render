@@ -97,190 +97,6 @@ def startExport(povPath, width, height, repRot, expFcView):
     openPovRay(fileName, width, height)
 
 
-def getStatistics(objs):
-    statistics = ""
-    noCsgCount = 0
-    CsgCount = 0
-    ParentCount = 0
-    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
-    for obj in objs:
-        if not obj.TypeId in supportedObjs :
-            noCsgCount = noCsgCount + 1
-        else:
-            CsgCount = CsgCount +1
-        if obj.InList == []:
-            ParentCount = ParentCount +1
-    statistics += str(ParentCount) + " parent objects found in highest layer\n"
-    statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
-    if noCsgCount != 0:
-        statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
-    return [statistics, noCsgCount]
-
-def getLight(incContent):
-    povLight = ""
-    secondLight = False
-    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
-
-    if incContent.find("light_source") != -1:
-        secondLight = True
-        povLight += "//"
-    #povLight += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
-    povLight += "light_source { <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + "> color rgb<0.5,0.5,0.5> }\n"
-
-    return povLight
-
-def getBackground(width, height):
-    CamType = Gui.ActiveDocument.ActiveView.getCameraType()
-    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
-    EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
-    bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
-    bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
-    bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
-    bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
-    ViewDir = Gui.ActiveDocument.ActiveView.getViewDirection()
-
-    AspectRatio = width/float(height)
-    povBg = ""
-
-    if CamType == "Orthographic":
-        if AspectRatio >= 1:
-            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
-            right = up*AspectRatio
-        else:
-            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
-            up = right/AspectRatio
-        povBg = "\npolygon {\n"
-        povBg += "    4, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
-        povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2) + ">\n"
-        povBg += "    pigment{"
-        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
-            povBg += " color rgb" + uintColorToRGB(bgColor1) + "}\n"
-        elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
-            povBg += "\n       gradient y\n"
-            povBg += "       color_map {\n"
-            povBg += "          [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
-            povBg += "          [ 0.05  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
-            if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
-                povBg += "          [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
-            povBg += "          [ 0.95  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
-            povBg += "          [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
-            povBg += "         }\n"
-            povBg += "        scale<1," + str(up) + ",1>\n"
-            povBg += "        translate<0," + str(-up/2) + ",0>\n"
-            povBg += "       }\n"
-        #color rgb<0,0,1>}\n"
-        povBg += "    finish{ambient 1 diffuse 0}\n"
-        povBg += "    rotate<" + str(EulerCam[2]) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
-        povBg += "    translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
-        povBg += "    translate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
-        povBg += "   }\n"
-
-    povBg += "sky_sphere {\n   pigment {\n"
-    if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
-        povBg += " color rgb" + uintColorToRGB(bgColor1)
-
-    elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
-        povBg += "   gradient z\n"
-        povBg += "   color_map {\n"
-        povBg += "        [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
-        povBg += "        [ 0.30  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
-        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
-            povBg += "        [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
-        povBg += "        [ 0.70  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
-        povBg += "        [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
-        povBg += "       }\n"
-        povBg += "   scale 2\n"
-        povBg += "   translate -1\n"
-        povBg += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
-    povBg += "   }\n}\n"
-    return povBg
-
-def getCam(width, height, incContent):
-    CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
-    EulerCam = CamOri.toEuler()
-    CamType = Gui.ActiveDocument.ActiveView.getCameraType()
-    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
-
-    AspectRatio = width/float(height)
-
-    PovCam = ""
-    CamComment = ""
-    incCamera = False
-    if incContent.find("camera") != -1:
-        incCamera = True
-        PovCam += "/*"
-
-
-    PovCamType = ""
-    PovCamAngle = ""
-    PovCamUp = ""
-    PovCamRight = ""
-
-
-    if CamType == "Perspective":
-        PovCamUp = "     up    < 0, 0, 1>\n"
-        PovCamRight = "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
-        if AspectRatio <= 1:
-            CamAngle = 45
-        else:
-            CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
-        PovCamAngle = "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
-        CamComment += "Perspective Camera\n"
-    elif CamType == "Orthographic":
-        if AspectRatio >= 1:
-            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
-            right = up*AspectRatio
-        else:
-            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
-            up = right/AspectRatio
-        PovCamType = "      orthographic\n"
-        PovCamUp = "     up    < 0, 0, " + "{0:1.2f}".format(up) + ">\n"
-        PovCamRight = "     right   <" + "{0:1.2f}".format(right) +", 0, 0>\n"
-        CamComment += "Orthographic camera\n"
-    else:
-        CamComment += "Unknown camera type - rudimentary camera statement will be used\n"
-
-
-    PovCam += "camera {\n"
-    PovCam += PovCamType
-    PovCam += "     location <0, 0, 0>\n"
-    PovCam += "     direction < 0, 1, 0>\n"
-    PovCam += PovCamUp
-    PovCam += PovCamRight
-    PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
-    PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
-    PovCam += PovCamAngle
-    PovCam += "    }\n"
-    if incCamera:
-        PovCam += "*/\n"
-        CamComment = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
-
-    App.Console.PrintMessage(CamComment)
-
-    return PovCam
-
-def delComments(code):
-    #delete big comments
-    while code.find("/*") is not -1:
-        comStart = code.find("/*")
-        comEnd = code.find("*/", comStart + 2)
-
-        if comEnd is -1:
-            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is an unclosed multi line comment.\n")
-            return
-        code = code[0:comStart] + code[comEnd + 2:]
-
-    #delete little comments
-    while code.find("//") is not -1:
-        comStart = code.find("//")
-        comEnd = code.find("\n", comStart + 2)
-
-        if comEnd is -1:
-            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is a misstake in a one line comment")
-            return
-        code = code[0:comStart] + code[comEnd:]
-    return code
-
 def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns the povray code for the object
     povCode = "\n//----- " + stringCorrection(fcObj.Label) + " -----" #add the name of the object
 
@@ -457,6 +273,170 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
     povCode += "}\n"
     return povCode
 
+
+def getStatistics(objs):
+    statistics = ""
+    noCsgCount = 0
+    CsgCount = 0
+    ParentCount = 0
+    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
+    for obj in objs:
+        if not obj.TypeId in supportedObjs :
+            noCsgCount = noCsgCount + 1
+        else:
+            CsgCount = CsgCount +1
+        if obj.InList == []:
+            ParentCount = ParentCount +1
+    statistics += str(ParentCount) + " parent objects found in highest layer\n"
+    statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
+    if noCsgCount != 0:
+        statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
+    return [statistics, noCsgCount]
+
+def getLight(incContent):
+    povLight = ""
+    secondLight = False
+    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
+
+    if incContent.find("light_source") != -1:
+        secondLight = True
+        povLight += "//"
+    #povLight += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
+    povLight += "light_source { <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + "> color rgb<0.5,0.5,0.5> }\n"
+
+    return povLight
+
+def getBackground(width, height):
+    CamType = Gui.ActiveDocument.ActiveView.getCameraType()
+    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
+    EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
+    bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
+    bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
+    bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
+    bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
+    ViewDir = Gui.ActiveDocument.ActiveView.getViewDirection()
+
+    AspectRatio = width/float(height)
+    povBg = ""
+
+    if CamType == "Orthographic":
+        if AspectRatio >= 1:
+            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            right = up*AspectRatio
+        else:
+            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            up = right/AspectRatio
+        povBg = "\npolygon {\n"
+        povBg += "    4, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
+        povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2) + ">\n"
+        povBg += "    pigment{"
+        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
+            povBg += " color rgb" + uintColorToRGB(bgColor1) + "}\n"
+        elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
+            povBg += "\n       gradient y\n"
+            povBg += "       color_map {\n"
+            povBg += "          [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+            povBg += "          [ 0.05  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+            if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
+                povBg += "          [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
+            povBg += "          [ 0.95  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "          [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "         }\n"
+            povBg += "        scale<1," + str(up) + ",1>\n"
+            povBg += "        translate<0," + str(-up/2) + ",0>\n"
+            povBg += "       }\n"
+        #color rgb<0,0,1>}\n"
+        povBg += "    finish{ambient 1 diffuse 0}\n"
+        povBg += "    rotate<" + str(EulerCam[2]) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
+        povBg += "    translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
+        povBg += "    translate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
+        povBg += "   }\n"
+
+    povBg += "sky_sphere {\n   pigment {\n"
+    if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
+        povBg += " color rgb" + uintColorToRGB(bgColor1)
+
+    elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
+        povBg += "   gradient z\n"
+        povBg += "   color_map {\n"
+        povBg += "        [ 0.00  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+        povBg += "        [ 0.30  color rgb" + uintColorToRGB(bgColor3) +" ]\n"
+        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
+            povBg += "        [ 0.50  color rgb" + uintColorToRGB(bgColor4) +" ]\n"
+        povBg += "        [ 0.70  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+        povBg += "        [ 1.00  color rgb" + uintColorToRGB(bgColor2) +" ]\n"
+        povBg += "       }\n"
+        povBg += "   scale 2\n"
+        povBg += "   translate -1\n"
+        povBg += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
+    povBg += "   }\n}\n"
+    return povBg
+
+def getCam(width, height, incContent):
+    CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
+    EulerCam = CamOri.toEuler()
+    CamType = Gui.ActiveDocument.ActiveView.getCameraType()
+    CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
+
+    AspectRatio = width/float(height)
+
+    PovCam = ""
+    CamComment = ""
+    incCamera = False
+    if incContent.find("camera") != -1:
+        incCamera = True
+        PovCam += "/*"
+
+
+    PovCamType = ""
+    PovCamAngle = ""
+    PovCamUp = ""
+    PovCamRight = ""
+
+
+    if CamType == "Perspective":
+        PovCamUp = "     up    < 0, 0, 1>\n"
+        PovCamRight = "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
+        if AspectRatio <= 1:
+            CamAngle = 45
+        else:
+            CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
+        PovCamAngle = "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
+        CamComment += "Perspective Camera\n"
+    elif CamType == "Orthographic":
+        if AspectRatio >= 1:
+            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            right = up*AspectRatio
+        else:
+            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            up = right/AspectRatio
+        PovCamType = "      orthographic\n"
+        PovCamUp = "     up    < 0, 0, " + "{0:1.2f}".format(up) + ">\n"
+        PovCamRight = "     right   <" + "{0:1.2f}".format(right) +", 0, 0>\n"
+        CamComment += "Orthographic camera\n"
+    else:
+        CamComment += "Unknown camera type - rudimentary camera statement will be used\n"
+
+
+    PovCam += "camera {\n"
+    PovCam += PovCamType
+    PovCam += "     location <0, 0, 0>\n"
+    PovCam += "     direction < 0, 1, 0>\n"
+    PovCam += PovCamUp
+    PovCam += PovCamRight
+    PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
+    PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
+    PovCam += PovCamAngle
+    PovCam += "    }\n"
+    if incCamera:
+        PovCam += "*/\n"
+        CamComment = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
+
+    App.Console.PrintMessage(CamComment)
+
+    return PovCam
+
+
 def getTranslation(fcObj):
     translation = ""
     x = fcObj.Placement.Base.x #get the position in every axis
@@ -522,12 +502,6 @@ def getPigment(fcObj, incContent):
         material = "\nmaterial {" + fcObj.Label + "_material}\n"
     return material
 
-def uintColorToRGB(uintColor):
-    Blue = (uintColor >> 8) & 255
-    Green = (uintColor >> 16) & 255
-    Red = (uintColor >> 24) & 255
-    rgbString = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(Red/float(255),Green/float(255),Blue/float(255))
-    return rgbString
 
 def writeFile(povText, fileName):
     #povText: the code for POVray
@@ -543,25 +517,6 @@ def openPovRay(path, width, height):
     terminalInput = "povray " + str(path) + " +P Width=" + str(width) + " Height=" + str(height) #create the string to start POVray
     os.system(terminalInput) #put terminalInput to the console
 
-def showWarning(msg):
-    #msg: message to show
-    dialog = QtGui.QMessageBox(QtGui.QMessageBox.Warning, "Warning", msg)
-    dialog.setWindowModality(QtCore.Qt.ApplicationModal)
-    dialog.exec_()
-
-def stringCorrection(inputString): #change a utf-8 string to an ASCII string
-    utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
-    uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
-    uniString = uniString.replace(u"Ä", "Ae")             # replacement of german "Umlaute"
-    uniString = uniString.replace(u"ä", "ae")
-    uniString = uniString.replace(u"Ü", "Ue")
-    uniString = uniString.replace(u"ü", "ue")
-    uniString = uniString.replace(u"Ö", "Oe")
-    uniString = uniString.replace(u"ö", "oe")
-    uniString = uniString.replace(u"ß", "ss")
-    uniString = uniString.replace(" ", "_")
-    outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
-    return outString
 
 def repairRot(objs):
     for obj in objs:
@@ -579,8 +534,53 @@ def repairRot(objs):
 def exportFcView(path, width, height): #export the current FreeCAD view like Tools / Save Picture...
     Gui.ActiveDocument.ActiveView.saveImage(path, width, height)
 
+
+def stringCorrection(inputString): #change a utf-8 string to an ASCII string
+    utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
+    uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
+    uniString = uniString.replace(u"Ä", "Ae")             # replacement of german "Umlaute"
+    uniString = uniString.replace(u"ä", "ae")
+    uniString = uniString.replace(u"Ü", "Ue")
+    uniString = uniString.replace(u"ü", "ue")
+    uniString = uniString.replace(u"Ö", "Oe")
+    uniString = uniString.replace(u"ö", "oe")
+    uniString = uniString.replace(u"ß", "ss")
+    uniString = uniString.replace(" ", "_")
+    outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
+    return outString
+
+def uintColorToRGB(uintColor):
+    Blue = (uintColor >> 8) & 255
+    Green = (uintColor >> 16) & 255
+    Red = (uintColor >> 24) & 255
+    rgbString = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(Red/float(255),Green/float(255),Blue/float(255))
+    return rgbString
+
 def isAscii(string): #test whether the string is an ASCII string
     return all(ord(c) < 128 for c in string)
+
+def delComments(code):
+    #delete big comments
+    while code.find("/*") is not -1:
+        comStart = code.find("/*")
+        comEnd = code.find("*/", comStart + 2)
+
+        if comEnd is -1:
+            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is an unclosed multi line comment.\n")
+            return
+        code = code[0:comStart] + code[comEnd + 2:]
+
+    #delete little comments
+    while code.find("//") is not -1:
+        comStart = code.find("//")
+        comEnd = code.find("\n", comStart + 2)
+
+        if comEnd is -1:
+            App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is a misstake in a one line comment")
+            return
+        code = code[0:comStart] + code[comEnd:]
+    return code
+
 
 class GUI(QtGui.QDialog):
     def __init__(self):
