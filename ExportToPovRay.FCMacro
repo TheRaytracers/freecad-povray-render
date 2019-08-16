@@ -389,12 +389,8 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
         else:
             distanceCam = fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2
             pictureSize = (width + height) / 2
-            linearDeflection = (distanceCam / pictureSize) * 100
-            #App.Console.PrintMessage(str(distanceCam) + "\n")
-            #App.Console.PrintMessage(str(pictureSize) + "\n")
-            #App.Console.PrintMessage(str(linearDeflection) + "\n")
-            #linearDeflection = 0.1
-            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = linearDeflection, AngularDeflection = 0.5, Relative = True)
+            angularDeflection = (distanceCam / pictureSize) * 2.5
+            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
 
         if not mesh:
             return ""

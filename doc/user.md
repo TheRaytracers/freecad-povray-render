@@ -8,7 +8,7 @@ Now you have to put the .FCMacro file in your macro directory. You cant look und
 * Mac: `XXX`
 
 ## Usage
-The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. POVray opens a windows with the rendering result. To close this window, click on the windows.
+The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. If you have many no CSG object the creation of the code can take a while. POVray opens a windows with the rendering result. To close this window, click on the windows.
 
 <a name="startTheMacro"></a>
 ### Start the Macro
@@ -84,7 +84,7 @@ Replace MODE with the one of the modes above.
 For more information please visit the [POVray wiki](http://wiki.povray.org/content/HowTo:Use_radiosity).
 
 ## Supported Objects
-The macro simulates objects which aren't supported already with a mesh. The meshes are in an extra file with the name `name_meshes.inc`.
+The macro simulates objects which aren't supported already with a mesh. The meshes are in an extra file with the name `name_meshes.inc`. But doubt, that the creation of a mesh needs a lot of cpu time.
 
 ### Part Workbench
 - [x] Cube
