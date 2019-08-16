@@ -60,7 +60,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     finalPovCode += "// objects in scene ------------------------\n"
 
     App.Console.PrintMessage(getStatistics(objs))
-      
+
 
     #repair rotation
     if repRot:
@@ -84,7 +84,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     writeFile(finalPovCode, fileName)
     openPovRay(fileName, width, height)
 
-    
+
 def getStatistics(objs):
     statistics = ""
     noCsgCount = 0
@@ -100,10 +100,10 @@ def getStatistics(objs):
             ParentCount = ParentCount +1
     statistics += str(ParentCount) + " parent objects found in highest layer\n"
     statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
-    if noCsgCount != 0: 
+    if noCsgCount != 0:
         statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
         statistics += "The macro won't render these parts.\n"     # replace when meshes are supported
-    return statistics  
+    return statistics
 
 def getLight(incContent):
     povLight = ""
@@ -127,10 +127,10 @@ def getBackground(width, height):
     bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
     bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
     ViewDir = Gui.ActiveDocument.ActiveView.getViewDirection()
-    
+
     AspectRatio = width/float(height)
     povBg = ""
-    
+
     if CamType == "Orthographic":
         if AspectRatio >= 1:
             up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
@@ -163,7 +163,7 @@ def getBackground(width, height):
         povBg += "    translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
         povBg += "    translate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
         povBg += "   }\n"
-                
+
     povBg += "sky_sphere {\n   pigment {\n"
     if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
         povBg += " color rgb" + uintColorToRGB(bgColor1)
@@ -198,13 +198,13 @@ def getCam(width, height, incContent):
     if incContent.find("camera") != -1:
         incCamera = True
         PovCam += "/*"
-        
+
 
     PovCamType = ""
     PovCamAngle = ""
     PovCamUp = ""
     PovCamRight = ""
-    
+
 
     if CamType == "Perspective":
         PovCamUp = "     up    < 0, 0, 1>\n"
@@ -243,7 +243,7 @@ def getCam(width, height, incContent):
     if incCamera:
         PovCam += "*/\n"
         CamComment = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
-    
+
     App.Console.PrintMessage(CamComment)
 
     return PovCam
@@ -331,7 +331,7 @@ def createPovrayCode(fcObj, incContent): #returns the povray code for the object
         length = fcObj.Length.getValueAs("mm").Value
 
         povPlane = "\npolygon { "
-        povPlane += "4, <0, 0>, <" + str(length) + ", 0>, <" + str(length) + ", " + str(width) + ">, <0, " + str(width) + ">"
+        povPlane += "5, <0, 0>, <" + str(length) + ", 0>, <" + str(length) + ", " + str(width) + ">, <0, " + str(width) + ">, <0, 0>"
 
         povCode += povPlane
 
