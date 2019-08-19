@@ -316,6 +316,7 @@ def getLight(incContent):
 def getBackground(width, height):
     CamType = Gui.ActiveDocument.ActiveView.getCameraType()
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
+    CamNode = Gui.ActiveDocument.ActiveView.getCameraNode()
     EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
     bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
     bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
@@ -328,10 +329,10 @@ def getBackground(width, height):
 
     if CamType == "Orthographic":
         if AspectRatio >= 1:
-            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            up = CamNode.height.getValue()
             right = up*AspectRatio
         else:
-            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            right = CamNode.height.getValue()
             up = right/AspectRatio
         povBg = "\npolygon {\n"
         povBg += "    5, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
@@ -385,6 +386,7 @@ def getCam(width, height, incContent):
     EulerCam = CamOri.toEuler()
     CamType = Gui.ActiveDocument.ActiveView.getCameraType()
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
+    CamNode = Gui.ActiveDocument.ActiveView.getCameraNode()
 
     AspectRatio = width/float(height)
 
@@ -413,10 +415,10 @@ def getCam(width, height, incContent):
         CamComment += "Perspective Camera\n"
     elif CamType == "Orthographic":
         if AspectRatio >= 1:
-            up = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            up = up = CamNode.height.getValue()
             right = up*AspectRatio
         else:
-            right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
+            right = CamNode.height.getValue()
             up = right/AspectRatio
         PovCamType = "      orthographic\n"
         PovCamUp = "     up    < 0, 0, " + "{0:1.2f}".format(up) + ">\n"
