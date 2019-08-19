@@ -334,8 +334,9 @@ def getBackground(width, height):
             right = float(Gui.ActiveDocument.ActiveView.getCamera().splitlines()[11].lstrip("   height "))
             up = right/AspectRatio
         povBg = "\npolygon {\n"
-        povBg += "    4, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
-        povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2) + ">\n"
+        povBg += "    5, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
+        povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2)
+        povBg += ">, <" + str(-right/2) + ", " + str(-up/2) + ">\n"
         povBg += "    pigment{"
         if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
             povBg += " color rgb" + uintColorToRGB(bgColor1) + "}\n"
