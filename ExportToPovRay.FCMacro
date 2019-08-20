@@ -85,7 +85,7 @@ def startExport(povPath, width, height, repRot, expFcView):
     finalPovCode += getLight(incContent)
 
     finalPovCode += "\n// background ------------------------------\n"
-    finalPovCode += getBackground(width, height)
+    finalPovCode += getBackground(width, height, incContent)
 
     #emission rgb <0.8,0.8,1>
     finalPovCode += "\n//------------------------------------------\n"
@@ -315,7 +315,7 @@ def getLight(incContent):
 
     return povLight
 
-def getBackground(width, height):
+def getBackground(width, height, incContent):
     CamType = Gui.ActiveDocument.ActiveView.getCameraType()
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
     CamNode = Gui.ActiveDocument.ActiveView.getCameraNode()
@@ -328,6 +328,11 @@ def getBackground(width, height):
 
     AspectRatio = width/float(height)
     povBg = ""
+    incBg = False
+
+    if incContent.find("sky_sphere") != -1:
+        povBg += "/*"
+        incBg = True
 
     if CamType == "Orthographic":
         if AspectRatio >= 1:
@@ -336,7 +341,7 @@ def getBackground(width, height):
         else:
             right = CamNode.height.getValue()
             up = right/AspectRatio
-        povBg = "\npolygon {\n"
+        povBg += "\npolygon {\n"
         povBg += "    5, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
         povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2)
         povBg += ">, <" + str(-right/2) + ", " + str(-up/2) + ">\n"
@@ -381,6 +386,10 @@ def getBackground(width, height):
         povBg += "   translate -1\n"
         povBg += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
     povBg += "   }\n}\n"
+
+    if incBg:
+        povBg += "*/"
+
     return povBg
 
 def getCam(width, height, incContent):
