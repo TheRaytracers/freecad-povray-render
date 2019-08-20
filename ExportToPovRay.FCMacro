@@ -70,7 +70,7 @@ def startExport(povPath, width, height, repRot, expFcView):
 
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
-    
+
     if userInc:
         finalPovCode += "\n#include \"" + incPath + "\"\n"
 
@@ -256,9 +256,11 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
 
         povCode += "}\n"
 
-        if fcObj.TypeId == "Part::FeaturePython":
-            childs = fcObj.OutList
-            for child in childs:
+        childs = fcObj.OutList
+        for child in childs:
+            guiObject = Gui.ActiveDocument.getObject(child.Name)
+            App.Console.PrintMessage("\n\nVisibility " + child.Label + ": " + str(guiObject.Visibility) + "\n\n")
+            if guiObject.Visibility:
                 childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
                 povCode += childCode
 
