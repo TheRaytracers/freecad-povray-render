@@ -570,7 +570,7 @@ def stringCorrection(inputString): #change a utf-8 string to an ASCII string
     uniString = uniString.replace(u"ß", "ss")
     uniString = uniString.replace(" ", "_")
     outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
-    return outString
+    return outString.decode("utf-8") #return and redecode to unicode but with converted chars
 
 def uintColorToRGB(uintColor): #convert uint color to a rgb color
     Blue = (uintColor >> 8) & 255
