@@ -6,9 +6,9 @@ from PySide import QtCore, QtGui
 import math
 import MeshPart
 
-DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
+DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor') #default color of shapes in FreeCAD (default rgb(0.8, 0.8, 0.8))
 
-def startExport(povPath, width, height, repRot, expFcView):
+def startExport(povPath, width, height, repRot, expFcView): #start the export to POVray
     firstLayer = []
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
@@ -285,7 +285,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
     return povCode
 
 
-def getStatistics(objs):
+def getStatistics(objs): #get statistics about the model the user want to render
     statistics = ""
     noCsgCount = 0
     CsgCount = 0
@@ -304,7 +304,7 @@ def getStatistics(objs):
         statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
     return [statistics, noCsgCount]
 
-def getLight(incContent):
+def getLight(incContent): #get the FreeCAD light
     povLight = ""
     secondLight = False
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
@@ -317,7 +317,7 @@ def getLight(incContent):
 
     return povLight
 
-def getBackground(width, height, incContent):
+def getBackground(width, height, incContent): #get the FreeCAD background
     CamType = Gui.ActiveDocument.ActiveView.getCameraType()
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
     CamNode = Gui.ActiveDocument.ActiveView.getCameraNode()
@@ -394,7 +394,7 @@ def getBackground(width, height, incContent):
 
     return povBg
 
-def getCam(width, height, incContent):
+def getCam(width, height, incContent): #get the FreeCAD camera
     CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
     EulerCam = CamOri.toEuler()
     CamType = Gui.ActiveDocument.ActiveView.getCameraType()
@@ -460,7 +460,7 @@ def getCam(width, height, incContent):
     return PovCam
 
 
-def getTranslation(fcObj):
+def getTranslation(fcObj): #get the translation of an object
     translation = ""
     x = fcObj.Placement.Base.x #get the position in every axis
     y = fcObj.Placement.Base.y
@@ -470,7 +470,7 @@ def getTranslation(fcObj):
 
     return translation
 
-def getRot(fcObj):
+def getRot(fcObj): #get the rotation of an object
     rotate = ""
     eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
     x = eulerRot[2] #get rotation in every axis
@@ -485,7 +485,7 @@ def getRot(fcObj):
 
     return rotate
 
-def getPigment(fcObj, incContent):
+def getPigment(fcObj, incContent): #get the pigment of an object
     appObject = FreeCADGui.ActiveDocument.getObject(fcObj.Name)
     material = ""
     pigment = ""
@@ -526,7 +526,7 @@ def getPigment(fcObj, incContent):
     return material
 
 
-def writeFile(povText, fileName):
+def writeFile(povText, fileName): #write the final pov file
     #povText: the code for POVray
     #fileName: path to pov file
     try:
@@ -536,12 +536,12 @@ def writeFile(povText, fileName):
     except:
         return -1
 
-def openPovRay(path, width, height):
+def openPovRay(path, width, height): #start POVray
     terminalInput = "povray " + str(path) + " +P Width=" + str(width) + " Height=" + str(height) #create the string to start POVray
     os.system(terminalInput) #put terminalInput to the console
 
 
-def repairRot(objs):
+def repairRot(objs): #repair the rotation of objects (likely a bug in FreeCAD)
     for obj in objs:
         if hasattr(obj, 'Placement'):
             ObjLocation = obj.Placement
@@ -572,17 +572,17 @@ def stringCorrection(inputString): #change a utf-8 string to an ASCII string
     outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
     return outString
 
-def uintColorToRGB(uintColor):
+def uintColorToRGB(uintColor): #convert uint color to a rgb color
     Blue = (uintColor >> 8) & 255
     Green = (uintColor >> 16) & 255
     Red = (uintColor >> 24) & 255
-    rgbString = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(Red/float(255),Green/float(255),Blue/float(255))
+    rgbString = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(Red / float(255), Green / float(255), Blue / float(255))
     return rgbString
 
 def isAscii(string): #test whether the string is an ASCII string
     return all(ord(c) < 128 for c in string)
 
-def delComments(code):
+def delComments(code): #delete the comments in incContent
     #delete big comments
     while code.find("/*") is not -1:
         comStart = code.find("/*")
@@ -605,13 +605,13 @@ def delComments(code):
     return code
 
 
-class GUI(QtGui.QDialog):
+class GUI(QtGui.QDialog): #the pyside class for the dialog window
     def __init__(self):
         super(GUI, self).__init__()
         self.initUI()
         self.setDefaultValues()
 
-    def initUI(self):
+    def initUI(self): #create the objects in the dialog window
         self.setWindowTitle("Export to POVray")
 
         #pov file selection
@@ -697,7 +697,7 @@ class GUI(QtGui.QDialog):
         self.setLayout(self.wrapLayout)
         self.show()
 
-    def setDefaultValues(self):
+    def setDefaultValues(self): #set the default values of the input objects
         defaultPath = "/home/"
         self.pathLineEdit.setText(defaultPath)
 
@@ -749,7 +749,7 @@ class GUI(QtGui.QDialog):
         self.helpLabel.setText(helpText)
         self.helpLabel.setOpenExternalLinks(True)
 
-    def openFileDialog(self):
+    def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
 
         fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
@@ -757,7 +757,7 @@ class GUI(QtGui.QDialog):
         if fileName and fileName != (u'', u''):
             self.pathLineEdit.setText(str(fileName[0]))
 
-    def checkPath(self, path):
+    def checkPath(self, path): #check if the path to pov file is valid
         if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:] == ".pov":
             self.okButton.setEnabled(True)
             self.warnLabel.setText("")
@@ -768,7 +768,7 @@ class GUI(QtGui.QDialog):
             else:
                 self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .pov file")
 
-    def saveInput(self):
+    def saveInput(self): #save the user inputs
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
         settings.beginGroup("userInput")
         settings.setValue("path", self.pathLineEdit.text())
@@ -778,20 +778,18 @@ class GUI(QtGui.QDialog):
         settings.setValue("expFcView", self.expFcView.isChecked())
         settings.endGroup()
 
-    def onCancel(self):
+    def onCancel(self): #called if "Cancel" button is pressed
         self.result = "Canceled"
         self.close()
         App.Console.PrintMessage("\n\nCanceled\n\n")
 
-    def onOk(self):
+    def onOk(self): #called if "OK" button is pressed
         self.result = "OK"
         self.close()
         self.saveInput()
         startExport(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value(), self.repRot.isChecked(), self.expFcView.isChecked())
 
-def main():
-    #print FreeCAD.ActiveDocument
-
+def main(): #the main function
     try:
         viewPos = Gui.ActiveDocument.ActiveView.viewPosition()
     except:
