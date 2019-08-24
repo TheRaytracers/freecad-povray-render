@@ -214,11 +214,11 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
         if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
             mesh = fcObj.Mesh
         else:
-            distanceCam = fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2
+            distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
             pictureSize = (width + height) / 2
             angularDeflection = (distanceCam / pictureSize) * 2.5
             mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
-            App.Console.PrintMessage(str(angularDeflection) + " " + stringCorrection(fcObj.Label) + ": " + str(mesh))
+            #App.Console.PrintMessage(str(angularDeflection) + " " + stringCorrection(fcObj.Label) + ": " + str(mesh))
 
         if not mesh:
             return ""
