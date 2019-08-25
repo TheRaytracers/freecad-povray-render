@@ -72,9 +72,6 @@ def startExport(povPath, width, height, repRot, expFcView): #start the export to
     finalPovCode += "//------------------------------------------\n"
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
-    if userInc:
-        finalPovCode += "\n#include \"" + incPath + "\"\n"
-
     if statistics[1]:
         finalPovCode += "#include \"" + povPath[:-4] + "_meshes.inc\"\n"
 
@@ -90,6 +87,10 @@ def startExport(povPath, width, height, repRot, expFcView): #start the export to
 
     #emission rgb <0.8,0.8,1>
     finalPovCode += "\n//------------------------------------------\n"
+
+    if userInc:
+        finalPovCode += "\n#include \"" + incPath + "\"\n\n"
+
     finalPovCode += "// objects in scene ------------------------\n"
 
     #create the povray code
@@ -423,14 +424,16 @@ def getCam(width, height, incContent): #get the FreeCAD camera
 
 
     if CamType == "Perspective":
-        PovCamUp = "     up    < 0, 0, 1>\n"
-        PovCamRight = "     right   <" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>\n"
+        PovCamUp = "< 0, 0, 1>"
+        PovCamRight = "<" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>"
+
         if AspectRatio <= 1:
             CamAngle = 45
         else:
             CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
-        PovCamAngle = "     angle " + "{0:1.2f}".format(CamAngle) + "\n"
+        PovCamAngle = "    angle {0:1.2f}".format(CamAngle) + "\n"
         CamComment += "Perspective Camera\n"
+
     elif CamType == "Orthographic":
         if AspectRatio >= 1:
             up = up = CamNode.height.getValue()
@@ -439,23 +442,28 @@ def getCam(width, height, incContent): #get the FreeCAD camera
             right = CamNode.height.getValue()
             up = right/AspectRatio
         PovCamType = "      orthographic\n"
-        PovCamUp = "     up    < 0, 0, " + "{0:1.2f}".format(up) + ">\n"
-        PovCamRight = "     right   <" + "{0:1.2f}".format(right) +", 0, 0>\n"
+        PovCamUp = "< 0, 0, " + "{0:1.2f}".format(up) + ">"
+        PovCamRight = "<" + "{0:1.2f}".format(right) +", 0, 0>"
         CamComment += "Orthographic camera\n"
+
     else:
         CamComment += "Unknown camera type - rudimentary camera statement will be used\n"
 
+    PovCam += "#declare CamUp = " + PovCamUp + ";\n"
+    PovCam += "#declare CamRight = " + PovCamRight + ";\n"
+    PovCam += "#declare CamRotation = <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">;\n"
+    PovCam += "#declare CamPosition = <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">;\n"
 
     PovCam += "camera {\n"
     PovCam += PovCamType
-    PovCam += "     location <0, 0, 0>\n"
-    PovCam += "     direction < 0, 1, 0>\n"
-    PovCam += PovCamUp
-    PovCam += PovCamRight
-    PovCam += "     rotate <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
-    PovCam += "     translate <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">\n"
+    PovCam += "    location <0, 0, 0>\n"
+    PovCam += "    direction < 0, 1, 0>\n"
+    PovCam += "    up CamUp\n"
+    PovCam += "    right CamRight\n"
+    PovCam += "    rotate CamRotation\n"
+    PovCam += "    translate CamPosition\n"
     PovCam += PovCamAngle
-    PovCam += "    }\n"
+    PovCam += "}\n"
     if incCamera:
         PovCam += "*/\n"
         CamComment = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
