@@ -205,8 +205,11 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
         return povCode
 
     else: #not a supported object
-        if fcObj.Shape.Solids == []:
-            return ""
+        try:
+            if fcObj.Shape.Solids == []:
+                return ""
+        except:
+            return "" #object has no shape property
 
         shape = fcObj.Shape
         mesh = 0
