@@ -11,3 +11,6 @@ You want to contribute to our macro? Great! Here you can find our [Developer Doc
 
 ## I'm a user
 You want to learn how to use our macro? Then this site will be right for you: [User Documentation](user.md)
+
+## FAQ
+We made a little FAQ for you: [FAQ](FAQ.md)

@@ -9,4 +9,4 @@
 * Very little normal to every object (in the reality, no object is perfect)
 * Link to change the material of objects (maybe define a standard finish)
 
-If you have not so much konwledge about POVray, we created a few templates for you. You can find them [here](XXX).
+If you have not so much konwledge about POVray, we created a few templates for you. You can find them in the [template folder](../Examples/Templates/).

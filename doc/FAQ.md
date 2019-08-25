@@ -4,7 +4,7 @@
   Are you sure, that you installed POVray? If you installed POVray and you get no image, please report a bug (see below).
 
 * **The rendered image doesn't look realistic, it looks very plastic**  
-  Look here for tips to [get a more realistic rendering](XXX).
+  Look here for tips to [get a more realistic rendering](realistic.md).
 
 * **I found a bug in the macro**  
   Please report the bug to us, so we can fix it hopefully soon.  
@@ -18,3 +18,8 @@
   [http://f-lohmueller.de/pov_tut/pov__eng.htm](http://f-lohmueller.de/pov_tut/pov__eng.htm)
   The official POVray documentation you can find here:  
   [http://www.povray.org/documentation/index-3.6.php](http://www.povray.org/documentation/index-3.6.php)
+
+* **I want to contribute to the macro**  
+  Cool, software is never finished :-)  
+  Please read our [Developer Documentation](developer.md) and start coding!  
+  Or report a bug, that is also contributing and not less important than coding!

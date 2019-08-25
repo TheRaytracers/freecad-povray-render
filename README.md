@@ -58,11 +58,15 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 * You can use **all** POVray features
 * The macro is easier to use
 * WYSIWYG
-* The macro is written in Python, so it is easier for expansion
+* The macro is written in Python, so it is easier for extending
+* The macro takes more object properties than the workbench
 * The macro reproduces the tree structure and doesn't create gigantic meshs
   * → Better understanding & editing of the file
   * → Better performance
   * → Better renderings
+
+## FAQ
+We created a little FAQ for you: [FAQ](doc/FAQ.md)
 
 ## Wiki
 For the full documentation, please visit our [Wiki](doc/index.md)
