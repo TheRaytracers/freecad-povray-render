@@ -61,7 +61,7 @@ def startExport(povPath, width, height, repRot, expFcView): #start the export to
     #get the first layer and check visibility of parent objects
     for obj in objs:
         if obj.InList == []: #no parents
-            guiObject = Gui.ActiveDocument.getObject(obj.Name)
+            guiObject = obj.ViewObject
             if guiObject.Visibility:
                 firstLayer.append(obj)
 
@@ -267,7 +267,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
 
         childs = fcObj.OutList
         for child in childs:
-            guiObject = Gui.ActiveDocument.getObject(child.Name)
+            guiObject = child.ViewObject
             if guiObject.Visibility:
                 childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
                 povCode += childCode
@@ -499,7 +499,7 @@ def getRot(fcObj): #get the rotation of an object
     return rotate
 
 def getPigment(fcObj, incContent): #get the pigment of an object
-    appObject = FreeCADGui.ActiveDocument.getObject(fcObj.Name)
+    appObject = fcObj.ViewObject
     material = ""
     pigment = ""
     transparency = ""
