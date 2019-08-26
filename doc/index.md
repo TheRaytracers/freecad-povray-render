@@ -6,6 +6,8 @@ An important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y*
 In a second step the user can add textures, materials or additional lightning to render a photorealistic scene.
 This can be either done by directly editing of the resulting POV-Ray file or by adding an include file with additional contents.
 
+![Normal FreeCAD View](img/Chess/Chess01.png "FreeCAD before cutting")
+
 ## I'm a developer
 You want to contribute to our macro? Great! Here you can find our [Developer Documentation](developer.md)
 

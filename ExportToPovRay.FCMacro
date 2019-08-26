@@ -412,9 +412,7 @@ def getCam(width, height, incContent): #get the FreeCAD camera
     PovCam = ""
     CamComment = ""
     incCamera = False
-    if incContent.find("camera") != -1:
-        incCamera = True
-        PovCam += "/*"
+    
 
 
     PovCamType = ""
@@ -453,6 +451,10 @@ def getCam(width, height, incContent): #get the FreeCAD camera
     PovCam += "#declare CamRight = " + PovCamRight + ";\n"
     PovCam += "#declare CamRotation = <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">;\n"
     PovCam += "#declare CamPosition = <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">;\n"
+    
+    if incContent.find("camera") != -1:
+        incCamera = True
+        PovCam += "/*"
 
     PovCam += "camera {\n"
     PovCam += PovCamType
