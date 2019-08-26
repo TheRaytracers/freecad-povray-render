@@ -6,7 +6,11 @@ An important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y*
 In a second step the user can add textures, materials or additional lightning to render a photorealistic scene.
 This can be either done by directly editing of the resulting POV-Ray file or by adding an include file with additional contents.
 
-![Normal FreeCAD View]( ./img/Chess/Chess_01.png "Here is the normal FreeCAD view with some CSG Chessfigures")| ![Simple POV-Ray rendering]( ./img/Chess/Chess_02.png "This is what you should get if you try our macro the first time")
+## How to render a photorealistic Scene from your FreeCAD model
+
+You are just a few steps away from rendering realistic scenes with our macro: read how it works in the [step by step description] (realistic.md)
+
+![Step by step]( ./img/Chess/Chess_steps.png "Step by step from FreeCAD CSG Objects to a photorealistic POV-Ray scene")
 
 ## I'm a developer
 You want to contribute to our macro? Great! Here you can find our [Developer Documentation](developer.md)
