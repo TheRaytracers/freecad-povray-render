@@ -1,4 +1,4 @@
-# Rendering e photorealistic scene - step by step
+# Rendering a photorealistic Scene - Step by Step
 
 POV-Ray is a very powerful renderer developed in the early 90ies. It has a mathematical approach not only for description of objects but also for textures an even for the visualisation of mathematical functions. So with adding only a few lines you can create great effects.
 

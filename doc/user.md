@@ -1,6 +1,7 @@
 # User Documentation
 ## Installation
-Download the macro here: [link] or install it via the addon manager  
+The easiest way is to install it via the **Addon Manager** under Tools / Addon Manager / Macros.  
+Alternative you can download the macro via [Macro Recipes](https://freecadweb.org/wiki/Macros_recipes) or download it directly from our [Gitlab Repository](https://gitlab.com/usbhub/exporttopovray) with the blue button top right to get the most actual version.  
 Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path.
 ### Standard Macro Paths
 * Linux: `/home/USERNAME/.FreeCAD/Macro/`  
@@ -15,12 +16,22 @@ The macro takes your actual view on the model, so pan your view how you would li
 Go to Macro/Macros… and start the installed macro by double clicking on it.
 
 ### Tips & Tricks
+* You can change the background of FreeCAD under Edit/Preferences/Display/Colors/Background Color. You can also add a middle color.
+* For side views, try the orthographic view. But for a non side view, don't use the orthographic view. That doesn't look realistic
+* Try to get a more realistic image: [Rendering a photorealistic Scene - Step by Step](realistic.md)
+* If you have a big scene with a lot of objects and many materials with light refraction, try a little size of the image first, because then you not must wait for a long time.
 * If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
-![FreeCAD before cutting](img/tipsAndTricks/01_FC.png "FreeCAD before cutting")
-![POVray before cutting](img/tipsAndTricks/01_PR.png "POVray before cutting")
-![FreeCAD after cutting](img/tipsAndTricks/02_FC.png "FreeCAD after cutting")
-![POVray after cutting](img/tipsAndTricks/02_PR.png "POVray after cutting")
-To avoid this, the part to be removed should be slightly larger than the other part.
+
+  ![FreeCAD before cutting](img/tipsAndTricks/01_FC.png "FreeCAD before cutting")
+  ![POVray before cutting](img/tipsAndTricks/01_PR.png "POVray before cutting")
+
+  Then you cut the two boxes.
+
+  ![FreeCAD after cutting](img/tipsAndTricks/02_FC.png "FreeCAD after cutting")
+  ![POVray after cutting](img/tipsAndTricks/02_PR.png "POVray after cutting")
+
+  To avoid this, the part to be removed should be slightly larger than the other part.
+
 
 ### Make changes
 If you want to change the texture / pigment / finish / etc. you have to create a file with the same name as the pov file in directory of your pov file. Change the ending to `inc`. To example
