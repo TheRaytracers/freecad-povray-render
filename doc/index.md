@@ -8,7 +8,7 @@ This can be either done by directly editing of the resulting POV-Ray file or by 
 
 ## How to render a photorealistic Scene from your FreeCAD model
 
-You are just a few steps away from rendering realistic scenes with our macro: read how it works in the [step by step description] (realistic.md)
+You are just a few steps away from rendering realistic scenes with our macro: read how it works in the [step by step description](realistic.md)
 
 ![Step by step]( ./img/Chess/Chess_steps.png "Step by step from FreeCAD CSG Objects to a photorealistic POV-Ray scene")
 

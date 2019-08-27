@@ -27,12 +27,12 @@ So what we did is: We changed the background color in FreeCAD via the Settings (
 
 If you create your own textures be shure to use the right syntax. Replace the "xxx" in the following declaration with te object name from the object tree in FreeCAD:
 "#declare xxx_material = material{ }"
-Put your material declaration inside the bracelets. Be aware of the hirarchy of material declaration. We only provide material{} in our macro because it is toplevel of all other statements like texture, pigment, finish, pattern etc. POV-Ray has an excellent dokumentation, so you will find further information in the [povray wiki]
+Put your material declaration inside the bracelets. Be aware of the hirarchy of material declaration. We only provide material{} in our macro because it is toplevel of all other statements like texture, pigment, finish, pattern etc. POV-Ray has an excellent dokumentation, so you will find further information in the [povray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_5_5_3)
 Ignoring the material hirarchie will lead to a POV-Ray error and nothing will be rendered. How to get the console output from POV-Ray for debugging see the [Tips and Tricks section].
 
 Now let's try to add more reality to the chess Example. You can download another FreeCAD file for a gaming scene and a corresponding include file:
 
-[Chess_002.FCstd](../Examples/Chess/Chess_002.FCstd)
+[Chess_002.FCstd](../Examples/Chess/Chess_002.FCstd)  
 [Chess_02.inc](../Examples/Chess/Chess02.inc)
 
 The rendering will look like this:
