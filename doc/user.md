@@ -5,7 +5,7 @@ Alternative you can download the macro via [Macro Recipes](https://freecadweb.or
 Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path.
 ### Standard Macro Paths
 * Linux: `/home/USERNAME/.FreeCAD/Macro/`  
-* Windows: `C:\Users\otto\AppData\Roaming\FreeCAD\Macro/`
+* Windows: `C:\Users\USERNAME\AppData\Roaming\FreeCAD\Macro/`
 * Mac: `XXX`
 
 ## Usage

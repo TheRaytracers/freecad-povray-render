@@ -6,7 +6,7 @@ global_settings{assumed_gamma 1.0}
 #include "colors.inc"
 #include "textures.inc"
 
-#include "/home/otto/Dokumente/exporttopovray/Examples/Dice.inc"
+#include "/home/USERNAME/Dokumente/exporttopovray/Examples/Dice.inc"
 //------------------------------------------
 // camera ----------------------------------
 camera {
@@ -43,167 +43,167 @@ difference {
 
     //----- BasicDice -----
     intersection {
-    
+
         //----- Cube -----
         box{ <0,0,0>, <10.0, 10.0, 10.0>
         }
-        
+
         //----- Sphere -----
         sphere { <0, 0, 0> 7
             translate <5.0, 5.0, 5.0>
         }
-        
-        
+
+
     material {BasicDice_material}
-    
+
     }
-    
+
     //----- Sides -----
     union {
-    
+
         //----- Side6 -----
         union {
-        
+
             //----- Sphere020 -----
             sphere { <0, 0, 0> 1
                 translate <7.0, 0.0, 5.0>
             }
-            
+
             //----- Sphere019 -----
             sphere { <0, 0, 0> 1
                 translate <3.0, 0.0, 5.0>
             }
-            
+
             //----- Sphere018 -----
             sphere { <0, 0, 0> 1
                 translate <3.0, 0.0, 3.0>
             }
-            
+
             //----- Sphere017 -----
             sphere { <0, 0, 0> 1
                 translate <3.0, 0.0, 7.0>
             }
-            
+
             //----- Sphere016 -----
             sphere { <0, 0, 0> 1
                 translate <7.0, 0.0, 3.0>
             }
-            
+
             //----- Sphere015 -----
             sphere { <0, 0, 0> 1
                 translate <7.0, 0.0, 7.0>
             }
-            
+
             translate <0.0, 10.5, 0.0>
         }
-        
+
         //----- Side5 -----
         union {
-        
+
             //----- Sphere014 -----
             sphere { <0, 0, 0> 1
                 translate <5.0, 0.0, 5.0>
             }
-            
+
             //----- Sphere013 -----
             sphere { <0, 0, 0> 1
                 translate <3.0, 0.0, 3.0>
             }
-            
+
             //----- Sphere012 -----
             sphere { <0, 0, 0> 1
                 translate <3.0, 0.0, 7.0>
             }
-            
+
             //----- Sphere011 -----
             sphere { <0, 0, 0> 1
                 translate <7.0, 0.0, 3.0>
             }
-            
+
             //----- Sphere010 -----
             sphere { <0, 0, 0> 1
                 translate <7.0, 0.0, 7.0>
             }
-            
+
             rotate <0.0, 0.0, 90.0>
             translate <10.5, 0.0, 0.0>
         }
-        
+
         //----- Side1 -----
         sphere { <0, 0, 0> 1
             translate <5.0, -0.5, 5.0>
         }
-        
+
         //----- Side3 -----
         union {
-        
+
             //----- Sphere005 -----
             sphere { <0, 0, 0> 1
                 translate <7.0, 0.0, 3.0>
             }
-            
+
             //----- Sphere004 -----
             sphere { <0, 0, 0> 1
                 translate <3.0, 0.0, 7.0>
             }
-            
+
             //----- Sphere003 -----
             sphere { <0, 0, 0> 1
                 translate <5.0, 0.0, 5.0>
             }
-            
+
             rotate <-90.0, 0.0, 0.0>
             translate <0.0, 0.0, -0.5>
         }
-        
+
         //----- Side4 -----
         union {
-        
+
             //----- Sphere009 -----
             sphere { <0, 0, 0> 1
                 translate <3.0, 0.0, 3.0>
             }
-            
+
             //----- Sphere008 -----
             sphere { <0, 0, 0> 1
                 translate <3.0, 0.0, 7.0>
             }
-            
+
             //----- Sphere007 -----
             sphere { <0, 0, 0> 1
                 translate <7.0, 0.0, 3.0>
             }
-            
+
             //----- Sphere006 -----
             sphere { <0, 0, 0> 1
                 translate <7.0, 0.0, 7.0>
             }
-            
+
             rotate <-90.0, 0.0, 0.0>
             translate <0.0, 0.0, 10.5>
         }
-        
+
         //----- Side2 -----
         union {
-        
+
             //----- Sphere002 -----
             sphere { <0, 0, 0> 1
                 translate <3.0, 0.0, 3.0>
             }
-            
+
             //----- Sphere001 -----
             sphere { <0, 0, 0> 1
                 translate <7.0, 0.0, 7.0>
             }
-            
+
             rotate <0.0, 0.0, 90.0>
             translate <-0.5, 0.0, 0.0>
         }
-        
+
         pigment{color rgb<1.000, 1.000, 1.000>}
-    
+
     }
-    
+
     pigment{color rgb<0.800, 0.000, 0.000>}
 
 }
