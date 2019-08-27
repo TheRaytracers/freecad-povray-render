@@ -22,11 +22,17 @@ def startExport(povPath, width, height, repRot, expFcView): #start the export to
     if statistics[1]:
         meshFile = open(povPath[:-4] + "_meshes.inc", "w")
 
+    directory = povPath
+    while directory[-1:] != os.sep:
+        directory = directory[:-1]
+
+    povName = povPath[len(directory):]
+
     #user inc file
-    fileName = povPath
+    fileName = povPath #I think, unnecessary anymore
     userInc = False
 
-    if fileName != -1 and fileName != "" and fileName != " ": #is there a file name
+    if fileName != -1 and fileName != "" and fileName != " ": #is there a pov file
         try: #try to open pov file
             file = open(fileName, "w+")
             file.close()
@@ -73,7 +79,7 @@ def startExport(povPath, width, height, repRot, expFcView): #start the export to
     finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
     if statistics[1]:
-        finalPovCode += "#include \"" + povPath[:-4] + "_meshes.inc\"\n"
+        finalPovCode += "#include \"" + povName[:-4] + "_meshes.inc\"\n"
 
     finalPovCode += "\n//------------------------------------------\n"
     finalPovCode += "// camera ----------------------------------\n"
@@ -89,7 +95,7 @@ def startExport(povPath, width, height, repRot, expFcView): #start the export to
     finalPovCode += "\n//------------------------------------------\n"
 
     if userInc:
-        finalPovCode += "\n#include \"" + incPath + "\"\n\n"
+        finalPovCode += "\n#include \"" + povName[:-3] + "inc" + "\"\n\n"
 
     finalPovCode += "// objects in scene ------------------------\n"
 
@@ -103,7 +109,7 @@ def startExport(povPath, width, height, repRot, expFcView): #start the export to
             finalPovCode += createPovrayCode(obj, incContent, width, height)
 
     writeFile(finalPovCode, fileName)
-    openPovRay(fileName, width, height)
+    openPovRay(directory, povName, width, height)
 
 
 def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns the povray code for the object
@@ -412,7 +418,7 @@ def getCam(width, height, incContent): #get the FreeCAD camera
     PovCam = ""
     CamComment = ""
     incCamera = False
-    
+
 
 
     PovCamType = ""
@@ -451,7 +457,7 @@ def getCam(width, height, incContent): #get the FreeCAD camera
     PovCam += "#declare CamRight = " + PovCamRight + ";\n"
     PovCam += "#declare CamRotation = <" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">;\n"
     PovCam += "#declare CamPosition = <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + ">;\n"
-    
+
     if incContent.find("camera") != -1:
         incCamera = True
         PovCam += "/*"
@@ -551,8 +557,8 @@ def writeFile(povText, fileName): #write the final pov file
     except:
         return -1
 
-def openPovRay(path, width, height): #start POVray
-    terminalInput = "povray " + str(path) + " +P Width=" + str(width) + " Height=" + str(height) #create the string to start POVray
+def openPovRay(directory, povName, width, height): #start POVray
+    terminalInput = "cd " + str(directory) + " && povray " + str(povName) + " +P Width=" + str(width) + " Height=" + str(height) #create the string to start POVray
     os.system(terminalInput) #put terminalInput to the console
 
 
