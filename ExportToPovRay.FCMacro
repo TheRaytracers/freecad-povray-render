@@ -9,7 +9,7 @@ import MeshPart
 
 DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor') #default color of shapes in FreeCAD (default rgb(0.8, 0.8, 0.8))
 
-def startExport(povPath, width, height, repRot, expFcView): #start the export to POVray
+def startExport(povPath, width, height, expBg, expLight, repRot, expFcView): #start the export to POVray
     firstLayer = []
     doc = FreeCAD.ActiveDocument
     objs = doc.Objects
@@ -85,11 +85,13 @@ def startExport(povPath, width, height, repRot, expFcView): #start the export to
     finalPovCode += "// camera ----------------------------------\n"
     finalPovCode += getCam(width, height, incContent)
 
-    finalPovCode += "\n// sun -------------------------------------\n"
-    finalPovCode += getLight(incContent)
+    if expLight:
+        finalPovCode += "\n// sun -------------------------------------\n"
+        finalPovCode += getLight()
 
-    finalPovCode += "\n// background ------------------------------\n"
-    finalPovCode += getBackground(width, height, incContent)
+    if expBg:
+        finalPovCode += "\n// background ------------------------------\n"
+        finalPovCode += getBackground(width, height)
 
     #emission rgb <0.8,0.8,1>
     finalPovCode += "\n//------------------------------------------\n"
@@ -316,20 +318,16 @@ def getStatistics(objs): #get statistics about the model the user want to render
         statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
     return [statistics, noCsgCount]
 
-def getLight(incContent): #get the FreeCAD light
+def getLight(): #get the FreeCAD light
     povLight = ""
-    secondLight = False
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
 
-    if incContent.find("light_source") != -1:
-        secondLight = True
-        povLight += "//"
     #povLight += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
     povLight += "light_source { <" + str(CamPos.Base.x) + ", " + str(CamPos.Base.y) + ", " + str(CamPos.Base.z) + "> color rgb<0.5,0.5,0.5> }\n"
 
     return povLight
 
-def getBackground(width, height, incContent): #get the FreeCAD background
+def getBackground(width, height): #get the FreeCAD background
     CamType = Gui.ActiveDocument.ActiveView.getCameraType()
     CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
     CamNode = Gui.ActiveDocument.ActiveView.getCameraNode()
@@ -342,11 +340,6 @@ def getBackground(width, height, incContent): #get the FreeCAD background
 
     AspectRatio = width/float(height)
     povBg = ""
-    incBg = False
-
-    if incContent.find("sky_sphere") != -1:
-        povBg += "/*"
-        incBg = True
 
     if CamType == "Orthographic":
         if AspectRatio >= 1:
@@ -400,9 +393,6 @@ def getBackground(width, height, incContent): #get the FreeCAD background
         povBg += "   translate -1\n"
         povBg += "   rotate<" + str(EulerCam[2]-90) + ", " + str(EulerCam[1]) + ", " + str(EulerCam[0]) + ">\n"
     povBg += "   }\n}\n"
-
-    if incBg:
-        povBg += "*/"
 
     return povBg
 
@@ -678,10 +668,15 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.WHImageGroup.setLayout(self.vertLayout1)
 
         #Options
+        self.expBg = QtGui.QCheckBox("Export Background")
+        self.expLight = QtGui.QCheckBox("Export FreeCAD light")
+
         self.repRot = QtGui.QCheckBox("Repair Rotation")
         self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
 
         self.vertLayout2 = QtGui.QVBoxLayout()
+        self.vertLayout2.addWidget(self.expBg)
+        self.vertLayout2.addWidget(self.expLight)
         self.vertLayout2.addWidget(self.repRot)
         self.vertLayout2.addWidget(self.expFcView)
         self.optionGroups = QtGui.QGroupBox("Options")
@@ -728,6 +723,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         path = settings.value("path", self.pathLineEdit.text())
         width = int(settings.value("width", self.imageWidth.value()))
         height = int(settings.value("height", self.imageHeight.value()))
+        expBg = settings.value("expBg", self.expBg.isChecked())
+        expLight = settings.value("expLight", self.expLight.isChecked())
         repRot = settings.value("repRot", self.repRot.isChecked())
         expFcView = settings.value("expFcView", self.expFcView.isChecked())
         settings.endGroup()
@@ -738,6 +735,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             self.imageWidth.setValue(width)
         if height is not None:
             self.imageHeight.setValue(height)
+        if expBg is not None and expBg == True:
+            self.expBg.setCheckState(QtCore.Qt.CheckState(2))
+        if expLight is not None and expLight == True:
+            self.expLight.setCheckState(QtCore.Qt.CheckState(2))
         if repRot is not None and repRot == True:
             self.repRot.setCheckState(QtCore.Qt.CheckState(2))
         if expFcView is not None and expFcView == True:
@@ -760,6 +761,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         <h3>Width and Height of the Image</h3>
         <p>Select the width and height in pixels of the image to be rendered with POV-Ray.</p>
         <h3>Options</h3>
+        <h5>Export Background</h5>
+        <p>Export the FreeCAD background</p>
+        <h5>Export Light</h5>
+        <p>Export the FreeCAD light</p>
         <h5>Repair Rotation</h5>
         <p>Use this option if objects in your scene appear in a wrong rotation.<br>
         This is a workaround for a FreeCAD bug.</p>
@@ -795,6 +800,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         settings.setValue("path", self.pathLineEdit.text())
         settings.setValue("width", self.imageWidth.value())
         settings.setValue("height", self.imageHeight.value())
+        settings.setValue("expBg", self.expBg.isChecked())
+        settings.setValue("expLight", self.expLight.isChecked())
         settings.setValue("repRot", self.repRot.isChecked())
         settings.setValue("expFcView", self.expFcView.isChecked())
         settings.endGroup()
@@ -808,7 +815,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.result = "OK"
         self.close()
         self.saveInput()
-        startExport(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value(), self.repRot.isChecked(), self.expFcView.isChecked())
+        startExport(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value(), self.expBg.isChecked(), self.expLight.isChecked(), self.repRot.isChecked(), self.expFcView.isChecked())
 
 def main(): #the main function
     try:
