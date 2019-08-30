@@ -249,7 +249,8 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 povArr += "#declare arrAngle = " + str(angle) + ";\n"
                 povArr += "#while (i < endNo)\n"
                 povArr += "    object { " + child.Label + "\n"
-                povArr += "        translate -" + center + "\n"
+                if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
+                    povArr += "        translate -" + center + "\n"
                 povArr += "        #declare rotAngle = i * arrAngle / endNo;\n"
                 povArr += "        #local vX = vaxis_rotate(x, axis, rotAngle);\n"
                 povArr += "        #local vY = vaxis_rotate(y, axis, rotAngle);\n"
@@ -258,8 +259,10 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 povArr += "            matrix <vX.x, vX.y, vX.z, vY.x, vY.y, vY.z, vZ.x, vZ.y, vZ.z, 0, 0, 0>\n"
                 povArr += "        }\n"
 
-                povArr += "        translate " + center + "\n"
-                povArr += "        translate " + intervalAxis + " * i\n"
+                if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
+                    povArr += "        translate " + center + "\n"
+                if fcObj.IntervalAxis.x != 0 or fcObj.IntervalAxis.y != 0 or fcObj.IntervalAxis.z != 0:
+                    povArr += "        translate " + intervalAxis + " * i\n"
 
                 povArr += "    }\n    #declare i = i + 1;\n"
                 povArr += "#end\n"
