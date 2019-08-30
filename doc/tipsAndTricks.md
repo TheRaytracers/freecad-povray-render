@@ -1,4 +1,9 @@
-# Tips & Tricks for the macro
+# Limitations, Tips & Tricks
+
+Even if FreeCAD an POV-Ray both support Constructive Solid Geometry we found a lot of differences in the details we had to deal with, while developing this macro.
+So if your rendering looks not like you expected it may not be a bug, it can also be a compromise to adapt the different concepts of FreeCAD and POV-Ray.
+
+
 
 * You can change the background of FreeCAD under Edit/Preferences/Display/Colors/Background Color. You can also add a middle color.
 * For side views, try the orthographic view. But for a non side view, don't use the orthographic view. That doesn't look realistic
