@@ -233,7 +233,11 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 axisY /= highestAxis
                 axisZ /= highestAxis
 
-                axis = "<" + str(axisX * 180) + ", " + str(axisY * 180) + ", " + str((axisZ - 1) * 180) + ">"
+                angleX = degrees(atan(axisY / axisZ))
+                angleY = degrees(atan(axisZ / axisX))
+                angleZ = degrees(atan(axisY / axisX))
+
+                axis = "<" + str(angleX) + ", " + str(angleY) + ", " + str((angleZ - ) + ">"
                 intervalAxis = "<" + str(fcObj.IntervalAxis.x) + ", " + str(fcObj.IntervalAxis.y) + ", " + str(fcObj.IntervalAxis.z) + ">"
                 number = fcObj.NumberPolar
 
