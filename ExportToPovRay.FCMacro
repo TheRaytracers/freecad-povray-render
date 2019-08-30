@@ -252,11 +252,12 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 povArr += "        #local vX = vaxis_rotate(x, axis, rotAngle);\n"
                 povArr += "        #local vY = vaxis_rotate(y, axis, rotAngle);\n"
                 povArr += "        #local vZ = vaxis_rotate(z, axis, rotAngle);\n"
-                povArr += "        transform {"
+                povArr += "        transform {\n"
                 povArr += "            matrix <vX.x, vX.y, vX.z, vY.x, vY.y, vY.z, vZ.x, vZ.y, vZ.z, 0, 0, 0>\n"
                 povArr += "        }\n"
 
                 povArr += "        translate " + center + "\n"
+                povArr += "        translate " + intervalAxis + " * i\n"
 
                 povArr += "    }\n    #declare i = i + 1;\n"
                 povArr += "#end\n"
