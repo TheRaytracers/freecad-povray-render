@@ -218,6 +218,46 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
 
         povCode += povCommon
 
+    elif fcObj.TypeId == 'Part::FeaturePython' and fcObj.Name == "Array": #Array from Draft workbench
+        if fcObj.ArrayType == "polar":
+            povArr = ""
+
+            childs = fcObj.OutList
+            for child in childs:
+                center = "<" + str(fcObj.Center.x) + ", " + str(fcObj.Center.y) + ", " + str(fcObj.Center.z) + ">"
+                axisX = fcObj.Axis.x
+                axisY = fcObj.Axis.y
+                axisZ = fcObj.Axis.z
+                highestAxis = max(axisX, axisY, axisZ) #get highest value
+                axisX /= highestAxis
+                axisY /= highestAxis
+                axisZ /= highestAxis
+
+                axis = "<" + str(axisX * 180) + ", " + str(axisY * 180) + ", " + str((axisZ - 1) * 180) + ">"
+                intervalAxis = "<" + str(fcObj.IntervalAxis.x) + ", " + str(fcObj.IntervalAxis.y) + ", " + str(fcObj.IntervalAxis.z) + ">"
+                number = fcObj.NumberPolar
+
+                povArr += "\n#declare " + child.Label + " = "
+                childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
+                povArr += childCode
+
+                povArr += "\n#declare i = 0;\n"
+                povArr += "#declare endNo = " + str(number) + ";\n"
+                povArr += "#while (i < endNo)\n"
+                povArr += "    object { " + child.Label + "\n"
+
+                povArr += "        translate -" + center + "\n"
+                #povArr += "        rotate " + axis + "\n"
+                povArr += "        rotate <0, 0, i * 360 / endNo>\n"
+
+                povArr += "        translate " + center + "\n"
+
+                povArr += "    }\n    #declare i = i + 1;\n"
+                povArr += "#end\n"
+
+            povCode += povArr
+            return povCode
+
     elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
         childs = fcObj.OutList
         for child in childs:
@@ -571,7 +611,6 @@ def checkErrFile(errorPath):
     #read error file
     error = file.read()
     file.close()
-    App.Console.PrintError(error)
     #is there any content in the file
     if error != "": #error occured
         #show error message
@@ -581,8 +620,6 @@ def checkErrFile(errorPath):
         errorText += "\n-----------------------------------------\n"
         errorText += "If the error occured in the pov file or the mesh file, please report a bug to us. (See the wiki, link is in the help tab of the dialog)\n\n"
         errorText += "You can see the error message in the error file too."
-        App.Console.PrintWarning("Called")
-        App.Console.PrintMessage(errorText)
         showError(errorText, "An error ocurred while rendering")
 
 def showError(text, title):
