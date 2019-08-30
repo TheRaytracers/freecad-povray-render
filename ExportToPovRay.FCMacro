@@ -88,7 +88,7 @@ def startExport(povPath, width, height, expBg, expLight, repRot, expFcView): #st
     finalPovCode += "#default{pigment{rgb " + uintColorToRGB(DefaultShapeColor) + "}}\n"
 
     finalPovCode += "//------------------------------------------\n"
-    finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
+    finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n#include \"transforms.inc\"\n"
 
     if statistics[1]:
         finalPovCode += "#include \"" + meshName + "\"\n"
@@ -229,15 +229,27 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 axisY = fcObj.Axis.y
                 axisZ = fcObj.Axis.z
                 highestAxis = max(axisX, axisY, axisZ) #get highest value
-                axisX /= highestAxis
-                axisY /= highestAxis
-                axisZ /= highestAxis
+                axisX /= highestAxis #/ 360
+                axisY /= highestAxis #/ 360
+                axisZ /= highestAxis #/ 360
 
-                angleX = degrees(atan(axisY / axisZ))
-                angleY = degrees(atan(axisZ / axisX))
-                angleZ = degrees(atan(axisY / axisX))
+                try:
+                    angleX = math.degrees(math.atan(axisZ / axisY))
+                except ZeroDivisionError:
+                    angleX = 0
 
-                axis = "<" + str(angleX) + ", " + str(angleY) + ", " + str((angleZ - ) + ">"
+                try:
+                    angleY = math.degrees(math.atan(axisZ / axisX))
+                except ZeroDivisionError:
+                    angleY = 0
+
+                try:
+                    angleZ = math.degrees(math.atan(axisY / axisX))
+                except ZeroDivisionError:
+                    angleZ = 0
+
+
+                axis = "<" + str(axisX) + ", " + str(axisY) + ", " + str(axisZ) + ">"
                 intervalAxis = "<" + str(fcObj.IntervalAxis.x) + ", " + str(fcObj.IntervalAxis.y) + ", " + str(fcObj.IntervalAxis.z) + ">"
                 number = fcObj.NumberPolar
 
@@ -251,8 +263,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 povArr += "    object { " + child.Label + "\n"
 
                 povArr += "        translate -" + center + "\n"
-                #povArr += "        rotate " + axis + "\n"
-                povArr += "        rotate <0, 0, i * 360 / endNo>\n"
+                povArr += "        Axis_Rotate_Trans(" + axis + ", i * 360 / endNo)"
 
                 povArr += "        translate " + center + "\n"
 
