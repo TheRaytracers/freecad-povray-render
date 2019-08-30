@@ -237,6 +237,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 axis = "<" + str(axisX) + ", " + str(axisY) + ", " + str(axisZ) + ">"
                 intervalAxis = "<" + str(fcObj.IntervalAxis.x) + ", " + str(fcObj.IntervalAxis.y) + ", " + str(fcObj.IntervalAxis.z) + ">"
                 number = fcObj.NumberPolar
+                angle = fcObj.Angle.getValueAs("deg").Value
 
                 povArr += "\n#declare " + child.Label + " = "
                 childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
@@ -245,10 +246,11 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 povArr += "\n#declare i = 0;\n"
                 povArr += "#declare endNo = " + str(number) + ";\n"
                 povArr += "#declare axis = " + axis + ";\n"
+                povArr += "#declare arrAngle = " + str(angle) + ";\n"
                 povArr += "#while (i < endNo)\n"
                 povArr += "    object { " + child.Label + "\n"
                 povArr += "        translate -" + center + "\n"
-                povArr += "        #declare rotAngle = i * 360 / endNo;\n"
+                povArr += "        #declare rotAngle = i * arrAngle / endNo;\n"
                 povArr += "        #local vX = vaxis_rotate(x, axis, rotAngle);\n"
                 povArr += "        #local vY = vaxis_rotate(y, axis, rotAngle);\n"
                 povArr += "        #local vZ = vaxis_rotate(z, axis, rotAngle);\n"
