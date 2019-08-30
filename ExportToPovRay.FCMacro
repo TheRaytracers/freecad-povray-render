@@ -123,7 +123,7 @@ def startExport(povPath, width, height, expBg, expLight, repRot, expFcView): #st
             finalPovCode += createPovrayCode(obj, incContent, width, height)
 
     writeFile(finalPovCode, povPath)
-    openPovRay(directory, povName, width, height)
+    openPovRay(directory, povName, errorName, width, height)
 
 
 def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns the povray code for the object
@@ -559,10 +559,36 @@ def writeFile(povText, fileName): #write the final pov file
     except:
         return -1
 
-def openPovRay(directory, povName, width, height): #start POVray
-    terminalInput = "cd " + str(directory) + " && povray " + str(povName) + " +P Width=" + str(width) + " Height=" + str(height) #create the string to start POVray
+def openPovRay(directory, povName, errorName, width, height): #start POVray
+    terminalInput = "cd " + str(directory) + " && povray " + str(povName) + " +P Width=" + str(width) + " Height=" + str(height) + " Fatal_File=" + errorName #create the string to start POVray
     os.system(terminalInput) #put terminalInput to the console
+    checkErrFile(directory + errorName)
 
+def checkErrFile(errorPath):
+    inPovFile = False
+    #open error file
+    file = open(errorPath, "r")
+    #read error file
+    error = file.read()
+    file.close()
+    App.Console.PrintError(error)
+    #is there any content in the file
+    if error != "": #error occured
+        #show error message
+        errorText = ""
+        errorText += "An error occured while rendering:\n-----------------------------------------\n"
+        errorText += error
+        errorText += "\n-----------------------------------------\n"
+        errorText += "If the error occured in the pov file or the mesh file, please report a bug to us. (See the wiki, link is in the help tab of the dialog)\n\n"
+        errorText += "You can see the error message in the error file too."
+        App.Console.PrintWarning("Called")
+        App.Console.PrintMessage(errorText)
+        showError(errorText, "An error ocurred while rendering")
+
+def showError(text, title):
+    dialog = QtGui.QMessageBox(QtGui.QMessageBox.Critical, title, text)
+    dialog.setWindowModality(QtCore.Qt.ApplicationModal)
+    dialog.exec_()
 
 def repairRot(objs): #repair the rotation of objects (likely a bug in FreeCAD)
     for obj in objs:
