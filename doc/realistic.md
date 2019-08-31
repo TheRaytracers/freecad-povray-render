@@ -16,7 +16,7 @@ To close the window with the rendered image click in the middle of the image!
 
 ![First render]( ./img/Chess/Chess_02.png "First render")
 
-Maybe the result is not very exciting for you. Without any additional file the macro follws the **WYSIWYG** principle. **W**hat **Y**ou **S**ee (in FreeCAD) **I**s **W**hat **Y**ou **G**et (in POV-Ray). If you checked the "Export FreeCAD view" checkbox in the popup window you can find a second picture with the FreeCAD view in the output directory. Both pictures have the same image size and camera view. But if you look carefully you can see litte differences: POV-Ray will not render the outlines of the objects and if you look more careful - the shadows are not the same. This is because FreeCAD illuminates each object for its own but in POV-Ray we used a single lightsource at the position of the camera. If there are bigger differences you should check our [Tips & Tricks Section](../tipsAndTricks.md).
+Maybe the result is not very exciting for you. Without any additional file the macro follws the **WYSIWYG** principle. **W**hat **Y**ou **S**ee (in FreeCAD) **I**s **W**hat **Y**ou **G**et (in POV-Ray). If you checked the "Export FreeCAD view" checkbox in the popup window you can find a second picture with the FreeCAD view in the output directory. Both pictures have the same image size and camera view. But if you look carefully you can see litte differences: POV-Ray will not render the outlines of the objects and if you look more careful - the shadows are not the same. This is because FreeCAD illuminates each object for its own but in POV-Ray we used a single lightsource at the position of the camera. If there are bigger differences you should check our [Tips & Tricks Section](tipsAndTricks.md).
 
 Now lets take the first step into realistic rendering! To add some textures we need a include file in the same directory of our .pov output file. To be recognized by our macro its name must be the same as the POV-Ray file but with the .inc extension. If you choose Chess01.pov for your output file the corresponding texture file is Chess01.inc
 Before you create your own textures take a look at our example which can be downloaded [Chess inc File](../Examples/Chess/ChessTextures.inc).
@@ -33,7 +33,7 @@ If you create your own textures be sure to use the right syntax. Replace the "xx
 ```
 
 Put your material declaration inside the brackets. Be aware of the hierarchy of material declaration. We only provide `material { }` in our macro because it is toplevel of all other statements like texture, pigment, finish, pattern etc. POVray has an excellent documentation, so you will find further information in the [POVray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_5_5_3).
-Ignoring the material hierarchy will lead to a POV-Ray error and nothing will be rendered. How to get the console output from POV-Ray for debugging see the [Tips & Tricks Section](../tipsAndTricks.md).
+Ignoring the material hierarchy will lead to a POV-Ray error and nothing will be rendered. How to get the console output from POV-Ray for debugging see the [Tips & Tricks Section](tipsAndTricks.md).
 
 Now let's try to add more reality to the chess Example. You can download another FreeCAD file for a gaming scene and a corresponding include file:
 

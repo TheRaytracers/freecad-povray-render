@@ -13,7 +13,7 @@ If you define your own camera in the .inc file the macro will detect this and th
 #declare CamRotation = <-50, -1, 25>;
 #declare CamPosition = <120, -25.6932964325, 100>;
 ```
-The example is also the key to the handedness of the coordinate system we use. While POV-Ray uses a left handed coordinate system FreeCAD like many other CAD Programs uses a right handed one. In th e above declaration you can see the up vector pointing in the z direction and the right vector in the x direction. In POV-Ray examles you will often find the following declaration:
+The example is also the key to the right handedness of the coordinate system we use. While POV-Ray uses a left handed coordinate system FreeCAD like many other CAD Programs uses a right handed one. In the above declaration you can see the up vector pointing in the z direction and the right vector in the x direction. In POV-Ray examles you will often find the following declaration:
 ```
 camera{
     up < 0, 1, 0>
@@ -22,7 +22,7 @@ camera{
     }
 ```
 So y and z axis are swaped and the result ist a left handed coordinate system.
-You may ask why right is 1.33. This ist aspect ratio of your image - If the value ist not correct the rendered image will be streched.
+You may ask why right is 1.33. This is the aspect ratio of your image - If the value ist not correct the rendered image will be streched or compressed.
 
 If you want to know more about the coordinate system see:
 
