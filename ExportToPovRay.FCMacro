@@ -230,9 +230,9 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
             if fcObj.Shape.Solids == []:
                 return ""
         except:
-            return "" #object has no shape property
+            if fcObj.isDerivedFrom("Mesh::Feature") == False:
+                return "" #object has no shape property
 
-        shape = fcObj.Shape
         mesh = 0
 
         if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
@@ -241,7 +241,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
             distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
             pictureSize = (width + height) / 2
             angularDeflection = (distanceCam / pictureSize) * 2.5
-            mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+            mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
             #App.Console.PrintMessage(str(angularDeflection) + " " + stringCorrection(fcObj.Label) + ": " + str(mesh))
 
         if not mesh:
@@ -775,13 +775,13 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             self.imageWidth.setValue(width)
         if height is not None:
             self.imageHeight.setValue(height)
-        if expBg is not None and expBg == True:
+        if expBg is not None and (expBg == True or expBg == "true"):
             self.expBg.setCheckState(QtCore.Qt.CheckState(2))
-        if expLight is not None and expLight == True:
+        if expLight is not None and (expLight == True or expLight == "true"):
             self.expLight.setCheckState(QtCore.Qt.CheckState(2))
-        if repRot is not None and repRot == True:
+        if repRot is not None and (repRot == True or repRot == "true"):
             self.repRot.setCheckState(QtCore.Qt.CheckState(2))
-        if expFcView is not None and expFcView == True:
+        if expFcView is not None and (expFcView == True or expFcView == "true"):
             self.expFcView.setCheckState(QtCore.Qt.CheckState(2))
 
         helpText = """
