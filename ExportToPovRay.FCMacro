@@ -754,6 +754,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
     def setDefaultValues(self): #set the default values of the input objects
         defaultPath = "/home/"
         self.pathLineEdit.setText(defaultPath)
+        self.expBg.setChecked(True)
+        self.expLight.setChecked(True)
 
         #get saved input
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
