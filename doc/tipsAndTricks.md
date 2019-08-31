@@ -34,6 +34,21 @@ and
 
 ## Background
 
+The Background of the rendered image was a challenge to implement. In FreeCAD you can choose the background colors via the settings menu. You can choose plain color or a gradient of two or three colors. The color you choose in the settings menu is not exactly the same you see in the viewport. FreeCAD darkens the Background slightly. So we had to make a decision either to take the original color or the darkened. We took the original - it looks bright and friendly.
+
+The background in POV-Ray is realised by a skysphere statement. [See POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_3_4)
+It is like an infinite sphere around the scene. The skysphere is rotated according to the camera rotation. If you use your own camera declaration the background may tilt. If the tilted background affects your inner balance - switch it of in the macro dialog and declare your own.
+
+A further problem was the background for the orthographic camera. The skysphere won't render a color gradient even if declared. So we placed a patch with exactly the size of the orthographic camera view behind the scene. But we also add the skysphere for realistic reflection on the objects.
+This "look from outside" illustrates the "orthographic background":
+
+![Orthographic bacground illustration]( ./img/Chess/Orthographic_background.png "Orthographic background")
+
+## Lights
+
+By default we defined a lightsource which is placed exactly at the position of the camera. If you switch it of some ambient light will remain. With our default lightsource the shadows are not so impressing. You can define as many lights as you want from different types in the .inc file. For more information about light see [POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_4).
+
+## Textures and materials
 
 * You can change the background of FreeCAD under Edit/Preferences/Display/Colors/Background Color. You can also add a middle color.
 * For side views, try the orthographic view. But for a non side view, don't use the orthographic view. That doesn't look realistic
