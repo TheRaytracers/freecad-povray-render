@@ -453,14 +453,15 @@ def getStatistics(objs): #get statistics about the model the user want to render
     noCsgCount = 0
     CsgCount = 0
     ParentCount = 0
-    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
+    supportedTypeIds = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
+    supportedNames = ["Array"]
     for obj in objs:
-        if not obj.TypeId in supportedObjs :
+        if not obj.TypeId in supportedTypeIds and not obj.Name in supportedNames and not obj.Name[:-3] in supportedNames:
             noCsgCount = noCsgCount + 1
         else:
-            CsgCount = CsgCount +1
+            CsgCount = CsgCount + 1
         if obj.InList == []:
-            ParentCount = ParentCount +1
+            ParentCount = ParentCount + 1
     statistics += str(ParentCount) + " parent objects found in highest layer\n"
     statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
     if noCsgCount != 0:
