@@ -251,6 +251,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 povArr += "    object { " + child.Label + "\n"
                 if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
                     povArr += "        translate -" + center + "\n"
+
                 povArr += "        #declare rotAngle = i * arrAngle / endNo;\n"
                 povArr += "        #local vX = vaxis_rotate(x, axis, rotAngle);\n"
                 povArr += "        #local vY = vaxis_rotate(y, axis, rotAngle);\n"
@@ -261,8 +262,21 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
 
                 if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
                     povArr += "        translate " + center + "\n"
+
+                rotation = getRot(fcObj)
+                if rotation != "": #test if the object is rotated
+                    povArr += "        " + rotation + "\n"
+
                 if fcObj.IntervalAxis.x != 0 or fcObj.IntervalAxis.y != 0 or fcObj.IntervalAxis.z != 0:
                     povArr += "        translate " + intervalAxis + " * i\n"
+
+                translation = getTranslation(fcObj)
+                if translation != "": #test if the object is translated
+                    povArr += "    " + translation + "\n"
+
+                pigment = getPigment(fcObj, incContent)
+                if pigment != "": #test if the object has the standard pigment
+                    povArr += "    " + pigment + "\n"
 
                 povArr += "    }\n    #declare i = i + 1;\n"
                 povArr += "#end\n"
@@ -353,7 +367,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
 
     translation = getTranslation(fcObj)
     if translation != "": #test if the object is translated
-        povCode += "    " + getTranslation(fcObj) + "\n"
+        povCode += "    " + translation + "\n"
 
     pigment = getPigment(fcObj, incContent)
     if pigment != "": #test if the object has the standard pigment
