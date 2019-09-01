@@ -218,6 +218,143 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
 
         povCode += povCommon
 
+    elif fcObj.TypeId == 'Part::FeaturePython' and (fcObj.Name == "Array" or fcObj.Name[:-3] == "Array"): #Array from Draft workbench
+        povArr = ""
+        if fcObj.ArrayType == "polar":
+            childs = fcObj.OutList
+            for child in childs:
+                center = "<" + str(fcObj.Center.x) + ", " + str(fcObj.Center.y) + ", " + str(fcObj.Center.z) + ">"
+                axisX = fcObj.Axis.x
+                axisY = fcObj.Axis.y
+                axisZ = fcObj.Axis.z
+                highestAxis = max(axisX, axisY, axisZ) #get highest value
+                axisX /= highestAxis
+                axisY /= highestAxis
+                axisZ /= highestAxis
+
+
+                axis = "<" + str(axisX) + ", " + str(axisY) + ", " + str(axisZ) + ">"
+                intervalAxis = "<" + str(fcObj.IntervalAxis.x) + ", " + str(fcObj.IntervalAxis.y) + ", " + str(fcObj.IntervalAxis.z) + ">"
+                number = fcObj.NumberPolar
+                angle = fcObj.Angle.getValueAs("deg").Value
+
+                povArr += "\n#declare " + child.Label.capitalize() + " = "
+                childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
+                povArr += childCode
+
+                povArr += "\n#declare i = 0;\n"
+                povArr += "#declare endNo = " + str(number) + ";\n"
+                povArr += "#declare axis = " + axis + ";\n"
+                povArr += "#declare arrAngle = " + str(angle) + ";\n"
+                povArr += "#while (i < endNo)\n"
+                povArr += "    object { " + child.Label.capitalize() + "\n"
+                if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
+                    povArr += "        translate -" + center + "\n"
+
+                povArr += "        #declare rotAngle = i * arrAngle / endNo;\n"
+                povArr += "        #local vX = vaxis_rotate(x, axis, rotAngle);\n"
+                povArr += "        #local vY = vaxis_rotate(y, axis, rotAngle);\n"
+                povArr += "        #local vZ = vaxis_rotate(z, axis, rotAngle);\n"
+                povArr += "        transform {\n"
+                povArr += "            matrix <vX.x, vX.y, vX.z, vY.x, vY.y, vY.z, vZ.x, vZ.y, vZ.z, 0, 0, 0>\n"
+                povArr += "        }\n"
+
+                if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
+                    povArr += "        translate " + center + "\n"
+
+                rotation = getRot(fcObj)
+                if rotation != "": #test if the object is rotated
+                    povArr += "        " + rotation + "\n"
+
+                if fcObj.IntervalAxis.x != 0 or fcObj.IntervalAxis.y != 0 or fcObj.IntervalAxis.z != 0:
+                    povArr += "        translate " + intervalAxis + " * i\n"
+
+                translation = getTranslation(fcObj)
+                if translation != "": #test if the object is translated
+                    povArr += "    " + translation + "\n"
+
+                pigment = getPigment(fcObj, incContent)
+                if pigment != "": #test if the object has the standard pigment
+                    povArr += "    " + pigment + "\n"
+
+                povArr += "    }\n    #declare i = i + 1;\n"
+                povArr += "#end\n"
+
+            povCode += povArr
+
+        elif fcObj.ArrayType == "ortho":
+            childs = fcObj.OutList
+            for child in childs:
+                intervalX = "<" + str(fcObj.IntervalX.x) + ", " + str(fcObj.IntervalX.y) + ", " + str(fcObj.IntervalX.z) + ">"
+                intervalY = "<" + str(fcObj.IntervalY.x) + ", " + str(fcObj.IntervalY.y) + ", " + str(fcObj.IntervalY.z) + ">"
+                intervalZ = "<" + str(fcObj.IntervalZ.x) + ", " + str(fcObj.IntervalZ.y) + ", " + str(fcObj.IntervalZ.z) + ">"
+
+                numX = fcObj.NumberX
+                if numX == 0:
+                    numX = 1
+
+                numY = fcObj.NumberY
+                if numY == 0:
+                    numY = 1
+
+                numZ = fcObj.NumberZ
+                if numZ == 0:
+                    numZ = 1
+
+
+                povArr += "\n#declare " + child.Label.capitalize() + " = "
+                childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
+                povArr += childCode
+
+                povArr += "#declare intervalX = " + intervalX + ";\n"
+                povArr += "#declare intervalY = " + intervalY + ";\n"
+                povArr += "#declare intervalZ = " + intervalZ + ";\n\n"
+
+                povArr += "#declare numX = " + str(numX) + ";\n"
+                povArr += "#declare ix = 0;\n"
+                povArr += "#while (ix < numX)\n"
+
+                povArr += "    #declare numY = " + str(numY) + ";\n"
+                povArr += "    #declare iy = 0;\n"
+                povArr += "    #while (iy < numY)\n"
+
+                povArr += "        #declare numZ = " + str(numZ) + ";\n"
+                povArr += "        #declare iz = 0;\n"
+                povArr += "        #while (iz < numZ)\n"
+
+                povArr += "            object { " + child.Label.capitalize() + "\n"
+
+
+
+                povArr += "                translate intervalX * ix\n"
+                povArr += "                translate intervalY * iy\n"
+                povArr += "                translate intervalZ * iz\n"
+
+                translation = getTranslation(fcObj)
+                if translation != "": #test if the object is translated
+                    povArr += "                " + translation + "\n"
+
+                rotation = getRot(fcObj)
+                if rotation != "": #test if the object is rotated
+                    povArr += "                " + rotation + "\n"
+
+                pigment = getPigment(fcObj, incContent)
+                if pigment != "": #test if the object has the standard pigment
+                    povArr += "                " + pigment + "\n"
+
+                povArr += "            }\n"
+
+                povArr += "            #declare iz = iz + 1;\n"
+                povArr += "        #end\n"
+                povArr += "        #declare iy = iy + 1;\n"
+                povArr += "    #end\n"
+                povArr += "    #declare ix = ix + 1;\n"
+                povArr += "#end\n"
+
+                povCode += povArr
+
+        return povCode
+
     elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
         childs = fcObj.OutList
         for child in childs:
@@ -301,7 +438,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
 
     translation = getTranslation(fcObj)
     if translation != "": #test if the object is translated
-        povCode += "    " + getTranslation(fcObj) + "\n"
+        povCode += "    " + translation + "\n"
 
     pigment = getPigment(fcObj, incContent)
     if pigment != "": #test if the object has the standard pigment
@@ -316,14 +453,15 @@ def getStatistics(objs): #get statistics about the model the user want to render
     noCsgCount = 0
     CsgCount = 0
     ParentCount = 0
-    supportedObjs = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
+    supportedTypeIds = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
+    supportedNames = ["Array"]
     for obj in objs:
-        if not obj.TypeId in supportedObjs :
+        if not obj.TypeId in supportedTypeIds and not obj.Name in supportedNames and not obj.Name[:-3] in supportedNames:
             noCsgCount = noCsgCount + 1
         else:
-            CsgCount = CsgCount +1
+            CsgCount = CsgCount + 1
         if obj.InList == []:
-            ParentCount = ParentCount +1
+            ParentCount = ParentCount + 1
     statistics += str(ParentCount) + " parent objects found in highest layer\n"
     statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
     if noCsgCount != 0:
@@ -571,7 +709,6 @@ def checkErrFile(errorPath):
     #read error file
     error = file.read()
     file.close()
-    App.Console.PrintError(error)
     #is there any content in the file
     if error != "": #error occured
         #show error message
@@ -581,8 +718,6 @@ def checkErrFile(errorPath):
         errorText += "\n-----------------------------------------\n"
         errorText += "If the error occured in the pov file or the mesh file, please report a bug to us. (See the wiki, link is in the help tab of the dialog)\n\n"
         errorText += "You can see the error message in the error file too."
-        App.Console.PrintWarning("Called")
-        App.Console.PrintMessage(errorText)
         showError(errorText, "An error ocurred while rendering")
 
 def showError(text, title):
