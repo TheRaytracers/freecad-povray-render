@@ -290,8 +290,17 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 intervalZ = "<" + str(fcObj.IntervalZ.x) + ", " + str(fcObj.IntervalZ.y) + ", " + str(fcObj.IntervalZ.z) + ">"
 
                 numX = fcObj.NumberX
+                if numX == 0:
+                    numX = 1
+
                 numY = fcObj.NumberY
+                if numY == 0:
+                    numY = 1
+
                 numZ = fcObj.NumberZ
+                if numZ == 0:
+                    numZ = 1
+
 
                 povArr += "\n#declare " + child.Label + " = "
                 childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
