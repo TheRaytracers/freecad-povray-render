@@ -218,7 +218,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
 
         povCode += povCommon
 
-    elif fcObj.TypeId == 'Part::FeaturePython' and fcObj.Name == "Array": #Array from Draft workbench
+    elif fcObj.TypeId == 'Part::FeaturePython' and (fcObj.Name == "Array" or fcObj.Name[:-3] == "Array"): #Array from Draft workbench
         povArr = ""
         if fcObj.ArrayType == "polar":
             childs = fcObj.OutList
