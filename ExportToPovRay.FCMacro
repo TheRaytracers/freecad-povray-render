@@ -238,7 +238,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 number = fcObj.NumberPolar
                 angle = fcObj.Angle.getValueAs("deg").Value
 
-                povArr += "\n#declare " + child.Label + " = "
+                povArr += "\n#declare " + child.Label.capitalize() + " = "
                 childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
                 povArr += childCode
 
@@ -247,7 +247,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 povArr += "#declare axis = " + axis + ";\n"
                 povArr += "#declare arrAngle = " + str(angle) + ";\n"
                 povArr += "#while (i < endNo)\n"
-                povArr += "    object { " + child.Label + "\n"
+                povArr += "    object { " + child.Label.capitalize() + "\n"
                 if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
                     povArr += "        translate -" + center + "\n"
 
@@ -302,7 +302,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                     numZ = 1
 
 
-                povArr += "\n#declare " + child.Label + " = "
+                povArr += "\n#declare " + child.Label.capitalize() + " = "
                 childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
                 povArr += childCode
 
@@ -322,7 +322,7 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 povArr += "        #declare iz = 0;\n"
                 povArr += "        #while (iz < numZ)\n"
 
-                povArr += "            object { " + child.Label + "\n"
+                povArr += "            object { " + child.Label.capitalize() + "\n"
 
 
 
