@@ -219,9 +219,8 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
         povCode += povCommon
 
     elif fcObj.TypeId == 'Part::FeaturePython' and fcObj.Name == "Array": #Array from Draft workbench
+        povArr = ""
         if fcObj.ArrayType == "polar":
-            povArr = ""
-
             childs = fcObj.OutList
             for child in childs:
                 center = "<" + str(fcObj.Center.x) + ", " + str(fcObj.Center.y) + ", " + str(fcObj.Center.z) + ">"
@@ -282,7 +281,70 @@ def createPovrayCode(fcObj, incContent, width, height, meshFile = 0): #returns t
                 povArr += "#end\n"
 
             povCode += povArr
-            return povCode
+
+        elif fcObj.ArrayType == "ortho":
+            childs = fcObj.OutList
+            for child in childs:
+                intervalX = "<" + str(fcObj.IntervalX.x) + ", " + str(fcObj.IntervalX.y) + ", " + str(fcObj.IntervalX.z) + ">"
+                intervalY = "<" + str(fcObj.IntervalY.x) + ", " + str(fcObj.IntervalY.y) + ", " + str(fcObj.IntervalY.z) + ">"
+                intervalZ = "<" + str(fcObj.IntervalZ.x) + ", " + str(fcObj.IntervalZ.y) + ", " + str(fcObj.IntervalZ.z) + ">"
+
+                numX = fcObj.NumberX
+                numY = fcObj.NumberY
+                numZ = fcObj.NumberZ
+
+                povArr += "\n#declare " + child.Label + " = "
+                childCode = createPovrayCode(child, incContent, width, height, meshFile) #call createPovrayCode for the child
+                povArr += childCode
+
+                povArr += "#declare intervalX = " + intervalX + ";\n"
+                povArr += "#declare intervalY = " + intervalY + ";\n"
+                povArr += "#declare intervalZ = " + intervalZ + ";\n\n"
+
+                povArr += "#declare numX = " + str(numX) + ";\n"
+                povArr += "#declare ix = 0;\n"
+                povArr += "#while (ix < numX)\n"
+
+                povArr += "    #declare numY = " + str(numY) + ";\n"
+                povArr += "    #declare iy = 0;\n"
+                povArr += "    #while (iy < numY)\n"
+
+                povArr += "        #declare numZ = " + str(numZ) + ";\n"
+                povArr += "        #declare iz = 0;\n"
+                povArr += "        #while (iz < numZ)\n"
+
+                povArr += "            object { " + child.Label + "\n"
+
+
+
+                povArr += "                translate intervalX * ix\n"
+                povArr += "                translate intervalY * iy\n"
+                povArr += "                translate intervalZ * iz\n"
+
+                translation = getTranslation(fcObj)
+                if translation != "": #test if the object is translated
+                    povArr += "                " + translation + "\n"
+
+                rotation = getRot(fcObj)
+                if rotation != "": #test if the object is rotated
+                    povArr += "                " + rotation + "\n"
+
+                pigment = getPigment(fcObj, incContent)
+                if pigment != "": #test if the object has the standard pigment
+                    povArr += "                " + pigment + "\n"
+
+                povArr += "            }\n"
+
+                povArr += "            #declare iz = iz + 1;\n"
+                povArr += "        #end\n"
+                povArr += "        #declare iy = iy + 1;\n"
+                povArr += "    #end\n"
+                povArr += "    #declare ix = ix + 1;\n"
+                povArr += "#end\n"
+
+                povCode += povArr
+
+        return povCode
 
     elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
         childs = fcObj.OutList
