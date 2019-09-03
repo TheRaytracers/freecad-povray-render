@@ -101,7 +101,7 @@ class ExportToPovRay:
 
         #get the first layer and check visibility of parent objects
         for obj in self.objs:
-            if obj.InList == []: #no parents
+            if obj.InList == [] or (len(obj.InList) == 1 and (obj.InList[0].Name == "Clone" or obj.InList[0].Name[:-3] == "Clone")): #no parents
                 guiObject = obj.ViewObject
                 if guiObject.Visibility:
                     firstLayer.append(obj)
@@ -146,8 +146,11 @@ class ExportToPovRay:
         self.openPovRay()
 
 
-    def createPovrayCode(self, fcObj): #returns the povray code for the object
-        povCode = "\n//----- " + self.stringCorrection(fcObj.Label) + " -----" #add the name of the object
+    def createPovrayCode(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expLabel = True): #returns the povray code for the object
+        if expLabel:
+            povCode = "\n//----- " + self.stringCorrection(fcObj.Label) + " -----" #add the name of the object
+        else:
+            povCode = ""
 
         if fcObj.TypeId == "Part::Box": #Box
             povBox = "\nbox{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">"
@@ -215,7 +218,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCut = "\ndifference {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
                 povCut += childCode.replace("\n", "\n    ") #add the indents
 
             povCode += povCut
@@ -224,7 +227,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povFusion = "\nunion {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
                 povFusion += childCode.replace("\n", "\n    ") #add the indents
 
             povCode += povFusion
@@ -233,12 +236,12 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCommon = "\nintersection {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
                 povCommon += childCode.replace("\n", "\n    ") #add the indents
 
             povCode += povCommon
 
-        elif fcObj.TypeId == 'Part::FeaturePython' and (fcObj.Name == "Array" or fcObj.Name[:-3] == "Array"): #Array from Draft workbench
+        elif fcObj.TypeId == "Part::FeaturePython" and (fcObj.Name == "Array" or fcObj.Name[:-3] == "Array"): #Array from Draft workbench
             povArr = ""
             if fcObj.ArrayType == "polar":
                 childs = fcObj.OutList
@@ -259,7 +262,7 @@ class ExportToPovRay:
                     angle = fcObj.Angle.getValueAs("deg").Value
 
                     povArr += "\n#declare " + child.Label.capitalize() + " = "
-                    childCode = self.createPovrayCode(child) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
                     povArr += childCode
 
                     povArr += "\n#declare i = 0;\n"
@@ -282,20 +285,23 @@ class ExportToPovRay:
                     if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
                         povArr += "        translate " + center + "\n"
 
-                    rotation = getRot(fcObj)
-                    if rotation != "": #test if the object is rotated
-                        povArr += "        " + rotation + "\n"
+                    if expPlacement:
+                        rotation = getRot(fcObj)
+                        if rotation != "": #test if the object is rotated
+                            povArr += "        " + rotation + "\n"
 
                     if fcObj.IntervalAxis.x != 0 or fcObj.IntervalAxis.y != 0 or fcObj.IntervalAxis.z != 0:
                         povArr += "        translate " + intervalAxis + " * i\n"
 
-                    translation = self.getTranslation(fcObj)
-                    if translation != "": #test if the object is translated
-                        povArr += "    " + translation + "\n"
+                    if expPlacement:
+                        translation = self.getTranslation(fcObj)
+                        if translation != "": #test if the object is translated
+                            povArr += "    " + translation + "\n"
 
-                    pigment = self.getPigment(fcObj)
-                    if pigment != "": #test if the object has the standard pigment
-                        povArr += "    " + pigment + "\n"
+                    if expPigment:
+                        pigment = self.getPigment(fcObj)
+                        if pigment != "": #test if the object has the standard pigment
+                            povArr += "    " + pigment + "\n"
 
                     povArr += "    }\n    #declare i = i + 1;\n"
                     povArr += "#end\n"
@@ -323,7 +329,7 @@ class ExportToPovRay:
 
 
                     povArr += "\n#declare " + child.Label.capitalize() + " = "
-                    childCode = self.createPovrayCode(child) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
                     povArr += childCode
 
                     povArr += "#declare intervalX = " + intervalX + ";\n"
@@ -343,24 +349,23 @@ class ExportToPovRay:
                     povArr += "        #while (iz < numZ)\n"
 
                     povArr += "            object { " + child.Label.capitalize() + "\n"
-
-
-
                     povArr += "                translate intervalX * ix\n"
                     povArr += "                translate intervalY * iy\n"
                     povArr += "                translate intervalZ * iz\n"
 
-                    translation = self.getTranslation(fcObj)
-                    if translation != "": #test if the object is translated
-                        povArr += "                " + translation + "\n"
+                    if expPlacement:
+                        translation = self.getTranslation(fcObj)
+                        if translation != "": #test if the object is translated
+                            povArr += "                " + translation + "\n"
 
-                    rotation = self.getRot(fcObj)
-                    if rotation != "": #test if the object is rotated
-                        povArr += "                " + rotation + "\n"
+                        rotation = self.getRot(fcObj)
+                        if rotation != "": #test if the object is rotated
+                            povArr += "                " + rotation + "\n"
 
-                    pigment = self.getPigment(fcObj)
-                    if pigment != "": #test if the object has the standard pigment
-                        povArr += "                " + pigment + "\n"
+                    if expPigment:
+                        pigment = self.getPigment(fcObj)
+                        if pigment != "": #test if the object has the standard pigment
+                            povArr += "                " + pigment + "\n"
 
                     povArr += "            }\n"
 
@@ -375,10 +380,18 @@ class ExportToPovRay:
 
             return povCode
 
+        elif fcObj.TypeId == "Part::FeaturePython" and (fcObj.Name == "Clone" or fcObj.Name[:-3] == "Clone"): #Clone from Draft workbench
+            povClone = ""
+            childs = fcObj.OutList
+            for child in childs:
+                povClone += self.createPovrayCode(child, False, False, False, False)
+
+            povCode += povClone
+
         elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
             childs = fcObj.OutList
             for child in childs:
-                childCode = self.createPovrayCode(child) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
                 povCode += childCode
             return povCode
 
@@ -435,35 +448,51 @@ class ExportToPovRay:
 
             #return pov code
             povCode += "\nobject { " + self.stringCorrection(fcObj.Label) + "_mesh\n"
-            pigment = getPigment(fcObj)
+            pigment = self.getPigment(fcObj)
+
+            if expPlacement == False:
+                rotation = self.getRot(fcObj)
+                if rotation != "": #test if the object is rotated
+                    povCode += "    " + rotation + " * (-1)\n"
+
+                translation = self.getTranslation(fcObj)
+                if translation != "": #test if the object is translated
+                    povCode += "    " + translation + " * (-1)\n"
+
             if pigment != "": #test if the object has the standard pigment
                 povCode += "    " + pigment + "\n"
 
-            povCode += "}\n"
+            if expClose:
+                povCode += "}\n"
 
             childs = fcObj.OutList
             for child in childs:
                 guiObject = child.ViewObject
                 if guiObject.Visibility:
-                    childCode = self.createPovrayCode(child) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
                     povCode += childCode
 
             return povCode #return because the mesh may not translated and rotated
 
         povCode += "\n"
-        rotation = self.getRot(fcObj)
-        if rotation != "": #test if the object is rotated
-            povCode += "    " + rotation + "\n"
 
-        translation = self.getTranslation(fcObj)
-        if translation != "": #test if the object is translated
-            povCode += "    " + translation + "\n"
+        if expPlacement:
+            rotation = self.getRot(fcObj)
+            if rotation != "": #test if the object is rotated
+                povCode += "    " + rotation + "\n"
 
-        pigment = self.getPigment(fcObj)
-        if pigment != "": #test if the object has the standard pigment
-            povCode += "    " + pigment + "\n"
+            translation = self.getTranslation(fcObj)
+            if translation != "": #test if the object is translated
+                povCode += "    " + translation + "\n"
 
-        povCode += "}\n"
+        if expPigment:
+            pigment = self.getPigment(fcObj)
+            if pigment != "": #test if the object has the standard pigment
+                povCode += "    " + pigment + "\n"
+
+        if expClose:
+            povCode += "}\n"
+
         return povCode
 
 
@@ -473,7 +502,7 @@ class ExportToPovRay:
         CsgCount = 0
         ParentCount = 0
         supportedTypeIds = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
-        supportedNames = ["Array"]
+        supportedNames = ["Array", "Clone"]
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not obj.Name in supportedNames and not obj.Name[:-3] in supportedNames:
                 noCsgCount = noCsgCount + 1
