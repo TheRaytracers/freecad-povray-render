@@ -387,7 +387,10 @@ class ExportToPovRay:
             povClone = ""
             childs = fcObj.OutList
             for child in childs:
-                povClone += self.createPovrayCode(child, False, False, False, False, False)
+                if fcObj.ViewObject.Visibility:
+                    povClone += self.createPovrayCode(child, False, False, False, False, False)
+                else:
+                    povClone += self.createPovrayCode(child, False, False, False, False, True)
 
             povCode += povClone
 
