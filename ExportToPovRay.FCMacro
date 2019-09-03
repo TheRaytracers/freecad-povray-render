@@ -149,7 +149,7 @@ class ExportToPovRay:
         self.openPovRay()
 
 
-    def createPovrayCode(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expLabel = True): #returns the povray code for the object
+    def createPovrayCode(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expLabel = True, expMeshDef = True): #returns the povray code for the object
         if expLabel:
             povCode = "\n//----- " + self.stringCorrection(fcObj.Label) + " -----" #add the name of the object
         else:
@@ -221,7 +221,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCut = "\ndifference {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
                 povCut += childCode.replace("\n", "\n    ") #add the indents
 
             povCode += povCut
@@ -230,7 +230,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povFusion = "\nunion {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
                 povFusion += childCode.replace("\n", "\n    ") #add the indents
 
             povCode += povFusion
@@ -239,7 +239,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCommon = "\nintersection {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
                 povCommon += childCode.replace("\n", "\n    ") #add the indents
 
             povCode += povCommon
@@ -265,7 +265,7 @@ class ExportToPovRay:
                     angle = fcObj.Angle.getValueAs("deg").Value
 
                     povArr += "\n#declare " + child.Label.capitalize() + " = "
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
 
                     povArr += "\n#declare i = 0;\n"
@@ -332,7 +332,7 @@ class ExportToPovRay:
 
 
                     povArr += "\n#declare " + child.Label.capitalize() + " = "
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
 
                     povArr += "#declare intervalX = " + intervalX + ";\n"
@@ -387,67 +387,65 @@ class ExportToPovRay:
             povClone = ""
             childs = fcObj.OutList
             for child in childs:
-                povClone += self.createPovrayCode(child, False, False, False, False)
+                povClone += self.createPovrayCode(child, False, False, False, False, False)
 
             povCode += povClone
 
         elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
             childs = fcObj.OutList
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
                 povCode += childCode
             return povCode
 
         else: #not a supported object
-            try:
-                if fcObj.Shape.Solids == []:
-                    return ""
-            except:
-                if fcObj.isDerivedFrom("Mesh::Feature") == False:
-                    return "" #object has no shape property
-
-            mesh = 0
-
-            if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
-                mesh = fcObj.Mesh
-            else:
-                distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
-                pictureSize = (self.width + self.height) / 2
-                angularDeflection = (distanceCam / pictureSize) * 2.5
-                mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
-
-            if not mesh:
+            isSolid = self.isSolid(fcObj)
+            if isSolid != "mesh" and isSolid == False:
                 return ""
 
-            #create mesh2 object
-            povMesh = "#declare " + self.stringCorrection(fcObj.Label) + "_mesh ="
-            povMesh += "\nmesh2 {\n    vertex_vectors {\n"
+            if expMeshDef:
+                mesh = 0
 
-            #create vertex_vectors
-            numOfVertex = len(mesh.Topology[0])
-            povMesh += "        " + str(numOfVertex)
+                if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
+                    mesh = fcObj.Mesh
+                else:
+                    distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
+                    pictureSize = (self.width + self.height) / 2
+                    angularDeflection = (distanceCam / pictureSize) * 2.5
+                    mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
 
-            for point in mesh.Topology[0]:
-                povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
-            povMesh += "    }\n\n"
+                if not mesh:
+                    return ""
 
-            #create face_indices
-            povMesh += "    face_indices {\n"
-            numOfTriangles = len(mesh.Topology[1])
-            povMesh += "        " + str(numOfTriangles)
+                #create mesh2 object
+                povMesh = "#declare " + self.stringCorrection(fcObj.Label) + "_mesh ="
+                povMesh += "\nmesh2 {\n    vertex_vectors {\n"
 
-            for triangle in mesh.Topology[1]:
-                povMesh += ",\n        <" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
-            povMesh += "    }\n\n"
+                #create vertex_vectors
+                numOfVertex = len(mesh.Topology[0])
+                povMesh += "        " + str(numOfVertex)
 
-            #add inside vector
-            povMesh += "    inside_vector <1, 1, 1>\n"
+                for point in mesh.Topology[0]:
+                    povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
+                povMesh += "    }\n\n"
 
-            povMesh += "}\n\n"
+                #create face_indices
+                povMesh += "    face_indices {\n"
+                numOfTriangles = len(mesh.Topology[1])
+                povMesh += "        " + str(numOfTriangles)
 
-            #povCode += povMesh
-            #write mesh in inc file
-            self.meshFile.write(povMesh)
+                for triangle in mesh.Topology[1]:
+                    povMesh += ",\n        <" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
+                povMesh += "    }\n\n"
+
+                #add inside vector
+                povMesh += "    inside_vector <1, 1, 1>\n"
+
+                povMesh += "}\n\n"
+
+                #povCode += povMesh
+                #write mesh in inc file
+                self.meshFile.write(povMesh)
 
             #return pov code
             povCode += "\nobject { " + self.stringCorrection(fcObj.Label) + "_mesh\n"
@@ -468,11 +466,12 @@ class ExportToPovRay:
             if expClose:
                 povCode += "}\n"
 
+            # XXX: Really needed???
             childs = fcObj.OutList
             for child in childs:
                 guiObject = child.ViewObject
                 if guiObject.Visibility:
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
                     povCode += childCode
 
             return povCode #return because the mesh may not translated and rotated
@@ -771,6 +770,16 @@ class ExportToPovRay:
 
     def exportFcView(self): #export the current FreeCAD view like Tools / Save Picture...
         Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
+
+    def isSolid(self, fcObj):
+        try:
+            if fcObj.Shape.Solids == []:
+                return False
+            else:
+                return True
+        except:
+            if fcObj.isDerivedFrom("Mesh::Feature") == False:
+                return "mesh" #object has no shape property
 
 
     def stringCorrection(self, inputString): #change a utf-8 string to an ASCII string
