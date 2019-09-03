@@ -466,14 +466,6 @@ class ExportToPovRay:
             if expClose:
                 povCode += "}\n"
 
-            # XXX: Really needed???
-            childs = fcObj.OutList
-            for child in childs:
-                guiObject = child.ViewObject
-                if guiObject.Visibility:
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
-                    povCode += childCode
-
             return povCode #return because the mesh may not translated and rotated
 
         povCode += "\n"
