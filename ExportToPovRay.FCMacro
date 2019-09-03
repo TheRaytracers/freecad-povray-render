@@ -682,8 +682,8 @@ def getPigment(fcObj, incContent): #get the pigment of an object
         finish += phong
         finish += "}\n"
     material += finish
-    if incContent.find("#declare " + fcObj.Label + "_material") != -1:
-        material = "\nmaterial {" + fcObj.Label + "_material}\n"
+    if incContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
+        material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material}\n"
     return material
 
 

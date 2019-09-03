@@ -42,13 +42,81 @@ It is like an infinite sphere around the scene. The skysphere is rotated accordi
 A further problem was the background for the orthographic camera. The skysphere won't render a color gradient even if declared. So we placed a patch with exactly the size of the orthographic camera view behind the scene. But we also add the skysphere for realistic reflection on the objects.
 This "look from outside" illustrates the "orthographic background":
 
-![Orthographic bacground illustration]( ./img/Chess/Orthographic_background.png "Orthographic background")
+![Orthographic background illustration]( ./img/Chess/Orthographic_background.png "Orthographic background")
 
 ## Lights
 
 By default we defined a lightsource which is placed exactly at the position of the camera. If you switch it of some ambient light will remain. With our default lightsource the shadows are not so impressing. You can define as many lights as you want from different types in the .inc file. For more information about light see [POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_4).
 
 ## Textures and materials
+
+To describe all surface and interior modifiying features of POV-Ray would burst this chapter. Our advice for the workflow is first to model your objects in FreeCAD without changing any colors and in a second step add textures and materials to the .inc file. The link from a FreeCAD object to its material in the .inc file is the name of the object in the FreeCAD object tree better called the object label.
+If you want to apply a material to an object you add a declaration to the .inc file with the following syntax:
+
+```
+#declare ObjectLabel_material = material { }
+```
+This is the .inc file for the following example:
+
+```
+#include "metals.inc"
+
+#declare My_Sphere_material = material{
+    texture {
+        pigment { P_Chrome1 }
+        finish { F_MetalD }
+        }
+    }
+
+#declare My_Box_material = material{
+    texture {
+        checker
+            texture { pigment{ color rgb <0,0,0> }}
+            texture { pigment{ color rgb <1,1,1> }}
+        }
+    }
+
+```
+
+![Object labels]( ./img/textures_1.png "Object labels")
+
+The first thing our macro will do ist to look for a .inc file with the same name as the .pov file in the same folder.
+For example the corresponding .inc file for "example.pov" is "example.inc".
+If the .inc file exsists it will be included in the .pov file with the following line:
+
+```
+#include "example.inc"
+
+```
+In the next step the macro will look for material declarations in the .inc file matching the object labels.
+If found the FreeCAD textures in the .pov file will be replaced:
+
+
+```
+material {My_Sphere_material}
+```
+Because POV-Ray can't deal with spaces and special chars we use a replacement function.
+If you have problems with object labels just lookup the .pov file - every object has a outcommented header with the correct label.
+Everything put together this is how the sphere declaration in the .pov file looks like: 
+
+```
+//----- My_Sphere -----
+sphere { <0, 0, 0> 5 
+    translate <0.0, -6.0, 0.0>
+    
+material {My_Sphere_material}
+
+}
+```
+It is important to take care of the material hirarchie. The macro looks only for the material statement to be replaced. In our example we use a predefined pigment and finish for the sphere. Both are two levels below below the material statement. And they need an additional include file: "metals.inc".
+For a wrong syntax a error message will pop up where you can find some debugging information.
+Together with the [POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_6)  you will be able to create any texture you want.
+
+## Object modelling
+
+## Transformations of Objects
+
+## Debugging
 
 * You can change the background of FreeCAD under Edit/Preferences/Display/Colors/Background Color. You can also add a middle color.
 * For side views, try the orthographic view. But for a non side view, don't use the orthographic view. That doesn't look realistic
