@@ -1,4 +1,15 @@
-# Limitations, Tips & Tricks
+## Table of Contents
+- [Limitations, Tips & Tricks](#limitations-tips--tricks)
+- [Table of Contents](#table-of-contents)
+- [The camera](#the-camera)
+- [Background](#background)
+- [Lights](#lights)
+- [Textures and materials](#textures-and-materials)
+- [Object modelling](#object-modelling)
+- [Transformations of Objects](#transformations-of-objects)
+- [Debugging](#debugging)
+
+## Limitations, Tips & Tricks
 
 Even if FreeCAD an POV-Ray both support Constructive Solid Geometry we found a lot of differences in the details we had to deal with, while developing this macro.
 So if your rendering looks not like you expected it may not be a bug, it can also be a compromise to adapt the different concepts of FreeCAD and POV-Ray.
