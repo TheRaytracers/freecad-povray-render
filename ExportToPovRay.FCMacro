@@ -83,8 +83,11 @@ class ExportToPovRay:
         App.Console.PrintMessage(self.statistics[0])
 
         #clear old mesh file
-        if self.statistics[1]:
+        try:
             self.meshFile = open(self.meshPath, "w")
+        except:
+            pass
+
 
         self.startExport()
 
