@@ -5,7 +5,7 @@ So if your rendering looks not like you expected it may not be a bug, it can als
 
 ## The camera
 
-Normally you wont have to deal with camera settings. The macro both supports orthographic and perspective view. You just choose the view in FreeCAD and the result of the rendering should have the same point of view and viewing angle. There may be some clipping of the borders of the rendered image if the size of the viewport in FreeCAD isn't exacly the same size you choose in the Macro popup. If you choose the "Export FreeCAD View" option you will find a image of the FreeCAD view in your output folder with the size of the rendered image. It should match the camera perspective exactly.
+Normally you want have to deal with camera settings. The macro both supports orthographic and perspective view. You just choose the view in FreeCAD and the result of the rendering should have the same point of view and viewing angle. There may be some clipping of the borders of the rendered image if the size of the viewport in FreeCAD isn't exacly the same size you choose in the macro popup. If you choose the "Export FreeCAD View" option you will find a image of the FreeCAD view in your output folder with the size of the rendered image. It should match the camera perspective exactly.
 If you define your own camera in the .inc file the macro will detect this and the camera statement will be outcommented in the .pov file. If you want to use special camera types and effects from POV-Ray but still want to take the camera point of view from FreeCAD we provide some declarations in the .pov file that you can use in your .inc file:
 ```
 #declare CamUp = < 0, 0, 1>;
@@ -19,7 +19,7 @@ camera{
     up < 0, 1, 0>
     right< 1.33, 0, 0>
     ...
-    }
+}
 ```
 So y and z axis are swaped and the result ist a left handed coordinate system.
 You may ask why right is 1.33. This is the aspect ratio of your image - If the value ist not correct the rendered image will be streched or compressed.
@@ -36,7 +36,7 @@ and
 
 The Background of the rendered image was a challenge to implement. In FreeCAD you can choose the background colors via the settings menu. You can choose plain color or a gradient of two or three colors. The color you choose in the settings menu is not exactly the same you see in the viewport. FreeCAD darkens the Background slightly. So we had to make a decision either to take the original color or the darkened. We took the original - it looks bright and friendly.
 
-The background in POV-Ray is realised by a skysphere statement. [See POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_3_4)
+The background in POV-Ray is realised by a skysphere statement. See [POV-Ray Wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_3_4).
 It is like an infinite sphere around the scene. The skysphere is rotated according to the camera rotation. If you use your own camera declaration the background may tilt. If the tilted background affects your inner balance - switch it of in the macro dialog and declare your own.
 
 A further problem was the background for the orthographic camera. The skysphere won't render a color gradient even if declared. So we placed a patch with exactly the size of the orthographic camera view behind the scene. But we also add the skysphere for realistic reflection on the objects.
@@ -46,7 +46,8 @@ This "look from outside" illustrates the "orthographic background":
 
 ## Lights
 
-By default we defined a lightsource which is placed exactly at the position of the camera. If you switch it of some ambient light will remain. With our default lightsource the shadows are not so impressing. You can define as many lights as you want from different types in the .inc file. For more information about light see [POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_4).
+By default we defined a lightsource which is placed exactly at the position of the camera. If you switch it of some ambient light will remain. With our default lightsource the shadows are not so impressing. You can define as many lights as you want from different types in the .inc file. For more information about light see [POV-Ray Wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_4).  
+Alternative we made a template for you (in this example an area light with soft shadows): [Area Light Template](../Examples/Templates/AreaLight.inc)
 
 ## Textures and materials
 
@@ -65,22 +66,22 @@ This is the .inc file for the following example:
     texture {
         pigment { P_Chrome1 }
         finish { F_MetalD }
-        }
     }
+}
 
 #declare My_Box_material = material{
     texture {
         checker
-            texture { pigment{ color rgb <0,0,0> }}
-            texture { pigment{ color rgb <1,1,1> }}
-        }
+        texture { pigment{ color rgb <0,0,0> }}
+        texture { pigment{ color rgb <1,1,1> }}
     }
+}
 
 ```
 
 ![Object labels]( ./img/textures_1.png "Object labels")
 
-The first thing our macro will do ist to look for a .inc file with the same name as the .pov file in the same folder.
+The first thing our macro will do is to look for a .inc file with the same name as the .pov file in the same folder.
 For example the corresponding .inc file for "example.pov" is "example.inc".
 If the .inc file exsists it will be included in the .pov file with the following line:
 
@@ -97,20 +98,23 @@ material {My_Sphere_material}
 ```
 Because POV-Ray can't deal with spaces and special chars we use a replacement function.
 If you have problems with object labels just lookup the .pov file - every object has a outcommented header with the correct label.
-Everything put together this is how the sphere declaration in the .pov file looks like: 
+Everything put together this is how the sphere declaration in the .pov file looks like:
 
 ```
 //----- My_Sphere -----
-sphere { <0, 0, 0> 5 
+sphere { <0, 0, 0> 5
     translate <0.0, -6.0, 0.0>
-    
-material {My_Sphere_material}
+
+    material {My_Sphere_material}
 
 }
 ```
-It is important to take care of the material hirarchie. The macro looks only for the material statement to be replaced. In our example we use a predefined pigment and finish for the sphere. Both are two levels below below the material statement. And they need an additional include file: "metals.inc".
+It is important to take care of the material hierarchie. The macro looks only for the material statement to be replaced. In our example we use a predefined pigment and finish for the sphere. Both are two levels below below the material statement. And they need an additional include file. Put this line at the top of the inc file to include the file:
+```
+"metals.inc"
+```
 For a wrong syntax a error message will pop up where you can find some debugging information.
-Together with the [POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_6)  you will be able to create any texture you want.
+Together with the [POV-Ray Wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_6)  you will be able to create any texture you want.
 
 ## Object modelling
 
@@ -124,12 +128,10 @@ Together with the [POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.
 * If you have a big scene with a lot of objects and many materials with light refraction, try a little size of the image first, because then you not must wait for a long time.
 * If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
 
-  ![FreeCAD before cutting](img/tipsAndTricks/01_FC.png "FreeCAD before cutting")
-  ![POVray before cutting](img/tipsAndTricks/01_PR.png "POVray before cutting")
+  ![FreeCAD before cutting](img/BeforeCut.png "FreeCAD before cutting")
 
   Then you cut the two boxes.
 
-  ![FreeCAD after cutting](img/tipsAndTricks/02_FC.png "FreeCAD after cutting")
-  ![POVray after cutting](img/tipsAndTricks/02_PR.png "POVray after cutting")
+  ![FreeCAD after cutting](img/AfterCut.png "FreeCAD after cutting")
 
   To avoid this, the part to be removed should be slightly larger than the other part.
