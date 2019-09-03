@@ -97,7 +97,7 @@ class ExportToPovRay:
 
         #export FreeCAD view
         if self.expFcView:
-            self.exportFcView(self.fcViewPath, self.width, self.height)
+            self.exportFcView()
 
         #get the first layer and check visibility of parent objects
         for obj in self.objs:
