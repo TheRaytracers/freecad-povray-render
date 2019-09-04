@@ -114,6 +114,15 @@ Together with the [POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.
 
 ## Object modelling
 
+### CSG or Mesh
+
+The intention of the macro is to create a model with **C**onstructive **S**olid **G**eometry in FreeCAD, add textures and scene descriptions and render everything with POV-Ray.
+So the focus of our developement was to implement a conversion for the solids of the part workbench and the boolean operations for constructions.
+But FreeCAD is more then a CSG Modeller. To avoid empty renderings all non implemented features will be converted to meshes. So if you use fillets for example or extrued sketches they will be converted to a mesh before rendering.
+FreeCAD, like other CAD software, won't tell you wether an object is a solid or a mesh. And for most cases it is not so important to know. But if you do a high resoloution rendering of a highly polished sphere for example you would not like to see a lot of faces. So for a realistic rendering our advice is to use CSG as long as you can and only switch to meshes if there is no other way.
+An other advatage of CSG is that it needs less memory than the mesh representation of the same object. One reason for developing this macro was the unübersichtlichkeit of the .pov files created by the raytracing workbench.
+-approximation / faces
+
 ## Transformations of Objects
 
 ## Debugging
