@@ -6,7 +6,9 @@
 - [Lights](#lights)
 - [Textures and materials](#textures-and-materials)
 - [Object modelling](#object-modelling)
-- [Transformations of Objects](#transformations-of-objects)
+ - [CSG or Mesh?](#CSG-or-Mesh?)
+ - [Touching surfaces](#Touching-surfaces)
+ - [Repair rotation](#Repair-rotation)
 - [Debugging](#debugging)
 
 ## Limitations, Tips & Tricks
@@ -129,24 +131,17 @@ Together with the [POV-Ray Wiki](http://www.povray.org/documentation/3.7.0/r3_4.
 
 ## Object modelling
 
-### CSG or Mesh
+### CSG or Mesh?
 
 The intention of the macro is to create a model with **C**onstructive **S**olid **G**eometry in FreeCAD, add textures and scene descriptions and render everything with POV-Ray.
 So the focus of our developement was to implement a conversion for the solids of the part workbench and the boolean operations for constructions.
 But FreeCAD is more then a CSG Modeller. To avoid empty renderings all non implemented features will be converted to meshes. So if you use fillets for example or extrued sketches they will be converted to a mesh before rendering.
 FreeCAD, like other CAD software, won't tell you wether an object is a solid or a mesh. And for most cases it is not so important to know. But if you do a high resoloution rendering of a highly polished sphere for example you would not like to see a lot of faces. So for a realistic rendering our advice is to use CSG as long as you can and only switch to meshes if there is no other way.
-An other advatage of CSG is that it needs less memory than the mesh representation of the same object. One reason for developing this macro was the unübersichtlichkeit of the .pov files created by the raytracing workbench.
--approximation / faces
+An other advatage of CSG is that it needs less memory than the mesh representation of the same object. One reason for developing this macro was the unclearness of the .pov files created by the raytracing workbench. Because we don't like any mess-up in the .pov file we put all meshes in a include file and only leave the matching identifiers in the .pov file
 
-## Transformations of Objects
+### Touching surfaces
 
-## Debugging
-
-* You can change the background of FreeCAD under Edit/Preferences/Display/Colors/Background Color. You can also add a middle color.
-* For side views, try the orthographic view. But for a non side view, don't use the orthographic view. That doesn't look realistic
-* Try to get a more realistic image: [Rendering a photorealistic Scene - Step by Step](realistic.md)
-* If you have a big scene with a lot of objects and many materials with light refraction, try a little size of the image first, because then you not must wait for a long time.
-* If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
+If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
 
   ![FreeCAD before cutting](img/BeforeCut.png "FreeCAD before cutting")
 
@@ -155,3 +150,13 @@ An other advatage of CSG is that it needs less memory than the mesh representati
   ![FreeCAD after cutting](img/AfterCut.png "FreeCAD after cutting")
 
   To avoid this, the part to be removed should be slightly larger than the other part.
+
+### Repair rotation
+
+## Debugging
+
+
+* For side views, try the orthographic view. But for a non side view, don't use the orthographic view. That doesn't look realistic
+* Try to get a more realistic image: [Rendering a photorealistic Scene - Step by Step](realistic.md)
+* If you have a big scene with a lot of objects and many materials with light refraction, try a little size of the image first, because then you not must wait for a long time.
+* 
