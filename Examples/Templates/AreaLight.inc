@@ -4,8 +4,7 @@
 * But doubt, that this is only a pattern, you can edit values
 * for your specific case.
 *
-* This template uses raytracing with the Radiosity_OutdoorLight mode.
-* Secondly this template defines an area light at the position of the camera.
+* This template defines an area light at the position of the camera.
 * The area light creates softer and more realistic shadows.
 *
 * You can use this values as are variable (in POVray a "#declare"):
@@ -24,12 +23,4 @@ light_source {
     jitter
     rotate CamRotation
     translate CamPosition
-}
-
-// Raytracing
-#include "rad_def.inc"
-global_settings {
-   radiosity {
-      Rad_Settings(Radiosity_OutdoorLight, off, off)
-   }
 }

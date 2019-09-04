@@ -873,7 +873,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.WHImageGroup.setLayout(self.vertLayout1)
 
         #Options
-        self.expBg = QtGui.QCheckBox("Export Background")
+        self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
         self.expLight = QtGui.QCheckBox("Export FreeCAD light")
 
         self.repRot = QtGui.QCheckBox("Repair Rotation")
@@ -921,8 +921,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
     def setDefaultValues(self): #set the default values of the input objects
         defaultPath = "/home/"
         self.pathLineEdit.setText(defaultPath)
-        self.expBg.setChecked(True)
-        self.expLight.setChecked(True)
 
         #get saved input
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
@@ -935,6 +933,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         repRot = settings.value("repRot", self.repRot.isChecked())
         expFcView = settings.value("expFcView", self.expFcView.isChecked())
         settings.endGroup()
+
+        if expBg is None:
+            self.expBg.setChecked(True)
+        if expLight is None:
+            self.expLight.setChecked(True)
 
         if path is not None:
             self.pathLineEdit.setText(path)
