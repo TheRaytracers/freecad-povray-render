@@ -84,9 +84,14 @@ class ExportToPovRay:
 
         #clear old mesh file
         try:
+            file = open(self.meshPath)
+            file.close()
             self.meshFile = open(self.meshPath, "w")
+            if self.statistics[1] == False:
+                self.meshFile.close()
         except:
-            pass
+            if self.statistics[1]:
+                self.meshFile = open(self.meshPath, "w")
 
 
         self.startExport()
