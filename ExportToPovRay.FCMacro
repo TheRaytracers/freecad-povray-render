@@ -294,7 +294,7 @@ class ExportToPovRay:
                         povArr += "        translate " + center + "\n"
 
                     if expPlacement:
-                        rotation = getRot(fcObj)
+                        rotation = self.getRot(fcObj)
                         if rotation != "": #test if the object is rotated
                             povArr += "        " + rotation + "\n"
 
