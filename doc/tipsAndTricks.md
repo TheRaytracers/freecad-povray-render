@@ -6,9 +6,9 @@
 - [Lights](#lights)
 - [Textures and materials](#textures-and-materials)
 - [Object modelling](#object-modelling)
--- [CSG or Mesh?](#csg-or-mesh?)
--- [Touching surfaces](#touching-surfaces)
--- [Repair rotation](#repair-rotation)
+    - [CSG or Mesh?](#csg-or-mesh?)
+    - [Touching surfaces](#touching-surfaces)
+    - [Repair rotation](#repair-rotation)
 - [Debugging](#debugging)
 
 ## Limitations, Tips & Tricks
@@ -142,7 +142,7 @@ An other advantage of CSG is that it needs less memory than the mesh representat
 ### Touching surfaces
 
 In reality there is alwas a gap between things that touch each other. If you put a glass on a table for example the total reflections on the inner side behaves like in air. If we model things that touch each other we tend to give the surface vectors the same values. This will lead to confusing effects.
-In the following example we create two boxes from exactly the same size sitting on a plane. The z-Position of all three objects is zero. On the left side you can see that your graphic processor gets confused because he doesn't know if he should render the red or the grey box in the overlapping area. Never mind - If we cut the two boxes everything semms to be OK, but ...
+In the following example we create two boxes from exactly the same size sitting on a plane. The z-Position of all three objects is zero. On the left side you can see that your graphic processor gets confused because he doesn't know if he should render the red or the grey box in the overlapping area. Never mind - If we cut the two boxes everything seems to be OK, but ...
 
   ![FreeCAD touching surfaces](img/touchingSurfaceFreeCAD.png "FreeCAD touching surfaces")
 
