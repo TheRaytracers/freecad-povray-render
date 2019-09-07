@@ -13,12 +13,12 @@
 
 ## Limitations, Tips & Tricks
 
-Even if FreeCAD an POV-Ray both support Constructive Solid Geometry we found a lot of differences in the details we had to deal with, while developing this macro.
+Even if FreeCAD an POV-Ray both support CSG **C**onstructive **S**olid **G**eometry we found a lot of differences in the details we had to deal with, while developing this macro.
 So if your rendering looks not like you expected it may not be a bug, it can also be a compromise to adapt the different concepts of FreeCAD and POV-Ray.
 
 ## The camera
 
-Normally you want have to deal with camera settings. The macro both supports orthographic and perspective view. You just choose the view in FreeCAD and the result of the rendering should have the same point of view and viewing angle. There may be some clipping of the borders of the rendered image if the size of the viewport in FreeCAD isn't exacly the same size you choose in the macro popup. If you choose the "Export FreeCAD View" option you will find a image of the FreeCAD view in your output folder with the size of the rendered image. It should match the camera perspective exactly.
+Normally you won't have to deal with camera settings. The macro supports both, orthographic and perspective view. You just choose the view in FreeCAD and the result of the rendering should have the same point of view and viewing angle. There may be some clipping of the borders of the rendered image if the size of the viewport in FreeCAD isn't exacly the same size you choose in the macro popup. If you choose the "Export FreeCAD View" option you will find a image of the FreeCAD view in your output folder with the size of the rendered image. It should match the camera perspective exactly.
 If you define your own camera in the .inc file the macro will detect this and the camera statement will be outcommented in the .pov file. If you want to use special camera types and effects from POV-Ray but still want to take the camera point of view from FreeCAD we provide some declarations in the .pov file that you can use in your .inc file:
 ```
 #declare CamUp = < 0, 0, 1>;
@@ -134,10 +134,10 @@ Together with the [POV-Ray Wiki](http://www.povray.org/documentation/3.7.0/r3_4.
 ### CSG or Mesh?
 
 The intention of the macro is to create a model with **C**onstructive **S**olid **G**eometry in FreeCAD, add textures and scene descriptions and render everything with POV-Ray.
-So the focus of our developement was to implement a conversion for the solids of the part workbench and the boolean operations for constructions.
-But FreeCAD is more then a CSG Modeller. To avoid empty renderings all non implemented features will be converted to meshes. So if you use fillets for example or extrued sketches they will be converted to a mesh before rendering.
+So the focus of our developement was to implement a conversion for the solids of the Part Workbench and the boolean operations for constructions.
+But FreeCAD is more than a CSG Modeller. To avoid empty renderings all non implemented features will be converted to meshes. So if you use fillets for example or extrued sketches they will be converted to a mesh before rendering.
 FreeCAD, like other CAD software, won't tell you wether an object is a solid or a mesh. And for most cases it is not so important to know. But if you do a high resoloution rendering of a highly polished sphere for example you would not like to see a lot of faces. So for a realistic rendering our advice is to use CSG as long as you can and only switch to meshes if there is no other way.
-An other advatage of CSG is that it needs less memory than the mesh representation of the same object. One reason for developing this macro was the unclearness of the .pov files created by the raytracing workbench. Because we don't like any mess-up in the .pov file we put all meshes in a include file and only leave the matching identifiers in the .pov file
+An other advantage of CSG is that it needs less memory than the mesh representation of the same object. One reason for developing this macro was the unclearness of the .pov files created by the Raytracing Workbench. Because we don't like any mess-up in the .pov file we put all meshes in a include file and only leave the matching identifiers in the .pov file
 
 ### Touching surfaces
 
@@ -158,4 +158,3 @@ if we render this scene with POV-Ray including some materials we can see some fu
 * For side views, try the orthographic view. But for a non side view, don't use the orthographic view. That doesn't look realistic
 * Try to get a more realistic image: [Rendering a photorealistic Scene - Step by Step](realistic.md)
 * If you have a big scene with a lot of objects and many materials with light refraction, try a little size of the image first, because then you not must wait for a long time.
-* 
