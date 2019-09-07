@@ -6,9 +6,9 @@
 - [Lights](#lights)
 - [Textures and materials](#textures-and-materials)
 - [Object modelling](#object-modelling)
- - [CSG or Mesh?](#CSG-or-Mesh?)
- - [Touching surfaces](#Touching-surfaces)
- - [Repair rotation](#Repair-rotation)
+-- [CSG or Mesh?](#csg-or-mesh?)
+-- [Touching surfaces](#touching-surfaces)
+-- [Repair rotation](#repair-rotation)
 - [Debugging](#debugging)
 
 ## Limitations, Tips & Tricks
@@ -141,15 +141,14 @@ An other advatage of CSG is that it needs less memory than the mesh representati
 
 ### Touching surfaces
 
-If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
+In reality there is alwas a gap between things that touch each other. If you put a glass on a table for example the total reflections on the inner side behaves like in air. If we model things that touch each other we tend to give the surface vectors the same values. This will lead to confusing effects.
+In the following example we create two boxes from exactly the same size sitting on a plane. The z-Position of all three objects is zero. On the left side you can see that your graphic processor gets confused because he doesn't know if he should render the red or the grey box in the overlapping area. Never mind - If we cut the two boxes everything semms to be OK, but ...
 
-  ![FreeCAD before cutting](img/BeforeCut.png "FreeCAD before cutting")
+  ![FreeCAD touching surfaces](img/touchingSurfaceFreeCAD.png "FreeCAD touching surfaces")
 
-  Then you cut the two boxes.
+if we render this scene with POV-Ray including some materials we can see some funny effects. In the overlapping area a thin holey layer remains. What you can also see is a dotted area where the bottom of the glassblock touches the checkered plane. If you want to avoid these effects leave a gap. In the right picture the plane is 0,01mm below zero and the red box is a little bit bigger then the glass block. So now the rendering on the right side is the same like our FreeCAD model.
 
-  ![FreeCAD after cutting](img/AfterCut.png "FreeCAD after cutting")
-
-  To avoid this, the part to be removed should be slightly larger than the other part.
+  ![POV-Ray touching surfaces](img/touchingSurfacePovRay.png "POV-Ray touching surfaces")
 
 ### Repair rotation
 
