@@ -269,7 +269,8 @@ class ExportToPovRay:
                     number = fcObj.NumberPolar
                     angle = fcObj.Angle.getValueAs("deg").Value
 
-                    povArr += "\n#declare " + child.Label.capitalize() + "_" + child.Name + " = "
+                    declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                    povArr += "\n#declare " + declareName + " = "
                     childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
 
@@ -278,7 +279,7 @@ class ExportToPovRay:
                     povArr += "#declare axis = " + axis + ";\n"
                     povArr += "#declare arrAngle = " + str(angle) + ";\n"
                     povArr += "#while (i < endNo)\n"
-                    povArr += "\tobject { " + child.Label.capitalize() + "_" + child.Name + "\n"
+                    povArr += "\tobject { " + declareName + "\n"
                     if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
                         povArr += "\t\ttranslate -" + center + "\n"
 
@@ -335,8 +336,8 @@ class ExportToPovRay:
                     if numZ == 0:
                         numZ = 1
 
-
-                    povArr += "\n#declare " + child.Label.capitalize() + "_" + child.Name + " = "
+                    declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                    povArr += "\n#declare " + declareName + " = "
                     childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
 
@@ -356,7 +357,7 @@ class ExportToPovRay:
                     povArr += "\t\t#declare iz = 0;\n"
                     povArr += "\t\t#while (iz < numZ)\n"
 
-                    povArr += "\t\t\tobject { " + child.Label.capitalize() + "_" + child.Name + "\n"
+                    povArr += "\t\t\tobject { " + declareName + "\n"
                     povArr += "\t\t\t\ttranslate intervalX * ix\n"
                     povArr += "\t\t\t\ttranslate intervalY * iy\n"
                     povArr += "\t\t\t\ttranslate intervalZ * iz\n"
