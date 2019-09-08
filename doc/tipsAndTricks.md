@@ -51,7 +51,7 @@ The Background of the rendered image was a challenge to implement. In FreeCAD yo
 The background in POV-Ray is realised by a skysphere statement. See [POV-Ray Wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_3_4).
 It is like an infinite sphere around the scene. The skysphere is rotated according to the camera rotation. If you use your own camera declaration the background may tilt. If the tilted background affects your inner balance - switch it of in the macro dialog and declare your own.
 
-A further problem was the background for the orthographic camera. The skysphere won't render a color gradient even if declared. So we placed a patch with exactly the size of the orthographic camera view behind the scene. But we also add the skysphere for realistic reflection on the objects.
+A further problem was the background for the orthographic camera. The skysphere won't render a color gradient even if declared. So we placed a patch (internally a polygon) with exactly the size of the orthographic camera view behind the scene. But we also add the skysphere for realistic reflection on the objects.
 This "look from outside" illustrates the "orthographic background":
 
 ![Orthographic background illustration]( ./img/Chess/Orthographic_background.png "Orthographic background")
@@ -158,7 +158,7 @@ FreeCAD provides some functions to convert between the systems. Unfortunatly one
 
 ## Debugging
 
-There are several ways to get debugging information if an error occures. First it is useful to activate the console output window. The macro will provide some statistical information while converting the scene into a POV-Ray file. If nothing is rendered you should localise the error. A bug in our macro will lead to an empty .pov file and incomplete console output. While a POV-Ray Error appears you will see a popup window with an error message. In most cases the error message will tell you about a wrong syntax in your include file so you have a chance to correct it. The POV-Ray error message will be also written into a file in the output directory. If you want to see the complete debugging information from povray open a console window and start the rendering from the commandline. 
+There are several ways to get debugging information if an error occures. First it is useful to activate the console output window. The macro will provide some statistical information while converting the scene into a POV-Ray file. If nothing is rendered you should localise the error. A bug in our macro will lead to an empty .pov file and incomplete console output. While a POV-Ray Error appears you will see a popup window with an error message. In most cases the error message will tell you about a wrong syntax in your include file so you have a chance to correct it. The POV-Ray error message will be also written into a file in the output directory. If you want to see the complete debugging information from povray open a console window and start the rendering from the commandline.
 
 ```
 povray myPovFile.pov +P +W600 +H400
@@ -171,5 +171,3 @@ If you think you found a bug in our macro we will be happy if you report it to u
 
 If you use many non CSG objects this will slow down our macro and result in a big mesh file. In this case you FreeCAD freezes until the calculation of the mesh file is finished.
 A slow rendering can also be a result of some POV-Ray options like radiosity or a complex scene. In this cases our advice is to start with small image sizes and render the high resoloution image at the end.
-
-

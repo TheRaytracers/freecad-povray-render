@@ -2,6 +2,8 @@
 
 **This macro exports your FreeCAD model to POVray and is very easy to use, also for absolute beginners in the rendering of images. But advanced users have also the full control about the process & settings and can use all POVray features.**
 
+![Rendering Example](/doc/img/Chess/Chess_08.png)
+
 The export macro is intended to export the FreeCAD model structure with their equivalent in POVray.
 In contrast to other solutions for exporting FreeCAD models to POVray, this macro tries to make the file clearly and easy to edit. For that, it doesn't create gigantic meshes, it moves the tree structure with the boolean operations into a POVray file.  
 Until now, the macro only supports objects from the Part Workbench, other objects are simulated with meshes (see [Supported Objects](#supportedObjects)).
@@ -55,7 +57,9 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 - [x] Shininess
 
 ## Advantages over the Raytracing Workbench
-* You can use **all** POVray features
+* You can use **all** POV-Ray features
+* Easy changing of materials / textures of objects
+  - If you edit a material in the pov file of the Raytracing Workbench and change the model later, you have to do all changes in the file again. With the macro you don't have to do that (define all changes in the inc file). 
 * The macro is easier to use
 * WYSIWYG
 * The macro is written in Python, so it is easier for extending
