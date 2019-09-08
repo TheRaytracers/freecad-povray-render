@@ -490,7 +490,7 @@ class ExportToPovRay:
         if expPigment:
             pigment = self.getPigment(fcObj)
             if pigment != "": #test if the object has the standard pigment
-                povCode += "\t" + pigment + "\n"
+                povCode += pigment.replace("\n", "\n\t") + "\n"
 
         if expClose:
             povCode += "}\n"
@@ -547,7 +547,7 @@ class ExportToPovRay:
             povBg += "\t5, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
             povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2)
             povBg += ">, <" + str(-right/2) + ", " + str(-up/2) + ">\n"
-            povBg += "\tpigment{"
+            povBg += "\tpigment {"
             if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
                 povBg += " color rgb" + self.uintColorToRGB(bgColor1) + "}\n"
             elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
@@ -568,25 +568,25 @@ class ExportToPovRay:
             povBg += "\trotate<" + str(self.EulerCam[2]) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
             povBg += "\ttranslate <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + ">\n"
             povBg += "\ttranslate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
-            povBg += "\t}\n"
+            povBg += "}\n"
 
         povBg += "sky_sphere {\n\tpigment {\n"
         if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
             povBg += " color rgb" + self.uintColorToRGB(bgColor1)
 
         elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
-            povBg += "\tgradient z\n"
-            povBg += "\tcolor_map {\n"
-            povBg += "\t\t[ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
-            povBg += "\t\t[ 0.30  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
+            povBg += "\t\tgradient z\n"
+            povBg += "\t\tcolor_map {\n"
+            povBg += "\t\t\t[ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
+            povBg += "\t\t\t[ 0.30  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
             if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
-                povBg += "\t\t[ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
-            povBg += "\t\t[ 0.70  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
-            povBg += "\t\t[ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
-            povBg += "\t}\n"
-            povBg += "\tscale 2\n"
-            povBg += "\ttranslate -1\n"
-            povBg += "\trotate<" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
+                povBg += "\t\t\t[ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
+            povBg += "\t\t\t[ 0.70  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "\t\t\t[ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "\t\t}\n"
+            povBg += "\t\tscale 2\n"
+            povBg += "\t\ttranslate -1\n"
+            povBg += "\t\trotate<" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
         povBg += "\t}\n}\n"
 
         return povBg
@@ -695,16 +695,16 @@ class ExportToPovRay:
             transparency += " transmit " + str(appObject.Transparency / float(100))
         ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
         if transparency != "" or ShapeColorRGB != self.uintColorToRGB(self.DefaultShapeColor):
-            pigment += "pigment{color rgb" + ShapeColorRGB + transparency + "}\n"
+            pigment += "\tpigment { color rgb " + ShapeColorRGB + transparency + " }\n"
         material += pigment
         if appObject.ShapeMaterial.AmbientColor != (0.20000000298023224,0.20000000298023224,0.20000000298023224,0):
             ambient += "ambient rgb<"
             ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.AmbientColor[0],appObject.ShapeMaterial.AmbientColor[1],appObject.ShapeMaterial.AmbientColor[2])
-            ambient += "> "
+            ambient += ">"
         if appObject.ShapeMaterial.EmissiveColor != (0,0,0,0):
             emission += "emission rgb<"
             emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.EmissiveColor[0],appObject.ShapeMaterial.EmissiveColor[1],appObject.ShapeMaterial.EmissiveColor[2])
-            emission += "> "
+            emission += ">"
         if appObject.ShapeMaterial.SpecularColor != (0,0,0,0):
             phong += "phong "
             phong += "{0:1.2f}".format((appObject.ShapeMaterial.SpecularColor[0]+appObject.ShapeMaterial.SpecularColor[1]+appObject.ShapeMaterial.SpecularColor[2])/3)
@@ -713,10 +713,10 @@ class ExportToPovRay:
             phong += " "
         if ambient != "" or emission != "" or  phong != "":
             finish = "finish {"
-            finish += ambient
-            finish += emission
-            finish += phong
-            finish += "}\n"
+            finish += "\n\t" + ambient
+            finish += "\n\t" + emission
+            finish += "\n\t" + phong
+            finish += "\n}\n"
         material += finish
         if self.incContent.find("#declare " + self.stringCorrection(fcObj.Label) + "_material") != -1:
             material = "\nmaterial {" + self.stringCorrection(fcObj.Label) + "_material}\n"
