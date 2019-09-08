@@ -269,7 +269,7 @@ class ExportToPovRay:
                     number = fcObj.NumberPolar
                     angle = fcObj.Angle.getValueAs("deg").Value
 
-                    povArr += "\n#declare " + child.Label.capitalize() + " = "
+                    povArr += "\n#declare " + child.Label.capitalize() + "_" + child.Name + " = "
                     childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
 
@@ -278,7 +278,7 @@ class ExportToPovRay:
                     povArr += "#declare axis = " + axis + ";\n"
                     povArr += "#declare arrAngle = " + str(angle) + ";\n"
                     povArr += "#while (i < endNo)\n"
-                    povArr += "    object { " + child.Label.capitalize() + "\n"
+                    povArr += "    object { " + child.Label.capitalize() + "_" + child.Name + "\n"
                     if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
                         povArr += "        translate -" + center + "\n"
 
@@ -336,7 +336,7 @@ class ExportToPovRay:
                         numZ = 1
 
 
-                    povArr += "\n#declare " + child.Label.capitalize() + " = "
+                    povArr += "\n#declare " + child.Label.capitalize() + "_" + child.Name + " = "
                     childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
 
@@ -356,7 +356,7 @@ class ExportToPovRay:
                     povArr += "        #declare iz = 0;\n"
                     povArr += "        #while (iz < numZ)\n"
 
-                    povArr += "            object { " + child.Label.capitalize() + "\n"
+                    povArr += "            object { " + child.Label.capitalize() + "_" + child.Name + "\n"
                     povArr += "                translate intervalX * ix\n"
                     povArr += "                translate intervalY * iy\n"
                     povArr += "                translate intervalZ * iz\n"
