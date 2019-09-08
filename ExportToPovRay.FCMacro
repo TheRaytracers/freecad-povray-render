@@ -226,7 +226,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCut = "\ndifference {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                 povCut += childCode.replace("\n", "\n    ") #add the indents
 
             povCode += povCut
@@ -235,7 +235,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povFusion = "\nunion {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                 povFusion += childCode.replace("\n", "\n    ") #add the indents
 
             povCode += povFusion
@@ -244,7 +244,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCommon = "\nintersection {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                 povCommon += childCode.replace("\n", "\n    ") #add the indents
 
             povCode += povCommon
@@ -270,7 +270,7 @@ class ExportToPovRay:
                     angle = fcObj.Angle.getValueAs("deg").Value
 
                     povArr += "\n#declare " + child.Label.capitalize() + " = "
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
 
                     povArr += "\n#declare i = 0;\n"
@@ -337,7 +337,7 @@ class ExportToPovRay:
 
 
                     povArr += "\n#declare " + child.Label.capitalize() + " = "
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
 
                     povArr += "#declare intervalX = " + intervalX + ";\n"
@@ -402,7 +402,7 @@ class ExportToPovRay:
         elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
             childs = fcObj.OutList
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, expClose, expLabel, expMeshDef) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                 povCode += childCode
             return povCode
 
