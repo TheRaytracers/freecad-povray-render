@@ -178,7 +178,7 @@ class ExportToPovRay:
 
             povSphere = "\nsphere { <0, 0, 0> 1\n"
 
-            povSphere += "    scale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">"
+            povSphere += "\tscale <" + str(r2) + ", " + str(r3) + ", " + str(r1) + ">"
 
             povCode += povSphere
 
@@ -227,7 +227,7 @@ class ExportToPovRay:
             povCut = "\ndifference {\n"
             for child in childs:
                 childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
-                povCut += childCode.replace("\n", "\n    ") #add the indents
+                povCut += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povCut
 
@@ -236,7 +236,7 @@ class ExportToPovRay:
             povFusion = "\nunion {\n"
             for child in childs:
                 childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
-                povFusion += childCode.replace("\n", "\n    ") #add the indents
+                povFusion += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povFusion
 
@@ -245,7 +245,7 @@ class ExportToPovRay:
             povCommon = "\nintersection {\n"
             for child in childs:
                 childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
-                povCommon += childCode.replace("\n", "\n    ") #add the indents
+                povCommon += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povCommon
 
@@ -278,20 +278,20 @@ class ExportToPovRay:
                     povArr += "#declare axis = " + axis + ";\n"
                     povArr += "#declare arrAngle = " + str(angle) + ";\n"
                     povArr += "#while (i < endNo)\n"
-                    povArr += "    object { " + child.Label.capitalize() + "_" + child.Name + "\n"
+                    povArr += "\tobject { " + child.Label.capitalize() + "_" + child.Name + "\n"
                     if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
-                        povArr += "        translate -" + center + "\n"
+                        povArr += "\t\ttranslate -" + center + "\n"
 
-                    povArr += "        #declare rotAngle = i * arrAngle / endNo;\n"
-                    povArr += "        #local vX = vaxis_rotate(x, axis, rotAngle);\n"
-                    povArr += "        #local vY = vaxis_rotate(y, axis, rotAngle);\n"
-                    povArr += "        #local vZ = vaxis_rotate(z, axis, rotAngle);\n"
-                    povArr += "        transform {\n"
-                    povArr += "            matrix <vX.x, vX.y, vX.z, vY.x, vY.y, vY.z, vZ.x, vZ.y, vZ.z, 0, 0, 0>\n"
-                    povArr += "        }\n"
+                    povArr += "\t\t#declare rotAngle = i * arrAngle / endNo;\n"
+                    povArr += "\t\t#local vX = vaxis_rotate(x, axis, rotAngle);\n"
+                    povArr += "\t\t#local vY = vaxis_rotate(y, axis, rotAngle);\n"
+                    povArr += "\t\t#local vZ = vaxis_rotate(z, axis, rotAngle);\n"
+                    povArr += "\t\ttransform {\n"
+                    povArr += "\t\t\tmatrix <vX.x, vX.y, vX.z, vY.x, vY.y, vY.z, vZ.x, vZ.y, vZ.z, 0, 0, 0>\n"
+                    povArr += "\t\t}\n"
 
                     if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
-                        povArr += "        translate " + center + "\n"
+                        povArr += "\t\ttranslate " + center + "\n"
 
                     if expPlacement:
                         rotation = self.getRot(fcObj)
@@ -299,19 +299,19 @@ class ExportToPovRay:
                             povArr += "        " + rotation + "\n"
 
                     if fcObj.IntervalAxis.x != 0 or fcObj.IntervalAxis.y != 0 or fcObj.IntervalAxis.z != 0:
-                        povArr += "        translate " + intervalAxis + " * i\n"
+                        povArr += "\t\ttranslate " + intervalAxis + " * i\n"
 
                     if expPlacement:
                         translation = self.getTranslation(fcObj)
                         if translation != "": #test if the object is translated
-                            povArr += "    " + translation + "\n"
+                            povArr += "\t" + translation + "\n"
 
                     if expPigment:
                         pigment = self.getPigment(fcObj)
                         if pigment != "": #test if the object has the standard pigment
-                            povArr += "    " + pigment + "\n"
+                            povArr += "\t" + pigment + "\n"
 
-                    povArr += "    }\n    #declare i = i + 1;\n"
+                    povArr += "    }\n\t#declare i = i + 1;\n"
                     povArr += "#end\n"
 
                 povCode += povArr
@@ -348,40 +348,40 @@ class ExportToPovRay:
                     povArr += "#declare ix = 0;\n"
                     povArr += "#while (ix < numX)\n"
 
-                    povArr += "    #declare numY = " + str(numY) + ";\n"
-                    povArr += "    #declare iy = 0;\n"
-                    povArr += "    #while (iy < numY)\n"
+                    povArr += "\t#declare numY = " + str(numY) + ";\n"
+                    povArr += "\t#declare iy = 0;\n"
+                    povArr += "\t#while (iy < numY)\n"
 
-                    povArr += "        #declare numZ = " + str(numZ) + ";\n"
-                    povArr += "        #declare iz = 0;\n"
-                    povArr += "        #while (iz < numZ)\n"
+                    povArr += "\t\t#declare numZ = " + str(numZ) + ";\n"
+                    povArr += "\t\t#declare iz = 0;\n"
+                    povArr += "\t\t#while (iz < numZ)\n"
 
-                    povArr += "            object { " + child.Label.capitalize() + "_" + child.Name + "\n"
-                    povArr += "                translate intervalX * ix\n"
-                    povArr += "                translate intervalY * iy\n"
-                    povArr += "                translate intervalZ * iz\n"
+                    povArr += "\t\t\tobject { " + child.Label.capitalize() + "_" + child.Name + "\n"
+                    povArr += "\t\t\t\ttranslate intervalX * ix\n"
+                    povArr += "\t\t\t\ttranslate intervalY * iy\n"
+                    povArr += "\t\t\t\ttranslate intervalZ * iz\n"
 
                     if expPlacement:
                         translation = self.getTranslation(fcObj)
                         if translation != "": #test if the object is translated
-                            povArr += "                " + translation + "\n"
+                            povArr += "\t\t\t\t" + translation + "\n"
 
                         rotation = self.getRot(fcObj)
                         if rotation != "": #test if the object is rotated
-                            povArr += "                " + rotation + "\n"
+                            povArr += "\t\t\t\t" + rotation + "\n"
 
                     if expPigment:
                         pigment = self.getPigment(fcObj)
                         if pigment != "": #test if the object has the standard pigment
-                            povArr += "                " + pigment + "\n"
+                            povArr += "\t\t\t\t" + pigment + "\n"
 
-                    povArr += "            }\n"
+                    povArr += "\t\t\t}\n"
 
-                    povArr += "            #declare iz = iz + 1;\n"
-                    povArr += "        #end\n"
-                    povArr += "        #declare iy = iy + 1;\n"
-                    povArr += "    #end\n"
-                    povArr += "    #declare ix = ix + 1;\n"
+                    povArr += "\t\t\t#declare iz = iz + 1;\n"
+                    povArr += "\t\t#end\n"
+                    povArr += "\t\t#declare iy = iy + 1;\n"
+                    povArr += "\t#end\n"
+                    povArr += "\t#declare ix = ix + 1;\n"
                     povArr += "#end\n"
 
                     povCode += povArr
@@ -427,27 +427,27 @@ class ExportToPovRay:
 
                 #create mesh2 object
                 povMesh = "#declare " + self.stringCorrection(fcObj.Label) + "_mesh ="
-                povMesh += "\nmesh2 {\n    vertex_vectors {\n"
+                povMesh += "\nmesh2 {\n\tvertex_vectors {\n"
 
                 #create vertex_vectors
                 numOfVertex = len(mesh.Topology[0])
-                povMesh += "        " + str(numOfVertex)
+                povMesh += "\t\t" + str(numOfVertex)
 
                 for point in mesh.Topology[0]:
-                    povMesh += ",\n        <" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
-                povMesh += "    }\n\n"
+                    povMesh += ",\n\t\t<" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
+                povMesh += "\n\t}\n\n"
 
                 #create face_indices
-                povMesh += "    face_indices {\n"
+                povMesh += "\tface_indices {\n"
                 numOfTriangles = len(mesh.Topology[1])
-                povMesh += "        " + str(numOfTriangles)
+                povMesh += "\t\t" + str(numOfTriangles)
 
                 for triangle in mesh.Topology[1]:
-                    povMesh += ",\n        <" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
-                povMesh += "    }\n\n"
+                    povMesh += ",\n\t\t<" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
+                povMesh += "\n\t}\n\n"
 
                 #add inside vector
-                povMesh += "    inside_vector <1, 1, 1>\n"
+                povMesh += "\tinside_vector <1, 1, 1>\n"
 
                 povMesh += "}\n\n"
 
@@ -462,14 +462,14 @@ class ExportToPovRay:
             if expPlacement == False:
                 rotation = self.getRot(fcObj)
                 if rotation != "": #test if the object is rotated
-                    povCode += "    " + rotation + " * (-1)\n"
+                    povCode += "\t" + rotation + " * (-1)\n"
 
                 translation = self.getTranslation(fcObj)
                 if translation != "": #test if the object is translated
-                    povCode += "    " + translation + " * (-1)\n"
+                    povCode += "\t" + translation + " * (-1)\n"
 
             if pigment != "": #test if the object has the standard pigment
-                povCode += "    " + pigment + "\n"
+                povCode += "\t" + pigment + "\n"
 
             if expClose:
                 povCode += "}\n"
@@ -481,16 +481,16 @@ class ExportToPovRay:
         if expPlacement:
             rotation = self.getRot(fcObj)
             if rotation != "": #test if the object is rotated
-                povCode += "    " + rotation + "\n"
+                povCode += "\t" + rotation + "\n"
 
             translation = self.getTranslation(fcObj)
             if translation != "": #test if the object is translated
-                povCode += "    " + translation + "\n"
+                povCode += "\t" + translation + "\n"
 
         if expPigment:
             pigment = self.getPigment(fcObj)
             if pigment != "": #test if the object has the standard pigment
-                povCode += "    " + pigment + "\n"
+                povCode += "\t" + pigment + "\n"
 
         if expClose:
             povCode += "}\n"
@@ -544,50 +544,50 @@ class ExportToPovRay:
                 right = self.CamNode.height.getValue()
                 up = right/AspectRatio
             povBg += "\npolygon {\n"
-            povBg += "    5, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
+            povBg += "\t5, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
             povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2)
             povBg += ">, <" + str(-right/2) + ", " + str(-up/2) + ">\n"
-            povBg += "    pigment{"
+            povBg += "\tpigment{"
             if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
                 povBg += " color rgb" + self.uintColorToRGB(bgColor1) + "}\n"
             elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
-                povBg += "\n       gradient y\n"
-                povBg += "       color_map {\n"
-                povBg += "          [ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
-                povBg += "          [ 0.05  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
+                povBg += "\n\t\tgradient y\n"
+                povBg += "\t\tcolor_map {\n"
+                povBg += "\t\t\t[ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
+                povBg += "\t\t\t[ 0.05  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
                 if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
-                    povBg += "          [ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
-                povBg += "          [ 0.95  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
-                povBg += "          [ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
-                povBg += "         }\n"
-                povBg += "        scale<1," + str(up) + ",1>\n"
-                povBg += "        translate<0," + str(-up/2) + ",0>\n"
-                povBg += "       }\n"
+                    povBg += "\t\t\t[ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
+                povBg += "\t\t\t[ 0.95  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+                povBg += "\t\t\t[ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+                povBg += "\t\t}\n"
+                povBg += "\t\tscale<1," + str(up) + ",1>\n"
+                povBg += "\t\ttranslate<0," + str(-up/2) + ",0>\n"
+                povBg += "\t}\n"
             #color rgb<0,0,1>}\n"
-            povBg += "    finish{ambient 1 diffuse 0}\n"
-            povBg += "    rotate<" + str(self.EulerCam[2]) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
-            povBg += "    translate <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + ">\n"
-            povBg += "    translate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
-            povBg += "   }\n"
+            povBg += "\tfinish{ambient 1 diffuse 0}\n"
+            povBg += "\trotate<" + str(self.EulerCam[2]) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
+            povBg += "\ttranslate <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + ">\n"
+            povBg += "\ttranslate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
+            povBg += "\t}\n"
 
-        povBg += "sky_sphere {\n   pigment {\n"
+        povBg += "sky_sphere {\n\tpigment {\n"
         if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
             povBg += " color rgb" + self.uintColorToRGB(bgColor1)
 
         elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
-            povBg += "   gradient z\n"
-            povBg += "   color_map {\n"
-            povBg += "        [ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
-            povBg += "        [ 0.30  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
+            povBg += "\tgradient z\n"
+            povBg += "\tcolor_map {\n"
+            povBg += "\t\t[ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
+            povBg += "\t\t[ 0.30  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
             if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
-                povBg += "        [ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
-            povBg += "        [ 0.70  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
-            povBg += "        [ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
-            povBg += "       }\n"
-            povBg += "   scale 2\n"
-            povBg += "   translate -1\n"
-            povBg += "   rotate<" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
-        povBg += "   }\n}\n"
+                povBg += "\t\t[ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
+            povBg += "\t\t[ 0.70  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "\t\t[ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+            povBg += "\t}\n"
+            povBg += "\tscale 2\n"
+            povBg += "\ttranslate -1\n"
+            povBg += "\trotate<" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
+        povBg += "\t}\n}\n"
 
         return povBg
 
@@ -611,7 +611,7 @@ class ExportToPovRay:
                 CamAngle = 45
             else:
                 CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
-            PovCamAngle = "    angle {0:1.2f}".format(CamAngle) + "\n"
+            PovCamAngle = "\tangle {0:1.2f}".format(CamAngle) + "\n"
             CamComment += "Perspective Camera\n"
 
         elif self.CamType == "Orthographic":
@@ -621,7 +621,7 @@ class ExportToPovRay:
             else:
                 right = self.CamNode.height.getValue()
                 up = right/AspectRatio
-            PovCamType = "      orthographic\n"
+            PovCamType = "\torthographic\n"
             PovCamUp = "< 0, 0, " + "{0:1.2f}".format(up) + ">"
             PovCamRight = "<" + "{0:1.2f}".format(right) +", 0, 0>"
             CamComment += "Orthographic camera\n"
@@ -640,12 +640,12 @@ class ExportToPovRay:
 
         PovCam += "camera {\n"
         PovCam += PovCamType
-        PovCam += "    location <0, 0, 0>\n"
-        PovCam += "    direction < 0, 1, 0>\n"
-        PovCam += "    up CamUp\n"
-        PovCam += "    right CamRight\n"
-        PovCam += "    rotate CamRotation\n"
-        PovCam += "    translate CamPosition\n"
+        PovCam += "\tlocation <0, 0, 0>\n"
+        PovCam += "\tdirection < 0, 1, 0>\n"
+        PovCam += "\tup CamUp\n"
+        PovCam += "\tright CamRight\n"
+        PovCam += "\trotate CamRotation\n"
+        PovCam += "\ttranslate CamPosition\n"
         PovCam += PovCamAngle
         PovCam += "}\n"
         if incCamera:
