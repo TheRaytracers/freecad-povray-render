@@ -1,6 +1,6 @@
 # Supported Features
-### Part Workbench
-#### Solids
+## Part Workbench
+### Solids
 - [x] Cube
 - [x] Cylinder
 - [x] Sphere
@@ -13,19 +13,19 @@
 
 The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sphere, cone, torus and ellipsoid
 
-#### Boolean
+### Boolean
 
 - [x] Union
 - [x] Cut
 - [x] Difference
 
-### Part Design Workbench
+## Part Design Workbench
 
 - [x] Clone 
 - [x] Array linear pattern
 - [x] Array polar pattern
 
-### Texture
+## Texture
 - [x] Color
 - [x] Transparency
 - [x] AmbientColor
@@ -33,16 +33,16 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 - [x] SpecularColor
 - [x] Shininess
 
-### Camera
+## Camera
 
 - [x] Orthographic
 - [x] Perspective
 
-### Background
+## Background
 
 - [x] Background (you can change the background under Edit/Preferences/Display/Colors/Background Color)
 
-### Non supported objects
+## Non supported objects
 
 - [x] will be rendered as mesh
 
