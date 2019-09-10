@@ -408,9 +408,12 @@ class ExportToPovRay:
             return povCode
 
         elif fcObj.TypeId == "Sketcher::SketchObject":
-            povPad = "\nprism {\n"
+            spline = self.sketchToBezier(fcObj)
 
-            povPad += self.sketchToBezier(fcObj)
+            povPad = "\nprism { "
+            povPad += "0, 1, " + str(spline[1]) + "\n"
+            povPad += spline[0]
+
             povCode += povPad
 
         else: #not a supported object
@@ -506,19 +509,17 @@ class ExportToPovRay:
 
     def sketchToBezier(self, sketch):
         povSpline = ""
-        splineHeader = ""
-        splineBody = ""
 
         lines = sketch.Geometry
         actLine = lines[0]
         del lines[0] #delete first line
 
-        splineBody += "<" + str(actLine.StartPoint.x) + ", " + str(actLine.StartPoint.y) + ">,\n"
+        povSpline += "<" + str(actLine.StartPoint.x) + ", " + str(actLine.StartPoint.y) + ">,\n"
 
         i = self.getNextLine(lines, actLine.EndPoint)
         while i != -1:
             #add actLine to spline
-            splineBody += "<" + str(actLine.EndPoint.x) + ", " + str(actLine.EndPoint.y) + ">,\n"
+            povSpline += "<" + str(actLine.EndPoint.x) + ", " + str(actLine.EndPoint.y) + ">,\n"
             nextLine = lines[i]
             del lines[i]
 
@@ -529,20 +530,13 @@ class ExportToPovRay:
             actLine = nextLine
             i = self.getNextLine(lines, actLine.EndPoint)
 
-        splineBody += "<" + str(actLine.EndPoint.x) + ", " + str(actLine.EndPoint.y) + ">\n"
+        povSpline += "<" + str(actLine.EndPoint.x) + ", " + str(actLine.EndPoint.y) + ">\n"
 
-        splineHeader += "0, 3, " + str(len(sketch.Geometry) + 1) + "\n"
-
-        #close spline
-        return splineHeader + splineBody
+        return [povSpline, len(sketch.Geometry) + 1]
 
     def getNextLine(self, lines, lastPoint):
         i = 0
         for line in lines:
-            #App.Console.PrintWarning("\n\n------\n\n")
-            #App.Console.PrintError(line)
-            #App.Console.PrintWarning("\n")
-            #App.Console.PrintError(lastPoint)
             if self.isSamePoint(line.EndPoint, lastPoint) or self.isSamePoint(line.StartPoint, lastPoint):
                 return i
             ++i
