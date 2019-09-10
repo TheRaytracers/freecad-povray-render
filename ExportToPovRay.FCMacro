@@ -407,6 +407,12 @@ class ExportToPovRay:
                 povCode += childCode
             return povCode
 
+        elif fcObj.TypeId == "Sketcher::SketchObject":
+            povPad = "\nprism {\n"
+
+            povPad += self.sketchToBezier(fcObj)
+            povCode += povPad
+
         else: #not a supported object
             isSolid = self.isSolid(fcObj)
             if isSolid != "mesh" and isSolid == False:
@@ -497,6 +503,55 @@ class ExportToPovRay:
             povCode += "}\n"
 
         return povCode
+
+    def sketchToBezier(self, sketch):
+        povSpline = ""
+        splineHeader = ""
+        splineBody = ""
+
+        lines = sketch.Geometry
+        actLine = lines[0]
+        del lines[0] #delete first line
+
+        splineBody += "<" + str(actLine.StartPoint.x) + ", " + str(actLine.StartPoint.y) + ">,\n"
+
+        i = self.getNextLine(lines, actLine.EndPoint)
+        while i != -1:
+            #add actLine to spline
+            splineBody += "<" + str(actLine.EndPoint.x) + ", " + str(actLine.EndPoint.y) + ">,\n"
+            nextLine = lines[i]
+            del lines[i]
+
+            if self.isSamePoint(actLine.EndPoint, nextLine.EndPoint): #false direction
+                nextLine.EndPoint = actLine.StartPoint
+                nextLine.StartPoint = actLine.EndPoint
+
+            actLine = nextLine
+            i = self.getNextLine(lines, actLine.EndPoint)
+
+        splineBody += "<" + str(actLine.EndPoint.x) + ", " + str(actLine.EndPoint.y) + ">\n"
+
+        splineHeader += "0, 3, " + str(len(sketch.Geometry) + 1) + "\n"
+
+        #close spline
+        return splineHeader + splineBody
+
+    def getNextLine(self, lines, lastPoint):
+        i = 0
+        for line in lines:
+            #App.Console.PrintWarning("\n\n------\n\n")
+            #App.Console.PrintError(line)
+            #App.Console.PrintWarning("\n")
+            #App.Console.PrintError(lastPoint)
+            if self.isSamePoint(line.EndPoint, lastPoint) or self.isSamePoint(line.StartPoint, lastPoint):
+                return i
+            ++i
+        return -1
+
+    def isSamePoint(self, point1, point2):
+        if round(point1.x, 3) == round(point2.x, 3) and round(point1.y, 3) == round(point2.y, 3) and round(point1.z, 3) == round(point2.z, 3):
+            return True
+        return False
 
 
     def getStatistics(self, objs): #get statistics about the model the user want to render
