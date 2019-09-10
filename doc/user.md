@@ -25,13 +25,9 @@ Go to Macro/Macros… and start the installed macro by double clicking on it.
 * If you have a big scene with a lot of objects and many materials with light refraction, try a little size of the image first, because then you not must wait for a long time.
 * If you create a cut with two touching surfaces in FreeCAD, nothing remains. With POVray, however, an infinitely thin layer remains:
 
-  ![FreeCAD before cutting](img/tipsAndTricks/01_FC.png "FreeCAD before cutting")
-  ![POVray before cutting](img/tipsAndTricks/01_PR.png "POVray before cutting")
+  ![FreeCAD before cutting](img/touchingSurfaceFreeCAD.png")
 
-  Then you cut the two boxes.
-
-  ![FreeCAD after cutting](img/tipsAndTricks/02_FC.png "FreeCAD after cutting")
-  ![POVray after cutting](img/tipsAndTricks/02_PR.png "POVray after cutting")
+  ![FreeCAD after cutting](img/touchingSurfacePovRay.png")
 
   To avoid this, the part to be removed should be slightly larger than the other part.
 
@@ -96,4 +92,3 @@ global_settings {
 Replace MODE with the one of the modes above.
 
 For more information please visit the [POVray wiki](http://wiki.povray.org/content/HowTo:Use_radiosity).
-

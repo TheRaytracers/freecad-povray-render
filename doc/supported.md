@@ -19,9 +19,9 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 - [x] Cut
 - [x] Difference
 
-## Part Design Workbench
+## Draft Workbench
 
-- [x] Clone 
+- [x] Clone
 - [x] Array linear pattern
 - [x] Array polar pattern
 
