@@ -407,14 +407,42 @@ class ExportToPovRay:
                 povCode += childCode
             return povCode
 
-        elif fcObj.TypeId == "Sketcher::SketchObject":
-            spline = self.sketchToBezier(fcObj)
+        elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
+            if fcObj.Tip != None:
+                App.Console.PrintWarning("\nBody\n")
+                povBody = self.createPovrayCode(fcObj.Tip)
+                povCode += povBody
+                return povCode
+            else:
+                return ""
 
-            povPad = "\nprism { "
-            povPad += "0, 1, " + str(spline[1]) + "\n"
-            povPad += spline[0]
+        elif fcObj.TypeId == "PartDesign::Pad": #Pad from PartDesign
+            spline = self.sketchToBezier(fcObj.Profile[0])
+            povPad = ""
+            povPad += "\nunion {\n"
+            povPad += "\tprism { "
+            povPad += "0, 1, " + str(spline[1])
+            povPad += spline[0].replace("\n", "\n\t\t") + "\n" #add the indents
+
+            if expPlacement:
+                rotation = self.getRot(fcObj.Profile[0])
+                if rotation != "": #test if the object is rotated
+                    povPad += "\t\t" + rotation + "\n"
+
+                translation = self.getTranslation(fcObj.Profile[0])
+                if translation != "": #test if the object is translated
+                    povPad += "\t\t" + translation + "\n"
+
+            povPad += "\n\t}\n"
+
+            if fcObj.BaseFeature != None:
+                povBase = self.createPovrayCode(fcObj.BaseFeature)
+                povPad += povBase.replace("\n", "\n\t") #add the indents
+
+            povPad += "\n}\n"
 
             povCode += povPad
+            return povCode
 
         else: #not a supported object
             isSolid = self.isSolid(fcObj)
@@ -490,7 +518,6 @@ class ExportToPovRay:
 
         if expPlacement:
             rotation = self.getRot(fcObj)
-            App.Console.PrintWarning(rotation)
             if rotation != "": #test if the object is rotated
                 povCode += "\t" + rotation + "\n"
 
@@ -509,7 +536,7 @@ class ExportToPovRay:
         return povCode
 
     def sketchToBezier(self, sketch):
-        povSpline = ""
+        povSpline = "\n"
 
         lines = sketch.Geometry
         actLine = lines[0]
