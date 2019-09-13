@@ -415,10 +415,12 @@ class ExportToPovRay:
             else:
                 return ""
 
-        elif fcObj.TypeId == "PartDesign::Pad": #Pad from PartDesign
+        elif fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket": #Pad or Pocket from PartDesign
             spline = self.sketchToBezier(fcObj.Profile[0])
 
             startHeight = 0;
+            if fcObj.TypeId == "PartDesign::Pocket":
+                startHeight = -0.0001
             endHeight = fcObj.Length.getValueAs("mm").Value
             if fcObj.Midplane:
                 endHeight /= 2
@@ -428,11 +430,25 @@ class ExportToPovRay:
             if not fcObj.Reversed:
                 startHeight *= -1
                 endHeight *= -1
+            if fcObj.TypeId == "PartDesign::Pocket":
+                startHeight *= -1
+                endHeight *= -1
 
             povPad = ""
-            povPad += "\nunion {\n"
+            try:
+                if fcObj.TypeId == "PartDesign::Pocket":
+                    povPad += "\ndifference {\n"
+                else:
+                    povPad += "\nunion {\n"
+            except:
+                povPad += "\nunion {\n"
+
+            if fcObj.BaseFeature != None:
+                povBase = self.createPovrayCode(fcObj.BaseFeature)
+                povPad += povBase.replace("\n", "\n\t") #add the indents
+
             povPad += "\tprism { "
-            povPad += str(endHeight) + ", " + str(startHeight) + ", " + str(spline[1])
+            povPad += str(startHeight) + ", " + str(endHeight) + ", " + str(spline[1])
             povPad += spline[0].replace("\n", "\n\t\t") + "\n" #add the indents
 
             if expPlacement:
@@ -445,10 +461,6 @@ class ExportToPovRay:
                     povPad += "\t\t" + translation + "\n"
 
             povPad += "\n\t}\n"
-
-            if fcObj.BaseFeature != None:
-                povBase = self.createPovrayCode(fcObj.BaseFeature)
-                povPad += povBase.replace("\n", "\n\t") #add the indents
 
             povPad += "\n}\n"
 
