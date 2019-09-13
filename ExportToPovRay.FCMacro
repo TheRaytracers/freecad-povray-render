@@ -22,9 +22,7 @@ class ExportToPovRay:
         self.objs = self.doc.Objects
 
         self.povPath = povPath
-        self.directory = self.povPath
-        while self.directory[-1:] != os.sep:
-            self.directory = self.directory[:-1]
+        self.directory = os.path.dirname(self.povPath) + os.sep
         self.povName = self.povPath[len(self.directory):]
         self.fileName = self.povName[:-4]
         self.incName = self.fileName + ".inc"
