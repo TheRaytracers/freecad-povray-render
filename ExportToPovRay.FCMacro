@@ -409,7 +409,6 @@ class ExportToPovRay:
 
         elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
             if fcObj.Tip != None:
-                App.Console.PrintWarning("\nBody\n")
                 povBody = self.createPovrayCode(fcObj.Tip)
                 povCode += povBody
                 return povCode
@@ -418,10 +417,22 @@ class ExportToPovRay:
 
         elif fcObj.TypeId == "PartDesign::Pad": #Pad from PartDesign
             spline = self.sketchToBezier(fcObj.Profile[0])
+
+            startHeight = 0;
+            endHeight = fcObj.Length.getValueAs("mm").Value
+            if fcObj.Midplane:
+                endHeight /= 2
+                startHeight = -endHeight
+            startHeight += fcObj.Offset.getValueAs("mm").Value
+            endHeight += fcObj.Offset.getValueAs("mm").Value
+            if not fcObj.Reversed:
+                startHeight *= -1
+                endHeight *= -1
+
             povPad = ""
             povPad += "\nunion {\n"
             povPad += "\tprism { "
-            povPad += "0, 1, " + str(spline[1])
+            povPad += str(endHeight) + ", " + str(startHeight) + ", " + str(spline[1])
             povPad += spline[0].replace("\n", "\n\t\t") + "\n" #add the indents
 
             if expPlacement:
