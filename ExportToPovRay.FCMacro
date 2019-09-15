@@ -561,41 +561,61 @@ class ExportToPovRay:
     def sketchToBezier(self, sketch):
         povSpline = "\n"
 
-        lines = sketch.Geometry
+        unorderedLines = sketch.Geometry
 
         #delete construction geometry
-        while self.hasLinesConstructive(lines): #Caution: Very dirty coding!!!
-            for line in lines:
+        while self.hasLinesConstructive(unorderedLines): #Caution: Very dirty coding!!!
+            for line in unorderedLines:
                 if line.Construction:
-                    del lines[lines.index(line)]
+                    del unorderedLines[lines.index(line)]
                     break
 
-        numOfPoints = len(lines)
+        #numOfPoints = len(lines)
+        App.Console.PrintError(unorderedLines)
+        #put the lines in the right order and split different forms
+        forms = []
+        geometry = unorderedLines
 
-        actLine = lines[0]
-        del lines[0] #delete first line
+        while len(geometry) > 0:
+            lines = [] #new form
+            startLine = geometry[0]
+            actLine = geometry[0]
+            actLineIndex = 0
 
-        povSpline += "<" + str(actLine.StartPoint.x) + ", " + str(actLine.StartPoint.y) + ">,\n"
+            while not self.isSamePoint(actLine.EndPoint, startLine.StartPoint):
+                del geometry[actLineIndex]
 
-        i = self.getNextLine(lines, actLine.EndPoint)
-        while i != -1:
-            #add actLine to spline
-            povSpline += "<" + str(actLine.EndPoint.x) + ", " + str(actLine.EndPoint.y) + ">,\n"
-            nextLine = lines[i]
-            del lines[i]
+                App.Console.PrintWarning("\n\nGAGA\n\n")
+                App.Console.PrintWarning(geometry)
+                App.Console.PrintWarning("\n")
+                App.Console.PrintWarning(startLine)
+                App.Console.PrintWarning("\n")
+                App.Console.PrintWarning(actLine)
 
-            if self.isSamePoint(actLine.EndPoint, nextLine.EndPoint): #false direction
-                nextLine.EndPoint = actLine.StartPoint
-                nextLine.StartPoint = actLine.EndPoint
+                lines.append(actLine)
 
-            actLine = nextLine
-            i = self.getNextLine(lines, actLine.EndPoint)
 
-        povSpline += "<" + str(actLine.EndPoint.x) + ", " + str(actLine.EndPoint.y) + ">\n"
+                nextLineIndex = self.getNextLine(geometry, actLine.EndPoint)
+                if nextLineIndex != -1:
+                    nextLine = geometry[nextLineIndex]
+                else:
+                    App.Console.PrintMessage("\n\nNo nextLine\n\n")
+                    break
 
-        return [povSpline, numOfPoints + 1]
+                if self.isSamePoint(actLine.EndPoint, nextLine.EndPoint): #false direction
+                    nextLine.EndPoint = actLine.StartPoint
+                    nextLine.StartPoint = actLine.EndPoint
 
-    def getNextLine(self, lines, lastPoint):
+                actLine = nextLine
+                actLineIndex = nextLineIndex
+
+            forms.append(lines)
+
+        App.Console.PrintWarning(forms)
+
+        return ["", 0]
+
+    def getNextLine(self, lines, lastPoint): #returns index
         i = 0
         for line in lines:
             if self.isSamePoint(line.EndPoint, lastPoint) or self.isSamePoint(line.StartPoint, lastPoint):
