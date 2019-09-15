@@ -28,6 +28,7 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 ## Other
 
 - [x] Group
+- [x] Part
 
 ## Texture
 - [x] Color
