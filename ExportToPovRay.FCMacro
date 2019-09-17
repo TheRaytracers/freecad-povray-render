@@ -417,20 +417,20 @@ class ExportToPovRay:
             expPigment = False #part has no pigment
 
         else: #not a supported object
-            isSolid = self.isSolid(fcObj)
-            if isSolid != "mesh" and isSolid == False or fcObj.TypeId == "App::Origin": # XXX: After fixing isSolid() remove fcObj.TypeId == "App::Origin"!!!!
-                return ""
-
             if expMeshDef:
                 mesh = 0
 
                 if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
                     mesh = fcObj.Mesh
                 else:
-                    distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
-                    pictureSize = (self.width + self.height) / 2
-                    angularDeflection = (distanceCam / pictureSize) * 2.5
-                    mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    try:
+                        distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
+                        pictureSize = (self.width + self.height) / 2
+                        angularDeflection = (distanceCam / pictureSize) * 2.5
+                        mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    except:
+                        return ""
+
 
                 if not mesh:
                     return ""
@@ -780,16 +780,6 @@ class ExportToPovRay:
 
     def exportFcView(self): #export the current FreeCAD view like Tools / Save Picture...
         Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
-
-    def isSolid(self, fcObj):
-        try:
-            if fcObj.Shape.Solids == []:
-                return False
-            else:
-                return True
-        except:
-            if fcObj.isDerivedFrom("Mesh::Feature") == False:
-                return "mesh" #object has no shape property
 
 
     def stringCorrection(self, inputString): #change a utf-8 string to an ASCII string
