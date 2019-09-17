@@ -581,8 +581,7 @@ class ExportToPovRay:
             del unsortedLines[0]
 
             while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
-                App.Console.PrintWarning("\n\nGAGA\n\n")
-                # handle -1
+                # handling of -1 missing
                 nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
 
                 #change direction
