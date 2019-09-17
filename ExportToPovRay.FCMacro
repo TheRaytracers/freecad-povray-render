@@ -6,6 +6,7 @@ import os
 from PySide import QtCore, QtGui
 import math
 import MeshPart
+import platform
 
 def showError(text, title):
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Critical, title, text)
@@ -923,7 +924,14 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.show()
 
     def setDefaultValues(self): #set the default values of the input objects
-        defaultPath = "/home/"
+        system = platform.system()
+        if system == "Linux" or system == "Darwin":
+            defaultPath = "/home/"
+        elif system == "Windows":
+            defaultPath = "C:\\Users\\%UserName%\\"
+        else:
+            defaultPath = ""
+
         self.pathLineEdit.setText(defaultPath)
 
         #get saved input
