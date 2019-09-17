@@ -22,9 +22,7 @@ class ExportToPovRay:
         self.objs = self.doc.Objects
 
         self.povPath = povPath
-        self.directory = self.povPath
-        while self.directory[-1:] != os.sep:
-            self.directory = self.directory[:-1]
+        self.directory = os.path.dirname(self.povPath) + os.sep
         self.povName = self.povPath[len(self.directory):]
         self.fileName = self.povName[:-4]
         self.incName = self.fileName + ".inc"
@@ -407,6 +405,18 @@ class ExportToPovRay:
                 povCode += childCode
             return povCode
 
+<<<<<<< HEAD
+        elif fcObj.TypeId == "App::Part": #Part
+            povPart = "\nunion {\n"
+
+            childs = fcObj.OutList
+            for child in childs:
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
+                povPart += childCode.replace("\n", "\n\t") #add the indents
+
+            povCode += povPart
+            expPigment = False #part has no pigment
+            
         elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
             if fcObj.Tip != None:
                 povBody = self.createPovrayCode(fcObj.Tip)
@@ -472,16 +482,21 @@ class ExportToPovRay:
             if isSolid != "mesh" and isSolid == False:
                 return ""
 
+        else: #not a supported object
             if expMeshDef:
                 mesh = 0
 
                 if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
                     mesh = fcObj.Mesh
                 else:
-                    distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
-                    pictureSize = (self.width + self.height) / 2
-                    angularDeflection = (distanceCam / pictureSize) * 2.5
-                    mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    try:
+                        distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
+                        pictureSize = (self.width + self.height) / 2
+                        angularDeflection = (distanceCam / pictureSize) * 2.5
+                        mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    except:
+                        return ""
+
 
                 if not mesh:
                     return ""
@@ -655,6 +670,7 @@ class ExportToPovRay:
                             "PartDesign::Pocket",
                             "Sketcher::SketchObject",
                             "App::DocumentObjectGroup"]
+                            "App::Part"
         supportedNames = ["Array", "Clone"]
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not obj.Name in supportedNames and not obj.Name[:-3] in supportedNames:
@@ -923,16 +939,6 @@ class ExportToPovRay:
 
     def exportFcView(self): #export the current FreeCAD view like Tools / Save Picture...
         Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
-
-    def isSolid(self, fcObj):
-        try:
-            if fcObj.Shape.Solids == []:
-                return False
-            else:
-                return True
-        except:
-            if fcObj.isDerivedFrom("Mesh::Feature") == False:
-                return "mesh" #object has no shape property
 
 
     def stringCorrection(self, inputString): #change a utf-8 string to an ASCII string
