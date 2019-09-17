@@ -448,8 +448,8 @@ class ExportToPovRay:
                 povPad += povBase.replace("\n", "\n\t") #add the indents
 
             povPad += "\n\tprism {\n"
-            povPad += "bezier_spline\n"
-            povPad += str(startHeight) + ", " + str(endHeight) + ", " + str(spline[1])
+            povPad += "\t\tbezier_spline\n"
+            povPad += "\t\t" + str(startHeight) + ", " + str(endHeight) + ", " + str(spline[1])
             povPad += spline[0].replace("\n", "\n\t\t") + "\n" #add the indents
 
             if expPlacement:
@@ -574,18 +574,23 @@ class ExportToPovRay:
         numOfPoints = len(unsortedLines) * 4
 
         sortedLines = []
-        sortedLines.append(unsortedLines[0])
-        del unsortedLines[0]
 
-        while not self.isSamePoint(sortedLines[0].StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
-            nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
+        while unsortedLines: #until the unsortedLines array is empty
+            sortedLines.append(unsortedLines[0])
+            startLine = unsortedLines[0]
+            del unsortedLines[0]
 
-            #change direction
-            if self.isSamePoint(sortedLines[len(sortedLines) - 1].EndPoint, unsortedLines[nextLineI].EndPoint):
-                unsortedLines[nextLineI].reverse()
+            while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
+                App.Console.PrintWarning("\n\nGAGA\n\n")
+                # handle -1
+                nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
 
-            sortedLines.append(unsortedLines[nextLineI])
-            del unsortedLines[nextLineI]
+                #change direction
+                if self.isSamePoint(sortedLines[len(sortedLines) - 1].EndPoint, unsortedLines[nextLineI].EndPoint):
+                    unsortedLines[nextLineI].reverse()
+
+                sortedLines.append(unsortedLines[nextLineI])
+                del unsortedLines[nextLineI]
 
         #create povSpline
         for line in sortedLines:
