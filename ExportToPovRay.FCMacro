@@ -531,8 +531,7 @@ class ExportToPovRay:
     def getLight(self): #get the FreeCAD light
         povLight = ""
 
-        #povLight += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
-        povLight += "light_source { <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + "> color rgb<0.5, 0.5, 0.5> }\n"
+        povLight += "light_source { CamPosition color rgb<0.5, 0.5, 0.5> }\n"
 
         return povLight
 
