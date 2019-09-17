@@ -561,66 +561,42 @@ class ExportToPovRay:
     def sketchToBezier(self, sketch):
         povSpline = "\n"
 
-        unorderedLines = sketch.Geometry
+        unsortedLines = sketch.Geometry
 
         #delete construction geometry
-        while self.hasLinesConstructive(unorderedLines): #Caution: Very dirty coding!!!
-            for line in unorderedLines:
+        while self.hasLinesConstructive(unsortedLines): #Caution: Very dirty coding!!!
+            for line in unsortedLines:
                 if line.Construction:
-                    del unorderedLines[lines.index(line)]
+                    del unsortedLines[lines.index(line)]
                     break
 
-        #numOfPoints = len(lines)
-        App.Console.PrintError(unorderedLines)
-        #put the lines in the right order and split different forms
-        forms = []
-        geometry = unorderedLines
+        numOfPoints = len(unsortedLines) * 4
+        App.Console.PrintError(unsortedLines)
 
-        while len(geometry) > 0:
-            lines = [] #new form
-            startLine = geometry[0]
-            actLine = geometry[0]
-            actLineIndex = 0
+        sortedLines = []
+        sortedLines.append(unsortedLines[0])
+        del unsortedLines[0]
 
-            while not self.isSamePoint(actLine.EndPoint, startLine.StartPoint):
-                del geometry[actLineIndex]
+        while not self.isSamePoint(sortedLines[0].StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
+            nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
 
-                App.Console.PrintWarning("\n\nGAGA\n\n")
-                App.Console.PrintWarning(geometry)
-                App.Console.PrintWarning("\n")
-                App.Console.PrintWarning(startLine)
-                App.Console.PrintWarning("\n")
-                App.Console.PrintWarning(actLine)
+            #change direction
+            if self.isSamePoint(sortedLines[len(sortedLines) - 1].EndPoint, unsortedLines[nextLineI].EndPoint):
+                unsortedLines[nextLineI].reverse()
 
-                lines.append(actLine)
+            sortedLines.append(unsortedLines[nextLineI])
+            del unsortedLines[nextLineI]
 
-
-                nextLineIndex = self.getNextLine(geometry, actLine.EndPoint)
-                if nextLineIndex != -1:
-                    nextLine = geometry[nextLineIndex]
-                else:
-                    App.Console.PrintMessage("\n\nNo nextLine\n\n")
-                    break
-
-                if self.isSamePoint(actLine.EndPoint, nextLine.EndPoint): #false direction
-                    nextLine.EndPoint = actLine.StartPoint
-                    nextLine.StartPoint = actLine.EndPoint
-
-                actLine = nextLine
-                actLineIndex = nextLineIndex
-
-            forms.append(lines)
-
-        App.Console.PrintWarning(forms)
+        App.Console.PrintWarning(sortedLines)
 
         return ["", 0]
 
-    def getNextLine(self, lines, lastPoint): #returns index
+    def getNextLine(self, lines, lastLine): #returns index
         i = 0
         for line in lines:
-            if self.isSamePoint(line.EndPoint, lastPoint) or self.isSamePoint(line.StartPoint, lastPoint):
+            if self.isSamePoint(line.EndPoint, lastLine.EndPoint) or self.isSamePoint(line.StartPoint, lastLine.EndPoint):
                 return i
-            ++i
+            i += 1
         return -1
 
     def isSamePoint(self, point1, point2):
