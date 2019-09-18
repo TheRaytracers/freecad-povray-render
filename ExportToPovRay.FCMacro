@@ -6,6 +6,7 @@ import os
 from PySide import QtCore, QtGui
 import math
 import MeshPart
+import platform
 
 def showError(text, title):
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Critical, title, text)
@@ -405,21 +406,32 @@ class ExportToPovRay:
                 povCode += childCode
             return povCode
 
-        else: #not a supported object
-            isSolid = self.isSolid(fcObj)
-            if isSolid != "mesh" and isSolid == False:
-                return ""
+        elif fcObj.TypeId == "App::Part": #Part
+            povPart = "\nunion {\n"
 
+            childs = fcObj.OutList
+            for child in childs:
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
+                povPart += childCode.replace("\n", "\n\t") #add the indents
+
+            povCode += povPart
+            expPigment = False #part has no pigment
+
+        else: #not a supported object
             if expMeshDef:
                 mesh = 0
 
                 if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
                     mesh = fcObj.Mesh
                 else:
-                    distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
-                    pictureSize = (self.width + self.height) / 2
-                    angularDeflection = (distanceCam / pictureSize) * 2.5
-                    mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    try:
+                        distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
+                        pictureSize = (self.width + self.height) / 2
+                        angularDeflection = (distanceCam / pictureSize) * 2.5
+                        mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    except:
+                        return ""
+
 
                 if not mesh:
                     return ""
@@ -502,7 +514,7 @@ class ExportToPovRay:
         noCsgCount = 0
         CsgCount = 0
         ParentCount = 0
-        supportedTypeIds = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup"]
+        supportedTypeIds = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup", "App::Part"]
         supportedNames = ["Array", "Clone"]
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not obj.Name in supportedNames and not obj.Name[:-3] in supportedNames:
@@ -520,8 +532,7 @@ class ExportToPovRay:
     def getLight(self): #get the FreeCAD light
         povLight = ""
 
-        #povLight += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
-        povLight += "light_source { <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + "> color rgb<0.5, 0.5, 0.5> }\n"
+        povLight += "light_source { CamPosition color rgb<0.5, 0.5, 0.5> }\n"
 
         return povLight
 
@@ -784,16 +795,6 @@ class ExportToPovRay:
     def exportFcView(self): #export the current FreeCAD view like Tools / Save Picture...
         Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
 
-    def isSolid(self, fcObj):
-        try:
-            if fcObj.Shape.Solids == []:
-                return False
-            else:
-                return True
-        except:
-            if fcObj.isDerivedFrom("Mesh::Feature") == False:
-                return "mesh" #object has no shape property
-
 
     def stringCorrection(self, inputString): #change a utf-8 string to an ASCII string
         utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
@@ -937,7 +938,14 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.show()
 
     def setDefaultValues(self): #set the default values of the input objects
-        defaultPath = "/home/"
+        system = platform.system()
+        if system == "Linux" or system == "Darwin":
+            defaultPath = "/home/"
+        elif system == "Windows":
+            defaultPath = "C:\\Users\\%UserName%\\"
+        else:
+            defaultPath = ""
+
         self.pathLineEdit.setText(defaultPath)
 
         #get saved input
