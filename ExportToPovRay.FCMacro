@@ -408,9 +408,10 @@ class ExportToPovRay:
             return povCode
 
         elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
-            App.Console.PrintWarning("\n\n")
-            App.Console.PrintWarning(self.isBodySupported(fcObj))
-            App.Console.PrintWarning("\n\n")
+            if not self.isBodySupported(fcObj):
+                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
+                return povCode #return because the mesh may not translated and rotated
+
             if fcObj.Tip != None:
                 povBody = self.createPovrayCode(fcObj.Tip)
                 povCode += povBody
@@ -472,73 +473,7 @@ class ExportToPovRay:
             return povCode
 
         else: #not a supported object
-            isSolid = self.isSolid(fcObj)
-            if isSolid != "mesh" and isSolid == False:
-                return ""
-
-            if expMeshDef:
-                mesh = 0
-
-                if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
-                    mesh = fcObj.Mesh
-                else:
-                    distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
-                    pictureSize = (self.width + self.height) / 2
-                    angularDeflection = (distanceCam / pictureSize) * 2.5
-                    mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
-
-                if not mesh:
-                    return ""
-
-                #create mesh2 object
-                povMesh = "#declare " + self.stringCorrection(fcObj.Label) + "_mesh ="
-                povMesh += "\nmesh2 {\n\tvertex_vectors {\n"
-
-                #create vertex_vectors
-                numOfVertex = len(mesh.Topology[0])
-                povMesh += "\t\t" + str(numOfVertex)
-
-                for point in mesh.Topology[0]:
-                    povMesh += ",\n\t\t<" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
-                povMesh += "\n\t}\n\n"
-
-                #create face_indices
-                povMesh += "\tface_indices {\n"
-                numOfTriangles = len(mesh.Topology[1])
-                povMesh += "\t\t" + str(numOfTriangles)
-
-                for triangle in mesh.Topology[1]:
-                    povMesh += ",\n\t\t<" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
-                povMesh += "\n\t}\n\n"
-
-                #add inside vector
-                povMesh += "\tinside_vector <1, 1, 1>\n"
-
-                povMesh += "}\n\n"
-
-                #povCode += povMesh
-                #write mesh in inc file
-                self.meshFile.write(povMesh)
-
-            #return pov code
-            povCode += "\nobject { " + self.stringCorrection(fcObj.Label) + "_mesh\n"
-            pigment = self.getPigment(fcObj)
-
-            if expPlacement == False:
-                rotation = self.getRot(fcObj)
-                if rotation != "": #test if the object is rotated
-                    povCode += "\t" + rotation + " * (-1)\n"
-
-                translation = self.getTranslation(fcObj)
-                if translation != "": #test if the object is translated
-                    povCode += "\t" + translation + " * (-1)\n"
-
-            if pigment != "": #test if the object has the standard pigment
-                povCode += "\t" + pigment + "\n"
-
-            if expClose:
-                povCode += "}\n"
-
+            povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
             return povCode #return because the mesh may not translated and rotated
 
         povCode += "\n"
@@ -667,6 +602,77 @@ class ExportToPovRay:
                 return False
 
         return True
+
+    def createMesh(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expMeshDef = True):
+        povCode = ""
+
+        isSolid = self.isSolid(fcObj)
+        if isSolid != "mesh" and isSolid == False:
+            return ""
+
+        if expMeshDef:
+            mesh = 0
+
+            if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
+                mesh = fcObj.Mesh
+            else:
+                distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
+                pictureSize = (self.width + self.height) / 2
+                angularDeflection = (distanceCam / pictureSize) * 2.5
+                mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+
+            if not mesh:
+                return ""
+
+            #create mesh2 object
+            povMesh = "#declare " + self.stringCorrection(fcObj.Label) + "_mesh ="
+            povMesh += "\nmesh2 {\n\tvertex_vectors {\n"
+
+            #create vertex_vectors
+            numOfVertex = len(mesh.Topology[0])
+            povMesh += "\t\t" + str(numOfVertex)
+
+            for point in mesh.Topology[0]:
+                povMesh += ",\n\t\t<" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
+            povMesh += "\n\t}\n\n"
+
+            #create face_indices
+            povMesh += "\tface_indices {\n"
+            numOfTriangles = len(mesh.Topology[1])
+            povMesh += "\t\t" + str(numOfTriangles)
+
+            for triangle in mesh.Topology[1]:
+                povMesh += ",\n\t\t<" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
+            povMesh += "\n\t}\n\n"
+
+            #add inside vector
+            povMesh += "\tinside_vector <1, 1, 1>\n"
+
+            povMesh += "}\n\n"
+
+            #write mesh in inc file
+            self.meshFile.write(povMesh)
+
+        #return pov code
+        povCode += "\nobject { " + self.stringCorrection(fcObj.Label) + "_mesh\n"
+        pigment = self.getPigment(fcObj)
+
+        if expPlacement == False: #meshes are already translated, so if they shouldnt translated, they translated back
+            rotation = self.getRot(fcObj)
+            if rotation != "": #test if the object is rotated
+                povCode += "\t" + rotation + " * (-1)\n"
+
+            translation = self.getTranslation(fcObj)
+            if translation != "": #test if the object is translated
+                povCode += "\t" + translation + " * (-1)\n"
+
+        if pigment != "": #test if the object has the standard pigment
+            povCode += "\t" + pigment + "\n"
+
+        if expClose:
+            povCode += "}\n"
+
+        return povCode
 
 
     def getStatistics(self, objs): #get statistics about the model the user want to render
