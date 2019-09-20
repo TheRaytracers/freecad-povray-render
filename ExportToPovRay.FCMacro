@@ -748,7 +748,21 @@ class ExportToPovRay:
             return -1
 
     def openPovRay(self): #start POVray
-        terminalInput = "cd " + str(self.directory) + " && povray " + str(self.povName) + " +P Width=" + str(self.width) + " Height=" + str(self.height) + " Fatal_File=" + self.errorName #create the string to start POVray
+        povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('PovrayExecutable')
+        if os.path.isfile(povExec) == False:
+            povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('PovrayExecutable')
+            if os.path.isfile(povExec) == False:
+                errorText = "To start the rendering you must\n"
+                errorText += "set the path to the POV-Ray executable\n"
+                errorText += "either in the settings of Render workbench\n"
+                errorText += "or in the settings of Raytracing workbench\n"
+                showError(errorText, "POV-Ray executable not found")
+                return -1
+            povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('OutputParameters')
+        povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('OutputParameters')
+        #create the string to start POVray
+        terminalInput = povExec + " " + str(self.povName) + " " + povOptions + " Width=" + str(self.width) + " Height=" + str(self.height) + " Fatal_File=" + self.errorName
+        os.chdir(str(self.directory))
         os.system(terminalInput) #put terminalInput to the console
         self.checkErrFile()
 
@@ -797,6 +811,9 @@ class ExportToPovRay:
         uniString = uniString.replace(u"Ö", "Oe")
         uniString = uniString.replace(u"ö", "oe")
         uniString = uniString.replace(u"ß", "ss")
+        uniString = uniString.replace(u"(", "_")
+        uniString = uniString.replace(u")", "_")
+        uniString = uniString.replace(u"#", "_")
         uniString = uniString.replace(" ", "_")
         outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
         return outString.decode("utf-8") #return and redecode to unicode but with converted chars
