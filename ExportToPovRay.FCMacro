@@ -412,10 +412,10 @@ class ExportToPovRay:
                 povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
                 return povCode #return because the mesh may not translated and rotated
 
+            povBody = "\nunion {\n"
             if fcObj.Tip != None:
-                povBody = self.createPovrayCode(fcObj.Tip)
+                povBody += self.createPovrayCode(fcObj.Tip).replace("\n", "\n\t") #add chld code and indents
                 povCode += povBody
-                return povCode
             else:
                 return ""
 
