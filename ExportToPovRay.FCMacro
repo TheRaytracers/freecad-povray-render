@@ -389,13 +389,18 @@ class ExportToPovRay:
             return povCode
 
         elif fcObj.TypeId == "Part::FeaturePython" and (fcObj.Name == "Clone" or fcObj.Name[:-3] == "Clone"): #Clone from Draft workbench
-            povClone = ""
+            povClone = "\nobject {\n"
+
             childs = fcObj.OutList
             for child in childs:
-                if fcObj.ViewObject.Visibility:
-                    povClone += self.createPovrayCode(child, False, False, False, False, False)
+                if child.ViewObject.Visibility: #if not visible, the object isnt created with a mesh already
+                    childCode = self.createPovrayCode(child, False, False, True, False, False)
                 else:
-                    povClone += self.createPovrayCode(child, False, False, False, False, True)
+                    childCode = self.createPovrayCode(child, False, False, True, False, True)
+
+                povClone += childCode.replace("\n", "\n\t") #add the indents
+
+            povClone += "\n\tscale <" + str(fcObj.Scale.x) + ", " + str(fcObj.Scale.y) + ", " + str(fcObj.Scale.z) + ">"
 
             povCode += povClone
 
