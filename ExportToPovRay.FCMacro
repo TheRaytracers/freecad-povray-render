@@ -408,6 +408,9 @@ class ExportToPovRay:
             return povCode
 
         elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
+            App.Console.PrintWarning("\n\n")
+            App.Console.PrintWarning(self.isBodySupported(fcObj))
+            App.Console.PrintWarning("\n\n")
             if fcObj.Tip != None:
                 povBody = self.createPovrayCode(fcObj.Tip)
                 povCode += povBody
@@ -619,6 +622,51 @@ class ExportToPovRay:
             if line.Construction:
                 return True
         return False
+
+    def isBodySupported(self, body):
+        supportedTypeIds = ["App::Origin",
+                            "App::Line",
+                            "App::Plane",
+                            "Sketcher::SketchObject",
+                            "PartDesign::Pad",
+                            "PartDesign::Pocket",
+                            "PartDesign::Point",
+                            "PartDesign::Line",
+                            "PartDesign::Plane"]
+
+        childs = body.OutListRecursive
+
+        #are objects supported
+        for obj in childs:
+            if not obj.TypeId in supportedTypeIds:
+                return False
+
+        #get sketches
+        sketches = []
+        for obj in childs:
+            if obj.TypeId == "Sketcher::SketchObject":
+                sketches.append(obj)
+
+        #test sketches
+        supportedGeometryTypes = [Part.LineSegment]
+        for sketch in sketches:
+            for line in sketch.Geometry:
+                if not type(line) in supportedGeometryTypes:
+                    return False
+
+        supportedTypes = ["Length"]
+        #get pads and pockets
+        padsPockets = []
+        for obj in childs:
+            if obj.TypeId == "PartDesign::Pad" or obj.TypeId == "PartDesign::Pocket":
+                padsPockets.append(obj)
+
+        #test types
+        for obj in padsPockets:
+            if not obj.Type in supportedTypes:
+                return False
+
+        return True
 
 
     def getStatistics(self, objs): #get statistics about the model the user want to render
