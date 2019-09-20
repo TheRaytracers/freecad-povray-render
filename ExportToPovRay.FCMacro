@@ -780,7 +780,8 @@ class ExportToPovRay:
             errorText += "An error occured while rendering:\n-----------------------------------------\n"
             errorText += error
             errorText += "\n-----------------------------------------\n"
-            errorText += "If the error occured in the pov file or the mesh file, please report a bug to us. (See the wiki, link is in the help tab of the dialog)\n\n"
+            errorText += "If the error occured in the pov file or the mesh file, please report a bug to us."
+            errorText += "(See the wiki, link is in the help tab of the dialog)\n\n"
             errorText += "You can see the error message in the error file too."
             showError(errorText, "An error ocurred while rendering")
 
@@ -1059,7 +1060,13 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.result = "OK"
         self.close()
         self.saveInput()
-        exporter = ExportToPovRay(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value(), self.expBg.isChecked(), self.expLight.isChecked(), self.repRot.isChecked(), self.expFcView.isChecked())
+        exporter = ExportToPovRay(self.pathLineEdit.text(),
+                                  self.imageWidth.value(),
+                                  self.imageHeight.value(),
+                                  self.expBg.isChecked(),
+                                  self.expLight.isChecked(),
+                                  self.repRot.isChecked(),
+                                  self.expFcView.isChecked())
 
 def main(): #the main function
     try:
