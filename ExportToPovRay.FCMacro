@@ -497,7 +497,7 @@ class ExportToPovRay:
 
         return povCode
 
-    def sketchToBezier(self, sketch):
+    def sketchToBezier(self, sketch): #create pov bezier_spline from sketch
         povSpline = "\n"
 
         unsortedLines = sketch.Geometry
@@ -546,19 +546,19 @@ class ExportToPovRay:
             i += 1
         return -1
 
-    def isSamePoint(self, point1, point2):
+    def isSamePoint(self, point1, point2): #are two points equal
         if round(point1.x, 3) == round(point2.x, 3) and round(point1.y, 3) == round(point2.y, 3) and round(point1.z, 3) == round(point2.z, 3):
             return True
         return False
 
-    def hasLinesConstructive(self, lines):
+    def hasLinesConstructive(self, lines): #are constructive lines in lines array
         constructive = False
         for line in lines:
             if line.Construction:
                 return True
         return False
 
-    def isBodySupported(self, body):
+    def isBodySupported(self, body): #is a body full supported
         supportedTypeIds = ["App::Origin",
                             "App::Line",
                             "App::Plane",
@@ -603,7 +603,7 @@ class ExportToPovRay:
 
         return True
 
-    def createMesh(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expMeshDef = True):
+    def createMesh(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expMeshDef = True): #create pov mesh from object
         povCode = ""
 
         isSolid = self.isSolid(fcObj)
@@ -929,7 +929,7 @@ class ExportToPovRay:
         os.system(terminalInput) #put terminalInput to the console
         self.checkErrFile()
 
-    def checkErrFile(self):
+    def checkErrFile(self): #check error file for errors
         inPovFile = False
         #open error file
         file = open(self.errorPath, "r")
