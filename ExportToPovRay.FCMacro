@@ -801,6 +801,11 @@ class ExportToPovRay:
             errorText += "(See the wiki, link is in the help tab of the dialog)\n\n"
             errorText += "You can see the error message in the error file too."
             showError(errorText, "An error ocurred while rendering")
+        else:
+            self.delErrorFile();
+
+    def delErrorFile(self):
+        os.remove(self.errorPath)
 
     def repairRot(self, objs): #repair the rotation of objects (likely a bug in FreeCAD)
         for obj in objs:
