@@ -34,7 +34,7 @@ def isAscii(string): #test whether the string is an ASCII string
     return all(ord(c) < 128 for c in string)
 
 class ExportToPovRay:
-    """Export the FreeCAD model to POVray"""
+    """Export the FreeCAD model to POV-Ray"""
     def __init__(self, povPath, width, height, expBg, expLight, repRot, expFcView):
         self.doc = FreeCAD.ActiveDocument
         self.objs = self.doc.Objects
