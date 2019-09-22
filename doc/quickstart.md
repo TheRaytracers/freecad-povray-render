@@ -3,10 +3,6 @@
 The easiest way is to install it via the **Addon Manager** under Tools / Addon Manager / Macros.  
 Alternative you can download the macro via [Macro Recipes](https://freecadweb.org/wiki/Macros_recipes) or download it directly from our [Gitlab Repository](https://gitlab.com/usbhub/exporttopovray) with the blue button top right to get the most actual version.  
 Now you have to put the .FCMacro file in your macro directory. You can look under Edit / Preferences / General / Macro for your path.
-### Standard Macro Paths
-* Linux: `/home/USERNAME/.FreeCAD/Macro/`  
-* Windows: `C:\Users\USERNAME\AppData\Roaming\FreeCAD\Macro/`
-* Mac: `XXX`
 
 ## Installation of POV-Ray
 
@@ -22,23 +18,23 @@ The name of the POV-Ray executable is different in Windows and Linux:
 * povray.exe (Linux)
 * pvengine.exe (Windows)
 
-It is important to write the hole path into the textfield for example
+It is important to write the hole path into the textfield for example (standard paths):
 
-* usr/bin/povray (Linux)
+* /usr/bin/povray (Linux)
 * ???
 
 For the executable options in the next field you should take
 
 * +P +A
 
-+P causes POV-Ray to show the rendered image. 
++P causes POV-Ray to show the rendered image.
 +A is for Antialiasing - this is optional.
 
 If the raytracing workbench works with these settings, the macro should do also.
 
 ## Usage
 Create a model with the part workbench.
-The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. If you have many no CSG object the creation of the code can take a while. POVray opens a windows with the rendering result. To close this window, click on the windows:
+The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POV-ray code. Now the macro creates the POVray code and start the POVray. If you have many no CSG object the creation of the code can take a while. POV-ray opens a windows with the rendering result. To close this window, click on the window.
 
 <a name="startTheMacro"></a>
 ## Start the Macro
@@ -67,10 +63,10 @@ you have to type this in your inc file:
 #declare White_pieces_material = material { M_Glass3 }
 
 ```
-It is also important to take care of the material hirarchie because POV-Ray will generate an error message
+It is also important to take care of the material hierarchy because POV-Ray will generate an error message
 
 ### Add objects
-If you want to add POVray objects (e.g. another lamp, a special background or any other object) you can do this also with the .inc file. Just add the POVray object to the .inc file and restart the macro. Now POVray also renders your own object which is defined in the inc file.  
+If you want to add POV-ray objects (e.g. another lamp, a special background or any other object) you can do this also with the .inc file. Just add the POV-ray object to the .inc file and restart the macro. Now POV-ray also renders your own object which is defined in the inc file.  
 The macro will comment out the camera if you define your own.
 FreeCAD light and background can be switched off in the dialog box if you define your own one.
 
