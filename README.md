@@ -11,6 +11,17 @@ Until now, the macro only supports objects from the Part Workbench, other object
 To give the user the full control, you can define extra things or another surface as in FreeCAD (Please visit the [Wiki](doc/user.md) for more information).
 
 
+## Content of wiki
+
+### Installation
+### Usage
+### Start of macro
+### Supportd Features
+### Realistic Rendering
+### Tips, Tricks and limitations
+### FAQ
+### Examples and templates
+
 ## Installation
 Download the macro here: [link] or install it via the addon manager  
 Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General for your path.
