@@ -18,13 +18,13 @@ To give the user the full control, you can define extra things or another surfac
 * [Adding features like material and textures](doc/quickstart.md#Make-changes)
 * [Tips, Tricks and limitations](doc/tipsAndTricks.md)
 * [Realistic Rendering example](doc/realistic.md)
-* [Supportd Features](/doc/supported.md)
+* [Supported Features](/doc/supported.md)
 * [FAQ](doc/FAQ.md)
 * [More examples and templates](doc/examples.md)
 * [Contributing](doc/developer.md)
 * [Future developement](doc/roadmap.md)
 
-## Advantages over the Raytracing Workbench
+## Advantages compared with the Raytracing Workbench
 * You can use **all** POV-Ray features
 * Easy changing of materials / textures of objects
   - If you edit a material in the pov file of the Raytracing Workbench and change the model later, you have to do all changes in the file again. With the macro you don't have to do that (define all changes in the inc file). 

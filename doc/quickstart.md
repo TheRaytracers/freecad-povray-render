@@ -15,10 +15,11 @@ The macro must know how to find the POV-Ray executable. The path will be taken f
 To reach the raytracing settings menu you must load the raytracing workbench first and second go to the settings menu.
 The name of the POV-Ray executable is different in Windows and Linux:
 
-* povray.exe (Linux)
+* povray (Linux)
 * pvengine.exe (Windows)
 
-It is important to write the hole path into the textfield for example (standard paths):
+It is important to write the complete path into the textfield. 
+These are the standard paths but they may vary depending on your installation:
 
 * /usr/bin/povray (Linux)
 * ???
@@ -27,7 +28,7 @@ For the executable options in the next field you should take
 
 * +P +A
 
-+P causes POV-Ray to show the rendered image.
++P causes POV-Ray to show the rendered image. 
 +A is for Antialiasing - this is optional.
 
 If the raytracing workbench works with these settings, the macro should do also.
@@ -63,7 +64,7 @@ you have to type this in your inc file:
 #declare White_pieces_material = material { M_Glass3 }
 
 ```
-It is also important to take care of the material hierarchy because POV-Ray will generate an error message
+It is also important to take care of the [material hierarchy](materialHierarchy.md) because otherwise POV-Ray will abort the rendering with an error message
 
 ### Add objects
 If you want to add POV-Ray objects (e.g. another lamp, a special background or any other object) you can do this also with the .inc file. Just add the POV-Ray object to the .inc file and restart the macro. Now POV-Ray also renders your own object which is defined in the inc file.  
