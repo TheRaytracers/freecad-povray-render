@@ -506,7 +506,7 @@ class ExportToPovRay:
         while self.hasLinesConstructive(unsortedLines): #Caution: Very dirty coding!!!
             for line in unsortedLines:
                 if line.Construction:
-                    del unsortedLines[lines.index(line)]
+                    del unsortedLines[unsortedLines.index(line)]
                     break
 
         numOfPoints = len(unsortedLines) * 4
@@ -586,7 +586,7 @@ class ExportToPovRay:
         supportedGeometryTypes = [Part.LineSegment]
         for sketch in sketches:
             for line in sketch.Geometry:
-                if not type(line) in supportedGeometryTypes:
+                if not type(line) in supportedGeometryTypes and not line.Construction:
                     return False
 
         supportedTypes = ["Length"]
