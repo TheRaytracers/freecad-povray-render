@@ -14,14 +14,15 @@ To give the user the full control, you can define extra things or another surfac
 ## Content of wiki
 
 * [Installation](doc/quickstart.md#Installation-of-POV-Ray)
-* [Usage]
-* [Start of macro]
-* [Supportd Features]
-* [Realistic Rendering]
-* [Tips, Tricks and limitations]
-* [FAQ]
-* [Examples and templates]
-* [Contributing]
+* [Usage of macro](doc/quickstart.md#Usage)
+* [Adding features like material and textures](doc/quickstart.md#Make-changes)
+* [Tips, Tricks and limitations](doc/tipsAndTricks.md)
+* [Realistic Rendering example](doc/realistic.md)
+* [Supportd Features](/doc/supported.md)
+* [FAQ](doc/FAQ.md)
+* [More examples and templates](doc/examples.md)
+* [Contributing](doc/developer.md)
+* [Future developement](doc/roadmap.md)
 
 ## Advantages over the Raytracing Workbench
 * You can use **all** POV-Ray features
