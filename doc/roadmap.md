@@ -1,0 +1,3 @@
+part design
+
+textur dialog
