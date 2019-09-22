@@ -2,7 +2,7 @@
 ## Installation of the macro
 The easiest way is to install it via the **Addon Manager** under Tools / Addon Manager / Macros.  
 Alternative you can download the macro via [Macro Recipes](https://freecadweb.org/wiki/Macros_recipes) or download it directly from our [Gitlab Repository](https://gitlab.com/usbhub/exporttopovray) with the blue button top right to get the most actual version.  
-Now you have to put the .FCMacro file in your macro directory. You cant look under Edit / Preferences / General / Macro for your path.
+Now you have to put the .FCMacro file in your macro directory. You can look under Edit / Preferences / General / Macro for your path.
 ### Standard Macro Paths
 * Linux: `/home/USERNAME/.FreeCAD/Macro/`  
 * Windows: `C:\Users\USERNAME\AppData\Roaming\FreeCAD\Macro/`
