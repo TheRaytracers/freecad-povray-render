@@ -1,4 +1,4 @@
-# User Documentation
+# Quick start
 ## Installation of the macro
 The easiest way is to install it via the **Addon Manager** under Tools / Addon Manager / Macros.  
 Alternative you can download the macro via [Macro Recipes](https://freecadweb.org/wiki/Macros_recipes) or download it directly from our [Gitlab Repository](https://gitlab.com/usbhub/exporttopovray) with the blue button top right to get the most actual version.  
@@ -31,7 +31,7 @@ For the executable options in the next field you should take
 
 * +P +A
 
-+P causes POV-Ray to show the rendered image.
++P causes POV-Ray to show the rendered image. 
 +A is for Antialiasing - this is optional.
 
 If the raytracing workbench works with these settings, the macro should do also.
@@ -41,12 +41,10 @@ Create a model with the part workbench.
 The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POVray code. Now the macro creates the POVray code and start the POVray. If you have many no CSG object the creation of the code can take a while. POVray opens a windows with the rendering result. To close this window, click on the windows:
 
 <a name="startTheMacro"></a>
-### Start the Macro
+## Start the Macro
 Go to Macro/Macros… and start the installed macro by double clicking on it.
 
-### Make changes
-
-#### Add textures and material
+## Make changes
 
 To use the full power of POV-Ray you can add textures, lights, athmosperic effects and many more to your model.
 For this you have to create an include file manually with the same name as the pov file in directory of your pov file. Change the extension to `.inc`.  
@@ -56,6 +54,8 @@ pov file: myPOVrayFile.pov
 inc file: myPOVrayFile.inc
 ```
 You should define all additional features in the include file. It will not be overwritten by the macro.
+
+### Add textures and material
 Be aware to use the right syntax if you want to define a texture for a specific object.  
 For example if you want to add the material `M_Glass3` to an object, labeled with `White_pieces` in the object tree,
 
@@ -69,11 +69,12 @@ you have to type this in your inc file:
 ```
 It is also important to take care of the material hirarchie because POV-Ray will generate an error message
 
-#### Add objects
-If you want to add POVray objects (e.g. another lamp or a super torus) you can do this also with the inc file. Just add the POVray object to the inc file and restart the macro. Now POVray also renders your own object which is defined in the inc file.  
-The macro will comment out the camera / light source if you defined another in the inc file.
+### Add objects
+If you want to add POVray objects (e.g. another lamp, a special background or any other object) you can do this also with the .inc file. Just add the POVray object to the .inc file and restart the macro. Now POVray also renders your own object which is defined in the inc file.  
+The macro will comment out the camera if you define your own.
+FreeCAD light and background can be switched off in the dialog box if you define your own one.
 
-#### Change global settings
+### Change global settings
 
 There are several ways to influence the way and quality of rendering.
 For example you can add a global ambient light:
