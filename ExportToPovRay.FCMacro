@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
 
+#Export FreeCAD models to Pov-Ray
+#Copyright (C) 2019  Usb Hub and DerUhrmacher
+#
+#This library is free software; you can redistribute it and/or
+#modify it under the terms of the GNU Lesser General Public
+#License as published by the Free Software Foundation; either
+#version 2.1 of the License, or (at your option) any later version.
+#
+#This library is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#Lesser General Public License for more details.
+#
+#You should have received a copy of the GNU Lesser General Public
+#License along with this library; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 from FreeCAD import Base
 from pivy import coin
 import os
@@ -153,13 +170,22 @@ class ExportToPovRay:
         self.openPovRay()
 
 
-    def createPovrayCode(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expLabel = True, expMeshDef = True): #returns the povray code for the object
+    def createPovrayCode(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expLabel = True, expMeshDef = True, testClone = True): #returns the povray code for the object
         if expLabel:
             povCode = "\n//----- " + self.stringCorrection(fcObj.Label) + " -----" #add the name of the object
         else:
             povCode = ""
 
-        if fcObj.TypeId == "Part::Box": #Box
+        if self.hasInListClone(fcObj) and testClone:
+            declareName = self.stringCorrection(fcObj.Label.capitalize()) + "_" + fcObj.Name
+            povDeclare = "\n#declare " + declareName + " ="
+            povDeclare += self.createPovrayCode(fcObj, False, False, True, True, True, False)
+            povChild = "\nobject {\n"
+            povChild += "\t" + declareName
+
+            povCode = povDeclare + povChild
+
+        elif fcObj.TypeId == "Part::Box": #Box
             povBox = "\nbox{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">"
             povCode += povBox
 
@@ -393,12 +419,8 @@ class ExportToPovRay:
 
             childs = fcObj.OutList
             for child in childs:
-                if child.ViewObject.Visibility: #if not visible, the object isnt created with a mesh already
-                    childCode = self.createPovrayCode(child, False, False, True, False, False)
-                else:
-                    childCode = self.createPovrayCode(child, False, False, True, False, True)
-
-                povClone += childCode.replace("\n", "\n\t") #add the indents
+                declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                povClone += "\t" + declareName + "\n"
 
             povClone += "\n\tscale <" + str(fcObj.Scale.x) + ", " + str(fcObj.Scale.y) + ", " + str(fcObj.Scale.z) + ">"
 
@@ -784,6 +806,11 @@ class ExportToPovRay:
             errorText += "(See the wiki, link is in the help tab of the dialog)\n\n"
             errorText += "You can see the error message in the error file too."
             showError(errorText, "An error ocurred while rendering")
+        else:
+            self.delErrorFile();
+
+    def delErrorFile(self):
+        os.remove(self.errorPath)
 
     def repairRot(self, objs): #repair the rotation of objects (likely a bug in FreeCAD)
         for obj in objs:
@@ -800,6 +827,13 @@ class ExportToPovRay:
 
     def exportFcView(self): #export the current FreeCAD view like Tools / Save Picture...
         Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
+
+    def hasInListClone(self, fcObj):
+        for parent in fcObj.InList:
+            if parent.TypeId == "Part::FeaturePython" and (parent.Name == "Clone" or parent.Name[:-3] == "Clone"):
+                return True
+
+        return False
 
 
     def stringCorrection(self, inputString): #change a utf-8 string to an ASCII string

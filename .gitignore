@@ -1,5 +1,6 @@
 *.*
 !ExportToPovRay.FCMacro
+!LICENSE.md
 !.gitignore
 !README.md
 !CSG FreeCAD POVray.ods
