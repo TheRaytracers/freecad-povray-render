@@ -1,7 +1,7 @@
 # Quick start
 ## Installation of the macro
 The easiest way is to install it via the **Addon Manager** under Tools / Addon Manager / Macros.  
-Alternative you can download the macro via [Macro Recipes](https://freecadweb.org/wiki/Macros_recipes) or download it directly from our [Gitlab Repository](https://gitlab.com/usbhub/exporttopovray) with the blue button top right to get the most actual version.  
+Alternative you can download the macro via [Macro Recipes](https://freecadweb.org/wiki/Macros_recipes) or download it directly from our [Gitlab Repository](https://gitlab.com/usbhub/exporttopovray) with the right button about the last commit message to get the most actual version.  
 Now you have to put the .FCMacro file in your macro directory. You can look under Edit / Preferences / General / Macro for your path.
 
 ## Installation of POV-Ray
@@ -34,7 +34,7 @@ If the raytracing workbench works with these settings, the macro should do also.
 
 ## Usage
 Create a model with the part workbench.
-The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POV-ray code. Now the macro creates the POVray code and start the POVray. If you have many no CSG object the creation of the code can take a while. POV-ray opens a windows with the rendering result. To close this window, click on the window.
+The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POV-Ray code. Now the macro creates the POV-Ray code and start the POV-Ray. If you have many no CSG object the creation of the code can take a while. POV-Ray opens a windows with the rendering result. To close this window, click on the window.
 
 <a name="startTheMacro"></a>
 ## Start the Macro
@@ -46,8 +46,8 @@ To use the full power of POV-Ray you can add textures, lights, athmosperic effec
 For this you have to create an include file manually with the same name as the pov file in directory of your pov file. Change the extension to `.inc`.  
 For example
 ```
-pov file: myPOVrayFile.pov
-inc file: myPOVrayFile.inc
+pov file: myPOV-RayFile.pov
+inc file: myPOV-RayFile.inc
 ```
 You should define all additional features in the include file. It will not be overwritten by the macro.
 
@@ -66,7 +66,7 @@ you have to type this in your inc file:
 It is also important to take care of the material hierarchy because POV-Ray will generate an error message
 
 ### Add objects
-If you want to add POV-ray objects (e.g. another lamp, a special background or any other object) you can do this also with the .inc file. Just add the POV-ray object to the .inc file and restart the macro. Now POV-ray also renders your own object which is defined in the inc file.  
+If you want to add POV-Ray objects (e.g. another lamp, a special background or any other object) you can do this also with the .inc file. Just add the POV-Ray object to the .inc file and restart the macro. Now POV-Ray also renders your own object which is defined in the inc file.  
 The macro will comment out the camera if you define your own.
 FreeCAD light and background can be switched off in the dialog box if you define your own one.
 
@@ -88,4 +88,4 @@ global_settings {
    }
 }
 ```
-Replace MODE with the one of the modes described in [POVray wiki](http://wiki.povray.org/content/HowTo:Use_radiosity).
+Replace MODE with the one of the modes described in [POV-Ray wiki](http://wiki.povray.org/content/HowTo:Use_radiosity).

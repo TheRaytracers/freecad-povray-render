@@ -1,14 +1,14 @@
-# CSG Export to POVray - Documentation
+# CSG Export to POV-Ray - Documentation
 #### The macro that creates user friendly .pov files from CSG objects
 
-This macro is intended to export CSG objects from the Part Workbench to a good readable and editable POVray file. For that, the macro converts the content of the FreeCAD object tree into the POVray language.
+This macro is intended to export CSG objects from the Part Workbench to a good readable and editable POV-Ray file. For that, the macro converts the content of the FreeCAD object tree into the POV-Ray language.
 An important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y**ou **G**et). So in the first step the rendered picture should look the same as displayed in FreeCAD view.
 In a second step the user can add textures, materials or additional lightning to render a photorealistic scene.
 This can be either done by directly editing of the resulting POV-Ray file or by adding an include file with additional contents.
 
 ## Get started
 
-A quick overview about [installation and usage](user.md) 
+A quick overview about [installation and usage](user.md)
 
 ## How to render a photorealistic Scene from your FreeCAD model
 
