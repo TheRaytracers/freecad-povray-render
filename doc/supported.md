@@ -25,6 +25,12 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 - [x] Array linear pattern
 - [x] Array polar pattern
 
+## Other
+
+- [x] Group
+- [x] Part
+
+
 ## Texture
 - [x] Color
 - [x] Transparency
