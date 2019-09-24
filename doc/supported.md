@@ -19,11 +19,31 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 - [x] Cut
 - [x] Difference
 
+## PartDesign Workbench
+
+- [x] Body
+- [x] Pad
+- [x] Pocket
+- [ ] Revolution
+- [ ] Groove
+
+### Sketches
+- [x] Line Segment
+- [ ] Arc
+- [ ] Circle
+- [ ] B-Spline
+
 ## Draft Workbench
 
 - [x] Clone
 - [x] Array linear pattern
 - [x] Array polar pattern
+
+## Other
+
+- [x] Group
+- [x] Part
+
 
 ## Texture
 - [x] Color
