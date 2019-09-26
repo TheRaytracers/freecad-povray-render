@@ -30,7 +30,7 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 ### Sketches
 - [x] Line Segment
 - [ ] Arc
-- [ ] Circle
+- [x] Circle
 - [ ] B-Spline
 
 ## Draft Workbench
