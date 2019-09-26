@@ -1,26 +1,29 @@
 # FAQ
 
 * **I get no image, only the pov file**  
-  * Are you sure, that you installed POVray? If you installed POVray and you get no image, please report a bug (see below).
-  * Or maybe there is an error in your inc file. Please start POVray externally with the pov file and look at the error message. If there is a mistake in the pov file, then the macro has a bug. Please report the bug (see below), that other user won't have this problem.
+  * Are you sure, that you installed Pov-Ray? If you installed Pov-Ray and you get no image, please report a bug (see below).
+  * Maybe there is an error in your inc file. Please start Pov-Ray externally with the pov file and look at the error message. If there is a mistake in the pov file, then the macro has a bug. Please report the bug (see below), so that other users won't have this problem.
 
-* **The rendered image doesn't look realistic, it looks very plastic**  
-  Look here for tips to [get a more realistic rendering](realistic.md).
+
+* **The rendered image doesn't look realistic, but plastic**  
+  Look here for tips to [Get a more realistic rendering](realistic.md).
 
 * **I found a bug in the macro**  
-  Please report the bug to us, so we can fix it hopefully soon.  
+  Please report the bug to us, so we hopefully can fix it soon.  
   You can report the bug via
-  * A GitLab Issue: [Create an Issue](https://gitlab.com/usbhub/exporttopovray/issues) (Green button top right)
+  * A GitLab Issue: [Create an Issue](https://gitlab.com/usbhub/exporttoPov-Ray/issues) (Green button top right.
   * Email: XXX
-  * The FreeCAD Forum XXX
+  * The FreeCAD Forum: XXX
 
-* **I want to learn more about POVray**  
-  You can look here, at this very good tutorial:  
+
+* **I want to learn more about Pov-Ray**  
+  * You can watch this very good tutorial:  
   [http://f-lohmueller.de/pov_tut/pov__eng.htm](http://f-lohmueller.de/pov_tut/pov__eng.htm)  
-  The official POVray documentation you can find here:  
-  [http://www.povray.org/documentation/index-3.6.php](http://www.povray.org/documentation/index-3.6.php)
+  * You can find the official Pov-Ray documentation here:  
+  [http://www.Pov-Ray.org/documentation/index-3.6.php](http://www.Pov-Ray.org/documentation/index-3.6.php)
+
 
 * **I want to contribute to the macro**  
   Cool, a software is never finished :-)  
   Please read our [Developer Documentation](developer.md) and start coding!  
-  Or report a bug (see above), that is also contributing and not less important than coding! Without bug reporting the problem would be there forever and every user would have the problem!
+  Or report a bug (see above), this is also contributing and not less important than coding! Without bug reporting the problem won't be solved and every user will have it!
