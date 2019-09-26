@@ -1,11 +1,29 @@
 # -*- coding: utf-8 -*-
 
+#  Export FreeCAD models to Pov-Ray
+#  Copyright (C) 2019  Usb Hub and DerUhrmacher
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License, or (at your option) any later version.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  Lesser General Public License for more details.
+#
+#  You should have received a copy of the GNU Lesser General Public
+#  License along with this library; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 from FreeCAD import Base
 from pivy import coin
 import os
 from PySide import QtCore, QtGui
 import math
 import MeshPart
+import platform
 
 def showError(text, title):
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Critical, title, text)
@@ -16,7 +34,7 @@ def isAscii(string): #test whether the string is an ASCII string
     return all(ord(c) < 128 for c in string)
 
 class ExportToPovRay:
-    """Export the FreeCAD model to POVray"""
+    """Export the FreeCAD model to POV-Ray"""
     def __init__(self, povPath, width, height, expBg, expLight, repRot, expFcView):
         self.doc = FreeCAD.ActiveDocument
         self.objs = self.doc.Objects
@@ -152,13 +170,22 @@ class ExportToPovRay:
         self.openPovRay()
 
 
-    def createPovrayCode(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expLabel = True, expMeshDef = True): #returns the povray code for the object
+    def createPovrayCode(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expLabel = True, expMeshDef = True, testClone = True): #returns the povray code for the object
         if expLabel:
             povCode = "\n//----- " + self.stringCorrection(fcObj.Label) + " -----" #add the name of the object
         else:
             povCode = ""
 
-        if fcObj.TypeId == "Part::Box": #Box
+        if self.hasInListClone(fcObj) and testClone:
+            declareName = self.stringCorrection(fcObj.Label.capitalize()) + "_" + fcObj.Name
+            povDeclare = "\n#declare " + declareName + " ="
+            povDeclare += self.createPovrayCode(fcObj, False, False, True, True, True, False)
+            povChild = "\nobject {\n"
+            povChild += "\t" + declareName
+
+            povCode = povDeclare + povChild
+
+        elif fcObj.TypeId == "Part::Box": #Box
             povBox = "\nbox{ <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">"
             povCode += povBox
 
@@ -388,13 +415,14 @@ class ExportToPovRay:
             return povCode
 
         elif fcObj.TypeId == "Part::FeaturePython" and (fcObj.Name == "Clone" or fcObj.Name[:-3] == "Clone"): #Clone from Draft workbench
-            povClone = ""
+            povClone = "\nobject {\n"
+
             childs = fcObj.OutList
             for child in childs:
-                if fcObj.ViewObject.Visibility:
-                    povClone += self.createPovrayCode(child, False, False, False, False, False)
-                else:
-                    povClone += self.createPovrayCode(child, False, False, False, False, True)
+                declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                povClone += "\t" + declareName + "\n"
+
+            povClone += "\n\tscale <" + str(fcObj.Scale.x) + ", " + str(fcObj.Scale.y) + ", " + str(fcObj.Scale.z) + ">"
 
             povCode += povClone
 
@@ -417,20 +445,20 @@ class ExportToPovRay:
             expPigment = False #part has no pigment
 
         else: #not a supported object
-            isSolid = self.isSolid(fcObj)
-            if isSolid != "mesh" and isSolid == False or fcObj.TypeId == "App::Origin": # XXX: After fixing isSolid() remove fcObj.TypeId == "App::Origin"!!!!
-                return ""
-
             if expMeshDef:
                 mesh = 0
 
                 if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
                     mesh = fcObj.Mesh
                 else:
-                    distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
-                    pictureSize = (self.width + self.height) / 2
-                    angularDeflection = (distanceCam / pictureSize) * 2.5
-                    mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    try:
+                        distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
+                        pictureSize = (self.width + self.height) / 2
+                        angularDeflection = (distanceCam / pictureSize) * 2.5
+                        mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    except:
+                        return ""
+
 
                 if not mesh:
                     return ""
@@ -531,8 +559,7 @@ class ExportToPovRay:
     def getLight(self): #get the FreeCAD light
         povLight = ""
 
-        #povLight += "light_source{<1500,3000,-2500> color rgb<1,1,1>}\n"
-        povLight += "light_source { <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + "> color rgb<0.5, 0.5, 0.5> }\n"
+        povLight += "light_source { CamPosition color rgb<0.5, 0.5, 0.5> }\n"
 
         return povLight
 
@@ -743,7 +770,21 @@ class ExportToPovRay:
             return -1
 
     def openPovRay(self): #start POVray
-        terminalInput = "cd " + str(self.directory) + " && povray " + str(self.povName) + " +P Width=" + str(self.width) + " Height=" + str(self.height) + " Fatal_File=" + self.errorName #create the string to start POVray
+        povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('PovrayExecutable')
+        if os.path.isfile(povExec) == False:
+            povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('PovrayExecutable')
+            if os.path.isfile(povExec) == False:
+                errorText = "To start the rendering you must\n"
+                errorText += "set the path to the POV-Ray executable\n"
+                errorText += "either in the settings of Render workbench\n"
+                errorText += "or in the settings of Raytracing workbench\n"
+                showError(errorText, "POV-Ray executable not found")
+                return -1
+            povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('OutputParameters')
+        povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('OutputParameters')
+        #create the string to start POVray
+        terminalInput = povExec + " " + str(self.povName) + " " + povOptions + " Width=" + str(self.width) + " Height=" + str(self.height) + " Fatal_File=" + self.errorName
+        os.chdir(str(self.directory))
         os.system(terminalInput) #put terminalInput to the console
         self.checkErrFile()
 
@@ -761,9 +802,15 @@ class ExportToPovRay:
             errorText += "An error occured while rendering:\n-----------------------------------------\n"
             errorText += error
             errorText += "\n-----------------------------------------\n"
-            errorText += "If the error occured in the pov file or the mesh file, please report a bug to us. (See the wiki, link is in the help tab of the dialog)\n\n"
+            errorText += "If the error occured in the pov file or the mesh file, please report a bug to us."
+            errorText += "(See the wiki, link is in the help tab of the dialog)\n\n"
             errorText += "You can see the error message in the error file too."
             showError(errorText, "An error ocurred while rendering")
+        else:
+            self.delErrorFile();
+
+    def delErrorFile(self):
+        os.remove(self.errorPath)
 
     def repairRot(self, objs): #repair the rotation of objects (likely a bug in FreeCAD)
         for obj in objs:
@@ -781,15 +828,12 @@ class ExportToPovRay:
     def exportFcView(self): #export the current FreeCAD view like Tools / Save Picture...
         Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
 
-    def isSolid(self, fcObj):
-        try:
-            if fcObj.Shape.Solids == []:
-                return False
-            else:
+    def hasInListClone(self, fcObj):
+        for parent in fcObj.InList:
+            if parent.TypeId == "Part::FeaturePython" and (parent.Name == "Clone" or parent.Name[:-3] == "Clone"):
                 return True
-        except:
-            if fcObj.isDerivedFrom("Mesh::Feature") == False:
-                return "mesh" #object has no shape property
+
+        return False
 
 
     def stringCorrection(self, inputString): #change a utf-8 string to an ASCII string
@@ -802,6 +846,9 @@ class ExportToPovRay:
         uniString = uniString.replace(u"Ö", "Oe")
         uniString = uniString.replace(u"ö", "oe")
         uniString = uniString.replace(u"ß", "ss")
+        uniString = uniString.replace(u"(", "_")
+        uniString = uniString.replace(u")", "_")
+        uniString = uniString.replace(u"#", "_")
         uniString = uniString.replace(" ", "_")
         outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
         return outString.decode("utf-8") #return and redecode to unicode but with converted chars
@@ -934,7 +981,14 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.show()
 
     def setDefaultValues(self): #set the default values of the input objects
-        defaultPath = "/home/"
+        system = platform.system()
+        if system == "Linux" or system == "Darwin":
+            defaultPath = "/home/"
+        elif system == "Windows":
+            defaultPath = "C:\\Users\\%UserName%\\"
+        else:
+            defaultPath = ""
+
         self.pathLineEdit.setText(defaultPath)
 
         #get saved input
@@ -1040,16 +1094,20 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.result = "OK"
         self.close()
         self.saveInput()
-        exporter = ExportToPovRay(self.pathLineEdit.text(), self.imageWidth.value(), self.imageHeight.value(), self.expBg.isChecked(), self.expLight.isChecked(), self.repRot.isChecked(), self.expFcView.isChecked())
+        exporter = ExportToPovRay(self.pathLineEdit.text(),
+                                  self.imageWidth.value(),
+                                  self.imageHeight.value(),
+                                  self.expBg.isChecked(),
+                                  self.expLight.isChecked(),
+                                  self.repRot.isChecked(),
+                                  self.expFcView.isChecked())
 
 def main(): #the main function
-    try:
-        viewPos = Gui.ActiveDocument.ActiveView.viewPosition()
-    except:
+    if App.ActiveDocument == None:
         App.Console.PrintWarning("No document opened\n")
         return -1
-
-    dialog = GUI()
-    dialog.exec_()
+    else:
+        dialog = GUI()
+        dialog.exec_()
 
 main()
