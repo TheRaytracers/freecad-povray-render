@@ -983,12 +983,14 @@ class ExportToPovRay:
         self.checkErrFile()
 
     def checkErrFile(self): #check error file for errors
+        error = ""
         inPovFile = False
         #open error file
-        file = open(self.errorPath, "r")
-        #read error file
-        error = file.read()
-        file.close()
+        if os.path.isfile(self.errorPath) == True:
+            file = open(self.errorPath, "r")
+            #read error file
+            error = file.read()
+            file.close()
         #is there any content in the file
         if error != "": #error occured
             #show error message
