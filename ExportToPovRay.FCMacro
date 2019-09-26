@@ -41,6 +41,7 @@ class ExportToPovRay:
 
         self.povPath = povPath
         self.directory = os.path.dirname(self.povPath) + os.sep
+
         self.povName = self.povPath[len(self.directory):]
         self.fileName = self.povName[:-4]
         self.incName = self.fileName + ".inc"
@@ -444,74 +445,74 @@ class ExportToPovRay:
             povCode += povPart
             expPigment = False #part has no pigment
 
-        else: #not a supported object
-            if expMeshDef:
-                mesh = 0
 
-                if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
-                    mesh = fcObj.Mesh
+        elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
+            if not self.isBodySupported(fcObj):
+                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
+                return povCode #return because the mesh may not translated and rotated
+
+            povBody = "\nunion {\n"
+            if fcObj.Tip != None:
+                povBody += self.createPovrayCode(fcObj.Tip).replace("\n", "\n\t") #add chld code and indents
+                povCode += povBody
+            else:
+                return ""
+
+        elif fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket": #Pad or Pocket from PartDesign
+            spline = self.sketchToBezier(fcObj.Profile[0])
+
+            startHeight = 0;
+            if fcObj.TypeId == "PartDesign::Pocket":
+                startHeight = -0.0001
+            endHeight = fcObj.Length.getValueAs("mm").Value
+            if fcObj.Midplane:
+                endHeight /= 2
+                startHeight = -endHeight
+            startHeight += fcObj.Offset.getValueAs("mm").Value
+            endHeight += fcObj.Offset.getValueAs("mm").Value
+            if not fcObj.Reversed:
+                startHeight *= -1
+                endHeight *= -1
+            if fcObj.TypeId == "PartDesign::Pocket":
+                startHeight *= -1
+                endHeight *= -1
+
+            povPad = ""
+            try:
+                if fcObj.TypeId == "PartDesign::Pocket":
+                    povPad += "\ndifference {\n"
                 else:
-                    try:
-                        distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
-                        pictureSize = (self.width + self.height) / 2
-                        angularDeflection = (distanceCam / pictureSize) * 2.5
-                        mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
-                    except:
-                        return ""
+                    povPad += "\nunion {\n"
+            except:
+                povPad += "\nunion {\n"
 
+            if fcObj.BaseFeature != None:
+                povBase = self.createPovrayCode(fcObj.BaseFeature)
+                povPad += povBase.replace("\n", "\n\t") #add the indents
 
-                if not mesh:
-                    return ""
+            povPad += "\n\tprism {\n"
+            povPad += "\t\tbezier_spline\n"
+            povPad += "\t\t" + str(startHeight) + ", " + str(endHeight) + ", " + str(spline[1])
+            povPad += spline[0].replace("\n", "\n\t\t") + "\n" #add the indents
 
-                #create mesh2 object
-                povMesh = "#declare " + self.stringCorrection(fcObj.Label) + "_mesh ="
-                povMesh += "\nmesh2 {\n\tvertex_vectors {\n"
-
-                #create vertex_vectors
-                numOfVertex = len(mesh.Topology[0])
-                povMesh += "\t\t" + str(numOfVertex)
-
-                for point in mesh.Topology[0]:
-                    povMesh += ",\n\t\t<" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
-                povMesh += "\n\t}\n\n"
-
-                #create face_indices
-                povMesh += "\tface_indices {\n"
-                numOfTriangles = len(mesh.Topology[1])
-                povMesh += "\t\t" + str(numOfTriangles)
-
-                for triangle in mesh.Topology[1]:
-                    povMesh += ",\n\t\t<" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
-                povMesh += "\n\t}\n\n"
-
-                #add inside vector
-                povMesh += "\tinside_vector <1, 1, 1>\n"
-
-                povMesh += "}\n\n"
-
-                #povCode += povMesh
-                #write mesh in inc file
-                self.meshFile.write(povMesh)
-
-            #return pov code
-            povCode += "\nobject { " + self.stringCorrection(fcObj.Label) + "_mesh\n"
-            pigment = self.getPigment(fcObj)
-
-            if expPlacement == False:
-                rotation = self.getRot(fcObj)
+            if expPlacement:
+                rotation = self.getRot(fcObj.Profile[0])
                 if rotation != "": #test if the object is rotated
-                    povCode += "\t" + rotation + " * (-1)\n"
+                    povPad += "\t\t" + rotation + "\n"
 
-                translation = self.getTranslation(fcObj)
+                translation = self.getTranslation(fcObj.Profile[0])
                 if translation != "": #test if the object is translated
-                    povCode += "\t" + translation + " * (-1)\n"
+                    povPad += "\t\t" + translation + "\n"
 
-            if pigment != "": #test if the object has the standard pigment
-                povCode += "\t" + pigment + "\n"
+            povPad += "\n\t}\n"
 
-            if expClose:
-                povCode += "}\n"
+            povPad += "\n}\n"
 
+            povCode += povPad
+            return povCode
+
+        else: #not a supported object
+            povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
             return povCode #return because the mesh may not translated and rotated
 
         povCode += "\n"
@@ -535,13 +536,204 @@ class ExportToPovRay:
 
         return povCode
 
+    def sketchToBezier(self, sketch): #create pov bezier_spline from sketch
+        povSpline = "\n"
+
+        unsortedLines = sketch.Geometry
+
+        #delete construction geometry
+        while self.hasLinesConstructive(unsortedLines): #Caution: Very dirty coding!!!
+            for line in unsortedLines:
+                if line.Construction:
+                    del unsortedLines[unsortedLines.index(line)]
+                    break
+
+        numOfPoints = len(unsortedLines) * 4
+
+        sortedLines = []
+
+        while unsortedLines: #until the unsortedLines array is empty
+            sortedLines.append(unsortedLines[0])
+            startLine = unsortedLines[0]
+            del unsortedLines[0]
+
+            while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
+                # handling of -1 missing
+                nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
+
+                #change direction
+                if self.isSamePoint(sortedLines[len(sortedLines) - 1].EndPoint, unsortedLines[nextLineI].EndPoint):
+                    unsortedLines[nextLineI].reverse()
+
+                sortedLines.append(unsortedLines[nextLineI])
+                del unsortedLines[nextLineI]
+
+        #create povSpline
+        for line in sortedLines:
+            povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
+            povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
+            povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">, "
+            povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">\n"
+
+        return [povSpline, numOfPoints]
+
+    def getNextLine(self, lines, lastLine): #returns index
+        i = 0
+        for line in lines:
+            if self.isSamePoint(line.EndPoint, lastLine.EndPoint) or self.isSamePoint(line.StartPoint, lastLine.EndPoint):
+                return i
+            i += 1
+        return -1
+
+    def isSamePoint(self, point1, point2): #are two points equal
+        if round(point1.x, 3) == round(point2.x, 3) and round(point1.y, 3) == round(point2.y, 3) and round(point1.z, 3) == round(point2.z, 3):
+            return True
+        return False
+
+    def hasLinesConstructive(self, lines): #are constructive lines in lines array
+        constructive = False
+        for line in lines:
+            if line.Construction:
+                return True
+        return False
+
+    def isBodySupported(self, body): #is a body full supported
+        supportedTypeIds = ["App::Origin",
+                            "App::Line",
+                            "App::Plane",
+                            "Sketcher::SketchObject",
+                            "PartDesign::Pad",
+                            "PartDesign::Pocket",
+                            "PartDesign::Point",
+                            "PartDesign::Line",
+                            "PartDesign::Plane"]
+
+        childs = body.OutListRecursive
+
+        #are objects supported
+        for obj in childs:
+            if not obj.TypeId in supportedTypeIds:
+                return False
+
+        #get sketches
+        sketches = []
+        for obj in childs:
+            if obj.TypeId == "Sketcher::SketchObject":
+                sketches.append(obj)
+
+        #test sketches
+        supportedGeometryTypes = [Part.LineSegment]
+        for sketch in sketches:
+            for line in sketch.Geometry:
+                if not type(line) in supportedGeometryTypes and not line.Construction:
+                    return False
+
+        supportedTypes = ["Length"]
+        #get pads and pockets
+        padsPockets = []
+        for obj in childs:
+            if obj.TypeId == "PartDesign::Pad" or obj.TypeId == "PartDesign::Pocket":
+                padsPockets.append(obj)
+
+        #test types
+        for obj in padsPockets:
+            if not obj.Type in supportedTypes:
+                return False
+
+        return True
+
+    def createMesh(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expMeshDef = True): #create pov mesh from object
+        povCode = ""
+
+        if expMeshDef:
+            mesh = 0
+
+            if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
+                mesh = fcObj.Mesh
+            else:
+                try:
+                    distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
+                    pictureSize = (self.width + self.height) / 2
+                    angularDeflection = (distanceCam / pictureSize) * 2.5
+                    mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                except:
+                    return ""
+
+
+            if not mesh:
+                return ""
+
+            #create mesh2 object
+            povMesh = "#declare " + self.stringCorrection(fcObj.Label) + "_mesh ="
+            povMesh += "\nmesh2 {\n\tvertex_vectors {\n"
+
+            #create vertex_vectors
+            numOfVertex = len(mesh.Topology[0])
+            povMesh += "\t\t" + str(numOfVertex)
+
+            for point in mesh.Topology[0]:
+                povMesh += ",\n\t\t<" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
+            povMesh += "\n\t}\n\n"
+
+            #create face_indices
+            povMesh += "\tface_indices {\n"
+            numOfTriangles = len(mesh.Topology[1])
+            povMesh += "\t\t" + str(numOfTriangles)
+
+            for triangle in mesh.Topology[1]:
+                povMesh += ",\n\t\t<" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
+            povMesh += "\n\t}\n\n"
+
+            #add inside vector
+            povMesh += "\tinside_vector <1, 1, 1>\n"
+
+            povMesh += "}\n\n"
+
+            #write mesh in inc file
+            self.meshFile.write(povMesh)
+
+        #return pov code
+        povCode += "\nobject { " + self.stringCorrection(fcObj.Label) + "_mesh\n"
+        pigment = self.getPigment(fcObj)
+
+        if expPlacement == False: #meshes are already translated, so if they shouldnt translated, they translated back
+            rotation = self.getRot(fcObj)
+            if rotation != "": #test if the object is rotated
+                povCode += "\t" + rotation + " * (-1)\n"
+
+            translation = self.getTranslation(fcObj)
+            if translation != "": #test if the object is translated
+                povCode += "\t" + translation + " * (-1)\n"
+
+        if pigment != "": #test if the object has the standard pigment
+            povCode += "\t" + pigment + "\n"
+
+        if expClose:
+            povCode += "}\n"
+
+        return povCode
+
 
     def getStatistics(self, objs): #get statistics about the model the user want to render
         statistics = ""
         noCsgCount = 0
         CsgCount = 0
         ParentCount = 0
-        supportedTypeIds = ["Part::Sphere", "Part::Box", "Part::Torus", "Part::Cylinder", "Part::Cone", "Part::Ellipsoid", "Part::Plane", "Part::Cut", "Part::MultiFuse", "Part::Fuse", "Part::MultiCommon", "Part::Common", "App::DocumentObjectGroup", "App::Part"]
+        supportedTypeIds = ["Part::Sphere",
+                            "Part::Box",
+                            "Part::Torus",
+                            "Part::Cylinder",
+                            "Part::Cone",
+                            "Part::Ellipsoid",
+                            "Part::Plane", "Part::Cut",
+                            "Part::MultiFuse", "Part::Fuse",
+                            "Part::MultiCommon", "Part::Common",
+                            "PartDesign::Body"
+                            "PartDesign::Pad",
+                            "PartDesign::Pocket",
+                            "Sketcher::SketchObject",
+                            "App::DocumentObjectGroup",
+                            "App:Part"]
         supportedNames = ["Array", "Clone"]
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not obj.Name in supportedNames and not obj.Name[:-3] in supportedNames:
@@ -711,8 +903,10 @@ class ExportToPovRay:
         y = eulerRot[1]
         z = eulerRot[0]
 
-        if fcObj.TypeId == "Part::Torus": #if fcObj is a torus is is necessary to rotate it in x axis
+        if fcObj.TypeId == "Part::Torus": #if fcObj is a torus it is necessary to rotate it in x axis
             x += 90
+        elif fcObj.TypeId == "Sketcher::SketchObject":
+            x -= 90
 
         if x != 0 or y != 0 or z != 0:
             rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create roation vector
@@ -788,7 +982,7 @@ class ExportToPovRay:
         os.system(terminalInput) #put terminalInput to the console
         self.checkErrFile()
 
-    def checkErrFile(self):
+    def checkErrFile(self): #check error file for errors
         inPovFile = False
         #open error file
         file = open(self.errorPath, "r")
