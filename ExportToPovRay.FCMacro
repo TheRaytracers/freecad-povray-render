@@ -977,7 +977,7 @@ class ExportToPovRay:
             povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('OutputParameters')
         povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('OutputParameters')
         #create the string to start POVray
-        terminalInput = povExec + " " + str(self.povName) + " " + povOptions + " Width=" + str(self.width) + " Height=" + str(self.height) + " Fatal_File=" + self.errorName
+        terminalInput = "\"" + povExec + "\" " + str(self.povName) + " " + povOptions + " Width=" + str(self.width) + " Height=" + str(self.height) + " Fatal_File=" + self.errorName
         os.chdir(str(self.directory))
         os.system(terminalInput) #put terminalInput to the console
         self.checkErrFile()
