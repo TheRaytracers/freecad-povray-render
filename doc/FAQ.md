@@ -5,8 +5,13 @@
   * Maybe there is an error in your inc file. Please start Pov-Ray externally with the pov file and look at the error message. If there is a mistake in the pov file, then the macro has a bug. Please report the bug (see below), so that other users won't have this problem.
 
 
+* **Which objects are supported?**  
+  We created a page with all supported objects and the objects we support hopefully soon: [Supported Features](supported.md)
+
+
 * **The rendered image doesn't look realistic, but plastic**  
   Look here for tips to [Get a more realistic rendering](realistic.md).
+
 
 * **I found a bug in the macro**  
   Please report the bug to us, so we hopefully can fix it soon.  

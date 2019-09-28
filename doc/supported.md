@@ -1,4 +1,5 @@
 # Supported Features
+The macro supports many objects from FreeCAD but not all. Here's a list of the supported objects (checked) and the not supported objects (unchecked) we hope to support soon.
 ## Part Workbench
 ### Solids
 - [x] Cube
