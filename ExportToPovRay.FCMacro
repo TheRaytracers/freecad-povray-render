@@ -548,7 +548,7 @@ class ExportToPovRay:
                     del unsortedLines[unsortedLines.index(line)]
                     break
 
-        numOfPoints = len(unsortedLines) * 4
+        numOfPoints = 0
 
         sortedLines = []
 
@@ -557,23 +557,55 @@ class ExportToPovRay:
             startLine = unsortedLines[0]
             del unsortedLines[0]
 
-            while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
-                # handling of -1 missing
-                nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
+            if type(startLine) != Part.Circle and type(sortedLines[len(sortedLines) - 1]) != Part.Circle:
+                while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
+                    # handling of -1 missing
+                    nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
 
-                #change direction
-                if self.isSamePoint(sortedLines[len(sortedLines) - 1].EndPoint, unsortedLines[nextLineI].EndPoint):
-                    unsortedLines[nextLineI].reverse()
+                    #change direction
+                    if self.isSamePoint(sortedLines[len(sortedLines) - 1].EndPoint, unsortedLines[nextLineI].EndPoint):
+                        unsortedLines[nextLineI].reverse()
 
-                sortedLines.append(unsortedLines[nextLineI])
-                del unsortedLines[nextLineI]
+                    sortedLines.append(unsortedLines[nextLineI])
+                    del unsortedLines[nextLineI]
 
         #create povSpline
         for line in sortedLines:
-            povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
-            povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
-            povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">, "
-            povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">\n"
+            if type(line) == Part.LineSegment:
+                povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
+                povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
+                povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">, "
+                povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">\n"
+
+                numOfPoints += 4
+            elif type(line) == Part.Circle:
+                r = line.Radius
+                cx = line.Center.x
+                cy = line.Center.y
+                dTC = (4.0/3.0) * math.tan(math.pi / 8.0) * r #distance to control point
+
+                posP0 = "<" + str(cx) + ", " + str(cy + r) + ">"
+                controlP0_0 = "<" + str(cx - dTC) + ", " + str(cy + r) + ">"
+                controlP0_1 = "<" + str(cx + dTC) + ", " + str(cy + r) + ">"
+
+                posP1 = "<" + str(cx + r) + ", " + str(cy) + ">"
+                controlP1_0 = "<" + str(cx + r) + ", " + str(cy + dTC) + ">"
+                controlP1_1 = "<" + str(cx + r) + ", " + str(cy - dTC) + ">"
+
+                posP2 = "<" + str(cx) + ", " + str(-cy - r) + ">"
+                controlP2_0 = "<" + str(cx + dTC) + ", " + str(-cy - r) + ">"
+                controlP2_1 = "<" + str(cx - dTC) + ", " + str(-cy - r) + ">"
+
+                posP3 = "<" + str(-cx - r) + ", " + str(cy) + ">"
+                controlP3_0 = "<" + str(-cx - r) + ", " + str(cy - dTC) + ">"
+                controlP3_1 = "<" + str(-cx - r) + ", " + str(cy + dTC) + ">"
+
+                povSpline += posP0 + ", " + controlP0_1 + ", " + controlP1_0 + ", " + posP1 + "\n"
+                povSpline += posP1 + ", " + controlP1_1 + ", " + controlP2_0 + ", " + posP2 + "\n"
+                povSpline += posP2 + ", " + controlP2_1 + ", " + controlP3_0 + ", " + posP3 + "\n"
+                povSpline += posP3 + ", " + controlP3_1 + ", " + controlP0_0 + ", " + posP0 + "\n"
+
+                numOfPoints += 16
 
         return [povSpline, numOfPoints]
 
@@ -622,7 +654,7 @@ class ExportToPovRay:
                 sketches.append(obj)
 
         #test sketches
-        supportedGeometryTypes = [Part.LineSegment]
+        supportedGeometryTypes = [Part.LineSegment, Part.Circle]
         for sketch in sketches:
             for line in sketch.Geometry:
                 if not type(line) in supportedGeometryTypes and not line.Construction:
