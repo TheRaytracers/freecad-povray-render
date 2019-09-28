@@ -31,13 +31,6 @@ For the executable options in the next field you should take
 +P causes POV-Ray to show the rendered image. 
 +A is for Antialiasing - this is optional.
 
-For Windows the following options can be useful:
-
-* /EXIT +P +A
-
-because without the /EXIT otion you have to close three windows after rendering  
-(terminal, POV-Ray Editor Window and the rendered image)
-
 If the raytracing workbench works with these settings, the macro should do also.
 
 ## Usage
