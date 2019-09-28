@@ -8,20 +8,20 @@ For each of the following examples we provide the FreeCAD model, the .pov file a
 
 ![Lens example](../Examples/Dice/Dice.png "Lens example")
 
-[Dice.fcstd](../Examples/Dice/Dice.fcstd)  
-[Dice.pov](../Examples/Dice/Dice.pov)  
-[Dice.inc](../Examples/Dice/Dice.inc)  
-[Dice.png](../Examples/Dice/Dice.png)  
+* [Dice.fcstd](../Examples/Dice/Dice.fcstd)  
+* [Dice.pov](../Examples/Dice/Dice.pov)  
+* [Dice.inc](../Examples/Dice/Dice.inc)  
+* [Dice.png](../Examples/Dice/Dice.png)  
 [Download all files](../Examples/Dice/Dice.zip) 
 
 ### Lens
 
 ![Lens example](../Examples/Lens/withRipples/Lens.png "Lens example")
 
-[Lens.fcstd](../Examples/Lens/withRipples/Lens.fcstd)  
-[Lens.pov](../Examples/Lens/withRipples/Lens.pov)  
-[Lens.inc](../Examples/Lens/withRipples/Lens.inc)  
-[Lens.png](../Examples/Lens/withRipples/Lens.png)  
+* [Lens.fcstd](../Examples/Lens/withRipples/Lens.fcstd)  
+* [Lens.pov](../Examples/Lens/withRipples/Lens.pov)  
+* [Lens.inc](../Examples/Lens/withRipples/Lens.inc)  
+* [Lens.png](../Examples/Lens/withRipples/Lens.png)  
 [Download all files](../Examples/Lens/withRipples/Lens.zip)  
 
 ## Advanced examples
@@ -30,28 +30,28 @@ For each of the following examples we provide the FreeCAD model, the .pov file a
 
 ![Chess example](../Examples/Chess/Chess.png "Chess example")
 
-[Chess.fcstd](../Examples/Chess/Chess.fcstd)  
-[Chess.pov](../Examples/Chess/Chess.pov)  
-[Chess.inc](../Examples/Chess/Chess.inc)  
-[Chess.png](../Examples/Chess/Chess.png)  
+* [Chess.fcstd](../Examples/Chess/Chess.fcstd)  
+* [Chess.pov](../Examples/Chess/Chess.pov)  
+* [Chess.inc](../Examples/Chess/Chess.inc)  
+* [Chess.png](../Examples/Chess/Chess.png)  
 [Download all files](../Examples/Chess/Chess.zip)  
 
 ### Architecture (360°VR)
 
 ![Architecture example](../Examples/Hall/Hall.png "Architecture example")
 
-[Hall.fcstd](../Examples/Hall/Hall.fcstd)  
-[Hall.pov](../Examples/Hall/Hall.pov)  
-[Hall.inc](../Examples/Hall/Hall.inc)  
-[Hall.png](../Examples/Hall/Hall.png)  
+* [Hall.fcstd](../Examples/Hall/Hall.fcstd)  
+* [Hall.pov](../Examples/Hall/Hall.pov)  
+* [Hall.inc](../Examples/Hall/Hall.inc)  
+* [Hall.png](../Examples/Hall/Hall.png)  
 [Download all files](../Examples/Hall/Hall.zip)  
-[Interactive VR visualisation](http://www.barozz.it/vr/fablab_andreas/)(external link)
+[Interactive VR visualisation](http://www.barozz.it/vr/fablab_andreas/) (external link)
 
 ## Templates
 
-*[Radiosity](../Examples/Templates/Radiosity.inc)
-*[Area Light](../Examples/Templates/AreaLight.inc)
-*[Sky](../Examples/Templates/SkyWithoutClouds.inc)
-*[Sky with clouds](../Examples/Templates/SkyWithClouds.inc)  
+* [Radiosity](../Examples/Templates/Radiosity.inc)
+* [Area Light](../Examples/Templates/AreaLight.inc)
+* [Sky](../Examples/Templates/SkyWithoutClouds.inc)
+* [Sky with clouds](../Examples/Templates/SkyWithClouds.inc)  
 
 [Download all template files](../Examples/Templates/Templates.zip)  
