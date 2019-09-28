@@ -1,8 +1,11 @@
 # FAQ
 
 * **I get no image, only the pov file**  
-  * Are you sure, that you installed Pov-Ray? If you installed Pov-Ray and you get no image, please report a bug (see below).
-  * Maybe there is an error in your inc file. Please start Pov-Ray externally with the pov file and look at the error message. If there is a mistake in the pov file, then the macro has a bug. Please report the bug (see below), so that other users won't have this problem.
+  * See instructions in [Quickstart](quickstart.md)
+  * Are you sure, that you installed POV-Ray?
+  * Does the path to the executable exsist in the settings of the raytracing workbench?
+  * Maybe there is an error in your inc file. You will get a error window and a err file can be found in the directory of the .pov file.
+  * If there is a mistake in the pov file, then the macro has a bug. Please report the bug (see below), so that other users won't have this problem.
 
 
 * **Which objects are supported?**  
