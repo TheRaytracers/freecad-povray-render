@@ -13,18 +13,18 @@ For each of the following examples we provide the FreeCAD model, the .pov file a
 * [Dice.inc](../Examples/Dice/Dice.inc)  
 * [Dice.png](../Examples/Dice/Dice.png)  
 
-[Download all files](../Examples/Dice/Dice.zip) 
+[Download all files](../Examples/Dice/Dice.zip)
 
 ### Lens
 
 ![Lens example](../Examples/Lens/withRipples/Lens.png "Lens example")
 
-* [Lens.fcstd](../Examples/Lens/withRipples/Lens.fcstd)  
-* [Lens.pov](../Examples/Lens/withRipples/Lens.pov)  
-* [Lens.inc](../Examples/Lens/withRipples/Lens.inc)  
-* [Lens.png](../Examples/Lens/withRipples/Lens.png)  
+* [Lens.fcstd](../Examples/Lens/Lens.fcstd)  
+* [Lens.pov](../Examples/Lens/Lens.pov)  
+* [Lens.inc](../Examples/Lens/Lens.inc)  
+* [Lens.png](../Examples/Lens/Lens.png)  
 
-[Download all files](../Examples/Lens/withRipples/Lens.zip)  
+[Download all files](../Examples/Lens/Lens.zip)  
 
 ## Advanced examples
 
