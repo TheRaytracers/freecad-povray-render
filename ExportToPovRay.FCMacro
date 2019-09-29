@@ -131,11 +131,11 @@ class ExportToPovRay:
                 if guiObject.Visibility:
                     firstLayer.append(obj)
 
-        finalPovCode = "#version 3.6; // 3.7\nglobal_settings{assumed_gamma 1.0}\n#default{ finish{ ambient 0.2 diffuse 0.9 }}\n"
+        finalPovCode = "#version 3.6; // 3.7\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
 
-        finalPovCode += "#default{pigment{rgb " + self.uintColorToRGB(self.DefaultShapeColor) + "}}\n"
+        finalPovCode += "#default { pigment { rgb " + self.uintColorToRGB(self.DefaultShapeColor) + " } }\n"
 
-        finalPovCode += "//------------------------------------------\n"
+        finalPovCode += "\n//------------------------------------------\n"
         finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
         if self.statistics[1]:
@@ -783,7 +783,7 @@ class ExportToPovRay:
     def getLight(self): #get the FreeCAD light
         povLight = ""
 
-        povLight += "light_source { CamPosition color rgb<0.5, 0.5, 0.5> }\n"
+        povLight += "light_source { CamPosition color rgb <0.5, 0.5, 0.5> }\n"
 
         return povLight
 
@@ -865,7 +865,7 @@ class ExportToPovRay:
         PovCamRight = ""
 
         if self.CamType == "Perspective":
-            PovCamUp = "< 0, 0, 1>"
+            PovCamUp = "<0, 0, 1>"
             PovCamRight = "<" + "{0:1.2f}".format(AspectRatio) + ", 0, 0>"
 
             if AspectRatio <= 1:
@@ -902,7 +902,7 @@ class ExportToPovRay:
         PovCam += "camera {\n"
         PovCam += PovCamType
         PovCam += "\tlocation <0, 0, 0>\n"
-        PovCam += "\tdirection < 0, 1, 0>\n"
+        PovCam += "\tdirection <0, 1, 0>\n"
         PovCam += "\tup CamUp\n"
         PovCam += "\tright CamRight\n"
         PovCam += "\trotate CamRotation\n"
