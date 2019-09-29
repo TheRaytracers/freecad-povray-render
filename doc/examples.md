@@ -61,6 +61,7 @@ The developement of POV-Ray started 30 years ago. At this time virtual reality a
 * [Radiosity](../Examples/Templates/Radiosity.inc)
 * [Area Light](../Examples/Templates/AreaLight.inc)
 * [Sky](../Examples/Templates/SkyWithoutClouds.inc)
-* [Sky with clouds](../Examples/Templates/SkyWithClouds.inc)  
+* [Sky with clouds](../Examples/Templates/SkyWithClouds.inc)
+* [f-lohmueller - Insert Menu Addons](http://www.f-lohmueller.de/pov_tut/addon/00_Basic_Templates/_index.htm)
 
 [Download all template files](../Examples/Templates/Templates.zip)  
