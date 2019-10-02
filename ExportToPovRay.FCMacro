@@ -1216,8 +1216,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
     def setDefaultValues(self): #set the default values of the input objects
         system = platform.system()
-        if system == "Linux" or system == "Darwin":
+        if system == "Linux":
             defaultPath = "/home/"
+        elif system == "Darwin":
+            defaultPath = "/Users/"
         elif system == "Windows":
             defaultPath = "C:\\Users\\%UserName%\\"
         else:
