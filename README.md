@@ -20,7 +20,7 @@ To give the user the full control, you can define extra things or another surfac
 * [Realistic Rendering example](doc/realistic.md)
 * [Supported Features](/doc/supported.md)
 * [FAQ](doc/FAQ.md)
-* [More examples and templates](doc/examples.md)
+* [More examples and templates](Examples/index.md)
 * [Contributing](doc/developer.md)
 * [Future developement](doc/roadmap.md)
 

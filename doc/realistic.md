@@ -54,4 +54,6 @@ Download the advanced lightning example [here](../Examples/Chess/ChessLightning.
 ![Lights and radiosity]( ./img/Chess/Chess_08.png "Add lights and radiosity")
 
 
-If you don't have that much knowledge about Pov-Ray, you can use a few templates, we created. You can find them in the [Template Folder](../Examples/Templates/).
+If you don't have that much knowledge about Pov-Ray, you can use a few templates, we created. You can find them in the [Template Folder](../Examples/Templates/).  
+And you can find some more examples in the [Examples Folder](../Examples/index.md)
+
