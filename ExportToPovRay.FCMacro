@@ -68,6 +68,8 @@ class ExportToPovRay:
         self.CamNode = Gui.ActiveDocument.ActiveView.getCameraNode()
         self.EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
 
+        self.os = platform.system()
+
         #user inc file
         self.userInc = False
 
@@ -166,6 +168,10 @@ class ExportToPovRay:
             finalPovCode += self.createPovrayCode(obj)
         if self.statistics[1]:
             self.meshFile.close()
+
+        #change line breaks for windows
+        if self.os == "Windows":
+            finalPovCode.replace("\n", "\r\n")
 
         self.writeFile(finalPovCode)
         self.openPovRay()
