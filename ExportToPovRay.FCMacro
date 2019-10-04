@@ -1086,6 +1086,10 @@ class ExportToPovRay:
         uniString = uniString.replace(u"(", "_")
         uniString = uniString.replace(u")", "_")
         uniString = uniString.replace(u"#", "_")
+        uniString = uniString.replace(u"-", "_")
+        uniString = uniString.replace(u"+", "_")
+        uniString = uniString.replace(u"*", "_")
+        uniString = uniString.replace(u"/", "_")
         uniString = uniString.replace(" ", "_")
         outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
         return outString.decode("utf-8") #return and redecode to unicode but with converted chars
