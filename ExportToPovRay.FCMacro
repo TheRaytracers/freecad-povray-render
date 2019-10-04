@@ -419,6 +419,9 @@ class ExportToPovRay:
 
                     povCode += povArr
 
+            else:
+                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
+
             return povCode
 
         elif fcObj.TypeId == "Part::FeaturePython" and (fcObj.Name == "Clone" or fcObj.Name[:-3] == "Clone"): #Clone from Draft workbench
