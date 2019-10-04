@@ -598,13 +598,13 @@ class ExportToPovRay:
                 controlP1_0 = "<" + str(cx + r) + ", " + str(cy + dTC) + ">"
                 controlP1_1 = "<" + str(cx + r) + ", " + str(cy - dTC) + ">"
 
-                posP2 = "<" + str(cx) + ", " + str(-cy - r) + ">"
-                controlP2_0 = "<" + str(cx + dTC) + ", " + str(-cy - r) + ">"
-                controlP2_1 = "<" + str(cx - dTC) + ", " + str(-cy - r) + ">"
+                posP2 = "<" + str(cx) + ", " + str(cy - r) + ">"
+                controlP2_0 = "<" + str(cx + dTC) + ", " + str(cy - r) + ">"
+                controlP2_1 = "<" + str(cx - dTC) + ", " + str(cy - r) + ">"
 
-                posP3 = "<" + str(-cx - r) + ", " + str(cy) + ">"
-                controlP3_0 = "<" + str(-cx - r) + ", " + str(cy - dTC) + ">"
-                controlP3_1 = "<" + str(-cx - r) + ", " + str(cy + dTC) + ">"
+                posP3 = "<" + str(cx - r) + ", " + str(cy) + ">"
+                controlP3_0 = "<" + str(cx - r) + ", " + str(cy - dTC) + ">"
+                controlP3_1 = "<" + str(cx - r) + ", " + str(cy + dTC) + ">"
 
                 povSpline += posP0 + ", " + controlP0_1 + ", " + controlP1_0 + ", " + posP1 + "\n"
                 povSpline += posP1 + ", " + controlP1_1 + ", " + controlP2_0 + ", " + posP2 + "\n"
