@@ -774,7 +774,8 @@ class ExportToPovRay:
                             "PartDesign::Pocket",
                             "Sketcher::SketchObject",
                             "App::DocumentObjectGroup",
-                            "App:Part"]
+                            "App:Part",
+                            "Part::Compound"]
         supportedNames = ["Array", "Clone"]
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not obj.Name in supportedNames and not obj.Name[:-3] in supportedNames:
@@ -786,7 +787,7 @@ class ExportToPovRay:
         statistics += str(ParentCount) + " parent objects found in highest layer\n"
         statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
         if noCsgCount != 0:
-            statistics += "Your model contains " + str(noCsgCount) + " objects which aren't from the part workbench.\n"
+            statistics += "Your model contains " + str(noCsgCount) + " objects which aren't supproted (will be represented as a mesh).\n"
         return [statistics, noCsgCount]
 
     def getLight(self): #get the FreeCAD light
