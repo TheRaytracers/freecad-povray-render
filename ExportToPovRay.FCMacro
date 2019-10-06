@@ -263,7 +263,7 @@ class ExportToPovRay:
 
             povCode += povCut
 
-        elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse": #Fusion
+        elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse" or fcObj.TypeId == "Part::Compound": #Fusion
             childs = fcObj.OutList
             povFusion = "\nunion {\n"
             for child in childs:
