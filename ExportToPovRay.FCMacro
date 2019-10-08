@@ -184,7 +184,7 @@ class ExportToPovRay:
             povCode = ""
 
         if self.hasInListClone(fcObj) and testClone:
-            declareName = self.stringCorrection(fcObj.Label.capitalize()) + "_" + fcObj.Name
+            declareName = self.getDeclareName(fcObj)
             povDeclare = "\n#declare " + declareName + " ="
             povDeclare += self.createPovrayCode(fcObj, False, False, True, True, True, False)
             povChild = "\nobject {\n"
@@ -301,7 +301,7 @@ class ExportToPovRay:
                     number = fcObj.NumberPolar
                     angle = fcObj.Angle.getValueAs("deg").Value
 
-                    declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                    declareName = self.getDeclareName(child)
                     povArr += "\n#declare " + declareName + " = "
                     childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
@@ -368,7 +368,7 @@ class ExportToPovRay:
                     if numZ == 0:
                         numZ = 1
 
-                    declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                    declareName = self.getDeclareName(child)
                     povArr += "\n#declare " + declareName + " = "
                     childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
                     povArr += childCode
@@ -429,7 +429,7 @@ class ExportToPovRay:
 
             childs = fcObj.OutList
             for child in childs:
-                declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                declareName = self.getDeclareName(child)
                 povClone += "\t" + declareName + "\n"
 
             if fcObj.Scale.x != 1 or fcObj.Scale.y != 1 or fcObj.Scale.z != 1:
@@ -706,7 +706,8 @@ class ExportToPovRay:
                 return ""
 
             #create mesh2 object
-            povMesh = "#declare " + self.stringCorrection(fcObj.Label) + "_mesh ="
+            declareName = self.getDeclareName(fcObj.Label) + "_mesh"
+            povMesh = "#declare " + declareName + " ="
             povMesh += "\nmesh2 {\n\tvertex_vectors {\n"
 
             #create vertex_vectors
@@ -735,7 +736,7 @@ class ExportToPovRay:
             self.meshFile.write(povMesh)
 
         #return pov code
-        povCode += "\nobject { " + self.stringCorrection(fcObj.Label) + "_mesh\n"
+        povCode += "\nobject { " + declareName + "\n"
         pigment = self.getPigment(fcObj)
 
         if expPlacement == False: #meshes are already translated, so if they shouldnt translated, they translated back
@@ -992,9 +993,12 @@ class ExportToPovRay:
             finish += "\n\t" + phong
             finish += "\n}\n"
         material += finish
-        if self.incContent.find("#declare " + self.stringCorrection(fcObj.Label) + "_material") != -1:
-            material = "\nmaterial {" + self.stringCorrection(fcObj.Label) + "_material}\n"
+        if self.incContent.find("#declare " + self.getDeclareName(fcObj) + "_material") != -1:
+            material = "\nmaterial {" + self.getDeclareName(fcObj) + "_material}\n"
         return material
+
+    def getDeclareName(self, fcObj):
+        return self.stringCorrection(fcObj.Label.capitalize()) + "_" + fcObj.Name
 
 
     def writeFile(self, povText): #write the final pov file
