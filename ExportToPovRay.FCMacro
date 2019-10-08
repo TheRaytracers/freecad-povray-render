@@ -281,7 +281,7 @@ class ExportToPovRay:
 
             povCode += povCommon
 
-        elif fcObj.TypeId == "Part::FeaturePython" and (fcObj.Name == "Array" or fcObj.Name[:-3] == "Array"): #Array from Draft workbench
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Array"): #Array from Draft workbench
             povArr = ""
             if fcObj.ArrayType == "polar":
                 childs = fcObj.OutList
@@ -424,7 +424,7 @@ class ExportToPovRay:
 
             return povCode
 
-        elif fcObj.TypeId == "Part::FeaturePython" and (fcObj.Name == "Clone" or fcObj.Name[:-3] == "Clone"): #Clone from Draft workbench
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"): #Clone from Draft workbench
             povClone = "\nobject {\n"
 
             childs = fcObj.OutList
@@ -779,7 +779,7 @@ class ExportToPovRay:
                             "Part::Compound"]
         supportedNames = ["Array", "Clone"]
         for obj in objs:
-            if not obj.TypeId in supportedTypeIds and not obj.Name in supportedNames and not obj.Name[:-3] in supportedNames:
+            if not obj.TypeId in supportedTypeIds and not self.isNameSupported(obj.Name, supportedNames):
                 noCsgCount = noCsgCount + 1
             else:
                 CsgCount = CsgCount + 1
@@ -1048,7 +1048,7 @@ class ExportToPovRay:
         else:
             self.delErrorFile();
 
-    def delErrorFile(self):
+    def delErrorFile(self): #delete error file
         os.remove(self.errorPath)
 
     def repairRot(self, objs): #repair the rotation of objects (likely a bug in FreeCAD)
@@ -1067,7 +1067,7 @@ class ExportToPovRay:
     def exportFcView(self): #export the current FreeCAD view like Tools / Save Picture...
         Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
 
-    def hasInListClone(self, fcObj):
+    def hasInListClone(self, fcObj): #has the object a clone as parent
         for parent in fcObj.InList:
             if parent.TypeId == "Part::FeaturePython" and (parent.Name == "Clone" or parent.Name[:-3] == "Clone"):
                 return True
@@ -1124,6 +1124,13 @@ class ExportToPovRay:
                 return
             code = code[0:comStart] + code[comEnd:]
         return code
+
+    def isNameSupported(self, objName, supportedNames): #is the name part of the supported names
+        for name in supportedNames:
+            if objName.startswith(name):
+                return True
+
+        return False
 
 
 class GUI(QtGui.QDialog): #the pyside class for the dialog window
