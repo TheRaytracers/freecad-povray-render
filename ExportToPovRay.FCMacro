@@ -432,7 +432,8 @@ class ExportToPovRay:
                 declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
                 povClone += "\t" + declareName + "\n"
 
-            povClone += "\n\tscale <" + str(fcObj.Scale.x) + ", " + str(fcObj.Scale.y) + ", " + str(fcObj.Scale.z) + ">"
+            if fcObj.Scale.x != 1 or fcObj.Scale.y != 1 or fcObj.Scale.z != 1:
+                povClone += "\n\tscale <" + str(fcObj.Scale.x) + ", " + str(fcObj.Scale.y) + ", " + str(fcObj.Scale.z) + ">"
 
             povCode += povClone
 
