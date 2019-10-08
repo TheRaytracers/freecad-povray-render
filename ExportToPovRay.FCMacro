@@ -946,7 +946,7 @@ class ExportToPovRay:
         y = eulerRot[1]
         z = eulerRot[0]
 
-        if fcObj.TypeId == "Part::Torus": #if fcObj is a torus it is necessary to rotate it in x axis
+        if fcObj.TypeId == "Part::Torus" or (fcObj.Name.startswith("Clone") and fcObj.OutList[0].TypeId == "Part::Torus"): #if fcObj is a torus it is necessary to rotate it in x axis
             x += 90
         elif fcObj.TypeId == "Sketcher::SketchObject":
             x -= 90
