@@ -1143,15 +1143,15 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.setDefaultValues()
 
     def initUI(self): #create the objects in the dialog window
-        self.setWindowTitle("Export to POVray")
+        self.setWindowTitle("Export to POV-Ray")
 
         #pov file selection
         self.pathLineEdit = QtGui.QLineEdit()
-        self.pathLineEdit.setPlaceholderText("Path to .pov file")
+        self.pathLineEdit.setPlaceholderText("Path to .pov Output File")
         self.pathLineEdit.setFixedWidth(300)
         self.pathLineEdit.textChanged.connect(self.checkPath)
 
-        self.openFileDialogButton = QtGui.QPushButton('Open pov File')
+        self.openFileDialogButton = QtGui.QPushButton('Open .pov Output File')
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
 
         self.warnLabel = QtGui.QLabel("")
@@ -1162,7 +1162,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.horizLayout1.addWidget(self.openFileDialogButton, 0, 1)
         self.horizLayout1.addWidget(self.warnLabel, 1, 0, 1, 2)
 
-        self.pathGroup = QtGui.QGroupBox(".pov File Selection")
+        self.pathGroup = QtGui.QGroupBox(".pov Output File Selection")
         self.pathGroup.setLayout(self.horizLayout1)
 
         #Width & Height of rendered image
@@ -1184,12 +1184,12 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.vertLayout1.addWidget(self.imageWidth)
         self.vertLayout1.addWidget(self.imageHeightLabel)
         self.vertLayout1.addWidget(self.imageHeight)
-        self.WHImageGroup = QtGui.QGroupBox("Width and Height of Image")
+        self.WHImageGroup = QtGui.QGroupBox("Width and Height of rendered Image")
         self.WHImageGroup.setLayout(self.vertLayout1)
 
         #Options
         self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
-        self.expLight = QtGui.QCheckBox("Export FreeCAD light")
+        self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
 
         self.repRot = QtGui.QCheckBox("Repair Rotation")
         self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
@@ -1298,7 +1298,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         <h5>Export Background</h5>
         <p>Export the FreeCAD background</p>
         <h5>Export Light</h5>
-        <p>Export the FreeCAD light</p>
+        <p>Export the FreeCAD light. Define your own light in the inc file if you uncheck this option</p>
         <h5>Repair Rotation</h5>
         <p>Use this option if objects in your scene appear in a wrong rotation.<br>
         This is a workaround for a FreeCAD bug.</p>
