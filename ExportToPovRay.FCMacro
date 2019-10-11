@@ -839,7 +839,7 @@ class ExportToPovRay:
             povBg += "\tfinish{ambient 1 diffuse 0}\n"
             povBg += "\trotate<" + str(self.EulerCam[2]) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
             povBg += "\ttranslate <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + ">\n"
-            povBg += "\ttranslate <" + str(ViewDir[0]*1000) + ", " + str(ViewDir[1]*1000) + ", " + str(ViewDir[2]*1000) + ">\n"
+            povBg += "\ttranslate <" + str(ViewDir[0]*100000) + ", " + str(ViewDir[1]*100000) + ", " + str(ViewDir[2]*100000) + ">\n"
             povBg += "}\n"
 
         povBg += "sky_sphere {\n\tpigment {\n"
