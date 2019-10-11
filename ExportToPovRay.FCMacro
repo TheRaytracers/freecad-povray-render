@@ -24,6 +24,7 @@ from PySide import QtCore, QtGui
 import math
 import MeshPart
 import platform
+import subprocess
 
 def showError(text, title):
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Critical, title, text)
@@ -1006,7 +1007,7 @@ class ExportToPovRay:
         except:
             return -1
 
-    def openPovRay(self): #start POVray
+    def openPovRay(self): #start POV-Ray
         povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('PovrayExecutable')
         if os.path.isfile(povExec) == False:
             povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('PovrayExecutable')
@@ -1019,10 +1020,12 @@ class ExportToPovRay:
                 return -1
             povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('OutputParameters')
         povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('OutputParameters')
-        #create the string to start POVray
-        terminalInput = "\"" + povExec + "\" " + str(self.povName) + " " + povOptions + " Width=" + str(self.width) + " Height=" + str(self.height) + " Fatal_File=" + self.errorName
+
+        #create output directory
         os.chdir(str(self.directory))
-        os.system(terminalInput) #put terminalInput to the console
+        #start povray
+        subprocess.call([povExec, str(self.povName), povOptions, "width=" + str(self.width), "height=" + str(self.height), "Fatal_File=" + self.errorName])
+
         self.checkErrFile()
 
     def checkErrFile(self): #check error file for errors
