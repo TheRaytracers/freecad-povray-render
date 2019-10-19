@@ -15,27 +15,27 @@ The macro must know how to find the POV-Ray executable. The path will be taken f
 To reach the raytracing settings menu you must load the raytracing workbench first and second go to the settings menu.
 The name of the POV-Ray executable is different in Windows and Linux:
 
-* povray (Linux)
-* pvengine.exe (Windows)
+* `povray` (Linux)
+* `pvengine.exe` (Windows)
 
 It is important to write the complete path into the textfield. 
 These are the standard paths but they may vary depending on your installation:
 
-* /usr/bin/povray (Linux)
-* ???
+* `/usr/bin/povray` (Linux)
+* `???`
 
 For the executable options in the next field you should take
 
-* +P +A
+* `+P +A`
 
-+P causes POV-Ray to show the rendered image. 
-+A is for Antialiasing - this is optional.
+`+P` causes POV-Ray to show the rendered image. 
+`+A` is for Antialiasing - this is optional.
 
 For Windows the following options can be useful:
 
-* /EXIT +P +A
+* `/EXIT +P +A`
 
-because without the /EXIT otion you have to close three windows after rendering  
+because without the `/EXIT` otion you have to close three windows after rendering  
 (terminal, POV-Ray Editor Window and the rendered image)
 
 If the raytracing workbench works with these settings, the macro should do also.
