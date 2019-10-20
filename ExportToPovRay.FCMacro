@@ -64,8 +64,8 @@ class ExportToPovRay:
         self.repRot = repRot
         self.expFcView = expFcView
 
-        #get default shape color (editable in FreeCAD settings)
-        self.DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor') #default color of shapes in FreeCAD (default rgb(0.8, 0.8, 0.8))
+        #get default shape color (editable in FreeCAD settings) (default rgb(0.8, 0.8, 0.8))
+        self.DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
         
         #get camera
         self.CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
@@ -958,7 +958,8 @@ class ExportToPovRay:
         y = eulerRot[1]
         z = eulerRot[0]
 
-        if fcObj.TypeId == "Part::Torus" or (fcObj.Name.startswith("Clone") and fcObj.OutList[0].TypeId == "Part::Torus"): #if fcObj is a torus it is necessary to rotate it in x axis
+        #if fcObj is a torus it is necessary to rotate it in x axis
+        if fcObj.TypeId == "Part::Torus" or (fcObj.Name.startswith("Clone") and fcObj.OutList[0].TypeId == "Part::Torus"):
             x += 90
         elif fcObj.TypeId == "Sketcher::SketchObject":
             x -= 90
@@ -985,15 +986,21 @@ class ExportToPovRay:
         material += pigment
         if appObject.ShapeMaterial.AmbientColor != (0.20000000298023224,0.20000000298023224,0.20000000298023224,0):
             ambient += "ambient rgb<"
-            ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.AmbientColor[0],appObject.ShapeMaterial.AmbientColor[1],appObject.ShapeMaterial.AmbientColor[2])
+            ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.AmbientColor[0],
+                                                             appObject.ShapeMaterial.AmbientColor[1],
+                                                             appObject.ShapeMaterial.AmbientColor[2])
             ambient += ">"
         if appObject.ShapeMaterial.EmissiveColor != (0,0,0,0):
             emission += "emission rgb<"
-            emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.EmissiveColor[0],appObject.ShapeMaterial.EmissiveColor[1],appObject.ShapeMaterial.EmissiveColor[2])
+            emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.EmissiveColor[0],
+                                                              appObject.ShapeMaterial.EmissiveColor[1],
+                                                              appObject.ShapeMaterial.EmissiveColor[2])
             emission += ">"
         if appObject.ShapeMaterial.SpecularColor != (0,0,0,0):
             phong += "phong "
-            phong += "{0:1.2f}".format((appObject.ShapeMaterial.SpecularColor[0]+appObject.ShapeMaterial.SpecularColor[1]+appObject.ShapeMaterial.SpecularColor[2])/3)
+            phong += "{0:1.2f}".format((appObject.ShapeMaterial.SpecularColor[0] +
+                                        appObject.ShapeMaterial.SpecularColor[1] +
+                                        appObject.ShapeMaterial.SpecularColor[2]) / 3)
             phong += " phong_size "
             phong += str(appObject.ShapeMaterial.Shininess * 50)
             phong += " "
