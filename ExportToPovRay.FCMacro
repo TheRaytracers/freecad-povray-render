@@ -171,9 +171,10 @@ class ExportToPovRay:
 
         finalPovCode += "// objects in scene ------------------------\n"
 
-        #create the povray code
+        #create povray code of objects
         for obj in firstLayer:
-            finalPovCode += self.createPovrayCode(obj)
+            finalPovCode += self.createPovrayCode(obj, True, True, True, True, True, True)
+
         if self.statistics[1]: #close the mesh file if exist
             self.meshFile.close()
 
@@ -185,7 +186,7 @@ class ExportToPovRay:
         self.openPovRay() #start povray
 
 
-    def createPovrayCode(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expLabel = True, expMeshDef = True, testClone = True): #returns the povray code for the object
+    def createPovrayCode(self, fcObj, expPlacement, expPigment, expClose, expLabel, expMeshDef, testClone): #returns the povray code for the object
         if expLabel:
             povCode = "\n//----- " + self.stringCorrection(fcObj.Label) + " -----" #add the name of the object
         else:
@@ -266,7 +267,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCut = "\ndifference {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
                 povCut += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povCut
@@ -275,7 +276,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povFusion = "\nunion {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
                 povFusion += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povFusion
@@ -284,7 +285,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCommon = "\nintersection {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
                 povCommon += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povCommon
@@ -311,7 +312,7 @@ class ExportToPovRay:
 
                     declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
                     povArr += "\n#declare " + declareName + " = "
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
                     povArr += childCode
 
                     povArr += "\n#declare i = 0;\n"
@@ -378,7 +379,7 @@ class ExportToPovRay:
 
                     declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
                     povArr += "\n#declare " + declareName + " = "
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
+                    childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, True, True) #call createPovrayCode for the child
                     povArr += childCode
 
                     povArr += "#declare intervalX = " + intervalX + ";\n"
@@ -448,7 +449,7 @@ class ExportToPovRay:
         elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
             childs = fcObj.OutList
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
                 povCode += childCode
             return povCode
 
@@ -457,7 +458,7 @@ class ExportToPovRay:
 
             childs = fcObj.OutList
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovrayCode for the child
+                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
                 povPart += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povPart
@@ -466,12 +467,12 @@ class ExportToPovRay:
 
         elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
             if not self.isBodySupported(fcObj):
-                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
+                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef, True)
                 return povCode #return because the mesh may not translated and rotated
 
             povBody = "\nunion {\n"
             if fcObj.Tip != None:
-                povBody += self.createPovrayCode(fcObj.Tip).replace("\n", "\n\t") #add chld code and indents
+                povBody += self.createPovrayCode(fcObj.Tip, True, True, True, True, True, True).replace("\n", "\n\t") #add chld code and indents
                 povCode += povBody
             else:
                 return ""
@@ -479,7 +480,7 @@ class ExportToPovRay:
         elif fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket": #Pad or Pocket from PartDesign
             spline = self.sketchToBezier(fcObj.Profile[0])
 
-            startHeight = 0;
+            startHeight = 0
             if fcObj.TypeId == "PartDesign::Pocket":
                 startHeight = -0.0001
             endHeight = fcObj.Length.getValueAs("mm").Value
@@ -505,7 +506,7 @@ class ExportToPovRay:
                 povPad += "\nunion {\n"
 
             if fcObj.BaseFeature != None:
-                povBase = self.createPovrayCode(fcObj.BaseFeature)
+                povBase = self.createPovrayCode(fcObj.BaseFeature, True, True, True, True, True, True)
                 povPad += povBase.replace("\n", "\n\t") #add the indents
 
             povPad += "\n\tprism {\n"
