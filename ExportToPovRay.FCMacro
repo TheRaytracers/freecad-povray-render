@@ -26,7 +26,7 @@ import MeshPart
 import platform
 import subprocess
 
-def showError(text, title):
+def showError(text, title): #show an error box
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Critical, title, text)
     dialog.setWindowModality(QtCore.Qt.ApplicationModal)
     dialog.exec_()
@@ -40,6 +40,7 @@ class ExportToPovRay:
         self.doc = FreeCAD.ActiveDocument
         self.objs = self.doc.Objects
 
+        #get all paths, file names, directories, etc.
         self.povPath = povPath
         self.directory = os.path.dirname(self.povPath) + os.sep
 
@@ -54,6 +55,7 @@ class ExportToPovRay:
         self.fcViewName = self.fileName + "_FC-View.png"
         self.fcViewPath = self.directory + self.fcViewName
 
+        #get all output options
         self.width = width
         self.height = height
 
@@ -62,16 +64,19 @@ class ExportToPovRay:
         self.repRot = repRot
         self.expFcView = expFcView
 
+        #get default shape color (editable in FreeCAD settings)
         self.DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor') #default color of shapes in FreeCAD (default rgb(0.8, 0.8, 0.8))
+        
+        #get camera
         self.CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
         self.CamType = Gui.ActiveDocument.ActiveView.getCameraType()
         self.CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
         self.CamNode = Gui.ActiveDocument.ActiveView.getCameraNode()
         self.EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
 
-        self.os = platform.system()
+        self.os = platform.system() #get system informations
 
-        #user inc file
+        #exist a user inc file
         self.userInc = False
 
         if self.povPath != -1 and self.povPath != "" and self.povPath != " ": #is there a pov file
@@ -114,12 +119,12 @@ class ExportToPovRay:
                 self.meshFile = open(self.meshPath, "w")
 
 
-        self.startExport()
+        self.startExport() #start the export
 
     def startExport(self): #start the export to POVray
-        firstLayer = []
+        firstLayer = [] #the highest objects in the model tree
 
-        #repair rotation
+        #repair rotation (see documentation)
         if self.repRot:
             self.repairRot(self.objs)
 
@@ -134,6 +139,7 @@ class ExportToPovRay:
                 if guiObject.Visibility:
                     firstLayer.append(obj)
 
+        #add general pov code / "header"
         finalPovCode = "#version 3.6; // 3.7\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
 
         finalPovCode += "#default { pigment { rgb " + self.uintColorToRGB(self.DefaultShapeColor) + " } }\n"
@@ -141,6 +147,7 @@ class ExportToPovRay:
         finalPovCode += "\n//------------------------------------------\n"
         finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
+        #if model contains mesh objects, a mesh file will be included
         if self.statistics[1]:
             finalPovCode += "#include \"" + self.meshName + "\"\n"
 
@@ -159,7 +166,7 @@ class ExportToPovRay:
         #emission rgb <0.8,0.8,1>
         finalPovCode += "\n//------------------------------------------\n"
 
-        if self.userInc:
+        if self.userInc: #include user inc file if there is a file
             finalPovCode += "\n#include \"" + self.incName + "\"\n\n"
 
         finalPovCode += "// objects in scene ------------------------\n"
@@ -167,15 +174,15 @@ class ExportToPovRay:
         #create the povray code
         for obj in firstLayer:
             finalPovCode += self.createPovrayCode(obj)
-        if self.statistics[1]:
+        if self.statistics[1]: #close the mesh file if exist
             self.meshFile.close()
 
         #change line breaks for windows
         if self.os == "Windows":
             finalPovCode.replace("\n", "\r\n")
 
-        self.writeFile(finalPovCode)
-        self.openPovRay()
+        self.writeFile(finalPovCode) #write the final code to the output file
+        self.openPovRay() #start povray
 
 
     def createPovrayCode(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expLabel = True, expMeshDef = True, testClone = True): #returns the povray code for the object
@@ -550,7 +557,7 @@ class ExportToPovRay:
     def sketchToBezier(self, sketch): #create pov bezier_spline from sketch
         povSpline = "\n"
 
-        unsortedLines = sketch.Geometry
+        unsortedLines = sketch.Geometry #unordered lines / original order
 
         #delete construction geometry
         while self.hasLinesConstructive(unsortedLines): #Caution: Very dirty coding!!!
@@ -561,7 +568,7 @@ class ExportToPovRay:
 
         numOfPoints = 0
 
-        sortedLines = []
+        sortedLines = [] #lines in the right order
 
         while unsortedLines: #until the unsortedLines array is empty
             sortedLines.append(unsortedLines[0])
@@ -589,6 +596,7 @@ class ExportToPovRay:
                 povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">\n"
 
                 numOfPoints += 4
+
             elif type(line) == Part.Circle:
                 r = line.Radius
                 cx = line.Center.x
@@ -620,7 +628,8 @@ class ExportToPovRay:
 
         return [povSpline, numOfPoints]
 
-    def getNextLine(self, lines, lastLine): #returns index
+    def getNextLine(self, lines, lastLine): #get index of next line for the given last line
+        #returns index
         i = 0
         for line in lines:
             if self.isSamePoint(line.EndPoint, lastLine.EndPoint) or self.isSamePoint(line.StartPoint, lastLine.EndPoint):
@@ -629,6 +638,7 @@ class ExportToPovRay:
         return -1
 
     def isSamePoint(self, point1, point2): #are two points equal
+        #round because FreeCAD has rounding mistakes
         if round(point1.x, 3) == round(point2.x, 3) and round(point1.y, 3) == round(point2.y, 3) and round(point1.z, 3) == round(point2.z, 3):
             return True
         return False
@@ -1128,7 +1138,7 @@ class ExportToPovRay:
             code = code[0:comStart] + code[comEnd:]
         return code
 
-    def isNameSupported(self, objName, supportedNames): #is the name part of the supported names
+    def isNameSupported(self, objName, supportedNames): #is fcObj.Name part of the supported names
         for name in supportedNames:
             if objName.startswith(name):
                 return True
