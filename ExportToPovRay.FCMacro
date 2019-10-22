@@ -467,7 +467,7 @@ class ExportToPovRay:
 
         elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
             if not self.isBodySupported(fcObj):
-                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef, True)
+                povCode += self.createMesh(fcObj.Tip, expPlacement, expPigment, expClose, expMeshDef)
                 return povCode #return because the mesh may not translated and rotated
 
             povBody = "\nunion {\n"
@@ -696,7 +696,7 @@ class ExportToPovRay:
 
         return True
 
-    def createMesh(self, fcObj, expPlacement = True, expPigment = True, expClose = True, expMeshDef = True): #create pov mesh from object
+    def createMesh(self, fcObj, expPlacement, expPigment, expClose, expMeshDef): #create pov mesh from object
         povCode = ""
 
         if expMeshDef:
@@ -706,15 +706,25 @@ class ExportToPovRay:
                 mesh = fcObj.Mesh
             else:
                 try:
-                    distanceCam = abs(fcObj.Shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - fcObj.Shape.BoundBox.DiagonalLength / 2)
-                    pictureSize = (self.width + self.height) / 2
-                    angularDeflection = (distanceCam / pictureSize) * 2.5
-                    mesh = MeshPart.meshFromShape(Shape = fcObj.Shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    shape = fcObj.Shape.copy(False)
+
+                    if(shape.BoundBox.isValid()):
+                        distanceCam = abs(shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - shape.BoundBox.DiagonalLength / 2)
+                        pictureSize = (self.width + self.height) / 2
+                        angularDeflection = (distanceCam / pictureSize) * 2.5
+                        mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
+                    else:
+                        App.Console.PrintWarning("\nBoundBox of object is invalid - Try to create mesh with standard resolution\n")
+                        mesh = MeshPart.meshFromShape(Shape = shape, MaxLength = 15)
                 except:
+                    App.Console.PrintError("\n\nError while creation of mesh - Creation of mesh aborted - Object won't be rendered\n")
+                    App.Console.PrintError("Please report a bug to the developers of the macro (see wiki FAQ for more information)\n\n")
                     return ""
 
 
             if not mesh:
+                App.Console.PrintError("\n\nNo mesh - Creation of mesh aborted - Object won't be rendered\n")
+                App.Console.PrintError("Please report a bug to the developers of the macro (see wiki FAQ for more information)\n\n")
                 return ""
 
             #create mesh2 object
