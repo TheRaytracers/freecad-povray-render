@@ -66,7 +66,7 @@ class ExportToPovRay:
 
         #get default shape color (editable in FreeCAD settings) (default rgb(0.8, 0.8, 0.8))
         self.DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
-        
+
         #get camera
         self.CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
         self.CamType = Gui.ActiveDocument.ActiveView.getCameraType()
@@ -707,15 +707,15 @@ class ExportToPovRay:
             else:
                 try:
                     shape = fcObj.Shape.copy(False)
+                    angularDeflection = fcObj.ViewObject.AngularDeflection.getValueAs("rad").Value
 
-                    if(shape.BoundBox.isValid()):
-                        distanceCam = abs(shape.BoundBox.Center.distanceToPoint(Gui.ActiveDocument.ActiveView.viewPosition().Base) - shape.BoundBox.DiagonalLength / 2)
-                        pictureSize = (self.width + self.height) / 2
-                        angularDeflection = (distanceCam / pictureSize) * 2.5
-                        mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 0.1, AngularDeflection = angularDeflection, Relative = False)
-                    else:
-                        App.Console.PrintWarning("\nBoundBox of object is invalid - Try to create mesh with standard resolution\n")
-                        mesh = MeshPart.meshFromShape(Shape = shape, MaxLength = 15)
+                    if fcObj.InList != []:
+                        if fcObj.InList[0].TypeId == "PartDesign::Body":
+                            angularDeflection = fcObj.InList[0].ViewObject.AngularDeflection.getValueAs("rad").Value
+
+                    App.Console.PrintWarning(angularDeflection)
+                    mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 100, AngularDeflection = angularDeflection, Relative = False)
+
                 except:
                     App.Console.PrintError("\n\nError while creation of mesh - Creation of mesh aborted - Object won't be rendered\n")
                     App.Console.PrintError("Please report a bug to the developers of the macro (see wiki FAQ for more information)\n\n")
