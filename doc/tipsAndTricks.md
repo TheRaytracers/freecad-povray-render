@@ -4,16 +4,18 @@ Even if FreeCAD and POV-Ray both support CSG (**C**onstructive **S**olid **G**eo
 So if your rendering doesn't look like you have expected, it may not be a bug, it can also be a compromise to adapt the different concepts of FreeCAD and POV-Ray.
 
 ## Table of Contents
-* [Camera](#camera)
-* [Background](#background)
-* [Lights](#lights)
-* [Textures and materials](#textures-and-materials)
-* [Object modelling](#object-modelling)
-    * [CSG or Mesh?](#csg-or-mesh?)
-    * [Touching surfaces](#touching-surfaces)
-    * [Repair rotation](#repair-rotation)
-* [Debugging](#debugging)
-* [Rendering time](#rendering-time)
+- [Limitations, Tips & Tricks](#limitations-tips--tricks)
+  - [Table of Contents](#table-of-contents)
+  - [The camera](#the-camera)
+  - [Background](#background)
+  - [Lights](#lights)
+  - [Textures and materials](#textures-and-materials)
+  - [Object modelling](#object-modelling)
+    - [CSG or Mesh](#csg-or-mesh)
+    - [Touching surfaces](#touching-surfaces)
+    - [Repair rotation](#repair-rotation)
+  - [Debugging](#debugging)
+  - [Rendering time](#rendering-time)
 
 ## The camera
 
@@ -130,7 +132,7 @@ Together with the [POV-Ray Wiki](http://www.povray.org/documentation/3.7.0/r3_4.
 
 ## Object modelling
 
-### CSG or Mesh?
+### CSG or Mesh
 
 The intention of the macro is, to create a model with **C**onstructive **S**olid **G**eometry in FreeCAD, add textures and scene descriptions and render everything with POV-Ray.
 So the focus of our developement was, to implement a conversion for the solids of the Part Workbench and the boolean operations for constructions.

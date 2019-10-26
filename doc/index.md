@@ -8,7 +8,7 @@ This can be done by adding an include file with the additional contents.
 
 ## Get started
 
-A quick overview about [installation and usage](user.md)
+A quick overview about [installation and usage](quickstart.md)
 
 ## How to render a photorealistic Scene from your FreeCAD model
 
