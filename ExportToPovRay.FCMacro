@@ -713,7 +713,6 @@ class ExportToPovRay:
                         if fcObj.InList[0].TypeId == "PartDesign::Body":
                             angularDeflection = fcObj.InList[0].ViewObject.AngularDeflection.getValueAs("rad").Value
 
-                    App.Console.PrintWarning(angularDeflection)
                     mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 100, AngularDeflection = angularDeflection, Relative = False)
 
                 except:
