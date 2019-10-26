@@ -28,18 +28,21 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 - [x] Pocket
 - [ ] Revolution
 - [ ] Groove
+- [ ] Linear Pattern
+- [ ] Polar Pattern
 
 ### Sketches
 - [x] Line Segment
 - [ ] Arc
 - [x] Circle
 - [ ] B-Spline
+- [ ] Ellipse
 
 ## Draft Workbench
 
 - [x] Clone
-- [x] Array linear pattern
-- [x] Array polar pattern
+- [x] Linear Array
+- [x] Polar Array
 
 ## Image Workbench
 
