@@ -720,8 +720,9 @@ class ExportToPovRay:
 
 
             if not mesh or len(mesh.Topology[0]) == 0 or len(mesh.Topology[1]) == 0:
-                App.Console.PrintError("\n\nNo mesh - Creation of mesh aborted - Object won't be rendered\n")
-                App.Console.PrintError("Please report a bug to the developers of the macro (see wiki FAQ for more information)\n\n")
+                errorMessage = "\n\nNo mesh created - Object " + fcObj.Label + " won't be rendered  --  "
+                errorMessage += "Please report a bug to the developers of the macro if this object should be rendered (see wiki FAQ for more information)\n\n"
+                App.Console.PrintError(errorMessage)
                 return ""
 
             #create mesh2 object
