@@ -717,12 +717,10 @@ class ExportToPovRay:
                     mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = 100, AngularDeflection = angularDeflection, Relative = False)
 
                 except:
-                    App.Console.PrintError("\n\nError while creation of mesh - Creation of mesh aborted - Object won't be rendered\n")
-                    App.Console.PrintError("Please report a bug to the developers of the macro (see wiki FAQ for more information)\n\n")
                     return ""
 
 
-            if not mesh:
+            if not mesh or len(mesh.Topology[0]) == 0 or len(mesh.Topology[1]) == 0:
                 App.Console.PrintError("\n\nNo mesh - Creation of mesh aborted - Object won't be rendered\n")
                 App.Console.PrintError("Please report a bug to the developers of the macro (see wiki FAQ for more information)\n\n")
                 return ""
