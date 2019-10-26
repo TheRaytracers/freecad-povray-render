@@ -446,6 +446,30 @@ class ExportToPovRay:
 
             povCode += povClone
 
+        elif fcObj.TypeId == "Image::ImagePlane":
+            image = fcObj.ImageFile
+            imgType = image[-3:]
+
+            width = fcObj.XSize.getValueAs("mm").Value
+            height = fcObj.YSize.getValueAs("mm").Value
+
+            povImg = "\npolygon { "
+            povImg += "5, <0, 0>, <" + str(width) + ", 0>, <" + str(width) + ", " + str(height) + ">, <0, " + str(height) + ">, <0, 0>"
+
+            povPigment = "\npigment {\n"
+            povPigment += "\timage_map {\n"
+            povPigment += "\t\t" + imgType + ' "' + image + '"\n'
+            povPigment += "\t\tmap_type 0\n"
+            povPigment += "\t}\n"
+            povPigment += "\tscale <" + str(width) + ", " + str(height) + ", 1>\n"
+            povPigment += "}\n"
+
+            povImg += povPigment.replace("\n", "\n\t")
+            povImg += "\ttranslate -<" + str(width / 2) + ", " + str(height / 2) + ", 0>\n"
+
+            expPigment = False
+            povCode += povImg
+
         elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
             childs = fcObj.OutList
             for child in childs:
@@ -796,7 +820,8 @@ class ExportToPovRay:
                             "Sketcher::SketchObject",
                             "App::DocumentObjectGroup",
                             "App:Part",
-                            "Part::Compound"]
+                            "Part::Compound",
+                            "Image::ImagePlane"]
         supportedNames = ["Array", "Clone"]
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not self.isNameSupported(obj.Name, supportedNames):
