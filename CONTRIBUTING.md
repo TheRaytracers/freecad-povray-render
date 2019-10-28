@@ -28,6 +28,8 @@ You see, contribution to a project is not only possible with coding skills. Anyt
 
 **Without your reports, ideas, etc. the macro won't get better or only very slow. So report all, that comes to your mind.**
 
+Before you create a new issue, please read the [Issue Guidelines](https://gitlab.com/usbhub/exporttopovray/issues/26).
+
 # Contribute to the Code
 ## Skeletal structure of the macro
 The macro works in this order:
