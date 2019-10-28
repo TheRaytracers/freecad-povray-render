@@ -2,7 +2,7 @@
 
 **This macro exports your FreeCAD model to Pov-Ray and is very easy to use, also for absolute beginners in the rendering of images. But advanced users have also the full control about the process & settings and can use all Pov-Ray features.**
 
-![Rendering Example](/doc/img/Chess/Chess_08.png)
+![Logo and Renderings](README_img.png)
 
 The export macro is intended to export the FreeCAD model structure with their equivalent in Pov-Ray.
 In contrast to other solutions for exporting FreeCAD models to Pov-Ray, this macro tries to make the file clearly and easy to edit. For that, it doesn't create gigantic meshes, it moves the tree structure with the boolean operations into a Pov-Ray file.  
