@@ -4,7 +4,7 @@
   * See instructions in [Quickstart](quickstart.md)
   * Are you sure, that you installed POV-Ray?
   * Does the path to the executable exsist in the settings of the raytracing workbench?
-  * Maybe there is an error in your inc file. You will get a error window and a err file can be found in the directory of the .pov file.
+  * Maybe there is an error in your inc file. You will get a error window and a error file can be found in the directory of the .pov file.
   * If there is a mistake in the pov file, then the macro has a bug. Please report the bug (see below), so that other users won't have this problem.
 
 
@@ -19,8 +19,8 @@
 * **I found a bug in the macro**  
   Please report the bug to us, so we hopefully can fix it soon.  
   You can report the bug via
-  * A GitLab Issue: [Create an Issue](https://gitlab.com/usbhub/exporttoPov-Ray/issues) (Green button top right.
-  * Email: XXX
+  * A GitLab Issue: [Create an Issue](https://gitlab.com/usbhub/exporttoPov-Ray/issues) (Green button top right)
+  * Email: usbhub.freecad@web.de
   * The FreeCAD Forum: XXX
 
 
