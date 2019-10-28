@@ -21,7 +21,7 @@ To give the user the full control, you can define extra things or another surfac
 * [Supported Features](/doc/supported.md)
 * [FAQ](doc/FAQ.md)
 * [More examples and templates](Examples/index.md)
-* [Contributing](doc/developer.md)
+* [Contributing](CONTRIBUTING.md)
 * [Future developement](doc/roadmap.md)
 
 ## Advantages compared with the Raytracing Workbench

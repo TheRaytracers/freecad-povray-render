@@ -30,4 +30,4 @@ We made a little FAQ for you: [FAQ](FAQ.md)
 
 
 ## For developers
-You want to contribute to our macro? Great! Here you can find our [Developer Documentation](developer.md)
+You want to contribute to our macro? Great! Here you can find [Contributing.md](../CONTRIBUTING.md)

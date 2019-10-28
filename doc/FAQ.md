@@ -33,5 +33,5 @@
 
 * **I want to contribute to the macro**  
   Cool, a software is never finished :-)  
-  Please read our [Developer Documentation](developer.md) and start coding!  
+  Please read [How to Contribute](../CONTRIBUTING.md) and start coding!  
   Or report a bug (see above), this is also contributing and not less important than coding! Without bug reporting the problem won't be solved and every user will have it!
