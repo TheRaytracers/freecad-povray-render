@@ -2,7 +2,12 @@
 ## Installation of the macro
 The easiest way is to install it via the **Addon Manager** under Tools / Addon Manager / Macros.  
 Alternative you can download the macro via [Macro Recipes](https://freecadweb.org/wiki/Macros_recipes) or download it directly from our [Gitlab Repository](https://gitlab.com/usbhub/exporttopovray) with the right button about the last commit message to get the most actual version.  
-Now you have to put the .FCMacro file in your macro directory. You can look under Edit / Preferences / General / Macro for your path.
+Now you have to put the .FCMacro file in your macro directory. You can look under Edit / Preferences / General / Macro for your path. It is important, that you don't have the .FCMacro in an extra folder, it have to be directly in the macro directory.
+
+**Right (Example):**
+`/home/usbhub/.FreeCAD/Macro/ExportToPovRay.FCMacro`  
+**False (Example):**
+`/home/usbhub/.FreeCAD/Macro/RenderMacro/ExportToPovRay.FCMacro`
 
 ## Installation of POV-Ray
 
