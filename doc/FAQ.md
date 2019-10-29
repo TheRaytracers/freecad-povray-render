@@ -1,6 +1,6 @@
 # FAQ
 
-* **I get no image, only the pov file**  
+* **I get no image, only the pov file**
   * See instructions in [Quickstart](quickstart.md)
   * Are you sure, that you installed POV-Ray?
   * Does the path to the executable exsist in the settings of the raytracing workbench?
@@ -10,6 +10,12 @@
 
 * **Which objects are supported?**  
   We created a page with all supported objects and the objects we support hopefully soon: [Supported Features](supported.md)
+
+
+* **The created mesh looks very rough, what can I do?**  
+  You can change two parameters to adjust the mesh resolution. Select the object in FreeCAD and go to the view tab, there you can find the two options `Angular Deflection` and `Deviation`, the smaller you set them, the more accurate the mesh becomes, but the longer it takes to create the mesh.  
+  Both parameters are related, `Angular Deflection` indicates the maximum deviation of the angle, and `Deviation` indicates the maximum distance between the mesh and the original object.  
+  **Tip:** Don't set the parameters too small, instead start with a larger value and first find good textures, etc., when you're done, set the mesh accuracy higher and finish your final rendering. The creation of a mesh needs a lot of time.
 
 
 * **The rendered image doesn't look realistic, but plastic**  
