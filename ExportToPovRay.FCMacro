@@ -744,9 +744,8 @@ class ExportToPovRay:
 
 
             if not mesh or len(mesh.Topology[0]) == 0 or len(mesh.Topology[1]) == 0:
-                errorMessage = "\n\nNo mesh created - Object " + fcObj.Label + " won't be rendered  --  "
-                errorMessage += "Please report a bug to the developers of the macro if this object should be rendered (see wiki FAQ for more information)\n\n"
-                App.Console.PrintError(errorMessage)
+                warningMessage = "\n\nNo mesh created - Object " + fcObj.Label + " won't be rendered"
+                App.Console.PrintWarning(warningMessage)
                 return ""
 
             #create mesh2 object
