@@ -20,7 +20,7 @@
   Please report the bug to us, so we hopefully can fix it soon.  
   You can report the bug via
   * A GitLab Issue: [Create an Issue](https://gitlab.com/usbhub/exporttoPov-Ray/issues) (Green button top right)
-  * Email: usbhub.freecad@web.de
+  * Email: usbhub.freecadABCweb.de replace ABC with an @
   * The FreeCAD Forum: XXX
 
 
