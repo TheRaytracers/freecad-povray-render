@@ -511,8 +511,6 @@ class ExportToPovRay:
             if fcObj.Midplane:
                 endHeight /= 2
                 startHeight = -endHeight
-            startHeight += fcObj.Offset.getValueAs("mm").Value
-            endHeight += fcObj.Offset.getValueAs("mm").Value
             if not fcObj.Reversed:
                 startHeight *= -1
                 endHeight *= -1
@@ -833,7 +831,7 @@ class ExportToPovRay:
         statistics += str(ParentCount) + " parent objects found in highest layer\n"
         statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
         if noCsgCount != 0:
-            statistics += "Your model contains " + str(noCsgCount) + " objects which aren't supproted (will be represented as a mesh).\n"
+            statistics += "Your model contains " + str(noCsgCount) + " objects which aren't supported (will be represented as mesh).\n"
         return [statistics, noCsgCount]
 
     def getLight(self): #get the FreeCAD light
