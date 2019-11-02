@@ -1409,6 +1409,14 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                                   self.expFcView.isChecked())
 
 def main(): #the main function
+    version = float(App.Version()[1])
+    if version < 17:
+        errText = "You're using an old FreeCAD version.\n"
+        errText += "The macro doesn't work with version 0.16 or older.\n"
+        errText += "\nPlease update to 0.17 or newer."
+        showError(errText, "FreeCAD version too old")
+        return -1
+    
     if App.ActiveDocument == None:
         App.Console.PrintWarning("No document opened\n")
         return -1
