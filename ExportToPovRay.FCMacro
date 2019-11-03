@@ -55,6 +55,8 @@ class ExportToPovRay:
         self.fcViewName = self.fileName + "_FC-View.png"
         self.fcViewPath = self.directory + self.fcViewName
 
+        self.meshFileContent = ""
+
         #get all output options
         self.width = width
         self.height = height
@@ -105,23 +107,19 @@ class ExportToPovRay:
         #get statistics
         objs = FreeCAD.ActiveDocument.Objects
         self.statistics = self.getStatistics(objs)
-        App.Console.PrintMessage(self.statistics[0])
+        App.Console.PrintMessage(self.statistics)
 
         #clear old mesh file
         try:
-            file = open(self.meshPath)
+            file = open(self.meshPath, "w")
             file.close()
-            self.meshFile = open(self.meshPath, "w")
-            if self.statistics[1] == False:
-                self.meshFile.close()
         except:
-            if self.statistics[1]:
-                self.meshFile = open(self.meshPath, "w")
+            pass
 
 
         self.startExport() #start the export
 
-    def startExport(self): #start the export to POVray
+    def startExport(self): #start the export to POV-Ray
         firstLayer = [] #the highest objects in the model tree
 
         #repair rotation (see documentation)
@@ -139,6 +137,11 @@ class ExportToPovRay:
                 if guiObject.Visibility:
                     firstLayer.append(obj)
 
+        #create pov code of objects
+        objPovCode = ""
+        for obj in firstLayer:
+            objPovCode += self.createPovrayCode(obj, True, True, True, True, True, True)
+
         #add general pov code / "header"
         finalPovCode = "#version 3.6; // 3.7\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
 
@@ -148,7 +151,7 @@ class ExportToPovRay:
         finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
         #if model contains mesh objects, a mesh file will be included
-        if self.statistics[1]:
+        if self.meshFileContent != "":
             finalPovCode += "#include \"" + self.meshName + "\"\n"
 
         finalPovCode += "\n//------------------------------------------\n"
@@ -163,7 +166,6 @@ class ExportToPovRay:
             finalPovCode += "\n// background ------------------------------\n"
             finalPovCode += self.getBackground()
 
-        #emission rgb <0.8,0.8,1>
         finalPovCode += "\n//------------------------------------------\n"
 
         if self.userInc: #include user inc file if there is a file
@@ -171,16 +173,18 @@ class ExportToPovRay:
 
         finalPovCode += "// objects in scene ------------------------\n"
 
-        #create povray code of objects
-        for obj in firstLayer:
-            finalPovCode += self.createPovrayCode(obj, True, True, True, True, True, True)
-
-        if self.statistics[1]: #close the mesh file if exist
-            self.meshFile.close()
+        finalPovCode += objPovCode
 
         #change line breaks for windows
         if self.os == "Windows":
             finalPovCode.replace("\n", "\r\n")
+            self.meshFileContent.replace("\n", "\r\n")
+
+        #write mesh file
+        if self.meshFileContent != "":
+            self.meshFile = open(self.meshPath, "w")
+            self.meshFile.write(self.meshFileContent)
+            self.meshFile.close()
 
         self.writeFile(finalPovCode) #write the final code to the output file
         self.openPovRay() #start povray
@@ -832,7 +836,7 @@ class ExportToPovRay:
             povMesh += "}\n\n"
 
             #write mesh in inc file
-            self.meshFile.write(povMesh)
+            self.meshFileContent += povMesh
 
         #return pov code
         povCode += "\nobject { " + self.stringCorrection(fcObj.Label) + "_mesh\n"
@@ -894,7 +898,7 @@ class ExportToPovRay:
         if noCsgCount != 0:
             statistics += "Your model contains " + str(noCsgCount) + " objects which aren't supported (will be represented as mesh).\n"
         
-        return [statistics, noCsgCount]
+        return statistics
 
     def getLight(self): #get the FreeCAD light
         povLight = ""
