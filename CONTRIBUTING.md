@@ -7,7 +7,7 @@ Boolean operations in the Pov-Ray file.
 The user should be able to modify the Pov-Ray file so that the
 extensive possibilities of Pov-Ray for a photorealistic display
 can be used (textures, light effects, etc.)  
-The main principle is to keep the POVray file as clear as possible,
+The main principle is to keep the POV-Ray file as clear as possible,
 so that objects can be found quickly.
 A second important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y**ou **G**et).
 The render result of the respective view in FreeCAD Gui looks like this
@@ -34,7 +34,7 @@ Before you create a new issue, please read the [Issue Guidelines](https://gitlab
 ## Skeletal structure of the macro
 The macro works in this order:
 1. Open the dialog and get the parameters from the user
-1. Create the skeletal structure of the POVray file
+1. Create the skeletal structure of the POV-Ray file
 1. Try whether the pov and inc file exists
 1. Add [global settings](#globalsettings) to the .pov file
 1. Add the [camera](#camera)
@@ -46,7 +46,7 @@ The macro works in this order:
   1. transform the object
   1. add texture properties from FreeCAD or user declaration from .inc file
 1. Write the pov file
-1. Start POVray
+1. Start POV-Ray
 
 ## General Characteristics
 * The macro uses a right handed koordinate system like FreeCAD (specified in [However, this limitation is clearly comprehensible for the user - either
@@ -71,21 +71,21 @@ The lightsource position is the same as the camera position.
 <a name="background"></a>
 ## Background
 All FreeCAD background color modes from the settings dialog are supported.
-The color(s) are mapped on the POVray sky-sphere and afterwards the skysphere is rotated in the camera direction to fit to the horizon.
+The color(s) are mapped on the POV-Ray sky-sphere and afterwards the skysphere is rotated in the camera direction to fit to the horizon.
 
 <a name="objectsFromScene"></a>
 ## Objects from Scene
-First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovrayCode()` which creates the real POVray code. The `main()` function calls it for every object in the `firstLayer`. `createPovrayCode()` calls itself for every child, so a recursive function.
+First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovrayCode()` which creates the real POV-Ray code. The `main()` function calls it for every object in the `firstLayer`. `createPovrayCode()` calls itself for every child, so a recursive function.
 
 <a name="characteristics"></a>
 ### Characteristics
-The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POVray rotates an object independently of the position of it <0, 0, 0>, FreeCAD rotates relative to the object.
+The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently of the position of it <0, 0, 0>, FreeCAD rotates relative to the object.
 
 ### createPovrayCode()
 1. The variable povCode will be initialised with the label / name of the object.
-1. Add the basing POVray object to povCode but don't close the object
-1. Add the rotation to the POVray object
-1. Add the translation to the POVray object
-1. Add the look to the POVray object
-1. Close the POVray object by adding `}`
+1. Add the basing POV-Ray object to povCode but don't close the object
+1. Add the rotation to the POV-Ray object
+1. Add the translation to the POV-Ray object
+1. Add the look to the POV-Ray object
+1. Close the POV-Ray object by adding `}`
 1. Return the created code

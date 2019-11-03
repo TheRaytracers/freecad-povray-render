@@ -1114,7 +1114,7 @@ class ExportToPovRay:
 
 
     def writeFile(self, povText): #write the final pov file
-        #povText: the code for POVray
+        #povText: the code for POV-Ray
         try:
             file = open(self.povPath, "w+") #open file (Really "w+"?)
             file.write(povText) #write code
@@ -1362,7 +1362,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.pathLineEdit.setText(defaultPath)
 
         #get saved input
-        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
+        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
         settings.beginGroup("userInput")
         path = settings.value("path", self.pathLineEdit.text())
         width = int(settings.value("width", self.imageWidth.value()))
@@ -1444,7 +1444,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                 self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .pov file")
 
     def saveInput(self): #save the user inputs
-        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POVray")
+        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
         settings.beginGroup("userInput")
         settings.setValue("path", self.pathLineEdit.text())
         settings.setValue("width", self.imageWidth.value())

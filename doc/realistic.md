@@ -32,7 +32,7 @@ If you create your own textures, make sure, you use the right syntax. Replace th
 #declare xxx_material = material { }
 ```
 
-Put your material declaration inside the brackets. Be aware of the hierarchy of material declaration. We only provide `material { }` in our macro because it is the wrapper of all other Pov-Ray statements like texture, pigment, finish, pattern etc. Pov-Ray has an excellent documentation, so you will find further information in the [POVray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_5_5_3).
+Put your material declaration inside the brackets. Be aware of the hierarchy of material declaration. We only provide `material { }` in our macro because it is the wrapper of all other Pov-Ray statements like texture, pigment, finish, pattern etc. Pov-Ray has an excellent documentation, so you will find further information in the [POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_5_5_3).
 Ignoring the material hierarchy will lead to a POV-Ray error and nothing will be rendered. How to get the console output from POV-Ray for debugging see the [Tips & Tricks Section](tipsAndTricks.md).
 
 Now let's try to add more reality to the chess Example. You can download another FreeCAD file for a gaming scene and a corresponding include file:

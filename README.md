@@ -1,6 +1,6 @@
-# Macro for exporting a FreeCAD model to Pov-Ray
+# Macro for exporting a FreeCAD model to POV-Ray
 
-**This macro exports your FreeCAD model to Pov-Ray and is very easy to use, also for absolute beginners in the rendering of images. But advanced users have also the full control about the process & settings and can use all Pov-Ray features.**
+**This macro exports your FreeCAD model to POV-Ray and is very easy to use, also for absolute beginners in the rendering of images. But advanced users have also the full control about the process & settings and can use all Pov-Ray features.**
 
 ![Logo and Renderings](README_img.png)
 
