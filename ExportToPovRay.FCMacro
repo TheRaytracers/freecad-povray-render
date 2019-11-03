@@ -446,6 +446,43 @@ class ExportToPovRay:
 
             povCode += povClone
 
+        elif fcObj.TypeId == "Part::Extrusion":
+            if not self.isExtrudeSupported(fcObj):
+                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
+                return povCode #return because the mesh may not translated and rotated
+
+            spline = self.sketchToBezier(fcObj.Base)
+
+            startHeight = 0
+            endHeight = fcObj.LengthFwd.getValueAs("mm").Value
+
+            if fcObj.Symmetric:
+                endHeight /= 2
+                startHeight = -endHeight
+
+            startHeight -= fcObj.LengthRev.getValueAs("mm").Value
+
+            if not fcObj.Reversed:
+                startHeight *= -1
+                endHeight *= -1
+
+            povPad = ""
+            povPad += "\nprism {\n"
+            povPad += "\tbezier_spline\n"
+            povPad += "\t" + str(startHeight) + ", " + str(endHeight) + ", " + str(spline[1])
+            povPad += spline[0].replace("\n", "\n\t") + "\n" #add the indents
+
+            if expPlacement:
+                rotation = self.getRot(fcObj.Base)
+                if rotation != "": #test if the object is rotated
+                    povPad += "\t" + rotation + "\n"
+
+                translation = self.getTranslation(fcObj.Base)
+                if translation != "": #test if the object is translated
+                    povPad += "\t" + translation + "\n"
+
+            povCode += povPad
+
         elif fcObj.TypeId == "Image::ImagePlane":
             image = fcObj.ImageFile
             imgType = image[-3:]
@@ -698,11 +735,9 @@ class ExportToPovRay:
                 sketches.append(obj)
 
         #test sketches
-        supportedGeometryTypes = [Part.LineSegment, Part.Circle]
         for sketch in sketches:
-            for line in sketch.Geometry:
-                if not type(line) in supportedGeometryTypes and not line.Construction:
-                    return False
+            if not self.isSketchSupported(sketch):
+                return False
 
         supportedTypes = ["Length"]
         #get pads and pockets
@@ -714,6 +749,29 @@ class ExportToPovRay:
         #test types
         for obj in padsPockets:
             if not obj.Type in supportedTypes:
+                return False
+
+        return True
+
+    def isExtrudeSupported(self, fcObj):
+        #test mode of direction
+        if fcObj.DirMode != "Normal":
+            return False
+        
+        #test base shape (only sketches are supported)
+        if fcObj.Base.TypeId != "Sketcher::SketchObject":
+            return False
+
+        #test sketch
+        if not self.isSketchSupported(fcObj.Base):
+            return False
+
+        return True
+
+    def isSketchSupported(self, sketch):
+        supportedGeometryTypes = [Part.LineSegment, Part.Circle]
+        for line in sketch.Geometry:
+            if not type(line) in supportedGeometryTypes and not line.Construction:
                 return False
 
         return True
@@ -809,9 +867,11 @@ class ExportToPovRay:
                             "Part::Cylinder",
                             "Part::Cone",
                             "Part::Ellipsoid",
-                            "Part::Plane", "Part::Cut",
+                            "Part::Plane",
+                            "Part::Cut",
                             "Part::MultiFuse", "Part::Fuse",
                             "Part::MultiCommon", "Part::Common",
+                            "Part::Extrusion",
                             "PartDesign::Body"
                             "PartDesign::Pad",
                             "PartDesign::Pocket",
@@ -821,6 +881,7 @@ class ExportToPovRay:
                             "Part::Compound",
                             "Image::ImagePlane"]
         supportedNames = ["Array", "Clone"]
+
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not self.isNameSupported(obj.Name, supportedNames):
                 noCsgCount = noCsgCount + 1
@@ -832,6 +893,7 @@ class ExportToPovRay:
         statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
         if noCsgCount != 0:
             statistics += "Your model contains " + str(noCsgCount) + " objects which aren't supported (will be represented as mesh).\n"
+        
         return [statistics, noCsgCount]
 
     def getLight(self): #get the FreeCAD light
