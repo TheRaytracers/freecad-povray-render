@@ -930,7 +930,7 @@ class ExportToPovRay:
             povBg += ">, <" + str(-right/2) + ", " + str(-up/2) + ">\n"
             povBg += "\tpigment {"
             if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
-                povBg += " color rgb" + self.uintColorToRGB(bgColor1) + "}\n"
+                povBg += " color rgb" + self.uintColorToRGB(bgColor1) + " }\n"
             elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
                 povBg += "\n\t\tgradient y\n"
                 povBg += "\t\tcolor_map {\n"
@@ -941,19 +941,19 @@ class ExportToPovRay:
                 povBg += "\t\t\t[ 0.95  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
                 povBg += "\t\t\t[ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
                 povBg += "\t\t}\n"
-                povBg += "\t\tscale<1," + str(up) + ",1>\n"
-                povBg += "\t\ttranslate<0," + str(-up/2) + ",0>\n"
+                povBg += "\t\tscale <1," + str(up) + ",1>\n"
+                povBg += "\t\ttranslate <0," + str(-up/2) + ",0>\n"
                 povBg += "\t}\n"
             #color rgb<0,0,1>}\n"
-            povBg += "\tfinish{ambient 1 diffuse 0}\n"
-            povBg += "\trotate<" + str(self.EulerCam[2]) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
+            povBg += "\tfinish { ambient 1 diffuse 0 }\n"
+            povBg += "\trotate <" + str(self.EulerCam[2]) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
             povBg += "\ttranslate <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + ">\n"
             povBg += "\ttranslate <" + str(ViewDir[0]*100000) + ", " + str(ViewDir[1]*100000) + ", " + str(ViewDir[2]*100000) + ">\n"
             povBg += "}\n"
 
         povBg += "sky_sphere {\n\tpigment {\n"
         if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
-            povBg += " color rgb" + self.uintColorToRGB(bgColor1)
+            povBg += "\t\tcolor rgb" + self.uintColorToRGB(bgColor1) + "\n"
 
         elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
             povBg += "\t\tgradient z\n"
