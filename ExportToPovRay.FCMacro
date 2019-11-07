@@ -761,6 +761,10 @@ class ExportToPovRay:
         #test mode of direction
         if fcObj.DirMode != "Normal":
             return False
+
+        #test TaperAngle and TaperAngleRev
+        if fcObj.TaperAngle.getValueAs("deg").Value != 0 or fcObj.TaperAngleRev.getValueAs("deg").Value:
+            return False
         
         #test base shape (only sketches are supported)
         if fcObj.Base.TypeId != "Sketcher::SketchObject":
@@ -1266,7 +1270,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.pathLineEdit.setFixedWidth(300)
         self.pathLineEdit.textChanged.connect(self.checkPath)
 
-        self.openFileDialogButton = QtGui.QPushButton('Open .pov Output File')
+        self.openFileDialogButton = QtGui.QPushButton('Browse .pov Output File')
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
 
         self.warnLabel = QtGui.QLabel("")
