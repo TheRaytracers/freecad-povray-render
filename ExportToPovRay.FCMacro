@@ -794,15 +794,23 @@ class ExportToPovRay:
                 mesh = fcObj.Mesh
             else:
                 try:
-                    shape = fcObj.Shape.copy(False)
-                    angularDeflection = fcObj.ViewObject.AngularDeflection.getValueAs("rad").Value
+                    shape = fcObj.Shape.copy()
+                    try:
+                        angularDeflection = fcObj.ViewObject.AngularDeflection.getValueAs("rad").Value
+                    except:
+                        angularDeflection = 0.5
                     deviation = fcObj.ViewObject.Deviation
 
                     if fcObj.InList != []:
                         if fcObj.InList[0].TypeId == "PartDesign::Body":
-                            angularDeflection = fcObj.InList[0].ViewObject.AngularDeflection.getValueAs("rad").Value
-
-                    mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = deviation, AngularDeflection = angularDeflection, Relative = False)
+                            try:
+                                angularDeflection = fcObj.InList[0].ViewObject.AngularDeflection.getValueAs("rad").Value
+                            except:
+                                angularDeflection = 0.5
+                    try:
+                        mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = deviation, AngularDeflection = angularDeflection, Relative = False)
+                    except:
+                        mesh = MeshPart.meshFromShape(shape,deviation,angularDeflection)
 
                 except:
                     return ""
