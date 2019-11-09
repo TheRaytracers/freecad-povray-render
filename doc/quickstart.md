@@ -27,7 +27,7 @@ It is important to write the complete path into the textfield.
 These are the standard paths but they may vary depending on your installation:
 
 * `/usr/bin/povray` (Linux)
-* `???`
+* `XXX` (Windows)
 
 For the executable options in the next field you should take
 
@@ -46,10 +46,24 @@ because without the `/EXIT` otion you have to close three windows after renderin
 If the raytracing workbench works with these settings, the macro should do also.
 
 ## Usage
-Create a model with the part workbench.
-The macro takes your actual view on the model, so pan your view how you would like the rendering. Now you can [Start the Macro](#startTheMacro). After that, select / create the file where you want to save the POV-Ray code. Now the macro creates the POV-Ray code and start the POV-Ray. If you have many no CSG object the creation of the code can take a while. POV-Ray opens a windows with the rendering result. To close this window, click on the window.
+### How to get your first result
 
-<a name="startTheMacro"></a>
+1. Open a document or create a new one with some objects
+2. Pan the model in the right view
+3. Start the macro about Macro / Macros… / ExportToPovRay.FCMacro / Execute
+4. Click on "Browse .pov Output File"
+5. Select / create a file with the ending .pov
+6. Click on Save in the file dialog
+7. Change the width of the picture to 800px and the height to 600px
+8. Turn on the options
+   * [x] Export FreeCAD Background
+   * [x] Export FreeCAD Light
+9.  Click on OK
+10. A window pops up with your rendering
+11. Close the window by clicking on it
+
+To understand all options, take a closer look to the wiki or look at the help tab.
+
 ## Start the Macro
 Go to Macro/Macros… and start the installed macro by double clicking on it.
 
