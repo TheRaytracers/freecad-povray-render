@@ -48,6 +48,9 @@ The macro works in this order:
 1. Write the pov file
 1. Start POV-Ray
 
+Here's a flowchart of the rough **program structure**:
+![Flowchart of the macro](/doc/img/programFlow.svg)
+
 ## General Characteristics
 * The macro uses a right handed koordinate system like FreeCAD (specified in [However, this limitation is clearly comprehensible for the user - either
 through a good documentation or in the program e.g. through colored
@@ -83,9 +86,9 @@ The macro creates all objects at <0, 0, 0> and translates the objects later. The
 
 ### createPovrayCode()
 1. The variable povCode will be initialised with the label / name of the object.
-1. Add the basing POV-Ray object to povCode but don't close the object
-1. Add the rotation to the POV-Ray object
-1. Add the translation to the POV-Ray object
-1. Add the look to the POV-Ray object
-1. Close the POV-Ray object by adding `}`
-1. Return the created code
+2. Add the basing POV-Ray object to povCode but don't close the object
+3. Add the rotation to the POV-Ray object
+4. Add the translation to the POV-Ray object
+5. Add the look to the POV-Ray object
+6. Close the POV-Ray object by adding `}`
+7. Return the created code

@@ -30,4 +30,5 @@ We made a little FAQ for you: [FAQ](FAQ.md)
 
 
 ## For developers
+![Flowchart of the macro](/doc/img/programFlow_small.png)  
 You want to contribute to our macro? Great! Here you can find [Contributing.md](../CONTRIBUTING.md)
