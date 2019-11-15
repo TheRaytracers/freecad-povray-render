@@ -64,9 +64,6 @@ If the raytracing workbench works with these settings, the macro should do also.
 
 To understand all options, take a closer look to the wiki or look at the help tab.
 
-## Start the Macro
-Go to Macro/Macros… and start the installed macro by double clicking on it.
-
 ## Make changes
 
 To use the full power of POV-Ray you can add textures, lights, athmosperic effects and many more to your model.
