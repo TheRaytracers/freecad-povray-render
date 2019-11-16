@@ -26,6 +26,8 @@ import MeshPart
 import platform
 import subprocess
 
+macroVersion = "0.1 beta"
+
 def showError(text, title): #show an error box
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Critical, title, text)
     dialog.setWindowModality(QtCore.Qt.ApplicationModal)
@@ -83,9 +85,8 @@ class ExportToPovRay:
 
         if self.povPath != -1 and self.povPath != "" and self.povPath != " ": #is there a pov file
             try: #try to open pov file
-                file = open(self.povPath, "w+") #really "w+"?
+                file = open(self.povPath, "w+") #XXX really "w+"?
                 file.close()
-                App.Console.PrintMessage("\n\nPath to *.pov File: " + self.povPath + "\n")
             except:
                 App.Console.PrintError("Can't open the pov file\n\n")
                 return -1
@@ -124,7 +125,7 @@ class ExportToPovRay:
 
         #repair rotation (see documentation)
         if self.repRot:
-            self.repairRot(self.objs)
+            self.repairRotation(self.objs)
 
         #export FreeCAD view
         if self.expFcView:
@@ -140,7 +141,7 @@ class ExportToPovRay:
         #create pov code of objects
         objPovCode = ""
         for obj in firstLayer:
-            objPovCode += self.createPovrayCode(obj, True, True, True, True, True, True)
+            objPovCode += self.createPovCode(obj, True, True, True, True, True, True)
 
         #add general pov code / "header"
         finalPovCode = "#version 3.6; // 3.7\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
@@ -190,7 +191,7 @@ class ExportToPovRay:
         self.openPovRay() #start povray
 
 
-    def createPovrayCode(self, fcObj, expPlacement, expPigment, expClose, expLabel, expMeshDef, testClone): #returns the povray code for the object
+    def createPovCode(self, fcObj, expPlacement, expPigment, expClose, expLabel, expMeshDef, testClone): #returns the povray code for the object
         if expLabel:
             povCode = "\n//----- " + self.stringCorrection(fcObj.Label) + " -----" #add the name of the object
         else:
@@ -199,7 +200,7 @@ class ExportToPovRay:
         if self.hasInListClone(fcObj) and testClone:
             declareName = self.stringCorrection(fcObj.Label.capitalize()) + "_" + fcObj.Name
             povDeclare = "\n#declare " + declareName + " ="
-            povDeclare += self.createPovrayCode(fcObj, False, False, True, True, True, False)
+            povDeclare += self.createPovCode(fcObj, False, False, True, True, True, False)
             povChild = "\nobject {\n"
             povChild += "\t" + declareName
 
@@ -271,7 +272,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCut = "\ndifference {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
+                childCode = self.createPovCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovCode for the child
                 povCut += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povCut
@@ -280,7 +281,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povFusion = "\nunion {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
+                childCode = self.createPovCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovCode for the child
                 povFusion += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povFusion
@@ -289,7 +290,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCommon = "\nintersection {\n"
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
+                childCode = self.createPovCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovCode for the child
                 povCommon += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povCommon
@@ -316,7 +317,7 @@ class ExportToPovRay:
 
                     declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
                     povArr += "\n#declare " + declareName + " = "
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
+                    childCode = self.createPovCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovCode for the child
                     povArr += childCode
 
                     povArr += "\n#declare i = 0;\n"
@@ -340,7 +341,7 @@ class ExportToPovRay:
                         povArr += "\t\ttranslate " + center + "\n"
 
                     if expPlacement:
-                        rotation = self.getRot(fcObj)
+                        rotation = self.getRotation(fcObj)
                         if rotation != "": #test if the object is rotated
                             povArr += "        " + rotation + "\n"
 
@@ -383,7 +384,7 @@ class ExportToPovRay:
 
                     declareName = self.stringCorrection(child.Label.capitalize()) + "_" + child.Name
                     povArr += "\n#declare " + declareName + " = "
-                    childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, True, True) #call createPovrayCode for the child
+                    childCode = self.createPovCode(child, expPlacement, expPigment, True, expLabel, True, True) #call createPovCode for the child
                     povArr += childCode
 
                     povArr += "#declare intervalX = " + intervalX + ";\n"
@@ -412,7 +413,7 @@ class ExportToPovRay:
                         if translation != "": #test if the object is translated
                             povArr += "\t\t\t\t" + translation + "\n"
 
-                        rotation = self.getRot(fcObj)
+                        rotation = self.getRotation(fcObj)
                         if rotation != "": #test if the object is rotated
                             povArr += "\t\t\t\t" + rotation + "\n"
 
@@ -477,7 +478,7 @@ class ExportToPovRay:
             povPad += spline[0].replace("\n", "\n\t") + "\n" #add the indents
 
             if expPlacement:
-                rotation = self.getRot(fcObj.Base)
+                rotation = self.getRotation(fcObj.Base)
                 if rotation != "": #test if the object is rotated
                     povPad += "\t" + rotation + "\n"
 
@@ -514,7 +515,7 @@ class ExportToPovRay:
         elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
             childs = fcObj.OutList
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
+                childCode = self.createPovCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovCode for the child
                 povCode += childCode
             return povCode
 
@@ -523,7 +524,7 @@ class ExportToPovRay:
 
             childs = fcObj.OutList
             for child in childs:
-                childCode = self.createPovrayCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovrayCode for the child
+                childCode = self.createPovCode(child, expPlacement, expPigment, True, expLabel, expMeshDef, True) #call createPovCode for the child
                 povPart += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povPart
@@ -537,7 +538,7 @@ class ExportToPovRay:
 
             povBody = "\nunion {\n"
             if fcObj.Tip != None:
-                povBody += self.createPovrayCode(fcObj.Tip, True, True, True, True, True, True).replace("\n", "\n\t") #add chld code and indents
+                povBody += self.createPovCode(fcObj.Tip, True, True, True, True, True, True).replace("\n", "\n\t") #add chld code and indents
                 povCode += povBody
             else:
                 return ""
@@ -569,7 +570,7 @@ class ExportToPovRay:
                 povPad += "\nunion {\n"
 
             if fcObj.BaseFeature != None:
-                povBase = self.createPovrayCode(fcObj.BaseFeature, True, True, True, True, True, True)
+                povBase = self.createPovCode(fcObj.BaseFeature, True, True, True, True, True, True)
                 povPad += povBase.replace("\n", "\n\t") #add the indents
 
             povPad += "\n\tprism {\n"
@@ -578,7 +579,7 @@ class ExportToPovRay:
             povPad += spline[0].replace("\n", "\n\t\t") + "\n" #add the indents
 
             if expPlacement:
-                rotation = self.getRot(fcObj.Profile[0])
+                rotation = self.getRotation(fcObj.Profile[0])
                 if rotation != "": #test if the object is rotated
                     povPad += "\t\t" + rotation + "\n"
 
@@ -600,7 +601,7 @@ class ExportToPovRay:
         povCode += "\n"
 
         if expPlacement:
-            rotation = self.getRot(fcObj)
+            rotation = self.getRotation(fcObj)
             if rotation != "": #test if the object is rotated
                 povCode += "\t" + rotation + "\n"
 
@@ -617,6 +618,7 @@ class ExportToPovRay:
             povCode += "}\n"
 
         return povCode
+
 
     def sketchToBezier(self, sketch): #create pov bezier_spline from sketch
         povSpline = "\n"
@@ -810,7 +812,7 @@ class ExportToPovRay:
                     try:
                         mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = deviation, AngularDeflection = angularDeflection, Relative = False)
                     except:
-                        mesh = MeshPart.meshFromShape(shape,deviation,angularDeflection)
+                        mesh = MeshPart.meshFromShape(shape, deviation, angularDeflection)
 
                 except:
                     return ""
@@ -855,7 +857,7 @@ class ExportToPovRay:
         pigment = self.getPigment(fcObj)
 
         if expPlacement == False: #meshes are already translated, so if they shouldnt translated, they translated back
-            rotation = self.getRot(fcObj)
+            rotation = self.getRotation(fcObj)
             if rotation != "": #test if the object is rotated
                 povCode += "\t" + rotation + " * (-1)\n"
 
@@ -905,11 +907,26 @@ class ExportToPovRay:
                 CsgCount = CsgCount + 1
             if obj.InList == []:
                 ParentCount = ParentCount + 1
+
+        statistics += "Version of Macro: " + macroVersion + "\n"
+        statistics += "Path to *.pov File: " + self.povPath + "\n"
         statistics += str(ParentCount) + " parent objects found in highest layer\n"
         statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
         if noCsgCount != 0:
             statistics += "Your model contains " + str(noCsgCount) + " objects which aren't supported (will be represented as mesh).\n"
-        
+
+        if self.CamType == "Perspective":
+            camInfo = "Perspective Camera\n"
+        elif self.CamType == "Orthographic":
+            camInfo = "Orthographic camera\n"
+        else:
+            camInfo = "Unknown camera type - rudimentary camera statement will be used\n"
+        if self.incContent.find("camera") != -1:
+            camInfo = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
+
+        statistics += camInfo
+        statistics += "\n"
+
         return statistics
 
     def getLight(self): #get the FreeCAD light
@@ -988,7 +1005,6 @@ class ExportToPovRay:
         AspectRatio = self.width / float(self.height)
 
         PovCam = ""
-        CamComment = ""
         incCamera = False
 
         PovCamType = ""
@@ -1005,7 +1021,6 @@ class ExportToPovRay:
             else:
                 CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
             PovCamAngle = "\tangle {0:1.2f}".format(CamAngle) + "\n"
-            CamComment += "Perspective Camera\n"
 
         elif self.CamType == "Orthographic":
             if AspectRatio >= 1:
@@ -1017,10 +1032,6 @@ class ExportToPovRay:
             PovCamType = "\torthographic\n"
             PovCamUp = "< 0, 0, " + "{0:1.2f}".format(up) + ">"
             PovCamRight = "<" + "{0:1.2f}".format(right) +", 0, 0>"
-            CamComment += "Orthographic camera\n"
-
-        else:
-            CamComment += "Unknown camera type - rudimentary camera statement will be used\n"
 
         PovCam += "#declare CamUp = " + PovCamUp + ";\n"
         PovCam += "#declare CamRight = " + PovCamRight + ";\n"
@@ -1043,9 +1054,6 @@ class ExportToPovRay:
         PovCam += "}\n"
         if incCamera:
             PovCam += "*/\n"
-            CamComment = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
-
-        App.Console.PrintMessage(CamComment)
 
         return PovCam
 
@@ -1060,7 +1068,7 @@ class ExportToPovRay:
 
         return translation
 
-    def getRot(self, fcObj): #get the rotation of an object
+    def getRotation(self, fcObj): #get the rotation of an object
         rotate = ""
         eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
         x = eulerRot[2] #get rotation in every axis
@@ -1128,7 +1136,7 @@ class ExportToPovRay:
     def writeFile(self, povText): #write the final pov file
         #povText: the code for POV-Ray
         try:
-            file = open(self.povPath, "w+") #open file (Really "w+"?)
+            file = open(self.povPath, "w+") #XXX open file (Really "w+"?)
             file.write(povText) #write code
             file.close() #close file
         except:
@@ -1181,7 +1189,7 @@ class ExportToPovRay:
     def delErrorFile(self): #delete error file
         os.remove(self.errorPath)
 
-    def repairRot(self, objs): #repair the rotation of objects (likely a bug in FreeCAD)
+    def repairRotation(self, objs): #repair the rotation of objects (likely a bug in FreeCAD)
         for obj in objs:
             if hasattr(obj, 'Placement'):
                 ObjLocation = obj.Placement

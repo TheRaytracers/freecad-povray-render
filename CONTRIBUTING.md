@@ -34,19 +34,19 @@ Before you create a new issue, please read the [Issue Guidelines](https://gitlab
 ## Skeletal structure of the macro
 The macro works in this order:
 1. Open the dialog and get the parameters from the user
-1. Create the skeletal structure of the POV-Ray file
-1. Try whether the pov and inc file exists
-1. Add [global settings](#globalsettings) to the .pov file
-1. Add the [camera](#camera)
-1. Add the [lightsource](#lightsource)
-1. Add the [background](#background)
-1. Add the [objects from the scene](#objectsFromScene)
-  1. create the basing object
-  1. rotate the object
-  1. transform the object
-  1. add texture properties from FreeCAD or user declaration from .inc file
-1. Write the pov file
-1. Start POV-Ray
+2. Create the skeletal structure of the POV-Ray file
+3. Try whether the pov and inc file exists
+4. Add [global settings](#global-settings) to the .pov file
+5. Add the [camera](#camera)
+6. Add the [lightsource](#lightsource)
+7. Add the [background](#background)
+8. Add the [objects from the scene](#objects-from-scene)
+   1. create the basing object
+   2. rotate the object
+   3.  transform the object
+   4.  add texture properties from FreeCAD or user declaration from .inc file
+9.  Write the pov file
+10. Start POV-Ray
 
 Here's a flowchart of the rough **program structure**:
 ![Flowchart of the macro](/doc/img/programFlow.svg)
@@ -55,36 +55,31 @@ Here's a flowchart of the rough **program structure**:
 * The macro uses a right handed koordinate system like FreeCAD (specified in [However, this limitation is clearly comprehensible for the user - either
 through a good documentation or in the program e.g. through colored
 selection of transferred objects in the object tree.camera](#camera))
-* All objects are created at <0, 0, 0> and translated later to the right position (see [Characteristics](#characteristics))
+* All objects are created at <0, 0, 0> and translated later to the right position (see [Characteristics](#general-characteristics))
 
-<a name="generalsettings"></a>
-## General settings
+## Global settings
 First, some general settings are added to the .pov file.
 The important one is the standard object color from the settings dialog.
 In objects with standard color and texture the `getPigment()` function will skip color and finish declaration of the pov object.
 
-<a name="camera"></a>
 ## Camera
 The idea for creation of the camera is to create a camera at <0, 0, 0> and translate and rotate them into the right position.
 global
-<a name="lightsource"></a>
+
 ## Lightsource
 The lightsource position is the same as the camera position.
 
-<a name="background"></a>
 ## Background
 All FreeCAD background color modes from the settings dialog are supported.
 The color(s) are mapped on the POV-Ray sky-sphere and afterwards the skysphere is rotated in the camera direction to fit to the horizon.
 
-<a name="objectsFromScene"></a>
 ## Objects from Scene
-First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovrayCode()` which creates the real POV-Ray code. The `main()` function calls it for every object in the `firstLayer`. `createPovrayCode()` calls itself for every child, so a recursive function.
+First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovCode()` which creates the real POV-Ray code. The `main()` function calls it for every object in the `firstLayer`. `createPovCode()` calls itself for every child, so a recursive function.
 
-<a name="characteristics"></a>
 ### Characteristics
 The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently of the position of it <0, 0, 0>, FreeCAD rotates relative to the object.
 
-### createPovrayCode()
+### `createPovCode()`
 1. The variable povCode will be initialised with the label / name of the object.
 2. Add the basing POV-Ray object to povCode but don't close the object
 3. Add the rotation to the POV-Ray object
