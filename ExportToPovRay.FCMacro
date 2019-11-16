@@ -26,6 +26,8 @@ import MeshPart
 import platform
 import subprocess
 
+macroVersion = "0.1 beta"
+
 def showError(text, title): #show an error box
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Critical, title, text)
     dialog.setWindowModality(QtCore.Qt.ApplicationModal)
@@ -85,7 +87,6 @@ class ExportToPovRay:
             try: #try to open pov file
                 file = open(self.povPath, "w+") #really "w+"?
                 file.close()
-                App.Console.PrintMessage("\n\nPath to *.pov File: " + self.povPath + "\n")
             except:
                 App.Console.PrintError("Can't open the pov file\n\n")
                 return -1
@@ -810,7 +811,7 @@ class ExportToPovRay:
                     try:
                         mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = deviation, AngularDeflection = angularDeflection, Relative = False)
                     except:
-                        mesh = MeshPart.meshFromShape(shape,deviation,angularDeflection)
+                        mesh = MeshPart.meshFromShape(shape, deviation, angularDeflection)
 
                 except:
                     return ""
@@ -905,11 +906,26 @@ class ExportToPovRay:
                 CsgCount = CsgCount + 1
             if obj.InList == []:
                 ParentCount = ParentCount + 1
+
+        statistics += "Version of Macro: " + macroVersion + "\n"
+        statistics += "Path to *.pov File: " + self.povPath + "\n"
         statistics += str(ParentCount) + " parent objects found in highest layer\n"
         statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
         if noCsgCount != 0:
             statistics += "Your model contains " + str(noCsgCount) + " objects which aren't supported (will be represented as mesh).\n"
-        
+
+        if self.CamType == "Perspective":
+            camInfo = "Perspective Camera\n"
+        elif self.CamType == "Orthographic":
+            camInfo = "Orthographic camera\n"
+        else:
+            camInfo = "Unknown camera type - rudimentary camera statement will be used\n"
+        if self.incContent.find("camera") != -1:
+            camInfo = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
+
+        statistics += camInfo
+        statistics += "\n"
+
         return statistics
 
     def getLight(self): #get the FreeCAD light
@@ -988,7 +1004,6 @@ class ExportToPovRay:
         AspectRatio = self.width / float(self.height)
 
         PovCam = ""
-        CamComment = ""
         incCamera = False
 
         PovCamType = ""
@@ -1005,7 +1020,6 @@ class ExportToPovRay:
             else:
                 CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
             PovCamAngle = "\tangle {0:1.2f}".format(CamAngle) + "\n"
-            CamComment += "Perspective Camera\n"
 
         elif self.CamType == "Orthographic":
             if AspectRatio >= 1:
@@ -1017,10 +1031,6 @@ class ExportToPovRay:
             PovCamType = "\torthographic\n"
             PovCamUp = "< 0, 0, " + "{0:1.2f}".format(up) + ">"
             PovCamRight = "<" + "{0:1.2f}".format(right) +", 0, 0>"
-            CamComment += "Orthographic camera\n"
-
-        else:
-            CamComment += "Unknown camera type - rudimentary camera statement will be used\n"
 
         PovCam += "#declare CamUp = " + PovCamUp + ";\n"
         PovCam += "#declare CamRight = " + PovCamRight + ";\n"
@@ -1043,9 +1053,6 @@ class ExportToPovRay:
         PovCam += "}\n"
         if incCamera:
             PovCam += "*/\n"
-            CamComment = "User defined camera found - FreeCAD camera will be commented out in *.pov file\n"
-
-        App.Console.PrintMessage(CamComment)
 
         return PovCam
 
