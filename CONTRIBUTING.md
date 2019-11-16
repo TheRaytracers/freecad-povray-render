@@ -78,13 +78,13 @@ The color(s) are mapped on the POV-Ray sky-sphere and afterwards the skysphere i
 
 <a name="objectsFromScene"></a>
 ## Objects from Scene
-First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovrayCode()` which creates the real POV-Ray code. The `main()` function calls it for every object in the `firstLayer`. `createPovrayCode()` calls itself for every child, so a recursive function.
+First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovCode()` which creates the real POV-Ray code. The `main()` function calls it for every object in the `firstLayer`. `createPovCode()` calls itself for every child, so a recursive function.
 
 <a name="characteristics"></a>
 ### Characteristics
 The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently of the position of it <0, 0, 0>, FreeCAD rotates relative to the object.
 
-### createPovrayCode()
+### createPovCode()
 1. The variable povCode will be initialised with the label / name of the object.
 2. Add the basing POV-Ray object to povCode but don't close the object
 3. Add the rotation to the POV-Ray object
