@@ -15,7 +15,7 @@ So if your rendering doesn't look like you have expected, it may not be a bug, i
     - [Touching surfaces](#touching-surfaces)
     - [Repair rotation](#repair-rotation)
   - [Debugging](#debugging)
-  - [Rendering time](#rendering-time)
+  - [Mesh resolution and rendering time](#mesh-resolution-and-rendering-time)
 
 ## The camera
 
@@ -174,10 +174,12 @@ If you think you found a bug in our macro we will be happy if you report it to u
 The usage of non CSG objects can slow down the macro and result in a big mesh file. In this case you FreeCAD freezes until the calculation of the mesh is finished. You can influence the resoloution of the mesh by changing the values of angular deflection an deviation in the objects view properties. The default values are 28,5° for Angular deflection and 0.5 for deviation.
 In the following example we increase the resolution of the mesh by changing these values.
 
-| Angular Deflection | Deviation | Render time | Meshfile size |
-|-------------------:|----------:|------------:|--------------:|
-| 28,5°              | 0,5       | 2s          | 295 KB        |
-| 10,0°              | 0,1       | 57s         | 2,1 MB        |
-|  5,0°              | 0,1       | 15min       | 7,2 MB        |
+| Angular Deflection | Deviation | Creation of mesh | Meshfile size |
+|-------------------:|----------:|-----------------:|--------------:|
+| 28,5°              | 0,5       | 2s               | 295 KB        |
+| 10,0°              | 0,1       | 57s              | 2,1 MB        |
+|  5,0°              | 0,1       | 15min            | 7,2 MB        |
+
+![Rendering with the three Settings](img/meshResolution.png "The image is a merge of the renderings with different resolution settings")
 
 A slow rendering can also be a result of some POV-Ray options like radiosity or a complex scene. In this cases our advice is to start with small image sizes and render the high resoloution image at the end.
