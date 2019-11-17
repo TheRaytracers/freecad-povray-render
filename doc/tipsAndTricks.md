@@ -138,7 +138,7 @@ The intention of the macro is, to create a model with **C**onstructive **S**olid
 So the focus of our developement was, to implement a conversion for the solids of the Part Workbench and the boolean operations for constructions.
 But FreeCAD is more than a CSG Modeller. To avoid empty renderings, all non implemented features will be converted to meshes. So if you use e.g. fillets or extrued sketches, they will be converted to a mesh before rendering.
 FreeCAD, like other CAD software, won't tell you wether an object is a solid or a mesh. And for most of the cases it is not that important to know. But if you do a high resoloution rendering of a highly polished sphere, for example you won't like to see a lot of faces. So for a realistic rendering our advice is, to use CSG as long as you can and only switch to meshes, if there is no other possibility.
-Another advantage of CSG is, that it needs less memory than the mesh representation of the same object. One reason for developing this macro was the unclearness of the .pov files created by the Raytracing Workbench. Because we don't like any mess-up in the .pov file we put all meshes in an include file and leave only the matching identifiers in the .pov file
+Another advantage of CSG is, that it needs less memory than the mesh representation of the same object. One reason for developing this macro was the unclearness of the .pov files created by the Raytracing Workbench. Because we don't like any mess-up in the .pov file we put all meshes in an include file and leave only the matching identifiers in the .pov file. On the bottom of this site you can find more information about [Mesh resolution and rendering time](#Mesh-resolution-and-rendering-time)
 
 ### Touching surfaces
 
@@ -179,6 +179,8 @@ In the following example we increase the resolution of the mesh by changing thes
 | 28,5°              | 0,5       | 2s               | 295 KB        |
 | 10,0°              | 0,1       | 57s              | 2,1 MB        |
 |  5,0°              | 0,1       | 15min            | 7,2 MB        |
+
+Increasing mesh resolution from left to right:
 
 ![Rendering with the three Settings](img/meshResolution.png "The image is a merge of the renderings with different resolution settings")
 
