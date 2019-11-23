@@ -819,8 +819,8 @@ class ExportToPovRay:
 
 
             if not mesh or len(mesh.Topology[0]) == 0 or len(mesh.Topology[1]) == 0:
-                warningMessage = "\n\nNo mesh created - Object " + fcObj.Label + " won't be rendered"
-                App.Console.PrintWarning(warningMessage)
+                #warningMessage = "\n\nNo mesh created - Object " + fcObj.Label + " won't be rendered"
+                #App.Console.PrintWarning(warningMessage)
                 return ""
 
             #create mesh2 object
