@@ -533,7 +533,7 @@ class ExportToPovRay:
 
         elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
             if not self.isBodySupported(fcObj):
-                povCode += self.createMesh(fcObj.Tip, expPlacement, expPigment, expClose, expMeshDef)
+                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
                 return povCode #return because the mesh may not translated and rotated
 
             povBody = "\nunion {\n"
@@ -803,12 +803,6 @@ class ExportToPovRay:
                         angularDeflection = 0.5
                     deviation = fcObj.ViewObject.Deviation
 
-                    if fcObj.InList != []:
-                        if fcObj.InList[0].TypeId == "PartDesign::Body":
-                            try:
-                                angularDeflection = fcObj.InList[0].ViewObject.AngularDeflection.getValueAs("rad").Value
-                            except:
-                                angularDeflection = 0.5
                     try:
                         mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = deviation, AngularDeflection = angularDeflection, Relative = False)
                     except:
@@ -1226,6 +1220,7 @@ class ExportToPovRay:
         uniString = uniString.replace(u"(", "_")
         uniString = uniString.replace(u")", "_")
         uniString = uniString.replace(u"#", "_")
+        uniString = uniString.replace(u".", "_")
         uniString = uniString.replace(u"-", "_")
         uniString = uniString.replace(u"+", "_")
         uniString = uniString.replace(u"*", "_")
