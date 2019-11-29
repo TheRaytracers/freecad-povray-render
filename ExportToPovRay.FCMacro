@@ -506,8 +506,10 @@ class ExportToPovRay:
 
             childs = fcObj.OutList
             for child in childs:
-                childCode = self.createPovCode(child, True, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
-                povPart += childCode.replace("\n", "\n\t") #add the indents
+                guiChild = child.ViewObject
+                if guiChild.Visibility:
+                    childCode = self.createPovCode(child, True, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
+                    povPart += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povPart
             expPigment = False #part has no pigment
