@@ -133,10 +133,9 @@ class ExportToPovRay:
 
         #get the first layer and check visibility of parent objects
         for obj in self.objs:
-            if obj.InList == [] or (len(obj.InList) == 1 and (obj.InList[0].Name == "Clone" or obj.InList[0].Name[:-3] == "Clone")): #no parents
-                guiObject = obj.ViewObject
-                if guiObject.Visibility:
-                    firstLayer.append(obj)
+            guiObject = obj.ViewObject
+            if guiObject.Visibility and obj.TypeId != "App::DocumentObjectGroup" and not self.hasBodyAsParent(obj) and not self.hasPartAsParent(obj):
+                firstLayer.append(obj)
 
         #create pov code of objects
         objPovCode = ""
@@ -501,13 +500,6 @@ class ExportToPovRay:
 
             expPigment = False
             povCode += povImg
-
-        elif fcObj.TypeId == "App::DocumentObjectGroup": #Group
-            childs = fcObj.OutList
-            for child in childs:
-                childCode = self.createPovCode(child, expPlacement, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
-                povCode += childCode
-            return povCode
 
         elif fcObj.TypeId == "App::Part": #Part
             povPart = "\nunion {\n"
@@ -1189,13 +1181,19 @@ class ExportToPovRay:
     def exportFcView(self): #export the current FreeCAD view like Tools / Save Picture...
         Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
 
-    def hasInListClone(self, fcObj): #has the object a clone as parent
+    def hasPartAsParent(self, fcObj):
         for parent in fcObj.InList:
-            if parent.TypeId == "Part::FeaturePython" and (parent.Name == "Clone" or parent.Name[:-3] == "Clone"):
+            if parent.TypeId == "App::Part":
                 return True
 
         return False
 
+    def hasBodyAsParent(self, fcObj):
+        for parent in fcObj.InList:
+            if parent.TypeId == "PartDesign::Body":
+                return True
+
+        return False
 
     def stringCorrection(self, inputString): #change a utf-8 string to an ASCII string
         utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
