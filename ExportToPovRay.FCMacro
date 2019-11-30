@@ -1322,19 +1322,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.optionGroups = QtGui.QGroupBox("Options")
         self.optionGroups.setLayout(self.vertLayout2)
 
-        self.cancelButton = QtGui.QPushButton('Cancel')
-        self.cancelButton.clicked.connect(self.onCancel)
-
-        self.okButton = QtGui.QPushButton('OK')
-        self.okButton.clicked.connect(self.onOk)
-        self.okButton.setAutoDefault(True)
-
+        #add widgets to the main layout
         self.mainLayout = QtGui.QVBoxLayout()
         self.mainLayout.addWidget(self.pathGroup)
         self.mainLayout.addWidget(self.WHImageGroup)
         self.mainLayout.addWidget(self.optionGroups)
-        self.mainLayout.addWidget(self.cancelButton)
-        self.mainLayout.addWidget(self.okButton)
 
         #Texture Tab
         self.initTextureTab()
@@ -1352,8 +1344,14 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.tabs.addTab(self.textureWidget, "Textures")
         self.tabs.addTab(self.helpLabel, "Help")
 
+        # ok cancel buttons
+        self.buttonBox = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
+        self.buttonBox.accepted.connect(self.onOk)
+        self.buttonBox.rejected.connect(self.onCancel)
+
         self.wrapLayout = QtGui.QVBoxLayout()
         self.wrapLayout.addWidget(self.tabs)
+        self.wrapLayout.addWidget(self.buttonBox)
         self.setLayout(self.wrapLayout)
         self.show()
 
@@ -1534,10 +1532,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
     def checkPath(self, path): #check if the path to pov file is valid
         if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:] == ".pov":
-            self.okButton.setEnabled(True)
+            self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(True)
             self.warnLabel.setText("")
         else:
-            self.okButton.setEnabled(False)
+            self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
             if path == "":
                 self.warnLabel.setText("Please type a path or get one with clicking on 'Open pov File'")
             else:
