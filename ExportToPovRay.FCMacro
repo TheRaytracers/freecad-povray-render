@@ -1371,31 +1371,26 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.listLayout.addWidget(self.objectListLabel, 0, 0)
         self.listLayout.addWidget(self.objectList, 1, 0)
 
-        #texture categories list
-        self.categoriesList = QtGui.QListWidget()
-
-        self.categoriesListLabel = QtGui.QLabel("<b>Texture Categorie</b>")
-        for i in range(10):
-            self.categoriesList.addItem('Object %s' % (i + 1))
-        
-        self.listLayout.addWidget(self.categoriesListLabel, 0, 1)
-        self.listLayout.addWidget(self.categoriesList, 1, 1)
-
         #texture list
         self.textureList = QtGui.QTreeWidget()
         self.textureList.setHeaderLabel("Type of Predefined")
 
-        self.predefTypes = []
+        self.categories = ["Glass", "Wood", "Metal", "Stone"]
+        self.predefKinds = ["Material", "Texture", "Pigment"] #kind of predefined
 
         self.textureListLabel = QtGui.QLabel("<b>Texture</b>")
-        for i in range(5):
-            kind = [QtGui.QTreeWidgetItem(self.textureList, ['Object %s' % (i + 1)])]
-            for k in range(10):
-                kind.append(QtGui.QTreeWidgetItem(kind[0], ["SubObject %s" % (k + 1)]))
+        for categorie in self.categories:
+            actCategorie = QtGui.QTreeWidgetItem(self.textureList, [categorie])
+
+            for kind in self.predefKinds:
+                actKind = QtGui.QTreeWidgetItem(actCategorie, [kind])
+
+                for i in range(5):
+                    QtGui.QTreeWidgetItem(actKind, ["Predefined " + str(i)])
 
         
-        self.listLayout.addWidget(self.textureListLabel, 0, 2)
-        self.listLayout.addWidget(self.textureList, 1, 2)
+        self.listLayout.addWidget(self.textureListLabel, 0, 1)
+        self.listLayout.addWidget(self.textureList, 1, 1)
 
         self.listWidget.setLayout(self.listLayout)
 
