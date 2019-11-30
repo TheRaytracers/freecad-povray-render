@@ -1336,6 +1336,9 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.mainLayout.addWidget(self.cancelButton)
         self.mainLayout.addWidget(self.okButton)
 
+        #Texture Tab
+        self.initTextureTab()
+
         #create macro group
         self.macroGroup = QtGui.QGroupBox("")
         self.macroGroup.setLayout(self.mainLayout)
@@ -1346,12 +1349,25 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         #create tabs
         self.tabs = QtGui.QTabWidget(self)
         self.tabs.addTab(self.macroGroup, "Macro")
+        self.tabs.addTab(self.textureWidget, "Textures")
         self.tabs.addTab(self.helpLabel, "Help")
 
         self.wrapLayout = QtGui.QVBoxLayout()
         self.wrapLayout.addWidget(self.tabs)
         self.setLayout(self.wrapLayout)
         self.show()
+
+    def initTextureTab(self):
+        self.list = QtGui.QListWidget(self)
+
+        for i in range(10):
+            self.list.addItem('Object %s' % (i + 1))
+        
+        self.textureLayout = QtGui.QGridLayout()
+        self.textureLayout.addWidget(self.list, 0, 0)
+
+        self.textureWidget = QtGui.QWidget()
+        self.textureWidget.setLayout(self.textureLayout)
 
     def setDefaultValues(self): #set the default values of the input objects
         system = platform.system()
