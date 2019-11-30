@@ -1382,11 +1382,17 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.listLayout.addWidget(self.categoriesList, 1, 1)
 
         #texture list
-        self.textureList = QtGui.QListWidget()
+        self.textureList = QtGui.QTreeWidget()
+        self.textureList.setHeaderLabel("Type of Predefined")
+
+        self.predefTypes = []
 
         self.textureListLabel = QtGui.QLabel("<b>Texture</b>")
-        for i in range(10):
-            self.textureList.addItem('Object %s' % (i + 1))
+        for i in range(5):
+            kind = [QtGui.QTreeWidgetItem(self.textureList, ['Object %s' % (i + 1)])]
+            for k in range(10):
+                kind.append(QtGui.QTreeWidgetItem(kind[0], ["SubObject %s" % (k + 1)]))
+
         
         self.listLayout.addWidget(self.textureListLabel, 0, 2)
         self.listLayout.addWidget(self.textureList, 1, 2)
