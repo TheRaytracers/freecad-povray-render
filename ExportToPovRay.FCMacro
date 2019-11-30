@@ -1362,7 +1362,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.listLayout = QtGui.QGridLayout()
 
         #object list
-        self.objectList = QtGui.QListWidget(self)
+        self.objectList = QtGui.QListWidget()
 
         self.objectListLabel = QtGui.QLabel("<b>Object</b>")
         for i in range(10):
@@ -1372,7 +1372,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.listLayout.addWidget(self.objectList, 1, 0)
 
         #texture categories list
-        self.categoriesList = QtGui.QListWidget(self)
+        self.categoriesList = QtGui.QListWidget()
 
         self.categoriesListLabel = QtGui.QLabel("<b>Texture Categorie</b>")
         for i in range(10):
@@ -1382,7 +1382,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.listLayout.addWidget(self.categoriesList, 1, 1)
 
         #texture list
-        self.textureList = QtGui.QListWidget(self)
+        self.textureList = QtGui.QListWidget()
 
         self.textureListLabel = QtGui.QLabel("<b>Texture</b>")
         for i in range(10):
@@ -1424,16 +1424,19 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.rotationX = QtGui.QDoubleSpinBox()
         self.rotationX.setMinimum(0)
         self.rotationX.setPrefix("x: ")
+        self.rotationX.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.rotationX, 1, 1)
 
         self.rotationY = QtGui.QDoubleSpinBox()
         self.rotationY.setMinimum(0)
         self.rotationY.setPrefix("y: ")
+        self.rotationY.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.rotationY, 1, 2)
 
         self.rotationZ = QtGui.QDoubleSpinBox()
         self.rotationZ.setMinimum(0)
         self.rotationZ.setPrefix("z: ")
+        self.rotationZ.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.rotationZ, 1, 3)
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
