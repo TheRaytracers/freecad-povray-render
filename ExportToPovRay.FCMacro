@@ -1358,7 +1358,17 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
     def initTextureTab(self):
         self.textureLayout = QtGui.QVBoxLayout()
+        
+        self.addObjectsTexturesLists()
+        self.addScaleRotate()
 
+        self.textureLayout.addWidget(self.listWidget)
+        self.textureLayout.addWidget(self.textureSettingsWidget)
+
+        self.textureWidget = QtGui.QWidget()
+        self.textureWidget.setLayout(self.textureLayout)
+
+    def addObjectsTexturesLists(self):
         self.listWidget = QtGui.QWidget()
         self.listLayout = QtGui.QGridLayout()
 
@@ -1423,7 +1433,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.listLayout.addWidget(self.objectListLabel, 0, 0)
         self.listLayout.addWidget(self.objectList, 1, 0)
 
-        #############################
+    def addScaleRotate(self):
         # scale, rotate, preview
         self.textureSettingsWidget = QtGui.QWidget()
         self.textureSettingsLayout = QtGui.QGridLayout()
@@ -1476,14 +1486,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureSettingsLayout.addWidget(self.rotationZ, 1, 3)
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
-
-        #############################
-
-        self.textureLayout.addWidget(self.listWidget)
-        self.textureLayout.addWidget(self.textureSettingsWidget)
-
-        self.textureWidget = QtGui.QWidget()
-        self.textureWidget.setLayout(self.textureLayout)
 
     def setDefaultValues(self): #set the default values of the input objects
         system = platform.system()
