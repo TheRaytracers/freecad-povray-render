@@ -1362,6 +1362,16 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.addObjectsTexturesLists()
         self.addScaleRotate()
 
+        # signals and slots
+        #self.objectList.itemSelectionChanged.connect(self.updateListObject)
+        self.textureList.itemSelectionChanged.connect(self.updateSelectedListObject)
+        self.scaleX.valueChanged.connect(self.updateSelectedListObject)
+        self.scaleY.valueChanged.connect(self.updateSelectedListObject)
+        self.scaleZ.valueChanged.connect(self.updateSelectedListObject)
+        self.rotationX.valueChanged.connect(self.updateSelectedListObject)
+        self.rotationY.valueChanged.connect(self.updateSelectedListObject)
+        self.rotationZ.valueChanged.connect(self.updateSelectedListObject)
+
         self.textureLayout.addWidget(self.listWidget)
         self.textureLayout.addWidget(self.textureSettingsWidget)
 
@@ -1487,6 +1497,43 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
+    def updateSelectedListObject(self):
+        listObj = self.getSelectedListObject()
+        if listObj == -1:
+            App.Console.PrintError("\n\n1Error occurred! Please report a bug!\n\n") #XXX better error message
+            return -1
+
+        predefine = self.getSelectedPredefined()
+        if predefine == -1:
+            App.Console.PrintError("\n\n2Error occurred! Please report a bug!\n\n") #XXX better error message
+            return -1
+
+        listObj.scaleX = self.scaleX.value()
+        listObj.scaleY = self.scaleY.value()
+        listObj.scaleZ = self.scaleZ.value()
+
+        listObj.rotationX = self.rotationX.value()
+        listObj.rotationY = self.rotationY.value()
+        listObj.rotationZ = self.rotationZ.value()
+
+        listObj.predefObject = predefine
+
+    def getSelectedListObject(self):
+        for listObj in self.listObjects:
+            #App.Console.PrintWarning(listObj.listItem.isSelected())
+            if listObj.listItem.isSelected():
+                return listObj
+
+        return -1
+
+    def getSelectedPredefined(self):
+        for predefine in self.predefines:
+            #App.Console.PrintMessage(predefine.treeItem.isSelected())
+            if predefine.treeItem.isSelected():
+                return predefine
+
+        return -1
+
     def setDefaultValues(self): #set the default values of the input objects
         system = platform.system()
         if system == "Linux":
@@ -1596,6 +1643,15 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
     def onCancel(self): #called if "Cancel" button is pressed
         self.result = "Canceled"
+        #only for testing
+        for listObj in self.listObjects:
+            App.Console.PrintWarning(listObj.scaleX)
+            App.Console.PrintWarning("\n")
+            App.Console.PrintWarning(listObj.scaleY)
+            App.Console.PrintWarning("\n")
+            App.Console.PrintWarning(listObj.scaleZ)
+            App.Console.PrintWarning("\n\n")
+
         self.close()
         App.Console.PrintMessage("\n\nCanceled\n\n")
 
@@ -1619,14 +1675,14 @@ class Predefined:
         self.treeItem = treeItem
 
 class ListObject:
-    def __init__(self, fcObj, listItem, predefObject, scaleX, scaleY, scaleZ, rotateX, rotateY, rotateZ):
+    def __init__(self, fcObj, listItem, predefObject, scaleX, scaleY, scaleZ, rotationX, rotationY, rotationZ):
         self.label = stringCorrection(fcObj.Label)
         self.scaleX = scaleX
         self.scaleY = scaleY
         self.scaleZ = scaleZ
-        self.rotateX = rotateX
-        self.rotateY = rotateY
-        self.rotateZ = rotateZ
+        self.rotationX = rotationX
+        self.rotationY = rotationY
+        self.rotationZ = rotationZ
         self.listItem = listItem
         self.predefObject = predefObject
 
