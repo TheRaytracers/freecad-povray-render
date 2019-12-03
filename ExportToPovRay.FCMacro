@@ -1363,7 +1363,17 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.addScaleRotate()
 
         # signals and slots
-        #self.objectList.itemSelectionChanged.connect(self.updateListObject)
+        self.connectSignals()
+
+        self.textureLayout.addWidget(self.listWidget)
+        self.textureLayout.addWidget(self.textureSettingsWidget)
+
+        self.textureWidget = QtGui.QWidget()
+        self.textureWidget.setLayout(self.textureLayout)
+
+    def connectSignals(self):
+        self.objectList.itemSelectionChanged.connect(self.updateTextureSettings)
+
         self.textureList.itemSelectionChanged.connect(self.updateSelectedListObject)
         self.scaleX.valueChanged.connect(self.updateSelectedListObject)
         self.scaleY.valueChanged.connect(self.updateSelectedListObject)
@@ -1372,11 +1382,16 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.rotationY.valueChanged.connect(self.updateSelectedListObject)
         self.rotationZ.valueChanged.connect(self.updateSelectedListObject)
 
-        self.textureLayout.addWidget(self.listWidget)
-        self.textureLayout.addWidget(self.textureSettingsWidget)
+    def disconnectSignals(self):
+        self.objectList.itemSelectionChanged.disconnect()
 
-        self.textureWidget = QtGui.QWidget()
-        self.textureWidget.setLayout(self.textureLayout)
+        self.textureList.itemSelectionChanged.disconnect()
+        self.scaleX.valueChanged.disconnect()
+        self.scaleY.valueChanged.disconnect()
+        self.scaleZ.valueChanged.disconnect()
+        self.rotationX.valueChanged.disconnect()
+        self.rotationY.valueChanged.disconnect()
+        self.rotationZ.valueChanged.disconnect()
 
     def addObjectsTexturesLists(self):
         self.listWidget = QtGui.QWidget()
@@ -1496,6 +1511,27 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureSettingsLayout.addWidget(self.rotationZ, 1, 3)
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
+
+    def updateTextureSettings(self):
+        App.Console.PrintWarning("updateTextureSettings\n")
+        self.disconnectSignals()
+        listObj = self.getSelectedListObject()
+
+        self.scaleX.setValue(listObj.scaleX)
+        self.scaleY.setValue(listObj.scaleY)
+        self.scaleZ.setValue(listObj.scaleZ)
+
+        self.rotationX.setValue(listObj.rotationX)
+        self.rotationY.setValue(listObj.rotationY)
+        self.rotationZ.setValue(listObj.rotationZ)
+
+        #unselect all textures
+        for predefine in self.predefines:
+            predefine.treeItem.setSelected(False)
+
+        listObj.predefObject.treeItem.setSelected(True)
+
+        self.connectSignals()
 
     def updateSelectedListObject(self):
         listObj = self.getSelectedListObject()
@@ -1643,17 +1679,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
     def onCancel(self): #called if "Cancel" button is pressed
         self.result = "Canceled"
-        #only for testing
-        for listObj in self.listObjects:
-            App.Console.PrintWarning(listObj.scaleX)
-            App.Console.PrintWarning("\n")
-            App.Console.PrintWarning(listObj.scaleY)
-            App.Console.PrintWarning("\n")
-            App.Console.PrintWarning(listObj.scaleZ)
-            App.Console.PrintWarning("\n")
-            App.Console.PrintWarning(listObj.predefObject.identifier)
-            App.Console.PrintWarning("\n\n")
-
         self.close()
         App.Console.PrintMessage("\n\nCanceled\n\n")
 
