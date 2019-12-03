@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<Predefined>
+    <Metals>
+        <Materials>
+
+        </Materials>
+
+        <Textures>
+            <Texture>T_Brass_1A</Texture>
+            <Texture>T_Brass_5E</Texture>
+            <Texture>T_Copper_1A</Texture>
+            <Texture>T_Copper_5E</Texture>
+            <Texture>T_Chrome_1A</Texture>
+            <Texture>T_Chrome_5E</Texture>
+            <Texture>T_Silver_1A</Texture>
+            <Texture>T_Silver_5E</Texture>
+        </Textures>
+
+        <Pigments>
+            <Texture>P_Brass1</Texture>
+            <Texture>P_Brass2</Texture>
+            <Texture>P_Brass3</Texture>
+            <Texture>P_Brass4</Texture>
+            <Texture>P_Brass5</Texture>
+            <Texture>P_Copper</Texture>
+            <Texture>P_Copper2</Texture>
+            <Texture>P_Copper3</Texture>
+            <Texture>P_Copper4</Texture>
+            <Texture>P_Copper5</Texture>
+            <Texture>P_Chrome1</Texture>
+            <Texture>P_Chrome2</Texture>
+            <Texture>P_Chrome3</Texture>
+            <Texture>P_Chrome4</Texture>
+            <Texture>P_Chrome5</Texture>
+            <Texture>P_Silver1</Texture>
+            <Texture>P_Silver2</Texture>
+            <Texture>P_Silver3</Texture>
+            <Texture>P_Silver4</Texture>
+            <Texture>P_Silver5</Texture>
+        </Pigments>
+    </Metals>
+</Predefined>

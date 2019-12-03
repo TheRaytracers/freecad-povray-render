@@ -25,6 +25,7 @@ import math
 import MeshPart
 import platform
 import subprocess
+import xml.etree.ElementTree as xml
 
 macroVersion = "0.1 beta"
 
@@ -1397,19 +1398,21 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureList = QtGui.QTreeWidget()
         self.textureList.setHeaderLabel("Type of Predefined")
 
-        self.categories = ["Glass", "Wood", "Metal", "Stone"]
-        self.predefKinds = ["Material", "Texture", "Pigment"] #kind of predefined
-
         self.textureListLabel = QtGui.QLabel("<b>Texture</b>")
-        for categorie in self.categories:
-            actCategorie = QtGui.QTreeWidgetItem(self.textureList, [categorie])
 
-            for kind in self.predefKinds:
-                actKind = QtGui.QTreeWidgetItem(actCategorie, [kind])
+        predefined = xml.parse('/home/otto/Dokumente/exporttopovray/predefined.xml').getroot()
+        categories = predefined.getchildren()
+        self.predefines = []
 
-                for i in range(5):
-                    QtGui.QTreeWidgetItem(actKind, ["Predefined " + str(i)])
-
+        for categorie in categories:
+            categorieItem = QtGui.QTreeWidgetItem(self.textureList, [categorie.tag])
+            kinds = categorie.getchildren()
+            for kind in kinds:
+                kindItem = QtGui.QTreeWidgetItem(categorieItem, [kind.tag])
+                predefines = kind.getchildren()
+                for predefined in predefines:
+                    treeItem = QtGui.QTreeWidgetItem(kindItem, [predefined.text])
+                    self.predefines.append(Predefined(predefined.text, categorie.tag, kind.tag, treeItem))
         
         self.listLayout.addWidget(self.textureListLabel, 0, 1)
         self.listLayout.addWidget(self.textureList, 1, 1)
@@ -1602,6 +1605,13 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                                   self.repRot.isChecked(),
                                   self.expFcView.isChecked())
 
+class Predefined:
+    def __init__(self, identifier, categorie, kind, treeItem):
+        self.identifier = identifier
+        self.categorie = categorie
+        self.kind = kind
+        self.treeItem = treeItem
+
 def main(): #the main function
     #version = float(App.Version()[1])
     #if version < 17:
@@ -1617,5 +1627,4 @@ def main(): #the main function
     else:
         dialog = GUI()
         dialog.exec_()
-
 main()
