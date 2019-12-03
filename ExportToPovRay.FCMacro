@@ -1650,6 +1650,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             App.Console.PrintWarning(listObj.scaleY)
             App.Console.PrintWarning("\n")
             App.Console.PrintWarning(listObj.scaleZ)
+            App.Console.PrintWarning("\n")
+            App.Console.PrintWarning(listObj.predefObject.identifier)
             App.Console.PrintWarning("\n\n")
 
         self.close()
