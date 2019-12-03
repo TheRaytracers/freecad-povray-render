@@ -1365,8 +1365,29 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.objectList = QtGui.QListWidget()
 
         self.objectListLabel = QtGui.QLabel("<b>Object</b>")
-        for i in range(10):
-            self.objectList.addItem('Object %s' % (i + 1))
+
+        #get objects
+        objs = App.ActiveDocument.Objects
+        self.listObjects = []
+        for obj in objs:
+            #has object a shape color
+            try:
+                obj.ViewObject.ShapeColor
+                shapeColor = True
+            except:
+                shapeColor = False
+            #has object a shape
+            try:
+                obj.Shape
+                shape = True
+            except:
+                shape = False
+
+            if obj.ViewObject.Visibility and shapeColor and shape:
+                self.listObjects.append(obj)
+
+        for obj in self.listObjects:
+            self.objectList.addItem(obj.Label)
         
         self.listLayout.addWidget(self.objectListLabel, 0, 0)
         self.listLayout.addWidget(self.objectList, 1, 0)
