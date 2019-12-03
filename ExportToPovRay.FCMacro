@@ -1387,7 +1387,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                 self.listObjects.append(obj)
 
         for obj in self.listObjects:
-            self.objectList.addItem(obj.Label)
+            item = QtGui.QListWidgetItem(obj.ViewObject.Icon, obj.Label)
+            self.objectList.addItem(item)
         
         self.listLayout.addWidget(self.objectListLabel, 0, 0)
         self.listLayout.addWidget(self.objectList, 1, 0)
