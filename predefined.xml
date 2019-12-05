@@ -6,37 +6,37 @@
         </Material>
 
         <Texture>
-            <Predef>T_Brass_1A</Predef>
-            <Predef>T_Brass_5E</Predef>
-            <Predef>T_Copper_1A</Predef>
-            <Predef>T_Copper_5E</Predef>
-            <Predef>T_Chrome_1A</Predef>
-            <Predef>T_Chrome_5E</Predef>
-            <Predef>T_Silver_1A</Predef>
-            <Predef>T_Silver_5E</Predef>
+            <Predef inc="metals.inc">T_Brass_1A</Predef>
+            <Predef inc="metals.inc">T_Brass_5E</Predef>
+            <Predef inc="metals.inc">T_Copper_1A</Predef>
+            <Predef inc="metals.inc">T_Copper_5E</Predef>
+            <Predef inc="metals.inc">T_Chrome_1A</Predef>
+            <Predef inc="metals.inc">T_Chrome_5E</Predef>
+            <Predef inc="metals.inc">T_Silver_1A</Predef>
+            <Predef inc="metals.inc">T_Silver_5E</Predef>
         </Texture>
 
         <Pigment>
-            <Predef>P_Brass1</Predef>
-            <Predef>P_Brass2</Predef>
-            <Predef>P_Brass3</Predef>
-            <Predef>P_Brass4</Predef>
-            <Predef>P_Brass5</Predef>
-            <Predef>P_Copper</Predef>
-            <Predef>P_Copper2</Predef>
-            <Predef>P_Copper3</Predef>
-            <Predef>P_Copper4</Predef>
-            <Predef>P_Copper5</Predef>
-            <Predef>P_Chrome1</Predef>
-            <Predef>P_Chrome2</Predef>
-            <Predef>P_Chrome3</Predef>
-            <Predef>P_Chrome4</Predef>
-            <Predef>P_Chrome5</Predef>
-            <Predef>P_Silver1</Predef>
-            <Predef>P_Silver2</Predef>
-            <Predef>P_Silver3</Predef>
-            <Predef>P_Silver4</Predef>
-            <Predef>P_Silver5</Predef>
+            <Predef inc="metals.inc">P_Brass1</Predef>
+            <Predef inc="metals.inc">P_Brass2</Predef>
+            <Predef inc="metals.inc">P_Brass3</Predef>
+            <Predef inc="metals.inc">P_Brass4</Predef>
+            <Predef inc="metals.inc">P_Brass5</Predef>
+            <Predef inc="metals.inc">P_Copper</Predef>
+            <Predef inc="metals.inc">P_Copper2</Predef>
+            <Predef inc="metals.inc">P_Copper3</Predef>
+            <Predef inc="metals.inc">P_Copper4</Predef>
+            <Predef inc="metals.inc">P_Copper5</Predef>
+            <Predef inc="metals.inc">P_Chrome1</Predef>
+            <Predef inc="metals.inc">P_Chrome2</Predef>
+            <Predef inc="metals.inc">P_Chrome3</Predef>
+            <Predef inc="metals.inc">P_Chrome4</Predef>
+            <Predef inc="metals.inc">P_Chrome5</Predef>
+            <Predef inc="metals.inc">P_Silver1</Predef>
+            <Predef inc="metals.inc">P_Silver2</Predef>
+            <Predef inc="metals.inc">P_Silver3</Predef>
+            <Predef inc="metals.inc">P_Silver4</Predef>
+            <Predef inc="metals.inc">P_Silver5</Predef>
         </Pigment>
     </Metal>
 </Predefined>

@@ -1403,7 +1403,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         self.textureListLabel = QtGui.QLabel("<b>Texture</b>")
 
-        predefined = xml.parse('/home/otto/Dokumente/exporttopovray/predefined.xml').getroot()
+        predefined = xml.parse('/home/otto/Dokumente/exporttopovray/predefined.xml').getroot() #XXX use right path
         categories = predefined.getchildren()
         self.predefines = []
 
@@ -1415,7 +1415,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                 predefines = kind.getchildren()
                 for predefined in predefines:
                     treeItem = QtGui.QTreeWidgetItem(kindItem, [predefined.text])
-                    self.predefines.append(Predefined(predefined.text, categorie.tag, kind.tag, treeItem))
+                    self.predefines.append(Predefined(predefined.text, categorie.tag, kind.tag, predefined.attrib["inc"], treeItem))
         
         self.listLayout.addWidget(self.textureListLabel, 0, 1)
         self.listLayout.addWidget(self.textureList, 1, 1)
@@ -1513,7 +1513,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
     def updateTextureSettings(self):
-        #TODO select one object and texture to beginning
         #TODO add auto selecting of first child element if a wrapper is selected
         
         self.disconnectSignals()
@@ -1678,6 +1677,33 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         settings.setValue("expFcView", self.expFcView.isChecked())
         settings.endGroup()
 
+    def writeTextureInc(self):
+        self.povPath = self.pathLineEdit.text()
+        self.directory = os.path.dirname(self.povPath) + os.sep
+        self.povName = self.povPath[len(self.directory):]
+        self.texIncPath = self.directory + self.povName[:-4] + "_textures.inc"
+
+        self.texIncFile = open(self.texIncPath, "w")
+        self.texIncFile.write(self.texIncContent)
+        self.texIncFile.close()
+
+    def createTexIncContent(self):
+        self.texIncContent = ""
+
+        for obj in self.listObjects:
+            self.texIncContent += "#include \"" + obj.predefObject.inc + "\"\n"
+            self.texIncContent += "#declare " + obj.label + "_material = { " + obj.predefObject.identifier + "\n"
+
+            if obj.scaleX != 1 or obj.scaleY != 1 or obj.scaleZ != 1:
+                self.texIncContent += "\tscale <" + str(obj.scaleX) + ", " + str(obj.scaleY) + ", " + str(obj.scaleZ) + ">\n"
+
+            if obj.rotationX != 0 or obj.rotationY != 0 or obj.rotationZ != 0:
+                self.texIncContent += "\trotate <" + str(obj.rotationX) + ", " + str(obj.rotationY) + ", " + str(obj.rotationZ) + ">\n"
+
+            self.texIncContent += "}\n\n"
+
+        
+
     def onCancel(self): #called if "Cancel" button is pressed
         self.result = "Canceled"
         self.close()
@@ -1687,6 +1713,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.result = "OK"
         self.close()
         self.saveInput()
+
+        self.createTexIncContent()
+        self.writeTextureInc()
+
         exporter = ExportToPovRay(self.pathLineEdit.text(),
                                   self.imageWidth.value(),
                                   self.imageHeight.value(),
@@ -1696,10 +1726,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                                   self.expFcView.isChecked())
 
 class Predefined:
-    def __init__(self, identifier, categorie, kind, treeItem):
+    def __init__(self, identifier, categorie, kind, inc, treeItem):
         self.identifier = identifier
         self.categorie = categorie
         self.kind = kind
+        self.inc = inc
         self.treeItem = treeItem
 
 class ListObject:
