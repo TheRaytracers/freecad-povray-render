@@ -79,6 +79,8 @@ class ExportToPovRay:
         self.errorPath = self.directory + self.errorName
         self.fcViewName = self.fileName + "_FC-View.png"
         self.fcViewPath = self.directory + self.fcViewName
+        self.texIncName = self.fileName + "_textures.inc"
+        self.texIncPath = self.directory + self.texIncName
 
         self.meshFileContent = ""
 
@@ -124,6 +126,11 @@ class ExportToPovRay:
                 self.userInc = True
             except:
                 self.incContent = ""
+
+            #open texture inc file
+            file = open(self.texIncPath, "r")
+            self.texIncContent = file.read()
+            file.close()
         else:
             App.Console.PrintMessage("\n\nCanceled\n\n")
             return -1
@@ -172,6 +179,9 @@ class ExportToPovRay:
 
         finalPovCode += "\n//------------------------------------------\n"
         finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
+
+        #add textures inc include
+        finalPovCode += "#include \"" + self.texIncName + "\"\n"
 
         #if model contains mesh objects, a mesh file will be included
         if self.meshFileContent != "":
@@ -1129,8 +1139,19 @@ class ExportToPovRay:
             finish += "\n\t" + phong
             finish += "\n}\n"
         material += finish
+
+        if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_") != -1:
+            if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
+                material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
+            elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_texture") != -1:
+                material = "\ntexture {" + stringCorrection(fcObj.Label) + "_texture }\n"
+            elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_pigment") != -1:
+                material = "\npigment {" + stringCorrection(fcObj.Label) + "_pigment }\n"
+            else:
+                return ""
+
         if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
-            material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material}\n"
+            material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
         return material
 
 
@@ -1711,7 +1732,18 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             if obj.predefObject.inc != None:
                 self.texIncContent += "#include \"" + obj.predefObject.inc + "\"\n"
 
-            self.texIncContent += "#declare " + obj.label + "_material = { " + obj.predefObject.identifier + "\n"
+            self.texIncContent += "#declare " + obj.label
+            
+            kind = obj.predefObject.kind.lower()
+            if kind == "material":
+                self.texIncContent += "_material = material { " + obj.predefObject.identifier + "\n"
+            elif kind == "texture":
+                self.texIncContent += "_texture = texture { " + obj.predefObject.identifier + "\n"
+            elif kind == "pigment":
+                self.texIncContent += "_pigment = pigment { " + obj.predefObject.identifier + "\n"
+            else:
+                App.Console.PrintWarning("Unknown kind texture found - only material, texture or pigment allowed\n")
+                return ""
 
             if obj.scaleX != 1 or obj.scaleY != 1 or obj.scaleZ != 1:
                 self.texIncContent += "\tscale <" + str(obj.scaleX) + ", " + str(obj.scaleY) + ", " + str(obj.scaleZ) + ">\n"
