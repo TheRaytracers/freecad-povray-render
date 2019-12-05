@@ -1365,6 +1365,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         # signals and slots
         self.connectSignals()
 
+        #set layouts
         self.textureLayout.addWidget(self.listWidget)
         self.textureLayout.addWidget(self.textureSettingsWidget)
 
@@ -1407,6 +1408,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         categories = predefined.getchildren()
         self.predefines = []
 
+        #add FreeCAD texture
+        self.fcTexItem = QtGui.QTreeWidgetItem(self.textureList, ["FreeCAD Texture"])
+        self.predefines.append(Predefined(None, "FreeCAD", "Material", None, self.fcTexItem))
+        self.fcTexItem.setSelected(True)
+
         for categorie in categories:
             categorieItem = QtGui.QTreeWidgetItem(self.textureList, [categorie.tag])
             kinds = categorie.getchildren()
@@ -1416,7 +1422,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                 for predefined in predefines:
                     treeItem = QtGui.QTreeWidgetItem(kindItem, [predefined.text])
                     self.predefines.append(Predefined(predefined.text, categorie.tag, kind.tag, predefined.attrib["inc"], treeItem))
-        
+
         self.listLayout.addWidget(self.textureListLabel, 0, 1)
         self.listLayout.addWidget(self.textureList, 1, 1)
 
@@ -1451,7 +1457,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         for obj in self.listFcObjects:
             listItem = QtGui.QListWidgetItem(obj.ViewObject.Icon, obj.Label)
             predefined = self.predefines[0]
-            self.listObjects.append(ListObject(obj, listItem, predefined, 1, 1, 1, 0, 0, 0))
+            self.listObjects.append(ListObject(obj, listItem, self.predefines[0], 1, 1, 1, 0, 0, 0))
 
             self.objectList.addItem(listItem)
         
@@ -1513,8 +1519,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
     def updateTextureSettings(self):
-        #TODO add auto selecting of first child element if a wrapper is selected
-        
         self.disconnectSignals()
         listObj = self.getSelectedListObject()
 
@@ -1542,6 +1546,17 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         listObj = self.getSelectedListObject()
         predefine = self.getSelectedPredefined()
         if listObj == -1 or predefine == -1:
+            if predefine == -1:
+                #expand and select predef under the categorie
+                self.disconnectSignals()
+                selectedItems = self.textureList.selectedItems()
+                selected = selectedItems[0]
+                selected.setSelected(False)
+                selected.setExpanded(True)
+                childItem = selected.child(0)
+                self.connectSignals()
+                childItem.setSelected(True)
+
             return -1
 
         listObj.scaleX = self.scaleX.value()
@@ -1556,7 +1571,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
     def getSelectedListObject(self):
         for listObj in self.listObjects:
-            #App.Console.PrintWarning(listObj.listItem.isSelected())
             if listObj.listItem.isSelected():
                 return listObj
 
@@ -1691,7 +1705,12 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.texIncContent = ""
 
         for obj in self.listObjects:
-            self.texIncContent += "#include \"" + obj.predefObject.inc + "\"\n"
+            if obj.predefObject.identifier == None: #for FreeCAD materials
+                continue
+
+            if obj.predefObject.inc != None:
+                self.texIncContent += "#include \"" + obj.predefObject.inc + "\"\n"
+
             self.texIncContent += "#declare " + obj.label + "_material = { " + obj.predefObject.identifier + "\n"
 
             if obj.scaleX != 1 or obj.scaleY != 1 or obj.scaleZ != 1:

@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <Predefined>
     <Metal>
-        <Material>
-
-        </Material>
-
         <Texture>
             <Predef inc="metals.inc">T_Brass_1A</Predef>
             <Predef inc="metals.inc">T_Brass_5E</Predef>
