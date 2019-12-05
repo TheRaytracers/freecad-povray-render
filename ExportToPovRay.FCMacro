@@ -1513,9 +1513,15 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
     def updateTextureSettings(self):
-        App.Console.PrintWarning("updateTextureSettings\n")
+        #TODO select one object and texture to beginning
+        #TODO add auto selecting of first child element if a wrapper is selected
+        
         self.disconnectSignals()
         listObj = self.getSelectedListObject()
+
+        if listObj == -1:
+            self.connectSignals()
+            return -1
 
         self.scaleX.setValue(listObj.scaleX)
         self.scaleY.setValue(listObj.scaleY)
@@ -1535,13 +1541,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
     def updateSelectedListObject(self):
         listObj = self.getSelectedListObject()
-        if listObj == -1:
-            App.Console.PrintError("\n\n1Error occurred! Please report a bug!\n\n") #XXX better error message
-            return -1
-
         predefine = self.getSelectedPredefined()
-        if predefine == -1:
-            App.Console.PrintError("\n\n2Error occurred! Please report a bug!\n\n") #XXX better error message
+        if listObj == -1 or predefine == -1:
             return -1
 
         listObj.scaleX = self.scaleX.value()
