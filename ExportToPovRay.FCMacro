@@ -1424,8 +1424,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureList.setHeaderLabel("Type of Predefined")
 
         self.textureListLabel = QtGui.QLabel("<b>Texture</b>")
+        
+        predefinedPath = App.ParamGet("User parameter:BaseApp/Preferences/Macro").GetString('MacroPath')
+        predefinedPath += "/predefined.xml"
 
-        predefined = xml.parse('/home/otto/Dokumente/exporttopovray/predefined.xml').getroot() #XXX use right path
+        predefined = xml.parse(predefinedPath).getroot() #XXX use right path
         categories = predefined.getchildren()
         self.predefines = []
 
