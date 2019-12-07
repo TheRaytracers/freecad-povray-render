@@ -37,9 +37,12 @@ def showError(text, title): #show an error box
 def isAscii(string): #test whether the string is an ASCII string
     return all(ord(c) < 128 for c in string)
 
-def stringCorrection(inputString): #change a utf-8 string to an ASCII string
+def stringCorrection(inputString): # String correction for compatibility with POV-Ray 
         utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
         uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
+        firstchar = ord(uniString[0])                         # POV-Ray doesn't like numbers as first charakter
+        if firstchar >= 48 and firstchar <= 57:
+            uniString = "_" + uniString
         uniString = uniString.replace(u"Ä", "Ae")             # replacement of german "Umlaute"
         uniString = uniString.replace(u"ä", "ae")
         uniString = uniString.replace(u"Ü", "Ue")
@@ -57,7 +60,7 @@ def stringCorrection(inputString): #change a utf-8 string to an ASCII string
         uniString = uniString.replace(u"/", "_")
         uniString = uniString.replace(" ", "_")
         outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
-        return outString.decode("utf-8") #return and redecode to unicode but with converted chars
+        return outString.decode("utf-8")                      #return and redecode to unicode but with converted chars
 
 class ExportToPovRay:
     """Export the FreeCAD model to POV-Ray"""
