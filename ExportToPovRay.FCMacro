@@ -1380,11 +1380,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.setLayout(self.wrapLayout)
         self.show()
 
-    def initTextureTab(self):
-        self.textureLayout = QtGui.QVBoxLayout()
+    def initTextureTab(self): #create all necessary stuff for texture tab and connect signals
+        self.textureLayout = QtGui.QVBoxLayout() #the wrapper layout for the tab
         
-        self.addObjectsTexturesLists()
-        self.addScaleRotate()
+        self.addObjectsTexturesLists() #add the two lists at the top
+        self.addScaleRotate() #add the menu for scaling and rotating at the bottom
 
         # signals and slots
         self.connectSignals()
@@ -1393,10 +1393,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureLayout.addWidget(self.listWidget)
         self.textureLayout.addWidget(self.textureSettingsWidget)
 
-        self.textureWidget = QtGui.QWidget()
+        self.textureWidget = QtGui.QWidget() #wrapper widget for texture tab
         self.textureWidget.setLayout(self.textureLayout)
 
-    def connectSignals(self):
+    def connectSignals(self): #connect all necessary signals for the texture tab
         self.objectList.itemSelectionChanged.connect(self.updateTextureSettings)
 
         self.textureList.itemSelectionChanged.connect(self.updateSelectedListObject)
@@ -1407,7 +1407,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.rotationY.valueChanged.connect(self.updateSelectedListObject)
         self.rotationZ.valueChanged.connect(self.updateSelectedListObject)
 
-    def disconnectSignals(self):
+    def disconnectSignals(self): #disconnect all signals for the texture tab
         self.objectList.itemSelectionChanged.disconnect()
 
         self.textureList.itemSelectionChanged.disconnect()
@@ -1418,28 +1418,30 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.rotationY.valueChanged.disconnect()
         self.rotationZ.valueChanged.disconnect()
 
-    def addObjectsTexturesLists(self):
-        self.listWidget = QtGui.QWidget()
-        self.listLayout = QtGui.QGridLayout()
+    def addObjectsTexturesLists(self): #add the two lists with the objects and textures
+        self.listWidget = QtGui.QWidget() #wrapper widget for the two lists
+        self.listLayout = QtGui.QGridLayout() #wrapper layout for the two lists
 
         #texture list
         self.textureList = QtGui.QTreeWidget()
         self.textureList.setHeaderLabel("Type of Predefined")
 
         self.textureListLabel = QtGui.QLabel("<b>Texture</b>")
-        
-        predefinedPath = App.ParamGet("User parameter:BaseApp/Preferences/Macro").GetString('MacroPath')
-        predefinedPath += "/predefined.xml"
 
-        predefined = xml.parse(predefinedPath).getroot() #XXX use right path
-        categories = predefined.getchildren()
         self.predefines = []
-
         #add FreeCAD texture
         self.fcTexItem = QtGui.QTreeWidgetItem(self.textureList, ["FreeCAD Texture"])
         self.predefines.append(Predefined(None, "FreeCAD", "Material", None, self.fcTexItem))
         self.fcTexItem.setSelected(True)
 
+        #get the predefined.xml
+        predefinedPath = App.ParamGet("User parameter:BaseApp/Preferences/Macro").GetString('MacroPath') #get macro path
+        predefinedPath += "/predefined.xml"
+
+        predefined = xml.parse(predefinedPath).getroot()
+        categories = predefined.getchildren()
+
+        #read the predefined.xml and add the predefined defined in the XML
         for categorie in categories:
             categorieItem = QtGui.QTreeWidgetItem(self.textureList, [categorie.tag])
             kinds = categorie.getchildren()
@@ -1450,6 +1452,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                     treeItem = QtGui.QTreeWidgetItem(kindItem, [predefined.text])
                     self.predefines.append(Predefined(predefined.text, categorie.tag, kind.tag, predefined.attrib["inc"], treeItem))
 
+        #add the list to the layouts and widgets
         self.listLayout.addWidget(self.textureListLabel, 0, 1)
         self.listLayout.addWidget(self.textureList, 1, 1)
 
@@ -1477,10 +1480,12 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             except:
                 shape = False
 
+            #test for the conditions for a object for the object list
             if obj.ViewObject.Visibility and shapeColor and shape:
                 self.listFcObjects.append(obj)
 
         self.listObjects = []
+        #create the listObjects
         for obj in self.listFcObjects:
             listItem = QtGui.QListWidgetItem(obj.ViewObject.Icon, obj.Label)
             predefined = self.predefines[0]
@@ -1488,10 +1493,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
             self.objectList.addItem(listItem)
         
+        #add the object list to the layouts
         self.listLayout.addWidget(self.objectListLabel, 0, 0)
         self.listLayout.addWidget(self.objectList, 1, 0)
 
-    def addScaleRotate(self):
+    def addScaleRotate(self): #add the scale and rotate menu
         # scale, rotate, preview
         self.textureSettingsWidget = QtGui.QWidget()
         self.textureSettingsLayout = QtGui.QGridLayout()
@@ -1545,14 +1551,15 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
-    def updateTextureSettings(self):
+    def updateTextureSettings(self): #get the selected object and select the right predefined
         self.disconnectSignals()
-        listObj = self.getSelectedListObject()
+        listObj = self.getSelectedListObject() #get the current selected object
 
-        if listObj == -1:
+        if listObj == -1: #is an object selected
             self.connectSignals()
             return -1
 
+        #set all values for scaling and rotating
         self.scaleX.setValue(listObj.scaleX)
         self.scaleY.setValue(listObj.scaleY)
         self.scaleZ.setValue(listObj.scaleZ)
@@ -1565,15 +1572,16 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         for predefine in self.predefines:
             predefine.treeItem.setSelected(False)
 
+        #select the right predefined
         listObj.predefObject.treeItem.setSelected(True)
 
         self.connectSignals()
 
-    def updateSelectedListObject(self):
+    def updateSelectedListObject(self): #get the selected predefined and update the listObject
         listObj = self.getSelectedListObject()
         predefine = self.getSelectedPredefined()
-        if listObj == -1 or predefine == -1:
-            if predefine == -1:
+        if listObj == -1 or predefine == -1: #is no object or predefine selected
+            if predefine == -1: #is only a categorie selected
                 #expand and select predef under the categorie
                 self.disconnectSignals()
                 selectedItems = self.textureList.selectedItems()
@@ -1584,8 +1592,9 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                 self.connectSignals()
                 childItem.setSelected(True)
 
-            return -1
+            return -1 #abort
 
+        #get the values for scaling and rotating
         listObj.scaleX = self.scaleX.value()
         listObj.scaleY = self.scaleY.value()
         listObj.scaleZ = self.scaleZ.value()
@@ -1594,18 +1603,17 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         listObj.rotationY = self.rotationY.value()
         listObj.rotationZ = self.rotationZ.value()
 
-        listObj.predefObject = predefine
+        listObj.predefObject = predefine #apply the read values to the predefObject in the listObject
 
-    def getSelectedListObject(self):
+    def getSelectedListObject(self): #get the current selected listObject
         for listObj in self.listObjects:
             if listObj.listItem.isSelected():
                 return listObj
 
         return -1
 
-    def getSelectedPredefined(self):
+    def getSelectedPredefined(self): #get the current selected predefined
         for predefine in self.predefines:
-            #App.Console.PrintMessage(predefine.treeItem.isSelected())
             if predefine.treeItem.isSelected():
                 return predefine
 
@@ -1718,7 +1726,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         settings.setValue("expFcView", self.expFcView.isChecked())
         settings.endGroup()
 
-    def writeTextureInc(self):
+    def writeTextureInc(self): #write the texture in content to a file
         self.povPath = self.pathLineEdit.text()
         self.directory = os.path.dirname(self.povPath) + os.sep
         self.povName = self.povPath[len(self.directory):]
@@ -1728,14 +1736,14 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.texIncFile.write(self.texIncContent)
         self.texIncFile.close()
 
-    def createTexIncContent(self):
+    def createTexIncContent(self): #create the content of the texture inc file
         self.texIncContent = ""
 
-        for obj in self.listObjects:
+        for obj in self.listObjects: #iterate over all listObjects
             if obj.predefObject.identifier == None: #for FreeCAD materials
-                continue
+                continue #texture will be applied in the exporter class
 
-            if obj.predefObject.inc != None:
+            if obj.predefObject.inc != None and obj.predefObject.inc != "": #only if include file is necessary
                 self.texIncContent += "#include \"" + obj.predefObject.inc + "\"\n"
 
             self.texIncContent += "#declare " + obj.label
