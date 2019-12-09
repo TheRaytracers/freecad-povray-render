@@ -1767,7 +1767,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
             self.texIncContent += "}\n\n"
 
-        
+        if platform.system() == "Windows":
+            self.texIncContent.replace("\n", "\r\n")
 
     def onCancel(self): #called if "Cancel" button is pressed
         self.result = "Canceled"
