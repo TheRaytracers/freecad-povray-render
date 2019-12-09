@@ -1,11 +1,11 @@
 # Developer Documentation
 
 ## The Goal of the Project
-The ExportToPovRay macro is intended to export as many solid CSG objects as possible from the FreeCAD Part workbench into a corresponding Pov-Ray.
+The ExportToPovRay macro is intended to export as many solid CSG objects as possible from the FreeCAD Part workbench into a corresponding POV-Ray.
 Convert scene description. The object tree with its
-Boolean operations in the Pov-Ray file.  
-The user should be able to modify the Pov-Ray file so that the
-extensive possibilities of Pov-Ray for a photorealistic display
+Boolean operations in the POV-Ray file.  
+The user should be able to modify the POV-Ray file so that the
+extensive possibilities of POV-Ray for a photorealistic display
 can be used (textures, light effects, etc.)  
 The main principle is to keep the POV-Ray file as clear as possible,
 so that objects can be found quickly.

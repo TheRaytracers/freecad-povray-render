@@ -160,7 +160,7 @@ FreeCAD provides some functions to convert between the systems. Unfortunatly one
 
 ## Debugging
 
-There are several ways to get debugging information if an error occures. First it is useful to activate the console output window. The macro will provide some statistical information while converting the scene into a POV-Ray file. If nothing is rendered you should localise the error. A bug in our macro will lead to an empty .pov file and incomplete console output. While a POV-Ray Error appears you will see a popup window with an error message. In most cases the error message will tell you about a wrong syntax in your include file so you have a chance to correct it. The POV-Ray error message will be also written into a file in the output directory. If you want to see the complete debugging information from Pov-Ray open a console window and start the rendering from the commandline.
+There are several ways to get debugging information if an error occures. First it is useful to activate the console output window. The macro will provide some statistical information while converting the scene into a POV-Ray file. If nothing is rendered you should localise the error. A bug in our macro will lead to an empty .pov file and incomplete console output. While a POV-Ray Error appears you will see a popup window with an error message. In most cases the error message will tell you about a wrong syntax in your include file so you have a chance to correct it. The POV-Ray error message will be also written into a file in the output directory. If you want to see the complete debugging information from POV-Ray open a console window and start the rendering from the commandline.
 
 ```
 povray myPovFile.pov +P +Wwidth +Hheight

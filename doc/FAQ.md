@@ -25,16 +25,16 @@
 * **I found a bug in the macro**  
   Please report the bug to us, so we hopefully can fix it soon.  
   You can report the bug via
-  * A GitLab Issue: [Create an Issue](https://gitlab.com/usbhub/exporttoPov-Ray/issues) (Green button top right)
+  * A GitLab Issue: [Create an Issue](https://gitlab.com/usbhub/exporttoPOV-Ray/issues) (Green button top right)
   * Email: usbhub.freecadABCweb.de replace ABC with an @
   * The FreeCAD Forum: XXX
 
 
-* **I want to learn more about Pov-Ray**  
+* **I want to learn more about POV-Ray**  
   * You can watch this very good tutorial:  
   [http://f-lohmueller.de/pov_tut/pov__eng.htm](http://f-lohmueller.de/pov_tut/pov__eng.htm)  
-  * You can find the official Pov-Ray documentation here:  
-  [http://www.Pov-Ray.org/documentation/index-3.6.php](http://www.Pov-Ray.org/documentation/index-3.6.php)
+  * You can find the official POV-Ray documentation here:  
+  [http://www.POV-Ray.org/documentation/index-3.6.php](http://www.POV-Ray.org/documentation/index-3.6.php)
 
 
 * **I want to contribute to the macro**  
