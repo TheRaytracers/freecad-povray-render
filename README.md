@@ -27,8 +27,10 @@ To give the user the full control, you can define extra things or another surfac
 ## Advantages compared with the Raytracing Workbench
 * You can use **all** POV-Ray features
 * Easy changing of materials / textures of objects
-  - If you edit a material in the pov file of the Raytracing Workbench and change the model later, you have to do all changes in the file again. With the macro you don't have to do that (define all changes in the inc file).
+  - To change the material of an object in the Raytracing Workbench, you have to know a lot about POV-Ray and write the changes manually to the created pov file. If you change you model and render again, you have to do all changes again.
+  - With the macro, you can easily choose a material in the textures tab and the changes will be saved (and you don't need any POV-Ray knowledge)
 * The macro is easier to use
+* The macro uses a right handed coordinate system like FreeCAD
 * WYSIWYG
 * The macro is written in Python, so it is easier for extending
 * The macro takes more object properties than the workbench
