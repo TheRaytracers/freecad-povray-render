@@ -54,6 +54,7 @@ def stringCorrection(inputString): # String correction for compatibility with PO
         uniString = uniString.replace(u")", "_")
         uniString = uniString.replace(u"#", "_")
         uniString = uniString.replace(u".", "_")
+        uniString = uniString.replace(u",", "_")
         uniString = uniString.replace(u"-", "_")
         uniString = uniString.replace(u"+", "_")
         uniString = uniString.replace(u"*", "_")
