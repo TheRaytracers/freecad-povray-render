@@ -1,13 +1,31 @@
 <?xml version="1.0"?>
 <Predefined>
+    <Glass>
+         <Predef material=" M_Glass3">Window glass</Predef>
+    </Glass>
     <Metal>
-        <Predef material="" texture="T_Chrome_1A" pigment="color Red" normal="bumps 0.25" inc="metals.inc">My super metal</Predef>
-        <Predef inc="metals.inc">Copper</Predef>
-        <Predef inc="metals.inc">Gold</Predef>
-        <Predef inc="metals.inc">Silver</Predef>
-        <Predef inc="metals.inc">T_Chrome_1A</Predef>
-        <Predef inc="metals.inc">T_Chrome_5E</Predef>
-        <Predef inc="metals.inc">T_Silver_1A</Predef>
-        <Predef inc="metals.inc">T_Silver_5E</Predef>
+        <polished>
+            <Predef inc="metals.inc">Copper</Predef>
+            <Predef inc="metals.inc">Gold</Predef>
+            <Predef inc="metals.inc">Silver</Predef>
+            <Predef inc="metals.inc">T_Chrome_1A</Predef>
+        </polished>
+        <sandblast>
+            <Predef inc="metals.inc">T_Chrome_5E</Predef>
+            <Predef inc="metals.inc">T_Silver_5E</Predef>
+        </sandblast>
+        <oxidized>
+            <Predef inc="metals.inc">T_Silver_1A</Predef>
+        </oxidized>
+        <tryThis>
+            <Predef material="" texture="T_Chrome_1A" pigment="color Red" normal="bumps 0.25" inc="metals.inc">My super metal</Predef>
+        </tryThis>
     </Metal>
+    <Stone>
+    </Stone>
+    <Wood>
+    </Wood>
+    <Pattern>
+    </Pattern>
+    
 </Predefined>
