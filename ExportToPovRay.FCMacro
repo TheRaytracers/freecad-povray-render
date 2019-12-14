@@ -1432,7 +1432,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.predefines = []
         #add FreeCAD texture
         self.fcTexItem = QtGui.QTreeWidgetItem(self.textureList, ["FreeCAD Texture"])
-        self.predefines.append(Predefined("FreeCAD Texture", None, "", "", "", "", "", "", "", self.fcTexItem))
+        self.predefines.append(Predefined("FreeCAD Texture", None, None, None, None, None, None, "", self.fcTexItem))
         self.fcTexItem.setSelected(True)
 
         #get the predefined.xml
@@ -1444,48 +1444,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         #read the predefined.xml and add the predefined defined in the XML
         for categorie in categories:
-            categorieItem = QtGui.QTreeWidgetItem(self.textureList, [categorie.tag])
-            predefs = categorie.getchildren()
-            for predef in predefs:
-                treeItem = QtGui.QTreeWidgetItem(categorieItem, [predef.text])
-                #get all attributes
-                attr = predef.attrib
-                if "material" in attr:
-                    material = attr["material"]
-                else:
-                    material = ""
+            #categorieItem = QtGui.QTreeWidgetItem(self.textureList, [categorie.tag])
+            #predefs = categorie.getchildren()
+            self.predefXmlToList(categorie, self.textureList)
 
-                if "texture" in attr:
-                    texture = attr["texture"]
-                else:
-                    texture = ""
-
-                if "pigment" in attr:
-                    pigment = attr["pigment"]
-                else:
-                    pigment = ""
-
-                if "finish" in attr:
-                    finish = attr["finish"]
-                else:
-                    finish = ""
-                
-                if "normal" in attr:
-                    normal = attr["normal"]
-                else:
-                    normal = ""
-
-                if "interior" in attr:
-                    interior = attr["interior"]
-                else:
-                    interior = ""
-
-                if "inc" in attr:
-                    inc = attr["inc"]
-                else:
-                    inc = ""
-
-                self.predefines.append(Predefined(predef.text, categorie.tag, material, texture, pigment, finish, normal, interior, inc, treeItem))
 
         #add the list to the layouts and widgets
         self.listLayout.addWidget(self.textureListLabel, 0, 1)
@@ -1531,6 +1493,56 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         #add the object list to the layouts
         self.listLayout.addWidget(self.objectListLabel, 0, 0)
         self.listLayout.addWidget(self.objectList, 1, 0)
+
+    def predefXmlToList(self, xmlNode, parentNode):
+        childNodes = xmlNode.getchildren()
+
+        if childNodes == []:
+            treeItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.text])
+            #get all attributes
+            attr = xmlNode.attrib
+            if "material" in attr:
+                material = attr["material"]
+            else:
+                material = ""
+
+            if "texture" in attr:
+                texture = attr["texture"]
+            else:
+                texture = ""
+
+            if "pigment" in attr:
+                pigment = attr["pigment"]
+            else:
+                pigment = ""
+
+            if "finish" in attr:
+                finish = attr["finish"]
+            else:
+                finish = ""
+            
+            if "normal" in attr:
+                normal = attr["normal"]
+            else:
+                normal = ""
+
+            if "interior" in attr:
+                interior = attr["interior"]
+            else:
+                interior = ""
+
+            if "inc" in attr:
+                inc = attr["inc"]
+            else:
+                inc = ""
+
+            self.predefines.append(Predefined(xmlNode.text, material, texture, pigment, finish, normal, interior, inc, treeItem))
+
+        else:
+            categorieItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
+            for node in childNodes:
+                #call method for child nodes
+                self.predefXmlToList(node, categorieItem)
 
     def addScaleRotate(self): #add the scale and rotate menu
         # scale, rotate, preview
@@ -1775,7 +1787,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.texIncContent = ""
 
         for obj in self.listObjects: #iterate over all listObjects
-            if obj.predefObject.categorie == None: #for FreeCAD materials
+            if obj.predefObject.material == None: #for FreeCAD materials
                 continue #texture will be applied in the exporter class
 
             if obj.predefObject.inc != None and obj.predefObject.inc != "": #only if include file is necessary
@@ -1840,9 +1852,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                                   self.expFcView.isChecked())
 
 class Predefined:
-    def __init__(self, identifier, categorie, material, texture, pigment, finish, normal, interior, inc, treeItem):
+    def __init__(self, identifier, material, texture, pigment, finish, normal, interior, inc, treeItem):
         self.identifier = identifier
-        self.categorie = categorie
         self.material = material
         self.texture = texture
         self.pigment = pigment
