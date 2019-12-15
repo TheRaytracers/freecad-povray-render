@@ -1,31 +1,45 @@
 <?xml version="1.0"?>
 <Predefined>
     <Glass>
-         <Predef material=" M_Glass3">Window glass</Predef>
+         <Predef material="M_Glass">Window glass</Predef>
+         <Predef material="M_Glass2">Plexiglas</Predef>
+         <Predef material="M_Glass3">Crystal glass</Predef>
+         <Predef inc="glass.inc" material="M_Glass3" pigment="Col_Glass_Winebottle" interior="I_Glass_Dispersion1">Winebottle glass</Predef>
+         <Predef inc="glass.inc" material="M_Glass" pigment="Col_Glass_Beerbottle">Beerbottle glass</Predef> 
     </Glass>
     <Metal>
         <polished>
-            <Predef inc="metals.inc">Copper</Predef>
-            <Predef inc="metals.inc">Gold</Predef>
-            <Predef inc="metals.inc">Silver</Predef>
-            <Predef inc="metals.inc">T_Chrome_1A</Predef>
+            <Predef inc="metals.inc" texture="Chrome_Metal">Chrome</Predef>
+            <Predef inc="metals.inc" texture="Silver_Metal">Silver</Predef>
+            <Predef inc="metals.inc" texture="Brass_Metal">Brass</Predef>
+            <Predef inc="metals.inc" texture="Bronze_Metal">Bronze</Predef>
+            <Predef inc="metals.inc" texture="Copper_Metal">Copper</Predef>
+            <Predef inc="metals.inc" texture="Gold_Metal">Gold</Predef>
         </polished>
         <sandblast>
-            <Predef inc="metals.inc">T_Chrome_5E</Predef>
-            <Predef inc="metals.inc">T_Silver_5E</Predef>
+            <Predef inc="metals.inc" texture="T_Chrome_1A" finish="crand 0.5">Chrome</Predef>
+            <Predef inc="metals.inc" texture="Bronze_Metal" finish="crand 0.5">Bronze</Predef>
         </sandblast>
+        <brushed>
+            <Predef inc="metals.inc" texture="Brushed_Aluminum">Aluminium</Predef>
+        </brushed>
         <oxidized>
-            <Predef inc="metals.inc">T_Silver_1A</Predef>
+            <Predef inc="metals.inc" texture="Brass_Valley">old Brass</Predef>
+            <Predef inc="metals.inc" texture="Spun_Brass">Spun Brass</Predef>
+            <Predef inc="metals.inc" texture="Rusty_Iron">Rusty iron</Predef>
         </oxidized>
         <tryThis>
             <Predef material="" texture="T_Chrome_1A" pigment="color Red" normal="bumps 0.25" inc="metals.inc">My super metal</Predef>
         </tryThis>
     </Metal>
     <Stone>
+        <Predef pigment="White_Marble">White Marble</Predef>
     </Stone>
     <Wood>
+        <Predef texture="EMBWood1">Wood</Predef>
     </Wood>
     <Pattern>
+        <Predef pigment="checker color White color Black">Checker</Predef>  
+        <Predef pigment="brick color White color Red mortar 0.1" normal="wrinkles 0.75 scale 0.01" finish="diffuse 0.9 phong 0.2">Red Bricks</Predef>
     </Pattern>
-    
 </Predefined>
