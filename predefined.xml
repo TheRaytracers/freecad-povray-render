@@ -5,7 +5,8 @@
          <Predef material="M_Glass2">Plexiglas</Predef>
          <Predef material="M_Glass3">Crystal glass</Predef>
          <Predef inc="glass.inc" material="M_Glass3" pigment="Col_Glass_Winebottle" interior="I_Glass_Dispersion1">Winebottle glass</Predef>
-         <Predef inc="glass.inc" material="M_Glass" pigment="Col_Glass_Beerbottle">Beerbottle glass</Predef> 
+         <Predef inc="glass.inc" material="M_Glass" pigment="Col_Glass_Beerbottle">Beerbottle glass</Predef>
+         <Predef media="scattering{1,&lt;1,1,1>} intervals 3 samples 1,1" finish="Glass_Finish"  pigment="rgbf&lt;0.98,0.98,0.98,0.8>">Milky glass</Predef>
     </Glass>
     <Metal>
         <polished>
@@ -40,6 +41,6 @@
     </Wood>
     <Pattern>
         <Predef pigment="checker color White color Black">Checker</Predef>  
-        <Predef pigment="brick color White color Red mortar 0.1" normal="wrinkles 0.75 scale 0.01" finish="diffuse 0.9 phong 0.2">Red Bricks</Predef>
+        <Predef pigment="brick color White color rgb &lt;0.9, 0.1, 0.1&gt; mortar 0.1" normal="wrinkles 0.75 scale 0.01" finish="diffuse 0.9 phong 0.2">Red Bricks</Predef>
     </Pattern>
 </Predefined>

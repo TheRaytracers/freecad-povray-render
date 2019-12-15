@@ -1432,7 +1432,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.predefines = []
         #add FreeCAD texture
         self.fcTexItem = QtGui.QTreeWidgetItem(self.textureList, ["FreeCAD Texture"])
-        self.predefines.append(Predefined("FreeCAD Texture", None, None, None, None, None, None, "", self.fcTexItem))
+        self.predefines.append(Predefined("FreeCAD Texture", None, None, None, None, None, None, None, "", self.fcTexItem))
         self.fcTexItem.setSelected(True)
 
         #get the predefined.xml
@@ -1530,13 +1530,18 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                 interior = attr["interior"]
             else:
                 interior = ""
+                
+            if "media" in attr:
+                media = attr["media"]
+            else:
+                media = ""    
 
             if "inc" in attr:
                 inc = attr["inc"]
             else:
                 inc = ""
 
-            self.predefines.append(Predefined(xmlNode.text, material, texture, pigment, finish, normal, interior, inc, treeItem))
+            self.predefines.append(Predefined(xmlNode.text, material, texture, pigment, finish, normal, interior, media, inc, treeItem))
 
         else:
             categorieItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
@@ -1814,9 +1819,15 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
                 self.texIncContent += "\t}\n"
 
-            #interior
-            if obj.predefObject.interior != "":
-                self.texIncContent += "\tinterior {\n\t" + obj.predefObject.interior + "\t}\n"
+            #interior and media
+            if obj.predefObject.interior != "" or obj.predefObject.media != "":
+                self.texIncContent += "\tinterior {\n\t" + obj.predefObject.interior + "\n"
+                
+                #media
+                if obj.predefObject.media != "":
+                    self.texIncContent += "\t\tmedia { " + obj.predefObject.media + " }\n"
+                
+                self.texIncContent += "\t}\n"
 
             #scale
             if obj.scaleX != 1 or obj.scaleY != 1 or obj.scaleZ != 1:
@@ -1852,7 +1863,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                                   self.expFcView.isChecked())
 
 class Predefined:
-    def __init__(self, identifier, material, texture, pigment, finish, normal, interior, inc, treeItem):
+    def __init__(self, identifier, material, texture, pigment, finish, normal, interior, media, inc, treeItem):
         self.identifier = identifier
         self.material = material
         self.texture = texture
@@ -1860,6 +1871,7 @@ class Predefined:
         self.finish = finish
         self.normal = normal
         self.interior = interior
+        self.media = media
         self.inc = inc
         self.treeItem = treeItem
 
