@@ -1144,7 +1144,10 @@ class ExportToPovRay:
             finish += "\n}\n"
         material += finish
 
-        if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_") != -1:
+        if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_material_hollow") != -1:
+            material = "\nhollow\nmaterial {" + stringCorrection(fcObj.Label) + "_material_hollow }\n"
+        
+        elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_") != -1:
             if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
                 material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
             elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_texture") != -1:
@@ -1156,6 +1159,9 @@ class ExportToPovRay:
 
         if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
             material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
+        
+        
+            
         return material
 
 
@@ -1798,7 +1804,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             if obj.predefObject.inc != None and obj.predefObject.inc != "": #only if include file is necessary
                 self.texIncContent += "#include \"" + obj.predefObject.inc + "\"\n"
 
-            self.texIncContent += "#declare " + obj.label + "_material = material { "
+            self.texIncContent += "#declare " + obj.label + "_material"
+            if obj.predefObject.media != "":
+                self.texIncContent += "_hollow"
+            self.texIncContent += " = material { "
+            
             self.texIncContent += obj.predefObject.material + "\n"
 
             #pigment and texture
