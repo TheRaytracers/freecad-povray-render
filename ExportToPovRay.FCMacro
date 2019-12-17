@@ -65,25 +65,25 @@ def stringCorrection(inputString): # String correction for compatibility with PO
 
 class ExportToPovRay:
     """Export the FreeCAD model to POV-Ray"""
-    def __init__(self, povPath, width, height, expBg, expLight, repRot, expFcView):
+    def __init__(self, projectName, width, height, expBg, expLight, repRot, expFcView):
         self.doc = FreeCAD.ActiveDocument
         self.objs = self.doc.Objects
 
         #get all paths, file names, directories, etc.
-        self.povPath = povPath
-        self.directory = os.path.dirname(self.povPath) + os.sep
+        self.projectName = projectName
+        self.directory = os.path.dirname(App.ActiveDocument.FileName) + os.sep
 
-        self.povName = self.povPath[len(self.directory):]
-        self.fileName = self.povName[:-4]
-        self.incName = self.fileName + ".inc"
+        self.povPath = self.directory + self.projectName + ".pov"
+        self.povName = self.projectName + ".pov"
+        self.incName = self.projectName + ".inc"
         self.incPath = self.directory + self.incName
-        self.meshName = self.fileName + "_meshes.inc"
+        self.meshName = self.projectName + "_meshes.inc"
         self.meshPath = self.directory + self.meshName
-        self.errorName = self.fileName + "_FatalError.out"
+        self.errorName = self.projectName + "_FatalError.out"
         self.errorPath = self.directory + self.errorName
-        self.fcViewName = self.fileName + "_FC-View.png"
+        self.fcViewName = self.projectName + "_FC-View.png"
         self.fcViewPath = self.directory + self.fcViewName
-        self.texIncName = self.fileName + "_textures.inc"
+        self.texIncName = self.projectName + "_textures.inc"
         self.texIncPath = self.directory + self.texIncName
 
         self.meshFileContent = ""
@@ -1748,14 +1748,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.helpLabel.setText(helpText)
         self.helpLabel.setOpenExternalLinks(True)
 
-    def openFileDialog(self): #open the file dialog for the pov file
-        defaultPath = self.pathLineEdit.text()
-
-        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
-
-        if fileName and fileName != (u'', u''):
-            self.pathLineEdit.setText(str(fileName[0]))
-
     def checkName(self, path): #check if the path to pov file is valid
         if path.find(" ") == -1 and path.find(os.sep) == -1 and isAscii(path) == True and path != "":
             self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(True)
@@ -1859,7 +1851,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.createTexIncContent()
         self.writeTextureInc()
 
-        exporter = ExportToPovRay(self.povPath,
+        exporter = ExportToPovRay(self.pathLineEdit.text(),
                                   self.imageWidth.value(),
                                   self.imageHeight.value(),
                                   self.expBg.isChecked(),
