@@ -73,8 +73,11 @@ class ExportToPovRay:
         self.projectName = projectName
         self.directory = os.path.dirname(App.ActiveDocument.FileName) + os.sep
 
-        self.povPath = self.directory + self.projectName + ".pov"
+        self.iniName = self.projectName + ".ini"
+        self.iniPath = self.directory + self.iniName
         self.povName = self.projectName + ".pov"
+        self.povPath = self.directory + self.povName
+        
         self.incName = self.projectName + ".inc"
         self.incPath = self.directory + self.incName
         self.meshName = self.projectName + "_meshes.inc"
@@ -1190,8 +1193,14 @@ class ExportToPovRay:
 
         #create output directory
         os.chdir(str(self.directory))
+
+        #write user options to ini file
+        iniHandler = open(self.iniPath, "a")
+        iniHandler.write("\n;User Options from FreeCAD Settings\n" + povOptions)
+        iniHandler.close()
+
         #start povray
-        subprocess.call([povExec, str(self.povName), povOptions, "width=" + str(self.width), "height=" + str(self.height), "Fatal_File=" + self.errorName])
+        subprocess.call([povExec, self.iniName])
 
         self.checkErrFile()
 
@@ -1776,6 +1785,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.texIncFile.write(self.texIncContent)
         self.texIncFile.close()
 
+    def writeIni(self):
+        self.iniFile = open(self.iniPath, "w")
+        self.iniFile.write(self.iniContent)
+        self.iniFile.close()
+
     def createTexIncContent(self): #create the content of the texture inc file
         self.texIncContent = ""
 
@@ -1833,6 +1847,13 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         if platform.system() == "Windows":
             self.texIncContent.replace("\n", "\r\n")
 
+    def createIniContent(self):
+        self.iniContent = ""
+        self.iniContent += "Input_File_Name='" + self.povName + "'\n"
+        self.iniContent += "Width=" + str(self.imageWidth.value()) + "\n"
+        self.iniContent += "Height=" + str(self.imageHeight.value()) + "\n"
+        self.iniContent += "Fatal_File='" + self.errorName + "'\n"
+
     def onCancel(self): #called if "Cancel" button is pressed
         self.result = "Canceled"
         self.close()
@@ -1843,13 +1864,19 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.close()
         self.saveInput()
 
+        self.projectName = self.pathLineEdit.text()
         self.directory = os.path.dirname(App.ActiveDocument.FileName) + os.sep
-        self.povName = self.pathLineEdit.text() + ".pov"
+        self.povName = self.projectName + ".pov"
         self.povPath = self.directory + self.povName
+        self.iniPath = self.directory + self.povName[:-4] + ".ini"
         self.texIncPath = self.directory + self.povName[:-4] + "_textures.inc"
+        self.errorName = self.projectName + "_FatalError.out"
 
         self.createTexIncContent()
         self.writeTextureInc()
+
+        self.createIniContent()
+        self.writeIni()
 
         exporter = ExportToPovRay(self.pathLineEdit.text(),
                                   self.imageWidth.value(),
