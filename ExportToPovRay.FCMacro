@@ -1299,23 +1299,18 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         #pov file selection
         self.pathLineEdit = QtGui.QLineEdit()
-        self.pathLineEdit.setPlaceholderText("Path to .pov Output File")
-        self.pathLineEdit.setFixedWidth(300)
-        self.pathLineEdit.textChanged.connect(self.checkPath)
-
-        self.openFileDialogButton = QtGui.QPushButton('Browse .pov Output File')
-        self.openFileDialogButton.clicked.connect(self.openFileDialog)
+        self.pathLineEdit.setPlaceholderText("Name of the Render Project")
+        self.pathLineEdit.textChanged.connect(self.checkName)
 
         self.warnLabel = QtGui.QLabel("")
         self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
 
-        self.horizLayout1 = QtGui.QGridLayout()
-        self.horizLayout1.addWidget(self.pathLineEdit, 0, 0)
-        self.horizLayout1.addWidget(self.openFileDialogButton, 0, 1)
-        self.horizLayout1.addWidget(self.warnLabel, 1, 0, 1, 2)
+        self.nameSelectionLayout = QtGui.QVBoxLayout()
+        self.nameSelectionLayout.addWidget(self.pathLineEdit)
+        self.nameSelectionLayout.addWidget(self.warnLabel)
 
-        self.pathGroup = QtGui.QGroupBox(".pov Output File Selection")
-        self.pathGroup.setLayout(self.horizLayout1)
+        self.pathGroup = QtGui.QGroupBox("Name of the Render Project")
+        self.pathGroup.setLayout(self.nameSelectionLayout)
 
         #Width & Height of rendered image
         self.imageWidthLabel = QtGui.QLabel("Width")
@@ -1761,16 +1756,16 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         if fileName and fileName != (u'', u''):
             self.pathLineEdit.setText(str(fileName[0]))
 
-    def checkPath(self, path): #check if the path to pov file is valid
-        if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:] == ".pov":
+    def checkName(self, path): #check if the path to pov file is valid
+        if path.find(" ") == -1 and path.find(os.sep) == -1 and isAscii(path) == True and path != "":
             self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(True)
             self.warnLabel.setText("")
         else:
             self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
             if path == "":
-                self.warnLabel.setText("Please type a path or get one with clicking on 'Open pov File'")
+                self.warnLabel.setText("Please type a name for the project")
             else:
-                self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .pov file")
+                self.warnLabel.setText("Your name contains a space or a mutated vowel or a file separator (like /)")
 
     def saveInput(self): #save the user inputs
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
@@ -1785,11 +1780,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         settings.endGroup()
 
     def writeTextureInc(self): #write the texture in content to a file
-        self.povPath = self.pathLineEdit.text()
-        self.directory = os.path.dirname(self.povPath) + os.sep
-        self.povName = self.povPath[len(self.directory):]
-        self.texIncPath = self.directory + self.povName[:-4] + "_textures.inc"
-
         self.texIncFile = open(self.texIncPath, "w")
         self.texIncFile.write(self.texIncContent)
         self.texIncFile.close()
@@ -1861,10 +1851,15 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.close()
         self.saveInput()
 
+        self.directory = os.path.dirname(App.ActiveDocument.FileName) + os.sep
+        self.povName = self.pathLineEdit.text() + ".pov"
+        self.povPath = self.directory + self.povName
+        self.texIncPath = self.directory + self.povName[:-4] + "_textures.inc"
+
         self.createTexIncContent()
         self.writeTextureInc()
 
-        exporter = ExportToPovRay(self.pathLineEdit.text(),
+        exporter = ExportToPovRay(self.povPath,
                                   self.imageWidth.value(),
                                   self.imageHeight.value(),
                                   self.expBg.isChecked(),
@@ -1909,6 +1904,9 @@ def main(): #the main function
     if App.ActiveDocument == None:
         App.Console.PrintWarning("No document opened\n")
         return -1
+    elif App.ActiveDocument.FileName == u"":
+        showError("Please save your FreeCAD model before rendering.", "Save File")
+
     else:
         dialog = GUI()
         dialog.exec_()
