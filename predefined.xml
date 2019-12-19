@@ -37,7 +37,11 @@
         <Predef pigment="White_Marble">White Marble</Predef>
     </Stone>
     <Wood>
-        <Predef texture="EMBWood1">Wood</Predef>
+        <Predef texture="EMBWood1">Walnut</Predef>
+        <Predef texture="Cherry_Wood">Cherry</Predef>
+        <Predef texture="Pine_Wood">Pine</Predef>
+        <Predef texture="Rosewood">Rosewood</Predef>
+        <Predef texture="DMFLightOak">Oak</Predef>
     </Wood>
     <Pattern>
         <Predef pigment="checker color White color Black">Checker</Predef>  
