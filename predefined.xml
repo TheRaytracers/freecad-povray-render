@@ -44,7 +44,8 @@
         <Predef texture="DMFLightOak">Oak</Predef>
     </Wood>
     <Pattern>
-        <Predef pigment="checker color White color Black">Checker</Predef>  
+        <Predef pigment="checker color White color Black">Checker</Predef>
+        <Predef pigment="tiling 1 color_map{[0 White][0.95 White][0.98 Black][1 Black]} scale 2">Tiles</Predef>
         <Predef pigment="brick color White color rgb &lt;0.9, 0.1, 0.1&gt; mortar 0.1" normal="wrinkles 0.75 scale 0.01" finish="diffuse 0.9 phong 0.2">Red Bricks</Predef>
     </Pattern>
     <Media>
