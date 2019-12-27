@@ -1494,7 +1494,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.listObjects = []
         #create the listObjects
         for obj in self.listFcObjects:
-            listItem = QtGui.QListWidgetItem(obj.ViewObject.Icon, obj.Label)
+            try:
+                listItem = QtGui.QListWidgetItem(obj.ViewObject.Icon, obj.Label)
+            except:
+                listItem = QtGui.QListWidgetItem(obj.Label)
             predefined = self.predefines[0]
             self.listObjects.append(ListObject(obj, listItem, self.predefines[0], 1, 1, 1, 0, 0, 0))
 
