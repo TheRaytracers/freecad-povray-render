@@ -43,6 +43,12 @@
         <Predef texture="Rosewood">Rosewood</Predef>
         <Predef texture="DMFLightOak">Oak</Predef>
     </Wood>
+    <Water>
+        <predef texture="Polished_Chrome" inc="textures.inc">Opaque, flat, reflecting water</predef>
+        <predef texture="Polished_Chrome" normal="bumps 0.03 scale &lt;1,0.25,0.25>*1 turbulence 0.6" inc="textures.inc">Moderatly moved reflecting water</predef>
+        <predef texture="Polished_Chrome" normal="crackle 0.15 scale 0.75 turbulence 0.3 translate &lt;-1,0,5>" inc="textures.inc">Moved, reflecting water</predef>
+        <predef texture="Polished_Chrome" normal="bozo 1.75 scale &lt;2.0,1,0.3>*0.20 rotate &lt;0,10,0> turbulence 0.9 translate &lt;0,0,-2>" inc="textures.inc">By wind moved, reflecting water</predef>
+    </Water>
     <Pattern>
         <Predef pigment="checker color White color Black">Checker</Predef>
         <Predef pigment="tiling 1 color_map{[0 White][0.95 White][0.98 Black][1 Black]} scale 2">Tiles</Predef>
