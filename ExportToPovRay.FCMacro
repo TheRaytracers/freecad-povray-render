@@ -1765,6 +1765,14 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.helpLabel.setText(helpText)
         self.helpLabel.setOpenExternalLinks(True)
 
+    def openFileDialog(self): #open the file dialog for the pov file
+        defaultPath = self.pathLineEdit.text()
+
+        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
+
+        if fileName and fileName != (u'', u''):
+            self.pathLineEdit.setText(str(fileName[0]))
+
     def checkName(self, path): #check if the path to pov file is valid
         if path.find(" ") == -1 and path.find(os.sep) == -1 and isAscii(path) == True and path != "":
             self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(True)
