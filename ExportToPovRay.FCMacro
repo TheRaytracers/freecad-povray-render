@@ -1692,7 +1692,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
     def setDefaultValues(self): #set the default values of the input objects
         system = platform.system()
         if system == "Linux":
-            defaultPath = "/home/$USER"
+            defaultPath = "/home/"
         elif system == "Darwin":
             defaultPath = "/Users/"
         elif system == "Windows":
@@ -1880,8 +1880,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.close()
         self.saveInput()
 
-        projectName = self.pathLineEdit.text()
-        directory = os.path.dirname(App.ActiveDocument.FileName) + os.sep
+        povPath = self.pathLineEdit.text()
+        directory = os.path.dirname(povPath) + os.sep
+        projectName = os.path.basename(povPath)
+
+        App.Console.PrintWarning(projectName)
 
         #create renderSettings object
         self.renderSettings = RenderSettings(directory, projectName,
