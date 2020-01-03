@@ -1355,14 +1355,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.repRot = QtGui.QCheckBox("Repair Rotation")
         self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
 
-        self.subFolder = QtGui.QCheckBox("Create own Subfolder for Render Files")
-
         self.vertLayout2 = QtGui.QVBoxLayout()
         self.vertLayout2.addWidget(self.expBg)
         self.vertLayout2.addWidget(self.expLight)
         self.vertLayout2.addWidget(self.repRot)
         self.vertLayout2.addWidget(self.expFcView)
-        self.vertLayout2.addWidget(self.subFolder)
         self.optionGroups = QtGui.QGroupBox("Options")
         self.optionGroups.setLayout(self.vertLayout2)
 
@@ -1708,17 +1705,13 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         #get saved input
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
         settings.beginGroup("userInput")
-
         path = settings.value("path", self.pathLineEdit.text())
-
         width = int(settings.value("width", self.imageWidth.value()))
         height = int(settings.value("height", self.imageHeight.value()))
         expBg = settings.value("expBg", self.expBg.isChecked())
         expLight = settings.value("expLight", self.expLight.isChecked())
         repRot = settings.value("repRot", self.repRot.isChecked())
         expFcView = settings.value("expFcView", self.expFcView.isChecked())
-        subFolder = settings.value("subFolder", self.subFolder.isChecked())
-
         settings.endGroup()
 
         if expBg is None:
@@ -1740,8 +1733,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             self.repRot.setCheckState(QtCore.Qt.CheckState(2))
         if expFcView is not None and (expFcView == True or expFcView == "true"):
             self.expFcView.setCheckState(QtCore.Qt.CheckState(2))
-        if subFolder is not None and (subFolder == True or subFolder == "true"):
-            self.subFolder.setCheckState(QtCore.Qt.CheckState(2))
 
         helpText = """
         <style>
@@ -1768,11 +1759,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         <p>Use this option if objects in your scene appear in a wrong rotation.<br>
         This is a workaround for a FreeCAD bug.</p>
         <h5>Export FreeCAD View</h5>
-        <p>Export the current FreeCAD view in the same size as the image rendered by POV-Ray</p>
-        <h5>Create own Subfolder for Render Files</h5>
-        <p>If you have several settings for one project, the folder with the project will get confusing quickly.<br>
-        Use this option for create for every project a subfolder with the project name.</p>
-        <br>
+        <p>Export the current FreeCAD view in the same size as the image rendered by POV-Ray<br></p>
         <p>For more information look in our <a href='https://gitlab.com/usbhub/exporttopovray/blob/master/doc/index.md'>Wiki</a></p>
         </div>"""
         self.helpLabel.setText(helpText)
@@ -1807,7 +1794,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         settings.setValue("expLight", self.expLight.isChecked())
         settings.setValue("repRot", self.repRot.isChecked())
         settings.setValue("expFcView", self.expFcView.isChecked())
-        settings.setValue("subFolder", self.subFolder.isChecked())
         settings.endGroup()
 
     def writeTextureInc(self): #write the texture in content to a file
@@ -1896,8 +1882,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         projectName = self.pathLineEdit.text()
         directory = os.path.dirname(App.ActiveDocument.FileName) + os.sep
-        if self.subFolder:
-            directory += projectName + os.sep
 
         #create renderSettings object
         self.renderSettings = RenderSettings(directory, projectName,
@@ -1907,9 +1891,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                                              self.expLight.isChecked(),
                                              self.repRot.isChecked(),
                                              self.expFcView.isChecked())
-
-        if not os.path.exists(directory):
-            os.makedirs(directory)
 
         self.createTexIncContent()
         self.writeTextureInc()
