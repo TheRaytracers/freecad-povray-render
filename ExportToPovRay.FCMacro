@@ -65,40 +65,40 @@ def stringCorrection(inputString): # String correction for compatibility with PO
 
 class ExportToPovRay:
     """Export the FreeCAD model to POV-Ray"""
-    def __init__(self, projectName, width, height, expBg, expLight, repRot, expFcView):
+    def __init__(self, renderSettings):
         self.doc = FreeCAD.ActiveDocument
         self.objs = self.doc.Objects
 
         #get all paths, file names, directories, etc.
-        self.projectName = projectName
-        self.directory = os.path.dirname(App.ActiveDocument.FileName) + os.sep
+        self.projectName = renderSettings.projectName
+        self.directory = renderSettings.directory
 
-        self.iniName = self.projectName + ".ini"
-        self.iniPath = self.directory + self.iniName
-        self.povName = self.projectName + ".pov"
-        self.povPath = self.directory + self.povName
+        self.iniName = renderSettings.iniName
+        self.iniPath = renderSettings.iniPath
+        self.povName = renderSettings.povName
+        self.povPath = renderSettings.povPath
         
-        self.incName = self.projectName + ".inc"
-        self.incPath = self.directory + self.incName
-        self.meshName = self.projectName + "_meshes.inc"
-        self.meshPath = self.directory + self.meshName
-        self.errorName = self.projectName + "_FatalError.out"
-        self.errorPath = self.directory + self.errorName
-        self.fcViewName = self.projectName + "_FC-View.png"
-        self.fcViewPath = self.directory + self.fcViewName
-        self.texIncName = self.projectName + "_textures.inc"
-        self.texIncPath = self.directory + self.texIncName
+        self.incName = renderSettings.incName
+        self.incPath = renderSettings.incPath
+        self.meshName = renderSettings.meshName
+        self.meshPath = renderSettings.meshPath
+        self.errorName = renderSettings.errorName
+        self.errorPath = renderSettings.errorPath
+        self.fcViewName = renderSettings.fcViewName
+        self.fcViewPath = renderSettings.fcViewPath
+        self.texIncName = renderSettings.texIncName
+        self.texIncPath = renderSettings.texIncPath
 
         self.meshFileContent = ""
 
         #get all output options
-        self.width = width
-        self.height = height
+        self.width = renderSettings.width
+        self.height = renderSettings.height
 
-        self.expBg = expBg
-        self.expLight = expLight
-        self.repRot = repRot
-        self.expFcView = expFcView
+        self.expBg = renderSettings.expBg
+        self.expLight = renderSettings.expLight
+        self.repRot = renderSettings.repRot
+        self.expFcView = renderSettings.expFcView
 
         #get default shape color (editable in FreeCAD settings) (default rgb(0.8, 0.8, 0.8))
         self.DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
@@ -1784,12 +1784,12 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         settings.endGroup()
 
     def writeTextureInc(self): #write the texture in content to a file
-        self.texIncFile = open(self.texIncPath, "w")
+        self.texIncFile = open(self.renderSettings.texIncPath, "w")
         self.texIncFile.write(self.texIncContent)
         self.texIncFile.close()
 
     def writeIni(self):
-        self.iniFile = open(self.iniPath, "w")
+        self.iniFile = open(self.renderSettings.iniPath, "w")
         self.iniFile.write(self.iniContent)
         self.iniFile.close()
 
@@ -1852,10 +1852,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
     def createIniContent(self):
         self.iniContent = ""
-        self.iniContent += "Input_File_Name='" + self.povName + "'\n"
-        self.iniContent += "Width=" + str(self.imageWidth.value()) + "\n"
-        self.iniContent += "Height=" + str(self.imageHeight.value()) + "\n"
-        self.iniContent += "Fatal_File='" + self.errorName + "'\n"
+        self.iniContent += "Input_File_Name='" + self.renderSettings.povName + "'\n"
+        self.iniContent += "Width=" + str(self.renderSettings.width) + "\n"
+        self.iniContent += "Height=" + str(self.renderSettings.height) + "\n"
+        self.iniContent += "Fatal_File='" + self.renderSettings.errorName + "'\n"
 
     def onCancel(self): #called if "Cancel" button is pressed
         self.result = "Canceled"
@@ -1867,13 +1867,17 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.close()
         self.saveInput()
 
-        self.projectName = self.pathLineEdit.text()
-        self.directory = os.path.dirname(App.ActiveDocument.FileName) + os.sep
-        self.povName = self.projectName + ".pov"
-        self.povPath = self.directory + self.povName
-        self.iniPath = self.directory + self.povName[:-4] + ".ini"
-        self.texIncPath = self.directory + self.povName[:-4] + "_textures.inc"
-        self.errorName = self.projectName + "_FatalError.out"
+        projectName = self.pathLineEdit.text()
+        directory = os.path.dirname(App.ActiveDocument.FileName) + os.sep
+
+        #create renderSettings object
+        self.renderSettings = RenderSettings(directory, projectName,
+                                             self.imageWidth.value(),
+                                             self.imageHeight.value(),
+                                             self.expBg.isChecked(),
+                                             self.expLight.isChecked(),
+                                             self.repRot.isChecked(),
+                                             self.expFcView.isChecked())
 
         self.createTexIncContent()
         self.writeTextureInc()
@@ -1881,13 +1885,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.createIniContent()
         self.writeIni()
 
-        exporter = ExportToPovRay(self.pathLineEdit.text(),
-                                  self.imageWidth.value(),
-                                  self.imageHeight.value(),
-                                  self.expBg.isChecked(),
-                                  self.expLight.isChecked(),
-                                  self.repRot.isChecked(),
-                                  self.expFcView.isChecked())
+        exporter = ExportToPovRay(self.renderSettings)
 
 class Predefined:
     def __init__(self, identifier, material, texture, pigment, finish, normal, interior, media, inc, treeItem):
@@ -1913,6 +1911,36 @@ class ListObject:
         self.rotationZ = rotationZ
         self.listItem = listItem
         self.predefObject = predefObject
+
+class RenderSettings:
+    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView):
+        self.projectName = projectName
+        self.directory = directory
+
+        self.iniName = self.projectName + ".ini"
+        self.iniPath = self.directory + self.iniName
+        self.povName = self.projectName + ".pov"
+        self.povPath = self.directory + self.povName
+        
+        self.incName = self.projectName + ".inc"
+        self.incPath = self.directory + self.incName
+        self.meshName = self.projectName + "_meshes.inc"
+        self.meshPath = self.directory + self.meshName
+        self.errorName = self.projectName + "_FatalError.out"
+        self.errorPath = self.directory + self.errorName
+        self.fcViewName = self.projectName + "_FC-View.png"
+        self.fcViewPath = self.directory + self.fcViewName
+        self.texIncName = self.projectName + "_textures.inc"
+        self.texIncPath = self.directory + self.texIncName
+
+        #get all output options
+        self.width = width
+        self.height = height
+
+        self.expBg = expBg
+        self.expLight = expLight
+        self.repRot = repRot
+        self.expFcView = expFcView
 
 def main(): #the main function
     #version = float(App.Version()[1])
