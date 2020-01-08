@@ -1,4 +1,5 @@
 *.*
+!UidGenerator.FCMacro
 !ExportToPovRay.FCMacro
 !LICENSE.md
 !README.md
