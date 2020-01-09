@@ -1884,8 +1884,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         directory = os.path.dirname(povPath) + os.sep
         projectName = os.path.basename(povPath)
 
-        App.Console.PrintWarning(projectName)
-
         #create renderSettings object
         self.renderSettings = RenderSettings(directory, projectName,
                                              self.imageWidth.value(),
