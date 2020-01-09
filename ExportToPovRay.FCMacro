@@ -1806,6 +1806,27 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.iniFile.write(self.iniContent)
         self.iniFile.close()
 
+    def settingsToCSV(self):
+        csv = ""
+
+        #add render settings
+        csv += ";stg_povPath, " + self.renderSettings.povPath + "\n"
+        csv += ";stg_width, " + str(self.renderSettings.width) + "\n"
+        csv += ";stg_height, " + str(self.renderSettings.height) + "\n"
+        csv += ";stg_expBg, " + str(self.renderSettings.expBg) + "\n"
+        csv += ";stg_expLight, " + str(self.renderSettings.expLight) + "\n"
+        csv += ";stg_repRot, " + str(self.renderSettings.repRot) + "\n"
+        csv += ";stg_expFcView, " + str(self.renderSettings.expFcView) + "\n"
+
+        #add settings for every listobject
+        for obj in self.listObjects:
+            csv += ";obj_" + obj.fcObj.Name + ", " + obj.predefObject.getHash() + ", "
+            csv += str(obj.scaleX) + ", " + str(obj.scaleY) + ", " + str(obj.scaleZ) + ", "
+            csv += str(obj.rotationX) + ", " + str(obj.rotationY) + ", " + str(obj.rotationZ) + "\n"
+
+        self.csv = csv
+
+
     def createTexIncContent(self): #create the content of the texture inc file
         self.texIncContent = ""
 
@@ -1864,7 +1885,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             self.texIncContent.replace("\n", "\r\n")
 
     def createIniContent(self):
+        self.settingsToCSV()
+        
         self.iniContent = ""
+        self.iniContent += self.csv + "\n"
         self.iniContent += "Input_File_Name='" + self.renderSettings.povName + "'\n"
         self.iniContent += "Width=" + str(self.renderSettings.width) + "\n"
         self.iniContent += "Height=" + str(self.renderSettings.height) + "\n"
@@ -1914,8 +1938,12 @@ class Predefined:
         self.inc = inc
         self.treeItem = treeItem
 
+    def getHash(self):
+        return str(self.identifier) + str(self.material) + str(self.texture) + str(self.pigment) + str(self.finish) + str(self.normal) + str(self.interior) + str(self.media) + str(self.inc)
+
 class ListObject:
     def __init__(self, fcObj, listItem, predefObject, scaleX, scaleY, scaleZ, rotationX, rotationY, rotationZ):
+        self.fcObj = fcObj
         self.label = stringCorrection(fcObj.Label)
         self.scaleX = scaleX
         self.scaleY = scaleY
