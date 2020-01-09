@@ -26,6 +26,7 @@ import MeshPart
 import platform
 import subprocess
 import xml.etree.ElementTree as xml
+import csv
 
 macroVersion = "0.1 beta"
 
@@ -62,6 +63,10 @@ def stringCorrection(inputString): # String correction for compatibility with PO
         uniString = uniString.replace(" ", "_")
         outString = uniString.encode("ASCII", "replace")      # conversion to ASCII for POV-Ray compatibility
         return outString.decode("utf-8")                      #return and redecode to unicode but with converted chars
+
+def strToBool(str):
+    return str.lower() in ['true', '1', 'y']
+
 
 class ExportToPovRay:
     """Export the FreeCAD model to POV-Ray"""
@@ -1690,50 +1695,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         return -1
 
     def setDefaultValues(self): #set the default values of the input objects
-        system = platform.system()
-        if system == "Linux":
-            defaultPath = "/home/"
-        elif system == "Darwin":
-            defaultPath = "/Users/"
-        elif system == "Windows":
-            defaultPath = "C:\\Users\\%UserName%\\"
-        else:
-            defaultPath = ""
-
-        self.pathLineEdit.setText(defaultPath)
-
-        #get saved input
-        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
-        settings.beginGroup("userInput")
-        path = settings.value("path", self.pathLineEdit.text())
-        width = int(settings.value("width", self.imageWidth.value()))
-        height = int(settings.value("height", self.imageHeight.value()))
-        expBg = settings.value("expBg", self.expBg.isChecked())
-        expLight = settings.value("expLight", self.expLight.isChecked())
-        repRot = settings.value("repRot", self.repRot.isChecked())
-        expFcView = settings.value("expFcView", self.expFcView.isChecked())
-        settings.endGroup()
-
-        if expBg is None:
-            self.expBg.setChecked(True)
-        if expLight is None:
-            self.expLight.setChecked(True)
-
-        if path is not None:
-            self.pathLineEdit.setText(path)
-        if width is not None:
-            self.imageWidth.setValue(width)
-        if height is not None:
-            self.imageHeight.setValue(height)
-        if expBg is not None and (expBg == True or expBg == "true"):
-            self.expBg.setCheckState(QtCore.Qt.CheckState(2))
-        if expLight is not None and (expLight == True or expLight == "true"):
-            self.expLight.setCheckState(QtCore.Qt.CheckState(2))
-        if repRot is not None and (repRot == True or repRot == "true"):
-            self.repRot.setCheckState(QtCore.Qt.CheckState(2))
-        if expFcView is not None and (expFcView == True or expFcView == "true"):
-            self.expFcView.setCheckState(QtCore.Qt.CheckState(2))
-
         helpText = """
         <style>
         div { margin: 15;}
@@ -1765,6 +1726,90 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.helpLabel.setText(helpText)
         self.helpLabel.setOpenExternalLinks(True)
 
+
+        #get saved input
+        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
+        settings.beginGroup("userInput")
+
+        if App.ActiveDocument.Name in settings.allKeys():
+            povPath = settings.value(settings.allKeys()[0])
+        else:
+            povPath = -1
+
+        settings.endGroup()
+
+        if povPath == -1:
+            #set some good standardValues
+            system = platform.system()
+            if system == "Linux":
+                defaultPath = "/home/"
+            elif system == "Darwin":
+                defaultPath = "/Users/"
+            elif system == "Windows":
+                defaultPath = "C:\\Users\\%UserName%\\"
+            else:
+                defaultPath = ""
+
+            self.pathLineEdit.setText(defaultPath)
+
+            #XXX
+
+        else:
+            self.pathLineEdit.setText(povPath)
+
+            #open ini file and extract CSV
+            try:
+                iniFile = open(os.path.basename(povPath) + ".ini", "r")
+            except:
+                return
+
+            lines = iniFile.readlines()
+            iniFile.close()
+            csvLines = []
+
+            for line in lines:
+                if line.startswith(";"):
+                    csvLines.append(line[1:])
+
+            #parse CSV
+            csvReader = csv.reader(csvLines, delimiter=',',)
+            for row in csvReader:
+                if row[0].startswith("stg_"):
+                    name = row[0][4:]
+
+                    if name == "width":
+                        self.imageWidth.setValue(int(row[1]))
+                    elif name == "height":
+                        self.imageHeight.setValue(int(row[1]))
+                    elif name == "expBg":
+                        self.expBg.setChecked(strToBool(row[1]))
+                    elif name == "expLight":
+                        self.expLight.setChecked(strToBool(row[1]))
+                    elif name == "repRot":
+                        self.repRot.setChecked(strToBool(row[1]))
+                    elif name == "expFcView":
+                        self.expFcView.setChecked(strToBool(row[1]))
+
+                elif row[0].startswith("obj_"):
+                    name = row[0][4:]
+                    hash = row[1]
+
+                    for listObj in self.listObjects:
+                        if listObj.fcObj.Name == name:
+
+                            for predef in self.predefines:
+                                if predef.getHash() == hash:
+                                    listObj.predefObject = predef
+                                    break
+
+                        listObj.scaleX = float(row[2])
+                        listObj.scaleY = float(row[3])
+                        listObj.scaleZ = float(row[4])
+
+                        listObj.rotationX = float(row[5])
+                        listObj.rotationY = float(row[6])
+                        listObj.rotationZ = float(row[7])
+
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
 
@@ -1784,16 +1829,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             else:
                 self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .pov file")
 
-    def saveInput(self): #save the user inputs
+    def saveActiveDocName(self): #save the user inputs
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
         settings.beginGroup("userInput")
-        settings.setValue("path", self.pathLineEdit.text())
-        settings.setValue("width", self.imageWidth.value())
-        settings.setValue("height", self.imageHeight.value())
-        settings.setValue("expBg", self.expBg.isChecked())
-        settings.setValue("expLight", self.expLight.isChecked())
-        settings.setValue("repRot", self.repRot.isChecked())
-        settings.setValue("expFcView", self.expFcView.isChecked())
+        settings.setValue(App.ActiveDocument.Name, self.pathLineEdit.text())
         settings.endGroup()
 
     def writeTextureInc(self): #write the texture in content to a file
@@ -1810,22 +1849,21 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         csv = ""
 
         #add render settings
-        csv += ";stg_povPath, " + self.renderSettings.povPath + "\n"
-        csv += ";stg_width, " + str(self.renderSettings.width) + "\n"
-        csv += ";stg_height, " + str(self.renderSettings.height) + "\n"
-        csv += ";stg_expBg, " + str(self.renderSettings.expBg) + "\n"
-        csv += ";stg_expLight, " + str(self.renderSettings.expLight) + "\n"
-        csv += ";stg_repRot, " + str(self.renderSettings.repRot) + "\n"
-        csv += ";stg_expFcView, " + str(self.renderSettings.expFcView) + "\n"
+        csv += ";stg_povPath," + self.renderSettings.povPath + "\n"
+        csv += ";stg_width," + str(self.renderSettings.width) + "\n"
+        csv += ";stg_height," + str(self.renderSettings.height) + "\n"
+        csv += ";stg_expBg," + str(self.renderSettings.expBg) + "\n"
+        csv += ";stg_expLight," + str(self.renderSettings.expLight) + "\n"
+        csv += ";stg_repRot," + str(self.renderSettings.repRot) + "\n"
+        csv += ";stg_expFcView," + str(self.renderSettings.expFcView) + "\n"
 
         #add settings for every listobject
         for obj in self.listObjects:
-            csv += ";obj_" + obj.fcObj.Name + ", " + obj.predefObject.getHash() + ", "
-            csv += str(obj.scaleX) + ", " + str(obj.scaleY) + ", " + str(obj.scaleZ) + ", "
-            csv += str(obj.rotationX) + ", " + str(obj.rotationY) + ", " + str(obj.rotationZ) + "\n"
+            csv += ";obj_" + obj.fcObj.Name + "," + obj.predefObject.getHash() + ","
+            csv += str(obj.scaleX) + "," + str(obj.scaleY) + "," + str(obj.scaleZ) + ","
+            csv += str(obj.rotationX) + "," + str(obj.rotationY) + "," + str(obj.rotationZ) + "\n"
 
         self.csv = csv
-
 
     def createTexIncContent(self): #create the content of the texture inc file
         self.texIncContent = ""
@@ -1902,7 +1940,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
     def onOk(self): #called if "OK" button is pressed
         self.result = "OK"
         self.close()
-        self.saveInput()
+        self.saveActiveDocName()
 
         povPath = self.pathLineEdit.text()
         directory = os.path.dirname(povPath) + os.sep
