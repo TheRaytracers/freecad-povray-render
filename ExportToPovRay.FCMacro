@@ -1650,7 +1650,16 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         #select the right predefined
         listObj.predefObject.treeItem.setSelected(True)
 
+        #expand categories
+        self.expandParentItems(listObj.predefObject.treeItem)
+
         self.connectSignals()
+
+    def expandParentItems(self, item):
+        parent = item.parent()
+        if type(parent) == QtGui.QTreeWidgetItem:
+            parent.setExpanded(True)
+            self.unfoldParentItem(parent)
 
     def updateSelectedListObject(self): #get the selected predefined and update the listObject
         listObj = self.getSelectedListObject()
