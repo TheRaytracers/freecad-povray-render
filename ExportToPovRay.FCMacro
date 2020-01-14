@@ -1762,8 +1762,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
             self.pathLineEdit.setText(defaultPath)
 
-            #XXX
-
         else:
             self.pathLineEdit.setText(povPath)
 
@@ -1954,7 +1952,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         povPath = self.pathLineEdit.text()
         directory = os.path.dirname(povPath) + os.sep
-        projectName = os.path.basename(povPath)
+        projectName = os.path.basename(povPath)[:-4]
+        App.Console.PrintWarning(projectName)
 
         #create renderSettings object
         self.renderSettings = RenderSettings(directory, projectName,
@@ -1988,7 +1987,7 @@ class Predefined:
 
     def getHash(self):
         stgStr = str(self.identifier) + str(self.material) + str(self.texture) + str(self.pigment) + str(self.finish) + str(self.normal) + str(self.interior) + str(self.media) + str(self.inc)
-        return hashlib.sha1(stgStr.encode("UTF-8")).hexdigest()
+        return hashlib.md5(stgStr.encode("UTF-8")).hexdigest()[:8]
 
 class ListObject:
     def __init__(self, fcObj, listItem, predefObject, scaleX, scaleY, scaleZ, rotationX, rotationY, rotationZ):
