@@ -27,6 +27,7 @@ import platform
 import subprocess
 import xml.etree.ElementTree as xml
 import csv
+import hashlib
 
 macroVersion = "0.1 beta"
 
@@ -1986,7 +1987,8 @@ class Predefined:
         self.treeItem = treeItem
 
     def getHash(self):
-        return str(self.identifier) + str(self.material) + str(self.texture) + str(self.pigment) + str(self.finish) + str(self.normal) + str(self.interior) + str(self.media) + str(self.inc)
+        stgStr = str(self.identifier) + str(self.material) + str(self.texture) + str(self.pigment) + str(self.finish) + str(self.normal) + str(self.interior) + str(self.media) + str(self.inc)
+        return hashlib.sha1(stgStr.encode("UTF-8")).hexdigest()
 
 class ListObject:
     def __init__(self, fcObj, listItem, predefObject, scaleX, scaleY, scaleZ, rotationX, rotationY, rotationZ):
