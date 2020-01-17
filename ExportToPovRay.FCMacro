@@ -1314,11 +1314,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         #pov file selection
         self.pathLineEdit = QtGui.QLineEdit()
-        self.pathLineEdit.setPlaceholderText("Path to .pov Output File")
+        self.pathLineEdit.setPlaceholderText("Path to INI File")
         self.pathLineEdit.setFixedWidth(300)
         self.pathLineEdit.textChanged.connect(self.checkPath)
 
-        self.openFileDialogButton = QtGui.QPushButton('Browse .pov Output File')
+        self.openFileDialogButton = QtGui.QPushButton('…')
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
 
         self.warnLabel = QtGui.QLabel("")
@@ -1329,7 +1329,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.horizLayout1.addWidget(self.openFileDialogButton, 0, 1)
         self.horizLayout1.addWidget(self.warnLabel, 1, 0, 1, 2)
 
-        self.pathGroup = QtGui.QGroupBox(".pov Output File Selection")
+        self.pathGroup = QtGui.QGroupBox("Output File Selection")
         self.pathGroup.setLayout(self.horizLayout1)
 
         #Width & Height of rendered image
@@ -1716,8 +1716,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         You can add user defined material for each object in a <br>
         seperate .inc file that won't be overwritten.</p>
         <h3>Pov File Selection</h3>
-        <p>Select the pov file by typing the path into the text field or choose a .pov file <br>
-        with the 'Open pov File' button.<br>
+        <p>Select the ini file by typing the path into the text field or choose a .ini file <br>
+        with the '…' button.<br>
         Be careful not to use spaces or special chars in pathname for POV-Ray compatibility.</p>
         <h3>Width and Height of the Image</h3>
         <p>Select the width and height in pixels of the image to be rendered with POV-Ray.</p>
@@ -1742,13 +1742,13 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         settings.beginGroup("userInput")
 
         if App.ActiveDocument.Name in settings.allKeys():
-            povPath = settings.value(settings.allKeys()[0])
+            iniPath = settings.value(settings.allKeys()[0])
         else:
-            povPath = -1
+            iniPath = -1
 
         settings.endGroup()
 
-        if povPath == -1:
+        if iniPath == -1:
             #set some good standardValues
             system = platform.system()
             if system == "Linux":
@@ -1763,11 +1763,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             self.pathLineEdit.setText(defaultPath)
 
         else:
-            self.pathLineEdit.setText(povPath)
+            self.pathLineEdit.setText(iniPath)
 
             #open ini file and extract CSV
             try:
-                iniFile = open(os.path.basename(povPath[:-4]) + ".ini", "r")
+                iniFile = open(os.path.basename(iniPath), "r")
             except:
                 App.Console.PrintError("Could not open ini file")
                 return
@@ -1822,21 +1822,21 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
 
-        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.pov file', defaultPath, "PovRay Files (*.pov)")
+        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.ini file', defaultPath, "POV-Ray INI Files (*.ini)")
 
         if fileName and fileName != (u'', u''):
             self.pathLineEdit.setText(str(fileName[0]))
 
     def checkPath(self, path): #check if the path to pov file is valid
-        if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:] == ".pov":
+        if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:] == ".ini":
             self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(True)
             self.warnLabel.setText("")
         else:
             self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
             if path == "":
-                self.warnLabel.setText("Please type a path or get one with clicking on 'Open pov File'")
+                self.warnLabel.setText("Please type a path or get one with clicking on '…'")
             else:
-                self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .pov file")
+                self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .ini file")
 
     def saveActiveDocName(self): #save the user inputs
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
@@ -1951,9 +1951,9 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.close()
         self.saveActiveDocName()
 
-        povPath = self.pathLineEdit.text()
-        directory = os.path.dirname(povPath) + os.sep
-        projectName = os.path.basename(povPath)[:-4]
+        iniPath = self.pathLineEdit.text()
+        directory = os.path.dirname(iniPath) + os.sep
+        projectName = os.path.basename(iniPath)[:-4]
 
         #create renderSettings object
         self.renderSettings = RenderSettings(directory, projectName,
