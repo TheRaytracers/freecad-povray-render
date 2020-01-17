@@ -1767,8 +1767,9 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
             #open ini file and extract CSV
             try:
-                iniFile = open(os.path.basename(povPath) + ".ini", "r")
+                iniFile = open(os.path.basename(povPath[:-4]) + ".ini", "r")
             except:
+                App.Console.PrintError("Could not open ini file")
                 return
 
             lines = iniFile.readlines()
@@ -1953,7 +1954,6 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         povPath = self.pathLineEdit.text()
         directory = os.path.dirname(povPath) + os.sep
         projectName = os.path.basename(povPath)[:-4]
-        App.Console.PrintWarning(projectName)
 
         #create renderSettings object
         self.renderSettings = RenderSettings(directory, projectName,
