@@ -1318,7 +1318,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.pathLineEdit.setFixedWidth(300)
         self.pathLineEdit.textChanged.connect(self.checkPath)
 
-        self.openFileDialogButton = QtGui.QPushButton('…')
+        self.openFileDialogButton = QtGui.QPushButton("...")
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
 
         self.warnLabel = QtGui.QLabel("")
