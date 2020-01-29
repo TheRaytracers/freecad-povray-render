@@ -1408,6 +1408,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         
         self.addObjectsTexturesLists() #add the two lists at the top
         self.addScaleRotate() #add the menu for scaling and rotating at the bottom
+        self.addPreview()
 
         # signals and slots
         self.connectSignals()
@@ -1415,6 +1416,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         #set layouts
         self.textureLayout.addWidget(self.listWidget)
         self.textureLayout.addWidget(self.textureSettingsWidget)
+        self.textureLayout.addWidget(self.previewLabel)
 
         self.textureWidget = QtGui.QWidget() #wrapper widget for texture tab
         self.textureWidget.setLayout(self.textureLayout)
@@ -1628,6 +1630,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
+    def addPreview(self):
+        self.previewLabel = QtGui.QLabel()
+        self.previewLabel.setStyleSheet("QLabel { color : #ff0000; }")
+
     def updateTextureSettings(self): #get the selected object and select the right predefined
         self.disconnectSignals()
         listObj = self.getSelectedListObject() #get the current selected object
@@ -1654,6 +1660,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         #expand categories
         self.expandParentItems(listObj.predefObject.treeItem)
+
+        self.renderPreview(listObj)
 
         self.connectSignals()
 
@@ -1694,6 +1702,13 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.renderPreview(listObj)
 
     def renderPreview(self, listObj):
+        if listObj.predefObject.material == None: #for FreeCAD materials
+            self.previewLabel.setText("The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled.")
+            return
+        elif listObj.predefObject.media != "":
+            self.previewLabel.setText("The texture is too complex for a preview and would need a lot of time\nso this texture is disabled.")
+            return
+
         #write file
         povFile = tempfile.NamedTemporaryFile(suffix=".pov") #pov file handler
         povFile.delete = False
@@ -1760,7 +1775,11 @@ sphere { <0, 0, 0> 5
         povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('OutputParameters')
 
         #start povray
-        subprocess.call([povExec, "-d", povName])
+        subprocess.call([povExec, "-d", "width=300", "height=225", povName])
+
+        #update preview widget
+        pixmap = QtGui.QPixmap(povName[:-4])
+        self.previewLabel.setPixmap(pixmap)
 
     def getSelectedListObject(self): #get the current selected listObject
         for listObj in self.listObjects:
