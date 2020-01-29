@@ -1739,7 +1739,15 @@ light_source { CamPosition color rgb <0.5, 0.5, 0.5> }
 
 sky_sphere {
 	pigment {
-		color rgb<1.000, 1.000, 1.000>
+	gradient z
+	color_map {
+            [0 rgb<0,0,0>]
+            [0.2 rgb<0,0,0>]
+            [0.75 rgb<1,1,1>]
+            [1 rgb<1,1,1>]
+            }
+        scale 2
+        translate -1    
 	}
 }
 """)
@@ -1776,7 +1784,7 @@ sphere { <0, 0, 0> 5
 
         #start povray
         subprocess.call([povExec, "-d", "width=300", "height=225", povName])
-
+        
         #update preview widget
         pixmap = QtGui.QPixmap(povName[:-4])
         self.previewLabel.setPixmap(pixmap)
