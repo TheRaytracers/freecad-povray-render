@@ -1414,6 +1414,8 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.connectSignals()
 
         self.previewDisableCheckBox.stateChanged.connect(self.updateSelectedListObject)
+        self.zoomIn.pressed.connect(self.largerPreview)
+        self.zoomOut.pressed.connect(self.smallerPreview)
 
         #set layouts
         self.textureLayout.addWidget(self.listWidget)
@@ -1422,6 +1424,21 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         self.textureWidget = QtGui.QWidget() #wrapper widget for texture tab
         self.textureWidget.setLayout(self.textureLayout)
+
+    def largerPreview(self):
+        self.previewWidth += 40
+        self.previewHeight += 30
+
+        self.updateSelectedListObject()
+
+    def smallerPreview(self):
+        if self.previewWidth < 45:
+            return
+
+        self.previewWidth -= 40
+        self.previewHeight -= 30
+
+        self.updateSelectedListObject()
 
     def connectSignals(self): #connect all necessary signals for the texture tab
         self.objectList.itemSelectionChanged.connect(self.updateTextureSettings)
@@ -1671,9 +1688,15 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         #disable checkbox
         self.previewDisableCheckBox = QtGui.QCheckBox("Disable Live Preview")
 
+        #zoom buttons
+        self.zoomIn = QtGui.QPushButton("Zoom In")
+        self.zoomOut = QtGui.QPushButton("Zoom Out")
+
         #preview setting layout
         self.previewSettingsLayout = QtGui.QHBoxLayout()
         self.previewSettingsLayout.addWidget(self.previewDisableCheckBox)
+        self.previewSettingsLayout.addWidget(self.zoomIn)
+        self.previewSettingsLayout.addWidget(self.zoomOut)
 
         #preview image
         self.previewLabel = QtGui.QLabel()
@@ -1848,7 +1871,7 @@ sphere { <0, 0, 0> 5
         povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('OutputParameters')
 
         #start povray
-        subprocess.call([povExec, "-d", "width=300", "height=225", povName])
+        subprocess.call([povExec, "-d", "width=" + str(self.previewWidth), "height=" + str(self.previewHeight), povName])
         
         #update preview widget
         pixmap = QtGui.QPixmap(povName[:-4])
@@ -1911,6 +1934,18 @@ sphere { <0, 0, 0> 5
             self.previewDisableCheckBox.setChecked(previewDisable)
         else:
             self.previewDisableCheckBox.setChecked(True)
+
+        previewWidth = settings.value("previewWidth")
+        if previewWidth != None and previewWidth != 0 and previewWidth != -1:
+            self.previewWidth = previewWidth
+        else:
+            self.previewWidth = 300
+
+        previewHeight = settings.value("previewHeight")
+        if previewHeight != None and previewHeight != 0 and previewHeight != -1:
+            self.previewHeight = previewHeight
+        else:
+            self.previewHeight = 225
 
         if App.ActiveDocument.Name in settings.allKeys():
             iniPath = settings.value(settings.allKeys()[0])
@@ -2017,6 +2052,8 @@ sphere { <0, 0, 0> 5
         settings.beginGroup("userInput")
         settings.setValue(App.ActiveDocument.Name, self.pathLineEdit.text())
         settings.setValue("previewDisable", self.previewDisableCheckBox.isChecked())
+        settings.setValue("previewWidth", self.previewWidth)
+        settings.setValue("previewHeight", self.previewHeight)
         settings.endGroup()
 
     def writeTextureInc(self): #write the texture in content to a file
