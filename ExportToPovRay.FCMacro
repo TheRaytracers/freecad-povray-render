@@ -1904,19 +1904,18 @@ sphere { <0, 0, 0> 5
 
                     for listObj in self.listObjects:
                         if listObj.fcObj.Name == name:
-
                             for predef in self.predefines:
                                 if predef.getHash() == hash:
                                     listObj.predefObject = predef
                                     break
 
-                        listObj.scaleX = float(row[2])
-                        listObj.scaleY = float(row[3])
-                        listObj.scaleZ = float(row[4])
+                            listObj.scaleX = float(row[2])
+                            listObj.scaleY = float(row[3])
+                            listObj.scaleZ = float(row[4])
 
-                        listObj.rotationX = float(row[5])
-                        listObj.rotationY = float(row[6])
-                        listObj.rotationZ = float(row[7])
+                            listObj.rotationX = float(row[5])
+                            listObj.rotationY = float(row[6])
+                            listObj.rotationZ = float(row[7])
 
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
