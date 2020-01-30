@@ -1407,16 +1407,18 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureLayout = QtGui.QVBoxLayout() #the wrapper layout for the tab
         
         self.addObjectsTexturesLists() #add the two lists at the top
-        self.addScaleRotate() #add the menu for scaling and rotating at the bottom
+        self.addScaleRotateTranslate() #add the menu for scaling and rotating at the bottom
         self.addPreview()
 
         # signals and slots
         self.connectSignals()
 
+        self.previewDisableCheckBox.stateChanged.connect(self.updateSelectedListObject)
+
         #set layouts
         self.textureLayout.addWidget(self.listWidget)
         self.textureLayout.addWidget(self.textureSettingsWidget)
-        self.textureLayout.addWidget(self.previewLabel)
+        self.textureLayout.addWidget(self.previewWidget)
 
         self.textureWidget = QtGui.QWidget() #wrapper widget for texture tab
         self.textureWidget.setLayout(self.textureLayout)
@@ -1586,7 +1588,7 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                 #call method for child nodes
                 self.predefXmlToList(node, categorieItem)
 
-    def addScaleRotate(self): #add the scale and rotate menu
+    def addScaleRotateTranslate(self): #add the scale and rotate menu
         # scale, rotate, preview
         self.textureSettingsWidget = QtGui.QWidget()
         self.textureSettingsLayout = QtGui.QGridLayout()
@@ -1666,8 +1668,24 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
     def addPreview(self):
+        #disable checkbox
+        self.previewDisableCheckBox = QtGui.QCheckBox("Disable Live Preview")
+
+        #preview setting layout
+        self.previewSettingsLayout = QtGui.QHBoxLayout()
+        self.previewSettingsLayout.addWidget(self.previewDisableCheckBox)
+
+        #preview image
         self.previewLabel = QtGui.QLabel()
         self.previewLabel.setStyleSheet("QLabel { color : #ff0000; }")
+
+        #main layout
+        self.previewLayout = QtGui.QVBoxLayout()
+        self.previewLayout.addLayout(self.previewSettingsLayout)
+        self.previewLayout.addWidget(self.previewLabel)
+
+        self.previewWidget = QtGui.QWidget()
+        self.previewWidget.setLayout(self.previewLayout)
 
     def updateTextureSettings(self): #get the selected object and select the right predefined
         self.disconnectSignals()
@@ -1745,6 +1763,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.renderPreview(listObj)
 
     def renderPreview(self, listObj):
+        if self.previewDisableCheckBox.isChecked():
+            self.previewLabel.setText(" ")
+            return
+
         if listObj.predefObject.material == None: #for FreeCAD materials
             self.previewLabel.setText("The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled.")
             return
@@ -1883,6 +1905,13 @@ sphere { <0, 0, 0> 5
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
         settings.beginGroup("userInput")
 
+        #set preview disable checkbox
+        previewDisable = settings.value("previewDisable")
+        if previewDisable != None:
+            self.previewDisableCheckBox.setChecked(previewDisable)
+        else:
+            self.previewDisableCheckBox.setChecked(True)
+
         if App.ActiveDocument.Name in settings.allKeys():
             iniPath = settings.value(settings.allKeys()[0])
         else:
@@ -1987,6 +2016,7 @@ sphere { <0, 0, 0> 5
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
         settings.beginGroup("userInput")
         settings.setValue(App.ActiveDocument.Name, self.pathLineEdit.text())
+        settings.setValue("previewDisable", self.previewDisableCheckBox.isChecked())
         settings.endGroup()
 
     def writeTextureInc(self): #write the texture in content to a file
