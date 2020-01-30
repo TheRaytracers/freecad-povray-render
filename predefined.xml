@@ -35,6 +35,7 @@
     </Metal>
     <Stone>
         <Predef pigment="White_Marble">White Marble</Predef>
+        <Predef pigment="color Black" finish="ambient 0.35&#10;brilliance 2&#10;diffuse 0.3&#10;metallic&#10;specular 0.80&#10;roughness 1/20&#10;reflection 0.1">Shungit</Predef>
     </Stone>
     <Wood>
         <Predef texture="EMBWood1">Walnut</Predef>
