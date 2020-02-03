@@ -67,6 +67,8 @@ def stringCorrection(inputString): # String correction for compatibility with PO
         return outString.decode("utf-8")                      #return and redecode to unicode but with converted chars
 
 def strToBool(str):
+    if str == True:
+        return True
     return str.lower() in ['true', '1', 'y']
 
 
@@ -1931,18 +1933,18 @@ sphere { <0, 0, 0> 5
         #set preview disable checkbox
         previewDisable = settings.value("previewDisable")
         if previewDisable != None:
-            self.previewDisableCheckBox.setChecked(previewDisable)
+            self.previewDisableCheckBox.setChecked(strToBool(previewDisable))
         else:
             self.previewDisableCheckBox.setChecked(True)
 
         previewWidth = settings.value("previewWidth")
-        if previewWidth != None and previewWidth != 0 and previewWidth != -1:
+        if previewWidth != None and previewWidth != 0 and previewWidth != -1 and type(previewWidth) == int:
             self.previewWidth = previewWidth
         else:
             self.previewWidth = 300
 
         previewHeight = settings.value("previewHeight")
-        if previewHeight != None and previewHeight != 0 and previewHeight != -1:
+        if previewHeight != None and previewHeight != 0 and previewHeight != -1 and type(previewWidth) == int:
             self.previewHeight = previewHeight
         else:
             self.previewHeight = 225
