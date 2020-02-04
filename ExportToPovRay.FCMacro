@@ -69,6 +69,9 @@ def stringCorrection(inputString): # String correction for compatibility with PO
 def strToBool(str):
     if str == True:
         return True
+    elif str == False:
+        return False
+
     return str.lower() in ['true', '1', 'y']
 
 
@@ -1938,14 +1941,14 @@ sphere { <0, 0, 0> 5
             self.previewDisableCheckBox.setChecked(True)
 
         previewWidth = settings.value("previewWidth")
-        if previewWidth != None and previewWidth != 0 and previewWidth != -1 and type(previewWidth) == int:
-            self.previewWidth = previewWidth
+        if previewWidth != None and previewWidth != 0 and previewWidth != -1:
+            self.previewWidth = int(previewWidth)
         else:
             self.previewWidth = 300
 
         previewHeight = settings.value("previewHeight")
-        if previewHeight != None and previewHeight != 0 and previewHeight != -1 and type(previewWidth) == int:
-            self.previewHeight = previewHeight
+        if previewHeight != None and previewHeight != 0 and previewHeight != -1:
+            self.previewHeight = int(previewHeight)
         else:
             self.previewHeight = 225
 
@@ -1975,7 +1978,7 @@ sphere { <0, 0, 0> 5
 
             #open ini file and extract CSV
             try:
-                iniFile = open(os.path.basename(iniPath), "r")
+                iniFile = open(iniPath, "r")
             except:
                 App.Console.PrintError("Could not open ini file\n")
                 return
