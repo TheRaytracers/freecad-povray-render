@@ -1953,7 +1953,7 @@ sphere { <0, 0, 0> 5
             self.previewHeight = 225
 
         if App.ActiveDocument.Name in settings.allKeys():
-            iniPath = settings.value(settings.allKeys()[0])
+            iniPath = settings.value(App.ActiveDocument.Name)
         else:
             iniPath = -1
 
