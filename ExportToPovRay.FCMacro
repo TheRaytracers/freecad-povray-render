@@ -1321,11 +1321,13 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         #pov file selection
         self.pathLineEdit = QtGui.QLineEdit()
         self.pathLineEdit.setPlaceholderText("Path to INI File")
+        self.pathLineEdit.setToolTip("Path to the INI file (kind of a project file)")
         self.pathLineEdit.setFixedWidth(300)
         self.pathLineEdit.textChanged.connect(self.checkPath)
 
         self.openFileDialogButton = QtGui.QPushButton("...")
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
+        self.openFileDialogButton.setToolTip("Open file dialog for choosing a INI file")
 
         self.warnLabel = QtGui.QLabel("")
         self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
@@ -1345,12 +1347,14 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.imageWidth.setMaximum(999999)
         self.imageWidth.setSuffix(" px")
         self.imageWidth.setValue(800)
+        self.imageWidth.setToolTip("Width of the rendered image in pixels")
         self.imageHeightLabel = QtGui.QLabel("Height")
         self.imageHeight = QtGui.QSpinBox()
         self.imageHeight.setMinimum(1)
         self.imageHeight.setMaximum(999999)
         self.imageHeight.setSuffix(" px")
         self.imageHeight.setValue(600)
+        self.imageHeight.setToolTip("Height of the rendered image in pixels")
 
         self.vertLayout1 = QtGui.QVBoxLayout()
         self.vertLayout1.addWidget(self.imageWidthLabel)
@@ -1362,10 +1366,16 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         #Options
         self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
+        self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via the settings)<br>Define your own background if you uncheck this option")
+        
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
+        self.expLight.setToolTip("Export the light FreeCAD uses. Define your own light if you uncheck this option")
 
         self.repRot = QtGui.QCheckBox("Repair Rotation")
+        self.repRot.setToolTip("Repair the rotation of all objects. Visit the Help tab for more information.")
+        
         self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
+        self.expFcView.setToolTip("Take a screenshot of the scene view and save it with the same resolution as the image")
 
         self.vertLayout2 = QtGui.QVBoxLayout()
         self.vertLayout2.addWidget(self.expBg)
