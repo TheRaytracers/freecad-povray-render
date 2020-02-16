@@ -340,150 +340,152 @@ class ExportToPovRay:
         elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Array"): #Array from Draft workbench
             povArr = ""
             if fcObj.ArrayType == "polar":
-                childs = fcObj.OutList
-                for child in childs:
-                    center = "<" + str(fcObj.Center.x) + ", " + str(fcObj.Center.y) + ", " + str(fcObj.Center.z) + ">"
-                    axisX = fcObj.Axis.x
-                    axisY = fcObj.Axis.y
-                    axisZ = fcObj.Axis.z
-                    highestAxis = max(axisX, axisY, axisZ) #get highest value
-                    axisX /= highestAxis
-                    axisY /= highestAxis
-                    axisZ /= highestAxis
+                child = fcObj.Base
+                #for child in childs:
+                center = "<" + str(fcObj.Center.x) + ", " + str(fcObj.Center.y) + ", " + str(fcObj.Center.z) + ">"
+                axisX = fcObj.Axis.x
+                axisY = fcObj.Axis.y
+                axisZ = fcObj.Axis.z
+                highestAxis = max(axisX, axisY, axisZ) #get highest value
+                axisX /= highestAxis
+                axisY /= highestAxis
+                axisZ /= highestAxis
 
 
-                    axis = "<" + str(axisX) + ", " + str(axisY) + ", " + str(axisZ) + ">"
-                    intervalAxis = "<" + str(fcObj.IntervalAxis.x) + ", " + str(fcObj.IntervalAxis.y) + ", " + str(fcObj.IntervalAxis.z) + ">"
-                    number = fcObj.NumberPolar
-                    angle = fcObj.Angle.getValueAs("deg").Value
+                axis = "<" + str(axisX) + ", " + str(axisY) + ", " + str(axisZ) + ">"
+                intervalAxis = "<" + str(fcObj.IntervalAxis.x) + ", " + str(fcObj.IntervalAxis.y) + ", " + str(fcObj.IntervalAxis.z) + ">"
+                number = fcObj.NumberPolar
+                angle = fcObj.Angle.getValueAs("deg").Value
 
-                    declareName = stringCorrection(child.Label.capitalize()) + "_" + child.Name
-                    povArr += "\n#declare " + declareName + " = "
-                    childCode = self.createPovCode(child, True, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
-                    povArr += childCode
+                declareName = stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                povArr += "\n#declare " + declareName + " = "
+                childCode = self.createPovCode(child, True, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
+                povArr += childCode
 
-                    povArr += "\n#declare i = 0;\n"
-                    povArr += "#declare endNo = " + str(number) + ";\n"
-                    povArr += "#declare axis = " + axis + ";\n"
-                    povArr += "#declare arrAngle = " + str(angle) + ";\n"
-                    povArr += "#while (i < endNo)\n"
-                    povArr += "\tobject { " + declareName + "\n"
-                    if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
-                        povArr += "\t\ttranslate -" + center + "\n"
+                povArr += "\n#declare i = 0;\n"
+                povArr += "#declare endNo = " + str(number) + ";\n"
+                povArr += "#declare axis = " + axis + ";\n"
+                povArr += "#declare arrAngle = " + str(angle) + ";\n"
+                povArr += "#while (i < endNo)\n"
+                povArr += "\tobject { " + declareName + "\n"
+                if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
+                    povArr += "\t\ttranslate -" + center + "\n"
 
-                    povArr += "\t\t#declare rotAngle = i * arrAngle / endNo;\n"
-                    povArr += "\t\t#local vX = vaxis_rotate(x, axis, rotAngle);\n"
-                    povArr += "\t\t#local vY = vaxis_rotate(y, axis, rotAngle);\n"
-                    povArr += "\t\t#local vZ = vaxis_rotate(z, axis, rotAngle);\n"
-                    povArr += "\t\ttransform {\n"
-                    povArr += "\t\t\tmatrix <vX.x, vX.y, vX.z, vY.x, vY.y, vY.z, vZ.x, vZ.y, vZ.z, 0, 0, 0>\n"
-                    povArr += "\t\t}\n"
+                povArr += "\t\t#declare rotAngle = i * arrAngle / endNo;\n"
+                povArr += "\t\t#local vX = vaxis_rotate(x, axis, rotAngle);\n"
+                povArr += "\t\t#local vY = vaxis_rotate(y, axis, rotAngle);\n"
+                povArr += "\t\t#local vZ = vaxis_rotate(z, axis, rotAngle);\n"
+                povArr += "\t\ttransform {\n"
+                povArr += "\t\t\tmatrix <vX.x, vX.y, vX.z, vY.x, vY.y, vY.z, vZ.x, vZ.y, vZ.z, 0, 0, 0>\n"
+                povArr += "\t\t}\n"
 
-                    if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
-                        povArr += "\t\ttranslate " + center + "\n"
+                if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
+                    povArr += "\t\ttranslate " + center + "\n"
 
-                    if expPlacement:
-                        rotation = self.getRotation(fcObj)
-                        if rotation != "": #test if the object is rotated
-                            povArr += "        " + rotation + "\n"
+                if expPlacement:
+                    rotation = self.getRotation(fcObj)
+                    if rotation != "": #test if the object is rotated
+                        povArr += "        " + rotation + "\n"
 
-                    if fcObj.IntervalAxis.x != 0 or fcObj.IntervalAxis.y != 0 or fcObj.IntervalAxis.z != 0:
-                        povArr += "\t\ttranslate " + intervalAxis + " * i\n"
+                if fcObj.IntervalAxis.x != 0 or fcObj.IntervalAxis.y != 0 or fcObj.IntervalAxis.z != 0:
+                    povArr += "\t\ttranslate " + intervalAxis + " * i\n"
 
-                    if expPlacement:
-                        translation = self.getTranslation(fcObj)
-                        if translation != "": #test if the object is translated
-                            povArr += "\t" + translation + "\n"
+                if expPlacement:
+                    translation = self.getTranslation(fcObj)
+                    if translation != "": #test if the object is translated
+                        povArr += "\t" + translation + "\n"
 
-                    if expPigment:
-                        pigment = self.getPigment(fcObj)
-                        if pigment != "": #test if the object has the standard pigment
-                            povArr += "\t" + pigment + "\n"
+                if expPigment:
+                    pigment = self.getPigment(fcObj)
+                    if pigment != "": #test if the object has the standard pigment
+                        povArr += "\t" + pigment + "\n"
 
-                    povArr += "    }\n\t#declare i = i + 1;\n"
-                    povArr += "#end\n"
-
-                povCode += povArr
+                povArr += "    }\n\t#declare i = i + 1;\n"
+                povArr += "#end\n"
 
             elif fcObj.ArrayType == "ortho":
-                childs = fcObj.OutList
-                for child in childs:
-                    intervalX = "<" + str(fcObj.IntervalX.x) + ", " + str(fcObj.IntervalX.y) + ", " + str(fcObj.IntervalX.z) + ">"
-                    intervalY = "<" + str(fcObj.IntervalY.x) + ", " + str(fcObj.IntervalY.y) + ", " + str(fcObj.IntervalY.z) + ">"
-                    intervalZ = "<" + str(fcObj.IntervalZ.x) + ", " + str(fcObj.IntervalZ.y) + ", " + str(fcObj.IntervalZ.z) + ">"
+                child = fcObj.Base
+                #App.Console.PrintWarning(childs)
+                #App.Console.PrintWarning("\n")
+                #for child in childs:
+                intervalX = "<" + str(fcObj.IntervalX.x) + ", " + str(fcObj.IntervalX.y) + ", " + str(fcObj.IntervalX.z) + ">"
+                intervalY = "<" + str(fcObj.IntervalY.x) + ", " + str(fcObj.IntervalY.y) + ", " + str(fcObj.IntervalY.z) + ">"
+                intervalZ = "<" + str(fcObj.IntervalZ.x) + ", " + str(fcObj.IntervalZ.y) + ", " + str(fcObj.IntervalZ.z) + ">"
 
-                    numX = fcObj.NumberX
-                    if numX == 0:
-                        numX = 1
+                numX = fcObj.NumberX
+                if numX == 0:
+                    numX = 1
 
-                    numY = fcObj.NumberY
-                    if numY == 0:
-                        numY = 1
+                numY = fcObj.NumberY
+                if numY == 0:
+                    numY = 1
 
-                    numZ = fcObj.NumberZ
-                    if numZ == 0:
-                        numZ = 1
+                numZ = fcObj.NumberZ
+                if numZ == 0:
+                    numZ = 1
 
-                    declareName = stringCorrection(child.Label.capitalize()) + "_" + child.Name
-                    povArr += "\n#declare " + declareName + " = "
-                    childCode = self.createPovCode(child, True, expPigment, True, expLabel, True) #call createPovCode for the child
-                    povArr += childCode
+                declareName = stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                povArr += "\n#declare " + declareName + " = "
+                childCode = self.createPovCode(child, True, expPigment, True, expLabel, True) #call createPovCode for the child
+                povArr += childCode
 
-                    povArr += "#declare intervalX = " + intervalX + ";\n"
-                    povArr += "#declare intervalY = " + intervalY + ";\n"
-                    povArr += "#declare intervalZ = " + intervalZ + ";\n\n"
+                povArr += "#declare intervalX = " + intervalX + ";\n"
+                povArr += "#declare intervalY = " + intervalY + ";\n"
+                povArr += "#declare intervalZ = " + intervalZ + ";\n\n"
 
-                    povArr += "#declare numX = " + str(numX) + ";\n"
-                    povArr += "#declare ix = 0;\n"
-                    povArr += "#while (ix < numX)\n"
+                povArr += "#declare numX = " + str(numX) + ";\n"
+                povArr += "#declare ix = 0;\n"
+                povArr += "#while (ix < numX)\n"
 
-                    povArr += "\t#declare numY = " + str(numY) + ";\n"
-                    povArr += "\t#declare iy = 0;\n"
-                    povArr += "\t#while (iy < numY)\n"
+                povArr += "\t#declare numY = " + str(numY) + ";\n"
+                povArr += "\t#declare iy = 0;\n"
+                povArr += "\t#while (iy < numY)\n"
 
-                    povArr += "\t\t#declare numZ = " + str(numZ) + ";\n"
-                    povArr += "\t\t#declare iz = 0;\n"
-                    povArr += "\t\t#while (iz < numZ)\n"
+                povArr += "\t\t#declare numZ = " + str(numZ) + ";\n"
+                povArr += "\t\t#declare iz = 0;\n"
+                povArr += "\t\t#while (iz < numZ)\n"
 
-                    povArr += "\t\t\tobject { " + declareName + "\n"
-                    povArr += "\t\t\t\ttranslate intervalX * ix\n"
-                    povArr += "\t\t\t\ttranslate intervalY * iy\n"
-                    povArr += "\t\t\t\ttranslate intervalZ * iz\n"
+                povArr += "\t\t\tobject { " + declareName + "\n"
+                povArr += "\t\t\t\ttranslate intervalX * ix\n"
+                povArr += "\t\t\t\ttranslate intervalY * iy\n"
+                povArr += "\t\t\t\ttranslate intervalZ * iz\n"
 
-                    if expPlacement:
-                        translation = self.getTranslation(fcObj)
-                        if translation != "": #test if the object is translated
-                            povArr += "\t\t\t\t" + translation + "\n"
+                if expPlacement:
+                    translation = self.getTranslation(fcObj)
+                    if translation != "": #test if the object is translated
+                        povArr += "\t\t\t\t" + translation + "\n"
 
-                        rotation = self.getRotation(fcObj)
-                        if rotation != "": #test if the object is rotated
-                            povArr += "\t\t\t\t" + rotation + "\n"
+                    rotation = self.getRotation(fcObj)
+                    if rotation != "": #test if the object is rotated
+                        povArr += "\t\t\t\t" + rotation + "\n"
 
-                    if expPigment:
-                        pigment = self.getPigment(fcObj)
-                        if pigment != "": #test if the object has the standard pigment
-                            povArr += "\t\t\t\t" + pigment + "\n"
+                if expPigment:
+                    pigment = self.getPigment(fcObj)
+                    if pigment != "": #test if the object has the standard pigment
+                        povArr += "\t\t\t\t" + pigment + "\n"
 
-                    povArr += "\t\t\t}\n"
+                povArr += "\t\t\t}\n"
 
-                    povArr += "\t\t\t#declare iz = iz + 1;\n"
-                    povArr += "\t\t#end\n"
-                    povArr += "\t\t#declare iy = iy + 1;\n"
-                    povArr += "\t#end\n"
-                    povArr += "\t#declare ix = ix + 1;\n"
-                    povArr += "#end\n"
-
-                    povCode += povArr
+                povArr += "\t\t\t#declare iz = iz + 1;\n"
+                povArr += "\t\t#end\n"
+                povArr += "\t\t#declare iy = iy + 1;\n"
+                povArr += "\t#end\n"
+                povArr += "\t#declare ix = ix + 1;\n"
+                povArr += "#end\n"
 
             else:
                 povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
 
-            return povCode
+            povArr = povArr.replace("\n", "\n\t")
+            povCode += "\nunion {\n"
+            povCode += povArr
+            expPigment = False
+            expPlacement = False
 
         elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"): #Clone from Draft workbench
             povClone = ""
 
-            childs = fcObj.OutList
+            childs = fcObj.Objects
             for child in childs:
                 povClone += self.createPovCode(child, False, False, False, False, True)
 
@@ -625,7 +627,8 @@ class ExportToPovRay:
 
             povPad += "\n\t}\n"
 
-            povPad += "\n}\n"
+            if expClose:
+                povPad += "\n}\n"
 
             povCode += povPad
             return povCode
