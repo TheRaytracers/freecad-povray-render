@@ -661,10 +661,10 @@ class ExportToPovRay:
 
         unsortedLines = sketch.Geometry #unordered lines / original order
 
-        #delete construction geometry
+        #delete construction geometry and points
         while self.hasLinesConstructive(unsortedLines): #Caution: Very dirty coding!!!
             for line in unsortedLines:
-                if line.Construction:
+                if line.Construction or type(line) == Part.Point:
                     del unsortedLines[unsortedLines.index(line)]
                     break
 
@@ -815,7 +815,7 @@ class ExportToPovRay:
         return True
 
     def isSketchSupported(self, sketch):
-        supportedGeometryTypes = [Part.LineSegment, Part.Circle]
+        supportedGeometryTypes = [Part.LineSegment, Part.Circle, Part.Point]
         for line in sketch.Geometry:
             if not type(line) in supportedGeometryTypes and not line.Construction:
                 return False
