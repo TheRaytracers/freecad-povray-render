@@ -582,6 +582,27 @@ class ExportToPovRay:
                 return ""
 
         elif fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket": #Pad or Pocket from PartDesign
+            povPad = ""
+
+            if not self.isSketchSupported(fcObj.Profile[0]):
+                povPad += self.createMesh(fcObj, False, False, False, expMeshDef)
+
+                if not expPlacement:
+                    rotation = self.getRotation(fcObj.Profile[0])
+                    if rotation != "": #test if the object is rotated
+                        povPad += "\t\t" + rotation + "\n"
+
+                    translation = self.getTranslation(fcObj.Profile[0])
+                    if translation != "": #test if the object is translated
+                        povPad += "\t\t" + translation + "\n"
+
+                if expClose:
+                    povPad += "}\n"
+
+                povCode += povPad
+                return povCode
+
+            
             spline = self.sketchToBezier(fcObj.Profile[0])
 
             startHeight = 0
@@ -598,7 +619,6 @@ class ExportToPovRay:
                 startHeight *= -1
                 endHeight *= -1
 
-            povPad = ""
             try:
                 if fcObj.TypeId == "PartDesign::Pocket":
                     povPad += "\ndifference {\n"
