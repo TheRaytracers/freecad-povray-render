@@ -583,8 +583,9 @@ class ExportToPovRay:
 
         elif fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket": #Pad or Pocket from PartDesign
             povPad = ""
+            spline = self.sketchToBezier(fcObj.Profile[0])
 
-            if not self.isSketchSupported(fcObj.Profile[0]):
+            if not self.isSketchSupported(fcObj.Profile[0]) or spline == -1:
                 povPad += self.createMesh(fcObj, False, False, False, expMeshDef)
 
                 if not expPlacement:
@@ -601,9 +602,6 @@ class ExportToPovRay:
 
                 povCode += povPad
                 return povCode
-
-            
-            spline = self.sketchToBezier(fcObj.Profile[0])
 
             startHeight = 0
             if fcObj.TypeId == "PartDesign::Pocket":
@@ -680,37 +678,41 @@ class ExportToPovRay:
 
 
     def sketchToBezier(self, sketch): #create pov bezier_spline from sketch
-        povSpline = "\n"
+        try:
+            povSpline = "\n"
 
-        unsortedLines = sketch.Geometry #unordered lines / original order
+            unsortedLines = sketch.Geometry #unordered lines / original order
 
-        #delete construction geometry and points
-        while self.hasLinesConstructive(unsortedLines): #Caution: Very dirty coding!!!
-            for line in unsortedLines:
-                if line.Construction or type(line) == Part.Point:
-                    del unsortedLines[unsortedLines.index(line)]
-                    break
+            #delete construction geometry and points
+            while self.hasLinesConstructive(unsortedLines): #Caution: Very dirty coding!!!
+                for line in unsortedLines:
+                    if line.Construction or type(line) == Part.Point:
+                        del unsortedLines[unsortedLines.index(line)]
+                        break
 
-        numOfPoints = 0
+            numOfPoints = 0
 
-        sortedLines = [] #lines in the right order
+            sortedLines = [] #lines in the right order
 
-        while unsortedLines: #until the unsortedLines array is empty
-            sortedLines.append(unsortedLines[0])
-            startLine = unsortedLines[0]
-            del unsortedLines[0]
+            while unsortedLines: #until the unsortedLines array is empty
+                sortedLines.append(unsortedLines[0])
+                startLine = unsortedLines[0]
+                del unsortedLines[0]
 
-            if type(startLine) != Part.Circle and type(sortedLines[len(sortedLines) - 1]) != Part.Circle:
-                while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
-                    # handling of -1 missing
-                    nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
+                if type(startLine) != Part.Circle and type(sortedLines[len(sortedLines) - 1]) != Part.Circle:
+                    while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
+                        # handling of -1 missing
+                        nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
 
-                    #change direction
-                    if self.isSamePoint(sortedLines[len(sortedLines) - 1].EndPoint, unsortedLines[nextLineI].EndPoint):
-                        unsortedLines[nextLineI].reverse()
+                        #change direction
+                        if self.isSamePoint(sortedLines[len(sortedLines) - 1].EndPoint, unsortedLines[nextLineI].EndPoint):
+                            unsortedLines[nextLineI].reverse()
 
-                    sortedLines.append(unsortedLines[nextLineI])
-                    del unsortedLines[nextLineI]
+                        sortedLines.append(unsortedLines[nextLineI])
+                        del unsortedLines[nextLineI]
+
+        except:
+            return -1
 
         #create povSpline
         for line in sortedLines:
