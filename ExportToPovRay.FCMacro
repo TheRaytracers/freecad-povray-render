@@ -684,11 +684,7 @@ class ExportToPovRay:
             unsortedLines = sketch.Geometry #unordered lines / original order
 
             #delete construction geometry and points
-            while self.hasLinesConstructive(unsortedLines): #Caution: Very dirty coding!!!
-                for line in unsortedLines:
-                    if line.Construction or type(line) == Part.Point:
-                        del unsortedLines[unsortedLines.index(line)]
-                        break
+            unsortedLines = [line for line in unsortedLines if not (line.Construction or type(line) == Part.Point)]
 
             numOfPoints = 0
 
