@@ -1834,60 +1834,55 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
             return
 
         #write file
+        fileContent =""
+        fileContent += '#version 3.6; // 3.7\n'
+        fileContent += 'global_settings { assumed_gamma 1.0 }\n'
+        fileContent += '#default { finish { ambient 0.2 diffuse 0.9 } }\n'
+        fileContent += '#default { pigment { rgb <0.871, 0.871, 0.871> } }\n'
+        fileContent += '//------------------------------------------\n'
+        fileContent += '#include "colors.inc"\n'
+        fileContent += '#include "textures.inc"\n'
+        fileContent += '#declare CamUp = <0, 0, 1>;\n'
+        fileContent += '#declare CamRight = <1.33, 0, 0>;\n'
+        fileContent += '#declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;\n'
+        fileContent += '#declare CamPosition = <25.9077129364, -15.9076957703, 20.907699585>;\n'
+        fileContent += 'camera {\n'
+        fileContent += '\tlocation <0, 0, 0>\n'
+        fileContent += '\tdirection <0, 1, 0>\n'
+        fileContent += '\tup CamUp\n'
+        fileContent += '\tright CamRight\n'
+        fileContent += '\trotate CamRotation\n'
+        fileContent += '\ttranslate CamPosition\n'
+        fileContent += '\tangle 57.82\n'
+        fileContent += '}\n'
+        fileContent += 'light_source { CamPosition color rgb <0.5, 0.5, 0.5> }\n'
+        fileContent += 'sky_sphere {\n'
+        fileContent += '\t\tpigment {\n'
+        fileContent += '\t\tgradient z\n'
+        fileContent += '\t\tcolor_map {\n'
+        fileContent += '\t\t\t[0 rgb<0,0,0>]\n'
+        fileContent += '\t\t\t[0.2 rgb<0,0,0>]\n'
+        fileContent += '\t\t\t[0.75 rgb<1,1,1>]\n'
+        fileContent += '\t\t\t[1 rgb<1,1,1>]\n'
+        fileContent += '\t\t\t}\n'
+        fileContent += '\t\tscale 2\n'
+        fileContent += '\t\ttranslate -1\n'
+        fileContent += '\t\t}\n'
+        fileContent += '}\n'
+
+        fileContent += self.listObjToPov(listObj, "predef")
+
+        fileContent+= 'box { <0,0,0>, <10.0, 10.0, 10.0>\n'
+        fileContent += '\ttranslate <5.0, 5.0, -5.0>\n'
+        fileContent += '\tmaterial { predef_material }\n'
+        fileContent += '}\n'
+        fileContent += 'sphere { <0, 0, 0> 5 \n'
+        fileContent += '\tmaterial { predef_material }\n'
+        fileContent += '}\n'
+
         povFile = tempfile.NamedTemporaryFile(suffix=".pov") #pov file handler
         povFile.delete = False
-        povFile.write("""#version 3.6; // 3.7
-global_settings { assumed_gamma 1.0 }
-#default { finish { ambient 0.2 diffuse 0.9 } }
-#default { pigment { rgb <0.871, 0.871, 0.871> } }
-
-//------------------------------------------
-#include "colors.inc"
-#include "textures.inc"
-
-#declare CamUp = <0, 0, 1>;
-#declare CamRight = <1.33, 0, 0>;
-#declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;
-#declare CamPosition = <25.9077129364, -15.9076957703, 20.907699585>;
-camera {
-	location <0, 0, 0>
-	direction <0, 1, 0>
-	up CamUp
-	right CamRight
-	rotate CamRotation
-	translate CamPosition
-	angle 57.82
-}
-
-light_source { CamPosition color rgb <0.5, 0.5, 0.5> }
-
-sky_sphere {
-	pigment {
-	gradient z
-	color_map {
-            [0 rgb<0,0,0>]
-            [0.2 rgb<0,0,0>]
-            [0.75 rgb<1,1,1>]
-            [1 rgb<1,1,1>]
-            }
-        scale 2
-        translate -1    
-	}
-}
-""")
-
-        povFile.write(self.listObjToPov(listObj, "predef"))
-
-        povFile.write("""box { <0,0,0>, <10.0, 10.0, 10.0>
-	translate <5.0, 5.0, -5.0>
-    material { predef_material }
-}
-
-sphere { <0, 0, 0> 5 
-    material { predef_material }
-}
-
-""")
+        povFile.write(fileContent)
 
         povName = povFile.name
         povFile.close()
