@@ -482,7 +482,7 @@ class ExportToPovRay:
             expPigment = False
             expPlacement = False
 
-        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"): #Clone from Draft workbench
+        elif False:#fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"): #Clone from Draft workbench
             povClone = ""
 
             childs = fcObj.Objects
@@ -586,19 +586,7 @@ class ExportToPovRay:
             spline = self.sketchToBezier(fcObj.Profile[0])
 
             if not self.isSketchSupported(fcObj.Profile[0]) or spline == -1:
-                povPad += self.createMesh(fcObj, False, False, False, expMeshDef)
-
-                if not expPlacement:
-                    rotation = self.getRotation(fcObj.Profile[0])
-                    if rotation != "": #test if the object is rotated
-                        povPad += "\t\t" + rotation + "\n"
-
-                    translation = self.getTranslation(fcObj.Profile[0])
-                    if translation != "": #test if the object is translated
-                        povPad += "\t\t" + translation + "\n"
-
-                if expClose:
-                    povPad += "}\n"
+                povPad += self.createMesh(fcObj, expPlacement, True, expClose, expMeshDef)
 
                 povCode += povPad
                 return povCode
