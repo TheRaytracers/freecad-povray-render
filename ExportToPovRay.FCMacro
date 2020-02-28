@@ -482,7 +482,7 @@ class ExportToPovRay:
             expPigment = False
             expPlacement = False
 
-        elif False:#fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"): #Clone from Draft workbench
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"): #Clone from Draft workbench
             povClone = ""
 
             childs = fcObj.Objects
@@ -630,6 +630,9 @@ class ExportToPovRay:
                 translation = self.getTranslation(fcObj.Profile[0])
                 if translation != "": #test if the object is translated
                     povPad += "\t\t" + translation + "\n"
+            else:
+                rotation = "\t\trotate <-90, 0, 0>"
+                povPad += rotation
 
             povPad += "\n\t}\n"
 
