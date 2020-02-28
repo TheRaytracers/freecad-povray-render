@@ -807,7 +807,7 @@ class ExportToPovRay:
     def isPadPocketSupported(self, fcObj):
         supportedTypes = ["Length"]
 
-        if not (obj.TypeId == "PartDesign::Pad" or obj.TypeId == "PartDesign::Pocket"):
+        if not (fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket"):
             return False
 
         if not fcObj.Type in supportedTypes:
