@@ -686,17 +686,17 @@ class ExportToPovRay:
             #delete construction geometry and points
             unsortedLines = [line for line in unsortedLines if not (line.Construction or type(line) == Part.Point)]
 
-            numOfPoints = 0
+            numOfPoints = 0 #counter for povray bezier points
 
             sortedLines = [] #lines in the right order
 
             while unsortedLines: #until the unsortedLines array is empty
-                sortedLines.append(unsortedLines[0])
-                startLine = unsortedLines[0]
-                del unsortedLines[0]
+                sortedLines.append(unsortedLines[0]) # put first line in sorted lines array
+                startLine = unsortedLines[0]         # and
+                del unsortedLines[0]                 # delete from unsorted lines array
 
                 if type(startLine) != Part.Circle and type(sortedLines[len(sortedLines) - 1]) != Part.Circle:
-                    while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint):
+                    while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint): # search for matching line
                         # handling of -1 missing
                         nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
 
