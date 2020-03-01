@@ -1436,9 +1436,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
         self.pathLineEdit.setPlaceholderText("Path to INI File")
         self.pathLineEdit.setToolTip("Path to the INI file (kind of a project file)")
         self.pathLineEdit.setFixedWidth(300)
-        self.pathLineEdit.textChanged.connect(self.checkPath)
+        #self.pathLineEdit.textChanged.connect(self.handlePath)
+        self.pathLineEdit.setEnabled(False)
 
-        self.openFileDialogButton = QtGui.QPushButton("...")
+        self.openFileDialogButton = QtGui.QPushButton("Open Project File (*.ini)")
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
         self.openFileDialogButton.setToolTip("Open file dialog for choosing a INI file")
 
@@ -2077,7 +2078,10 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         settings.endGroup()
 
-        if iniPath == -1:
+        self.setSettings(iniPath)
+
+    def setSettings(self, iniPath):
+        if iniPath == -1 or iniPath == "" or iniPath == None:
             #set some good standardValues
             system = platform.system()
             if system == "Linux":
@@ -2090,9 +2094,11 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
                 defaultPath = ""
 
             self.pathLineEdit.setText(defaultPath)
+            self.checkPath(defaultPath)
 
         else:
             self.pathLineEdit.setText(iniPath)
+            self.checkPath(iniPath)
 
             #open ini file and extract CSV
             try:
@@ -2158,17 +2164,35 @@ class GUI(QtGui.QDialog): #the pyside class for the dialog window
 
         if fileName and fileName != (u'', u''):
             self.pathLineEdit.setText(str(fileName[0]))
+            self.handlePath(str(fileName[0]))
 
+    def handlePath(self, path):
+        pathLegal = self.checkPath(path)
+
+        if pathLegal:
+            #ask to apply settings from selected file
+            content = "Do you want to apply the settings from the selected file?\n"
+            content += "Click 'Apply' if you want to adopt the settings from the file."
+            dialog = QtGui.QMessageBox(QtGui.QMessageBox.Question, "Apply settings from file?", content, QtGui.QMessageBox.Apply | QtGui.QMessageBox.No)
+            dialog.setWindowModality(QtCore.Qt.ApplicationModal)
+            answer = dialog.exec_()
+
+            if answer == QtGui.QMessageBox.Apply:
+                self.setSettings(path)
+    
     def checkPath(self, path): #check if the path to pov file is valid
-        if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:] == ".ini":
+        if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:].lower() == ".ini":
             self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(True)
             self.warnLabel.setText("")
+            return True
         else:
             self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
             if path == "":
                 self.warnLabel.setText("Please type a path or get one with clicking on '…'")
             else:
                 self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .ini file")
+
+            return False
 
     def saveActiveDocName(self): #save the user inputs
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
