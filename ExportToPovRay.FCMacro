@@ -372,7 +372,7 @@ class ExportToPovRay:
                 if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
                     povArr += "\t\ttranslate -" + center + "\n"
 
-                povArr += "\t\t#declare rotAngle = i * arrAngle / endNo;\n"
+                povArr += "\t\t#declare rotAngle = i * arrAngle / (endNo-1);\n"
                 povArr += "\t\t#local vX = vaxis_rotate(x, axis, rotAngle);\n"
                 povArr += "\t\t#local vY = vaxis_rotate(y, axis, rotAngle);\n"
                 povArr += "\t\t#local vZ = vaxis_rotate(z, axis, rotAngle);\n"
@@ -406,8 +406,6 @@ class ExportToPovRay:
 
             elif fcObj.ArrayType == "ortho":
                 child = fcObj.Base
-                #App.Console.PrintWarning(childs)
-                #App.Console.PrintWarning("\n")
                 #for child in childs:
                 intervalX = "<" + str(fcObj.IntervalX.x) + ", " + str(fcObj.IntervalX.y) + ", " + str(fcObj.IntervalX.z) + ">"
                 intervalY = "<" + str(fcObj.IntervalY.x) + ", " + str(fcObj.IntervalY.y) + ", " + str(fcObj.IntervalY.z) + ">"
@@ -586,21 +584,8 @@ class ExportToPovRay:
             povPad = ""
             spline = self.sketchToBezier(fcObj.Profile[0])
 
-            if not self.isSketchSupported(fcObj.Profile[0]) or spline == -1:
-                povPad += self.createMesh(fcObj, False, False, False, expMeshDef)
-
-                if not expPlacement:
-                    rotation = self.getRotation(fcObj.Profile[0])
-                    if rotation != "": #test if the object is rotated
-                        povPad += "\t\t" + rotation + "\n"
-
-                    translation = self.getTranslation(fcObj.Profile[0])
-                    if translation != "": #test if the object is translated
-                        povPad += "\t\t" + translation + "\n"
-
-                if expClose:
-                    povPad += "}\n"
-
+            if (self.isSketchSupported(fcObj.Profile[0]) == False) or spline == -1 or (self.isPadPocketSupported(fcObj) == False):
+                povPad += self.createMesh(fcObj, expPlacement, True, expClose, expMeshDef)
                 povCode += povPad
                 return povCode
 
@@ -643,6 +628,9 @@ class ExportToPovRay:
                 translation = self.getTranslation(fcObj.Profile[0])
                 if translation != "": #test if the object is translated
                     povPad += "\t\t" + translation + "\n"
+            else:
+                rotation = "\t\trotate <-90, 0, 0>"
+                povPad += rotation
 
             povPad += "\n\t}\n"
 
@@ -817,6 +805,20 @@ class ExportToPovRay:
 
         return True
 
+    def isPadPocketSupported(self, fcObj):
+        supportedTypes = ["Length"]
+
+        if not (fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket"):
+            return False
+
+        if not fcObj.Type in supportedTypes:
+            return False
+
+        if not self.isSketchSupported(fcObj.Profile[0]):
+            return False
+
+        return True
+
     def isExtrudeSupported(self, fcObj):
         #test mode of direction
         if fcObj.DirMode != "Normal":
@@ -909,13 +911,13 @@ class ExportToPovRay:
         pigment = self.getPigment(fcObj)
 
         if expPlacement == False: #meshes are already translated, so if they shouldnt translated, they translated back
-            rotation = self.getRotation(fcObj)
-            if rotation != "": #test if the object is rotated
-                povCode += "\t" + rotation + " * (-1)\n"
-
             translation = self.getTranslation(fcObj)
             if translation != "": #test if the object is translated
                 povCode += "\t" + translation + " * (-1)\n"
+            
+            rotation = self.getInvertedRotation(fcObj)
+            if rotation != "": #test if the object is rotated
+                povCode += rotation.replace("\n", "\t\n")
 
         if pigment != "": #test if the object has the standard pigment
             povCode += "\t" + pigment + "\n"
@@ -1135,6 +1137,30 @@ class ExportToPovRay:
 
         if x != 0 or y != 0 or z != 0:
             rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create roation vector
+
+        return rotate
+
+    def getInvertedRotation(self, fcObj):
+        rotate = ""
+        eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
+        x = eulerRot[2] #get rotation in every axis
+        y = eulerRot[1]
+        z = eulerRot[0]
+
+        #if fcObj is a torus it is necessary to rotate it in x axis
+        if fcObj.TypeId == "Part::Torus" or (fcObj.Name.startswith("Clone") and fcObj.OutList[0].TypeId == "Part::Torus"):
+            x += 90
+        elif fcObj.TypeId == "Sketcher::SketchObject":
+            x -= 90
+
+        rotate = "\n"
+
+        if z != 0:
+            rotate += "rotate <0, 0, " + str(-z) + ">\n"
+        if y != 0:
+            rotate += "rotate <0, " + str(-y) + ", 0>\n"
+        if x != 0:
+            rotate += "rotate <" + str(-x) + ", 0, 0>\n"
 
         return rotate
 
