@@ -166,9 +166,8 @@ class ExportToPovRay:
         finalPovCode += "// camera ----------------------------------\n"
         finalPovCode += self.getCam()
 
-        if self.expLight:
-            finalPovCode += "\n// sun -------------------------------------\n"
-            finalPovCode += self.getLight()
+        finalPovCode += "\n// light -------------------------------------"
+        finalPovCode += self.getLights()
 
         if self.expBg:
             finalPovCode += "\n// background ------------------------------\n"
@@ -595,6 +594,9 @@ class ExportToPovRay:
             povCode += povPad
             return povCode
 
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("PointLight"):
+            return "" #lights are converted in getLights()
+
         else: #not a supported object
             povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
             return povCode #return because the mesh may not translated and rotated
@@ -907,7 +909,7 @@ class ExportToPovRay:
                             "App:Part",
                             "Part::Compound",
                             "Image::ImagePlane"]
-        supportedNames = ["Array", "Clone"]
+        supportedNames = ["Array", "Clone", "PointLight"]
 
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not self.isNameSupported(obj.Name, supportedNames):
@@ -937,10 +939,24 @@ class ExportToPovRay:
 
         return statistics
 
-    def getLight(self): #get the FreeCAD light
+    def getLights(self): #get the FreeCAD light
         povLight = ""
 
-        povLight += "light_source { CamPosition color rgb <0.5, 0.5, 0.5> }\n"
+        if self.expLight:
+            povLight += "\nlight_source { CamPosition color rgb <0.5, 0.5, 0.5> }\n"
+
+        for fcObj in self.objs:
+            if fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("PointLight"):
+                povLight += "\n//-----" + fcObj.Label + "-----"
+                povLight += "\nlight_source {"
+                povLight += "\n\t" + self.getTranslation(fcObj, True)
+                povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
+
+                if fcObj.Fade_Distance != 0 and fcObj.Fade_Power != 0:
+                    povLight += "\n\tfade_distance " + str(fcObj.Fade_Distance)
+                    povLight += "\n\tfade_power " + str(fcObj.Fade_Power)
+
+                povLight += "\n}\n"
 
         return povLight
 
@@ -1066,17 +1082,19 @@ class ExportToPovRay:
         return PovCam
 
 
-    def getTranslation(self, fcObj): #get the translation of an object
+    def getTranslation(self, fcObj, onlyValue=False): #get the translation of an object
         translation = ""
         x = fcObj.Placement.Base.x #get the position in every axis
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
         if x != 0 or y != 0 or z != 0: #test whether the position is 0,0,0
-            translation += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">" #create translation vector
+            if not onlyValue:
+                translation += "translate "
+            translation += "<" + str(x) + ", " + str(y) + ", " + str(z) + ">" #create translation vector
 
         return translation
 
-    def getRotation(self, fcObj): #get the rotation of an object
+    def getRotation(self, fcObj, onlyValue=False): #get the rotation of an object
         rotate = ""
         eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
         x = eulerRot[2] #get rotation in every axis
@@ -1090,7 +1108,9 @@ class ExportToPovRay:
             x -= 90
 
         if x != 0 or y != 0 or z != 0:
-            rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create roation vector
+            if not onlyValue:
+                rotate += "rotate "
+            rotate = "<" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create roation vector
 
         return rotate
 
