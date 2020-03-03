@@ -1,12 +1,11 @@
 *.*
-!UidGenerator.FCMacro
-!ExportToPovRay.FCMacro
+!*.py
 !LICENSE.md
 !README.md
 !README_img.png
 !CONTRIBUTING.md
 !predefined.xml
-!logo*
+!icons/**
 !CSG FreeCAD POVray.ods
 !doc/**
 !Examples/**
