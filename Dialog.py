@@ -493,9 +493,8 @@ class TextureTab(QtGui.QWidget):
         self.fcTexItem.setSelected(True)
 
         #get the predefined.xml
-        predefinedPath = App.ParamGet("User parameter:BaseApp/Preferences/Macro").GetString('MacroPath') #get macro path
-        predefinedPath += os.sep + "predefined.xml"
-
+        predefinedPath = os.path.join(os.path.dirname(__file__), "predefined.xml") #get macro path
+        
         predefined = xml.parse(predefinedPath).getroot()
         categories = predefined.getchildren()
 
