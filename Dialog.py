@@ -269,7 +269,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
     def handlePath(self, path):
         pathLegal = self.checkPath(path)
 
-        if pathLegal:
+        if pathLegal and os.path.isfile(path) :
             #ask to apply settings from selected file
             content = "Do you want to apply the settings from the selected file?\n"
             content += "Click 'Apply' if you want to adopt the settings from the file."
