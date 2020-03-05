@@ -186,12 +186,12 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         settings.endGroup()
 
-        self.setSettings(iniPath)
+        self.setIniSettings(iniPath)
 
         self.textureTab.setDefaultValues(settings)
-        self.textureTab.setTextures(iniPath)
+        self.textureTab.setIniSettings(iniPath)
 
-    def setSettings(self, iniPath):
+    def setIniSettings(self, iniPath):
         if iniPath == -1 or iniPath == "" or iniPath == None:
             #set some good standardValues
             system = platform.system()
@@ -247,7 +247,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
                     elif name == "expFcView":
                         self.expFcView.setChecked(strToBool(row[1]))
 
-            self.textureTab.setTextures(csvLines)
+            self.textureTab.setIniSettings(csvLines)
 
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
@@ -270,7 +270,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
             answer = dialog.exec_()
 
             if answer == QtGui.QMessageBox.Apply:
-                self.setSettings(path)
+                self.setIniSettings(path)
     
     def checkPath(self, path): #check if the path to pov file is valid
         if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:].lower() == ".ini":
@@ -884,7 +884,7 @@ class TextureTab(QtGui.QWidget):
 
         return -1
 
-    def setTextures(self, csvLines):
+    def setIniSettings(self, csvLines):
         #parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
         for row in csvReader:
