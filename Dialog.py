@@ -192,6 +192,13 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.textureTab.setIniSettings(iniPath)
 
     def setIniSettings(self, iniPath):
+        #open ini file and extract CSV
+        try:
+            iniFile = open(iniPath, "r")
+        except:
+            App.Console.PrintWarning("Could not open ini file\n")
+            iniPath = -1
+                
         if iniPath == -1 or iniPath == "" or iniPath == None:
             #set some good standardValues
             system = platform.system()
@@ -207,16 +214,17 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
             self.pathLineEdit.setText(defaultPath)
             self.checkPath(defaultPath)
 
+            self.imageWidth.setValue(800)
+            self.imageHeight.setValue(600)
+
+            self.expBg.setChecked(True)
+            self.expLight.setChecked(True)
+            self.expFcView.setChecked(False)
+            self.repRot.setChecked(False)
+
         else:
             self.pathLineEdit.setText(iniPath)
             self.checkPath(iniPath)
-
-            #open ini file and extract CSV
-            try:
-                iniFile = open(iniPath, "r")
-            except:
-                App.Console.PrintError("Could not open ini file\n")
-                return
 
             lines = iniFile.readlines()
             iniFile.close()
