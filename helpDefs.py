@@ -21,6 +21,7 @@ import FreeCAD as App
 import FreeCADGui as Gui
 
 from PySide import QtCore, QtGui
+import os
 
 def showError(text, title): #show an error box
     dialog = QtGui.QMessageBox(QtGui.QMessageBox.Critical, title, text)
@@ -63,3 +64,6 @@ def strToBool(str):
         return False
 
     return str.lower() in ['true', '1', 'y']
+
+#set the icon path because InitGui.py can't import os
+initGui__iconPath = os.path.join(os.path.dirname(__file__), "icons")

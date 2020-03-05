@@ -154,11 +154,11 @@ class PovRay (Workbench):
 		return "Gui::PythonWorkbench"
 	
 	def Initialize(self):
-		import Export, LightCommands
+		import Export, LightCommands, helpDefs
 		self.appendToolbar("POV-Ray", ["Export", "PointLightCommand"])
 		self.appendMenu("&POV-Ray", ["Export", "PointLightCommand"])
 
-		Gui.addIconPath("/home/otto/.FreeCAD/Mod/exporttopovray/icons")
+		Gui.addIconPath(helpDefs.initGui__iconPath)
 
 		Log ("Loading Export to POV-Ray... done\n")
 
