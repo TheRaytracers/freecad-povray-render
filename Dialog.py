@@ -230,7 +230,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         #get the predefined.xml
         predefinedPath = App.ParamGet("User parameter:BaseApp/Preferences/Macro").GetString('MacroPath') #get macro path
-        predefinedPath += "/predefined.xml"
+        predefinedPath += os.sep + "predefined.xml"
 
         predefined = xml.parse(predefinedPath).getroot()
         categories = predefined.getchildren()
@@ -266,6 +266,8 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
             #has object a shape
             try:
                 obj.Shape
+                obj.Shape.Area
+                obj.Shape.isValid()
                 shape = True
             except:
                 shape = False
