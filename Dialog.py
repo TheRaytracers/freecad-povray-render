@@ -189,7 +189,6 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.setIniSettings(iniPath)
 
         self.textureTab.setDefaultValues(settings)
-        self.textureTab.setIniSettings(iniPath)
 
     def setIniSettings(self, iniPath):
         #open ini file and extract CSV
