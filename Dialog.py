@@ -272,7 +272,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         if pathLegal and os.path.isfile(path) :
             #ask to apply settings from selected file
             content += "Do you want to overwrite the current settings with those from the selected file?\n"
-            content += "Settings not made in the selected file will not be overwritten.\n
+            content += "Settings not made in the selected file will not be overwritten.\n"
             content += "Click 'Apply' if you want to apply the settings from the file."
             dialog = QtGui.QMessageBox(QtGui.QMessageBox.Question, "Apply settings from file?", content, QtGui.QMessageBox.Apply | QtGui.QMessageBox.No)
             dialog.setWindowModality(QtCore.Qt.ApplicationModal)
