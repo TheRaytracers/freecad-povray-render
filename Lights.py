@@ -26,12 +26,12 @@ class ViewProviderPointLight:
  
     def attach(self, obj):
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
-        self.noShadow = coin.SoGroup()
+        self.defaultStyle = coin.SoGroup()
 
         img = coin.SoImage()
         img.filename = os.path.join(os.path.dirname(__file__),"icons","pointLight.svg")
-        self.noShadow.addChild(img)
-        obj.addDisplayMode(self.noShadow, "Default")
+        self.defaultStyle.addChild(img)
+        obj.addDisplayMode(self.defaultStyle, "Default")
  
     def updateData(self, fp, prop):
         '''If a property of the handled feature has changed we have the chance to handle this here'''
