@@ -949,9 +949,9 @@ class ExportToPovRay:
             if fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("PointLight"):
                 povLight += "\n//-----" + fcObj.Label + "-----"
                 povLight += "\nlight_source {"
-                povLight += "\n\t" + self.getTranslation(fcObj, True)
+                povLight += "<" + str(fcObj.Placement.Base.x) + ", " + str(fcObj.Placement.Base.y) + ", " + str(fcObj.Placement.Base.z) + ">"
                 povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
-
+                
                 if fcObj.Fade_Distance != 0 and fcObj.Fade_Power != 0:
                     povLight += "\n\tfade_distance " + str(fcObj.Fade_Distance)
                     povLight += "\n\tfade_power " + str(fcObj.Fade_Power)
@@ -1082,19 +1082,17 @@ class ExportToPovRay:
         return PovCam
 
 
-    def getTranslation(self, fcObj, onlyValue=False): #get the translation of an object
+    def getTranslation(self, fcObj): #get the translation of an object
         translation = ""
         x = fcObj.Placement.Base.x #get the position in every axis
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
         if x != 0 or y != 0 or z != 0: #test whether the position is 0,0,0
-            if not onlyValue:
-                translation += "translate "
-            translation += "<" + str(x) + ", " + str(y) + ", " + str(z) + ">" #create translation vector
+            translation += "translate <" + str(x) + ", " + str(y) + ", " + str(z) + ">" #create translation vector
 
         return translation
 
-    def getRotation(self, fcObj, onlyValue=False): #get the rotation of an object
+    def getRotation(self, fcObj): #get the rotation of an object
         rotate = ""
         eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
         x = eulerRot[2] #get rotation in every axis
@@ -1108,9 +1106,7 @@ class ExportToPovRay:
             x -= 90
 
         if x != 0 or y != 0 or z != 0:
-            if not onlyValue:
-                rotate += "rotate "
-            rotate = "<" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create roation vector
+            rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create roation vector
 
         return rotate
 

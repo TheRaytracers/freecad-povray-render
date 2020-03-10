@@ -38,12 +38,17 @@
         <Predef pigment="color Black" finish="ambient 0.35&#10;brilliance 2&#10;diffuse 0.3&#10;metallic&#10;specular 0.80&#10;roughness 1/20&#10;reflection 0.1">Shungit</Predef>
     </Stone>
     <Wood>
+        <Predef inc="woods.inc" texture="T_Wood7">Generic Wood</Predef>
         <Predef texture="EMBWood1">Walnut</Predef>
         <Predef texture="Cherry_Wood">Cherry</Predef>
         <Predef texture="Pine_Wood">Pine</Predef>
         <Predef texture="Rosewood">Rosewood</Predef>
         <Predef texture="DMFLightOak">Oak</Predef>
     </Wood>
+    <Floor>
+        <!-- We used the parquet texture for the floor from https://wiki.freecadweb.org/Tutorial_FreeCAD_POV_ray and adapted it for this specific syntax. Thanks to the creators of the tutorial. The tutorial is licensed under CC 3.0: https://creativecommons.org/licenses/by/3.0/ -->
+        <Predef inc="woods.inc" pigment="wood color_map { M_Wood8A }turbulence 0.5 scale&lt;200, 20, 20>" finish="ambient 0.0 reflection 0.1 specular 0.2" normal="average normal_map {[1 gradient y 2 slope_map { [0&lt;0,1>][0.05 &lt;1,0>][0.95 &lt;1,0>][1 &lt;0,-1>] } scale 80][1 wood 0.5 slope_map { [0 &lt;0,0>][0.5 &lt;0.5,1>][1 &lt;1,0>] }turbulence 0.5 scale &lt;200, 20, 20>]}">Parquet</Predef>
+    </Floor>
     <Water>
         <predef texture="Polished_Chrome" inc="textures.inc">Opaque, flat, reflecting water</predef>
         <predef texture="Polished_Chrome" normal="bumps 0.03 scale &lt;1,0.25,0.25>*1 turbulence 0.6" inc="textures.inc">Moderatly moved reflecting water</predef>
