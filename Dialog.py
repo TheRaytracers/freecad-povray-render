@@ -37,7 +37,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         super(Dialog, self).__init__()
         self.exporter = ExportToPovRay()
         self.initUI()
-        self.setDefaultValues()
+        self.applyQSettings()
 
     def initUI(self): #create the objects in the dialog window
         self.setWindowTitle("Export to POV-Ray")
@@ -142,7 +142,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.setLayout(self.wrapLayout)
         self.show()
 
-    def setDefaultValues(self): #set the default values of the input objects
+    def applyQSettings(self): #set the default values of the input objects
         helpText = """
         <style>
         div { margin: 15;}
@@ -186,42 +186,42 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         settings.endGroup()
 
-        self.setIniSettings(iniPath)
+        self.applyIniSettings(iniPath)
 
-        self.textureTab.setDefaultValues(settings)
+        self.textureTab.applyQSettings(settings)
 
-    def setIniSettings(self, iniPath):
+    def applyIniSettings(self, iniPath):
+        #set some good standardValues
+        system = platform.system()
+        if system == "Linux":
+            defaultPath = "/home/"
+        elif system == "Darwin":
+            defaultPath = "/Users/"
+        elif system == "Windows":
+            defaultPath = "C:\\Users\\%UserName%\\"
+        else:
+            defaultPath = ""
+
+        self.pathLineEdit.setText(defaultPath)
+        self.checkPath(defaultPath)
+
+        self.imageWidth.setValue(800)
+        self.imageHeight.setValue(600)
+
+        self.expBg.setChecked(True)
+        self.expLight.setChecked(True)
+        self.expFcView.setChecked(False)
+        self.repRot.setChecked(False)
+
         #open ini file and extract CSV
         try:
             iniFile = open(iniPath, "r")
         except:
             App.Console.PrintWarning("Could not open ini file\n")
             iniPath = -1
+            iniFile = None
                 
-        if iniPath == -1 or iniPath == "" or iniPath == None:
-            #set some good standardValues
-            system = platform.system()
-            if system == "Linux":
-                defaultPath = "/home/"
-            elif system == "Darwin":
-                defaultPath = "/Users/"
-            elif system == "Windows":
-                defaultPath = "C:\\Users\\%UserName%\\"
-            else:
-                defaultPath = ""
-
-            self.pathLineEdit.setText(defaultPath)
-            self.checkPath(defaultPath)
-
-            self.imageWidth.setValue(800)
-            self.imageHeight.setValue(600)
-
-            self.expBg.setChecked(True)
-            self.expLight.setChecked(True)
-            self.expFcView.setChecked(False)
-            self.repRot.setChecked(False)
-
-        else:
+        if iniFile and iniPath != -1 and iniPath != "" and iniPath != None:
             self.pathLineEdit.setText(iniPath)
             self.checkPath(iniPath)
 
@@ -254,7 +254,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
                     elif name == "expFcView":
                         self.expFcView.setChecked(strToBool(row[1]))
 
-            self.textureTab.setIniSettings(csvLines)
+            self.textureTab.applyIniSettings(csvLines)
 
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
@@ -279,7 +279,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
             answer = dialog.exec_()
 
             if answer == QtGui.QMessageBox.Apply:
-                self.setIniSettings(path)
+                self.applyIniSettings(path)
     
     def checkPath(self, path): #check if the path to pov file is valid
         if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:].lower() == ".ini":
@@ -308,7 +308,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.iniFile.write(self.iniContent)
         self.iniFile.close()
 
-    def settingsToCSV(self):
+    def settingsToIniFormat(self):
         csv = ""
 
         #add render settings
@@ -320,12 +320,12 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         csv += ";stg_repRot," + str(self.renderSettings.repRot) + "\n"
         csv += ";stg_expFcView," + str(self.renderSettings.expFcView) + "\n"
 
-        csv += self.textureTab.settingsToCSV()
+        csv += self.textureTab.settingsToIniFormat()
 
         self.csv = csv
 
     def createIniContent(self):
-        self.settingsToCSV()
+        self.settingsToIniFormat()
         
         self.iniContent = ""
         self.iniContent += self.csv + "\n"
@@ -393,7 +393,7 @@ class TextureTab(QtGui.QWidget):
 
         self.setLayout(self.textureLayout)
 
-    def setDefaultValues(self, settingsObject):
+    def applyQSettings(self, settingsObject):
         #get saved input
         settingsObject.beginGroup(self.qSettingsGroup)
 
@@ -892,7 +892,7 @@ class TextureTab(QtGui.QWidget):
 
         return -1
 
-    def setIniSettings(self, csvLines):
+    def applyIniSettings(self, csvLines):
         #parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
         for row in csvReader:
@@ -919,7 +919,7 @@ class TextureTab(QtGui.QWidget):
                         listObj.translationY = float(row[9])
                         listObj.translationZ = float(row[10])
 
-    def settingsToCSV(self):
+    def settingsToIniFormat(self):
         csv = ""
 
         #add settings for every listobject
