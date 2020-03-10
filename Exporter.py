@@ -952,8 +952,8 @@ class ExportToPovRay:
                 povLight += "<" + str(fcObj.Placement.Base.x) + ", " + str(fcObj.Placement.Base.y) + ", " + str(fcObj.Placement.Base.z) + ">"
                 povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
                 
-                if fcObj.Fade_Distance != 0 and fcObj.Fade_Power != 0:
-                    povLight += "\n\tfade_distance " + str(fcObj.Fade_Distance)
+                if fcObj.Fade_Distance.getValueAs("mm").Value != 0 and fcObj.Fade_Power != 0:
+                    povLight += "\n\tfade_distance " + str(fcObj.Fade_Distance.getValueAs("mm").Value)
                     povLight += "\n\tfade_power " + str(fcObj.Fade_Power)
 
                 povLight += "\n}\n"
