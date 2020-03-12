@@ -10,11 +10,11 @@ class PointLight:
 
     def setProperties(self, obj):
         if not "Color" in obj.PropertiesList:
-            obj.addProperty("App::PropertyColor", "Color").Color = (1.0, 1.0, 1.0, 0.0)
+            obj.addProperty("App::PropertyColor", "Color", "PointLight", "Color of the Light").Color = (1.0, 1.0, 1.0, 0.0)
         if not "Fade Distance" in obj.PropertiesList:
-            obj.addProperty("App::PropertyLength", "Fade Distance")
+            obj.addProperty("App::PropertyLength", "Fade Distance", "PointLight", "Distance of full light intensity")
         if not "Fade Power" in obj.PropertiesList:
-            obj.addProperty("App::PropertyFloat", "Fade Power") #XXX negative values are not allowed
+            obj.addProperty("App::PropertyFloat", "Fade Power", "PointLight", "Potency of light decrease (2=quadratic, 3=cubic, etc.)") #XXX negative values are not allowed
 
     def execute(self, obj):
         return True
