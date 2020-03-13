@@ -259,7 +259,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
 
-        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.ini file', defaultPath, "POV-Ray INI Files (*.ini)")
+        fileName = QtGui.QFileDialog.getOpenFileName(None, 'Select path and name of the *.ini file', defaultPath, "POV-Ray INI Files (*.ini)")
 
         if fileName and fileName != (u'', u''):
             self.pathLineEdit.setText(str(fileName[0]))
@@ -402,7 +402,7 @@ class TextureTab(QtGui.QWidget):
         if previewDisable != None:
             self.previewDisableCheckBox.setChecked(strToBool(previewDisable))
         else:
-            self.previewDisableCheckBox.setChecked(True)
+            self.previewDisableCheckBox.setChecked(False)
 
         previewWidth = settingsObject.value("previewWidth")
         if previewWidth != None and previewWidth != 0 and previewWidth != -1:
