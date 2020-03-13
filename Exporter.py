@@ -607,6 +607,29 @@ class ExportToPovRay:
 
             povCode += povLight
 
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("AreaLight"):
+            povLight = "\nlight_source { "
+            povLight += "<0, 0, 0>"
+            povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
+            povLight += "\n\tarea_light"
+
+            povLight += "\n\t<" + str(fcObj.Length.getValueAs("mm").Value) + ", 0, 0>, "
+            povLight += "<0, " + str(fcObj.Width.getValueAs("mm").Value) + ", 0>"
+
+            povLight += "\n\t" + str(fcObj.LengthLights) + ", " + str(fcObj.WidthLights)
+
+            povLight += "\n\tadaptive " + str(fcObj.Adaptive)
+
+            if fcObj.Jitter:
+                povLight += "\n\tjitter"
+            
+            if fcObj.Fade_Distance.getValueAs("mm").Value != 0 and fcObj.Fade_Power != 0:
+                povLight += "\n\tfade_distance " + str(fcObj.Fade_Distance.getValueAs("mm").Value)
+                povLight += "\n\tfade_power " + str(fcObj.Fade_Power)
+
+            povCode += povLight
+
+
         else: #not a supported object
             povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
             return povCode #return because the mesh may not translated and rotated
@@ -919,7 +942,7 @@ class ExportToPovRay:
                             "App:Part",
                             "Part::Compound",
                             "Image::ImagePlane"]
-        supportedNames = ["Array", "Clone", "PointLight"]
+        supportedNames = ["Array", "Clone", "PointLight", "AreaLight"]
 
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not self.isNameSupported(obj.Name, supportedNames):
