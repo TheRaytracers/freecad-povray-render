@@ -155,8 +155,8 @@ class PovRay (Workbench):
 	
 	def Initialize(self):
 		import Export, LightCommands, helpDefs
-		self.appendToolbar("POV-Ray", ["Export", "PointLightCommand"])
-		self.appendMenu("&POV-Ray", ["Export", "PointLightCommand"])
+		self.appendToolbar("POV-Ray", ["Export", "PointLightCommand", "AreaLightCommand"])
+		self.appendMenu("&POV-Ray", ["Export", "PointLightCommand", "AreaLightCommand"])
 
 		Gui.addIconPath(helpDefs.initGui__iconPath)
 

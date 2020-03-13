@@ -45,3 +45,30 @@ class PointLightCommand:
         App.ActiveDocument.recompute()
 
 Gui.addCommand('PointLightCommand', PointLightCommand())
+
+
+class AreaLightCommand:
+    "Insert an area light"
+
+    def GetResources(self):
+        return {"MenuText": "Insert an Area Light",
+				"Accel": "Ctrl+A",
+				"ToolTip": "Insert an area light (array of lights)",
+				"Pixmap"  : "areaLight.svg"}
+                
+    def IsActive(self):
+        if App.ActiveDocument == None:
+            return False
+        else:
+            return True
+            
+    def Activated(self):
+        from Lights import AreaLight
+        from Lights import ViewProviderAreaLight
+
+        light = App.ActiveDocument.addObject("Part::FeaturePython","AreaLight")
+        AreaLight(light)
+        ViewProviderAreaLight(light.ViewObject)
+        App.ActiveDocument.recompute()
+
+Gui.addCommand('AreaLightCommand', AreaLightCommand())
