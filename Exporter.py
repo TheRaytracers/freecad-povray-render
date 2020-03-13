@@ -163,14 +163,15 @@ class ExportToPovRay:
             finalPovCode += "#include \"" + self.meshName + "\"\n"
 
         finalPovCode += "\n//------------------------------------------\n"
-        finalPovCode += "// camera ----------------------------------\n"
+        finalPovCode += "// Camera ----------------------------------\n"
         finalPovCode += self.getCam()
 
-        finalPovCode += "\n// light -------------------------------------"
-        finalPovCode += self.getLights()
+        if self.expLight:
+            finalPovCode += "\n// FreeCAD Light -------------------------------------\n"
+            finalPovCode += self.getFCLight()
 
         if self.expBg:
-            finalPovCode += "\n// background ------------------------------\n"
+            finalPovCode += "\n// Background ------------------------------\n"
             finalPovCode += self.getBackground()
 
         finalPovCode += "\n//------------------------------------------\n"
@@ -178,7 +179,7 @@ class ExportToPovRay:
         if self.userInc: #include user inc file if there is a file
             finalPovCode += "\n#include \"" + self.incName + "\"\n\n"
 
-        finalPovCode += "// objects in scene ------------------------\n"
+        finalPovCode += "// Objects in Scene ------------------------\n"
 
         finalPovCode += objPovCode
 
@@ -594,8 +595,17 @@ class ExportToPovRay:
             povCode += povPad
             return povCode
 
+
         elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("PointLight"):
-            return "" #lights are converted in getLights()
+            povLight = "\nlight_source { "
+            povLight += "<0, 0, 0>"
+            povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
+            
+            if fcObj.Fade_Distance.getValueAs("mm").Value != 0 and fcObj.Fade_Power != 0:
+                povLight += "\n\tfade_distance " + str(fcObj.Fade_Distance.getValueAs("mm").Value)
+                povLight += "\n\tfade_power " + str(fcObj.Fade_Power)
+
+            povCode += povLight
 
         else: #not a supported object
             povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
@@ -939,24 +949,10 @@ class ExportToPovRay:
 
         return statistics
 
-    def getLights(self): #get the FreeCAD light
+    def getFCLight(self): #get the FreeCAD light
         povLight = ""
 
-        if self.expLight:
-            povLight += "\nlight_source { CamPosition color rgb <0.5, 0.5, 0.5> }\n"
-
-        for fcObj in self.objs:
-            if fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("PointLight"):
-                povLight += "\n//-----" + fcObj.Label + "-----"
-                povLight += "\nlight_source {"
-                povLight += "<" + str(fcObj.Placement.Base.x) + ", " + str(fcObj.Placement.Base.y) + ", " + str(fcObj.Placement.Base.z) + ">"
-                povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
-                
-                if fcObj.Fade_Distance.getValueAs("mm").Value != 0 and fcObj.Fade_Power != 0:
-                    povLight += "\n\tfade_distance " + str(fcObj.Fade_Distance.getValueAs("mm").Value)
-                    povLight += "\n\tfade_power " + str(fcObj.Fade_Power)
-
-                povLight += "\n}\n"
+        povLight += "light_source { CamPosition color rgb <0.5, 0.5, 0.5> }\n"
 
         return povLight
 
