@@ -192,15 +192,18 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
     def applyIniSettings(self, iniPath):
         #set some good standardValues
-        system = platform.system()
-        if system == "Linux":
-            defaultPath = "/home/"
-        elif system == "Darwin":
-            defaultPath = "/Users/"
-        elif system == "Windows":
-            defaultPath = "C:\\Users\\%UserName%\\"
-        else:
-            defaultPath = ""
+
+        defaultPath = os.path.dirname(App.ActiveDocument.FileName)
+
+        if defaultPath == "":
+            system = platform.system()
+            if system == "Linux":
+                defaultPath = "/home/"
+            elif system == "Darwin":
+                defaultPath = "/Users/"
+            elif system == "Windows":
+                defaultPath = "C:\\Users\\%UserName%\\"
+
 
         self.pathLineEdit.setText(defaultPath)
         self.checkPath(defaultPath)
@@ -259,7 +262,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
 
-        fileName = QtGui.QFileDialog.getOpenFileName(None, 'Select path and name of the *.ini file', defaultPath, "POV-Ray INI Files (*.ini)")
+        fileName = QtGui.QFileDialog.getSaveFileName(None, 'Select path and name of the *.ini file', defaultPath, "POV-Ray INI Files (*.ini)")
 
         if fileName and fileName != (u'', u''):
             self.pathLineEdit.setText(str(fileName[0]))
