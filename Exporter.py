@@ -955,7 +955,7 @@ class ExportToPovRay:
                             "App:Part",
                             "Part::Compound",
                             "Image::ImagePlane"]
-        supportedNames = ["Array", "Clone", "PointLight", "AreaLight"]
+        supportedNames = ["Array", "Clone", "PointLight", "AreaLight", "SpotLight"]
 
         for obj in objs:
             if not obj.TypeId in supportedTypeIds and not self.isNameSupported(obj.Name, supportedNames):
