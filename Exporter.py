@@ -629,6 +629,19 @@ class ExportToPovRay:
 
             povCode += povLight
 
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("SpotLight"):
+            povLight = "\nlight_source { "
+            povLight += "<0, 0, 0>"
+            povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
+            povLight += "\n\tspotlight"
+            povLight += "\n\tpoint_at <0, -1, 0>"
+
+            povLight += "\n\tradius " + str(fcObj.Radius.getValueAs("deg").Value)
+            povLight += "\n\tfalloff " + str(fcObj.FallOff.getValueAs("deg").Value)
+            povLight += "\n\ttightness " + str(fcObj.Tightness)
+
+            povCode += povLight
+
 
         else: #not a supported object
             povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
