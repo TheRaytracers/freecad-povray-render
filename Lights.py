@@ -30,6 +30,10 @@ class ViewProviderPointLight:
 
         img = coin.SoImage()
         img.filename = os.path.join(os.path.dirname(__file__),"icons","pointLight.svg")
+        img.vertAlignment = img.CENTER
+        img.horAlignment = img.CENTER
+        img.width = 16
+        img.height = 16
         self.defaultStyle.addChild(img)
         obj.addDisplayMode(self.defaultStyle, "Default")
  
@@ -123,17 +127,22 @@ class ViewProviderAreaLight:
         self.lengthLights = int(fp.getPropertyByName("LengthLights"))
         self.widthLights = int(fp.getPropertyByName("WidthLights"))
 
-        x = self.length / self.lengthLights
-        y = self.width / self.widthLights
+        x = self.length / (self.lengthLights - 1)
+        y = self.width / (self.widthLights - 1)
 
         for i in range(self.lengthLights):
             for k in range(self.widthLights):
                 sep = coin.SoSeparator()
                 trans = coin.SoTranslation()
-                trans.translation.setValue([x * i, y * k, 0])
+                trans.translation.setValue([-self.length / 2 + x * i, -self.width / 2 + y * k, 0])
 
                 img = coin.SoImage()
                 img.filename = os.path.join(os.path.dirname(__file__),"icons","pointLight.svg")
+                img.vertAlignment = img.CENTER
+                img.horAlignment = img.CENTER
+                img.width = 16
+                img.height = 16
+
                 sep.addChild(trans)
                 sep.addChild(img)
 
