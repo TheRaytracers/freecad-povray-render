@@ -132,7 +132,12 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.tabs.addTab(self.helpLabel, "Help")
 
         # ok cancel buttons
-        self.buttonBox = QtGui.QDialogButtonBox(QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel)
+        self.renderButton = QtGui.QPushButton("Start Rendering")
+        self.cancelButton = QtGui.QPushButton("Cancel")
+
+        self.buttonBox = QtGui.QDialogButtonBox()
+        self.buttonBox.addButton(self.renderButton, QtGui.QDialogButtonBox.AcceptRole)
+        self.buttonBox.addButton(self.cancelButton, QtGui.QDialogButtonBox.RejectRole)
         self.buttonBox.accepted.connect(self.onOk)
         self.buttonBox.rejected.connect(self.onCancel)
 
@@ -296,11 +301,11 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
     
     def checkPath(self, path): #check if the path to pov file is valid
         if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:].lower() == ".ini":
-            self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(True)
+            self.renderButton.setEnabled(True)
             self.warnLabel.setText("")
             return True
         else:
-            self.buttonBox.button(QtGui.QDialogButtonBox.Ok).setEnabled(False)
+            self.renderButton.setEnabled(False)
             if path == "":
                 self.warnLabel.setText("Please type a path or get one with clicking on '…'")
             else:
