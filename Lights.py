@@ -2,6 +2,7 @@ import FreeCAD as App
 import FreeCADGui as Gui
 import os
 from pivy import coin
+import math
 
 class PointLight:
     def __init__(self, obj):
@@ -76,6 +77,7 @@ class ViewProviderPointLight:
                 Since no data were serialized nothing needs to be done here.'''
         return None
 
+
 class AreaLight:
     def __init__(self, obj):
         obj.Proxy = self
@@ -127,8 +129,15 @@ class ViewProviderAreaLight:
         self.lengthLights = int(fp.getPropertyByName("LengthLights"))
         self.widthLights = int(fp.getPropertyByName("WidthLights"))
 
-        x = self.length / (self.lengthLights - 1)
-        y = self.width / (self.widthLights - 1)
+        if self.lengthLights == 1:
+            x = self.length / 2
+        else:
+            x = self.length / (self.lengthLights - 1)
+
+        if self.widthLights == 1:
+            y = self.width / 2
+        else:
+            y = self.width / (self.widthLights - 1)
 
         for i in range(self.lengthLights):
             for k in range(self.widthLights):
@@ -171,6 +180,152 @@ class ViewProviderAreaLight:
         '''Return the icon in XPM format which will appear in the tree view. This method is\
                 optional and if not defined a default icon is shown.'''
         return os.path.join(os.path.dirname(__file__),"icons","areaLight.svg")
+ 
+    def __getstate__(self):
+        '''When saving the document this object gets stored using Python's json module.\
+                Since we have some un-serializable parts here -- the Coin stuff -- we must define this method\
+                to return a tuple of all serializable objects or None.'''
+        return None
+ 
+    def __setstate__(self,state):
+        '''When restoring the serialized object from document we have the chance to set some internals here.\
+                Since no data were serialized nothing needs to be done here.'''
+        return None
+
+
+class SpotLight:
+    def __init__(self, obj):
+        obj.Proxy = self
+        self.setProperties(obj)
+
+    def setProperties(self, obj):
+        if not "Color" in obj.PropertiesList:
+            obj.addProperty("App::PropertyColor", "Color", "Light", "Color of the Light").Color = (1.0, 1.0, 1.0, 0.0)
+        if not "Fade Distance" in obj.PropertiesList:
+            obj.addProperty("App::PropertyLength", "Fade Distance", "Light", "Distance of full light intensity").Fade_Distance = 0
+        if not "Fade Power" in obj.PropertiesList:
+            obj.addProperty("App::PropertyFloat", "Fade Power", "Light", "Potency of light decrease (2=quadratic, 3=cubic, etc.)").Fade_Power = 0 #XXX negative values are not allowed
+
+        if not "Radius" in obj.PropertiesList:
+            obj.addProperty("App::PropertyAngle", "Radius", "SpotLight", "Angle of the bright center").Radius = 30
+        if not "FallOff" in obj.PropertiesList:
+            obj.addProperty("App::PropertyAngle", "FallOff", "SpotLight", "Angle of the outer light circle").FallOff = 45
+        if not "Tightness" in obj.PropertiesList:
+            obj.addProperty("App::PropertyIntegerConstraint", "Tightness", "SpotLight", "Exponential softening of the edges").Tightness = (0, 0, 100, 1)
+
+    def execute(self, obj):
+        return True
+
+class ViewProviderSpotLight:
+    def __init__(self, obj):
+        '''Set this object to the proxy object of the actual view provider'''
+        obj.addProperty("App::PropertyLength", "RadiusHeight", "SpotLight", "Height of the radius cone").RadiusHeight = 100
+        obj.addProperty("App::PropertyLength", "FallOffHeight", "SpotLight", "Height of the fall off cone").FallOffHeight = 100
+
+        obj.Proxy = self
+ 
+    def attach(self, obj):
+        '''Setup the scene sub-graph of the view provider, this method is mandatory'''
+        self.radiusHeight = 100
+        self.fallOffHeight = 100
+        self.defaultStyle = coin.SoGroup()
+
+
+        self.radiusSep = coin.SoSeparator()
+        self.radiusCone = coin.SoCone()
+        self.radiusCone.height = self.radiusHeight
+
+        self.radiusTrans = coin.SoTranslation()
+        self.radiusTrans.translation.setValue([0, -self.radiusHeight / 2, 0])
+
+        radiusMaterial = coin.SoMaterial()
+        radiusMaterial.transparency.setValue(0.75)
+        radiusMaterial.diffuseColor.setValue(coin.SbColor(1, 1, 0))
+
+        radiusComplexity = coin.SoComplexity()
+        radiusComplexity.value = 0.9
+
+        self.radiusSep.addChild(self.radiusTrans)
+        self.radiusSep.addChild(radiusMaterial)
+        self.radiusSep.addChild(radiusComplexity)
+        self.radiusSep.addChild(self.radiusCone)
+        self.defaultStyle.addChild(self.radiusSep)
+
+
+        self.fallOffSep = coin.SoSeparator()
+        self.fallOffCone = coin.SoCone()
+        self.fallOffCone.height = self.fallOffHeight
+
+        self.fallOffTrans = coin.SoTranslation()
+        self.fallOffTrans.translation.setValue([0, -self.fallOffHeight / 2, 0])
+
+        fallOffMaterial = coin.SoMaterial()
+        fallOffMaterial.transparency.setValue(0.75)
+        fallOffMaterial.diffuseColor.setValue(coin.SbColor(1, 1, 0))
+
+        fallOffComplexity = coin.SoComplexity()
+        fallOffComplexity.value = 0.9
+
+        self.fallOffSep.addChild(self.fallOffTrans)
+        self.fallOffSep.addChild(fallOffMaterial)
+        self.fallOffSep.addChild(fallOffComplexity)
+        self.fallOffSep.addChild(self.fallOffCone)
+        self.defaultStyle.addChild(self.fallOffSep)
+
+        obj.addDisplayMode(self.defaultStyle, "Default")
+ 
+    def updateData(self, fp, prop):
+        '''If a property of the handled feature has changed we have the chance to handle this here'''
+        # fp is the handled feature, prop is the name of the property that has changed
+        self.radius = fp.getPropertyByName("Radius").getValueAs("rad").Value
+        self.fallOff = fp.getPropertyByName("FallOff").getValueAs("rad").Value
+
+        self.updateConeRadius()
+
+    def updateConeRadius(self):
+        radius_r = math.tan(self.radius) * self.radiusHeight
+        fallOff_r = math.tan(self.fallOff) * self.fallOffHeight
+
+        self.radiusCone.bottomRadius = radius_r
+        self.fallOffCone.bottomRadius = fallOff_r
+ 
+    def getDisplayModes(self,obj):
+        '''Return a list of display modes.'''
+        modes=[]
+        modes.append("Default")
+        return modes
+ 
+    def getDefaultDisplayMode(self):
+        '''Return the name of the default display mode. It must be defined in getDisplayModes.'''
+        return "Default"
+ 
+    def setDisplayMode(self,mode):
+        '''Map the display mode defined in attach with those defined in getDisplayModes.\
+                Since they have the same names nothing needs to be done. This method is optional'''
+        return mode
+ 
+    def onChanged(self, vp, prop):
+        '''Here we can do something when a single property got changed'''
+        if prop == "RadiusHeight":
+            height = vp.getPropertyByName("RadiusHeight").getValueAs("mm").Value
+            self.radiusHeight = height
+            self.radiusCone.height = height
+            self.radiusTrans.translation.setValue([0, -height / 2, 0])
+            
+            self.updateConeRadius()
+
+        elif prop == "FallOffHeight":
+            height = vp.getPropertyByName("FallOffHeight").getValueAs("mm").Value
+            self.fallOffHeight = height
+            self.fallOffCone.height = height
+            self.fallOffTrans.translation.setValue([0, -height / 2, 0])
+            
+            self.updateConeRadius()
+ 
+    def getIcon(self):
+        '''Return the icon in XPM format which will appear in the tree view. This method is\
+                optional and if not defined a default icon is shown.'''
+        return os.path.join(os.path.dirname(__file__),"icons","spotLight.svg")
  
     def __getstate__(self):
         '''When saving the document this object gets stored using Python's json module.\

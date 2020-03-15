@@ -72,3 +72,30 @@ class AreaLightCommand:
         App.ActiveDocument.recompute()
 
 Gui.addCommand('AreaLightCommand', AreaLightCommand())
+
+
+class SpotLightCommand:
+    "Insert a spot light"
+
+    def GetResources(self):
+        return {"MenuText": "Insert a Spot Light",
+				"Accel": "Ctrl+S",
+				"ToolTip": "Insert a spot light",
+				"Pixmap"  : "spotLight.svg"}
+                
+    def IsActive(self):
+        if App.ActiveDocument == None:
+            return False
+        else:
+            return True
+            
+    def Activated(self):
+        from Lights import SpotLight
+        from Lights import ViewProviderSpotLight
+
+        light = App.ActiveDocument.addObject("Part::FeaturePython","SpotLight")
+        SpotLight(light)
+        ViewProviderSpotLight(light.ViewObject)
+        App.ActiveDocument.recompute()
+
+Gui.addCommand('SpotLightCommand', SpotLightCommand())
