@@ -620,6 +620,9 @@ class ExportToPovRay:
 
             povLight += "\n\tadaptive " + str(fcObj.Adaptive)
 
+            if fcObj.Area_Illumination:
+                povLight += "\n\tarea_illumination on"
+
             if fcObj.Jitter:
                 povLight += "\n\tjitter"
             
