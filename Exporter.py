@@ -158,13 +158,16 @@ class ExportToPovRay:
         finalPovCode += "\n//------------------------------------------\n"
         finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
 
-        if self.radiosity != -1:
+        if self.radiosity["radiosityName"] != -1:
             finalPovCode += '\n#include "rad_def.inc"'
             finalPovCode += "\nglobal_settings {\n"
             finalPovCode += "\tradiosity {\n"
-            finalPovCode += "\t\tRad_Settings(" + self.radiosity + ", off, off)\n"
+            finalPovCode += "\t\tRad_Settings(" + self.radiosity["radiosityName"] + ", off, off)\n"
             finalPovCode += "\t}\n"
             finalPovCode += "}\n"
+
+            if self.radiosity["ambientTo0"]:
+                finalPovCode += "#default { finish{ ambient 0 } }\n"
 
         finalPovCode += "\n//------------------------------------------\n"
 

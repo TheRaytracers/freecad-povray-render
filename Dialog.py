@@ -344,11 +344,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         csv += ";stg_expFcView," + str(self.renderSettings.expFcView) + "\n"
 
         csv += self.textureTab.settingsToIniFormat()
-        gaga = self.radiosityTab.settingsToIniFormat()
-
-        App.Console.PrintWarning(gaga)
-
-        csv += gaga
+        csv += self.radiosityTab.settingsToIniFormat()
 
         self.csv = csv
 
@@ -1109,15 +1105,33 @@ class RadiosityTab(QtGui.QWidget):
         for radio in self.radioButtons:
             self.groupBoxLayout.addWidget(radio)
 
+        self.ambientTo0 = QtGui.QCheckBox("Set default Ambient to 0")
+        self.ambientTo0.setChecked(True)
+        self.ambientTo0.setToolTip("Set the color of the objects without any light to 0 (black)")
+
+        self.groupBoxLayout.addWidget(self.ambientTo0)
+
         self.groupBox.setLayout(self.groupBoxLayout)
         self.wrapperLayout.addWidget(self.groupBox)
         self.setLayout(self.wrapperLayout)
 
     def getRadiosity(self):
+        radiosity = {
+            "radiosityName": "",
+            "ambientTo0": True
+        }
+
         if self.groupBox.isChecked():
-            return "Radiosity_" + self.getRadiosityName()
+            radiosity["radiosityName"] = "Radiosity_" + self.getRadiosityName()
         else:
-            return -1
+            radiosity["radiosityName"] = -1
+
+        if self.ambientTo0.isChecked():
+            radiosity["ambientTo0"] = True
+        else:
+            radiosity["ambientTo0"] = False
+
+        return radiosity
 
     def getRadiosityName(self):
         for radio in self.radioButtons:
@@ -1141,20 +1155,29 @@ class RadiosityTab(QtGui.QWidget):
                 for radio in self.radioButtons:
                     if radio.text() == row[2]:
                         radio.setChecked(True)
-                        return
+                
+                if row[3] == "stdAmbient":
+                    self.ambientTo0.setChecked(False)
+                else:
+                    self.ambientTo0.setChecked(True)
 
     def settingsToIniFormat(self):
         csv = ";"
-        csv += "radiosity,"
+        csv += "radiosity"
 
         if self.groupBox.isChecked():
-            csv += "on"
+            csv += ",on"
         else:
-            csv += "off"
+            csv += ",off"
 
-        csv += "," + self.getRadiosityName() + "\n"
+        csv += "," + self.getRadiosityName()
 
-        return csv
+        if self.ambientTo0.isChecked():
+            csv += "," + "ambientToZero"
+        else:
+            csv += "," + "stdAmbient"
+
+        return csv + "\n"
 
     def saveQSettings(self, qSettingsObject):
         pass
