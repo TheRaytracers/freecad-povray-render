@@ -125,10 +125,12 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         #create tabs
         self.textureTab = TextureTab()
+        self.radiosityTab = RadiosityTab()
 
         self.tabs = QtGui.QTabWidget(self)
-        self.tabs.addTab(self.macroGroup, "Macro")
+        self.tabs.addTab(self.macroGroup, "General")
         self.tabs.addTab(self.textureTab, "Textures")
+        self.tabs.addTab(self.radiosityTab, "Radiosity")
         self.tabs.addTab(self.helpLabel, "Help")
 
         # ok cancel buttons
@@ -194,6 +196,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.applyIniSettings(iniPath)
 
         self.textureTab.applyQSettings(settings)
+        self.radiosityTab.applyQSettings(settings)
 
     def applyIniSettings(self, iniPath):
         #set some good standardValues
@@ -263,6 +266,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
                         self.expFcView.setChecked(strToBool(row[1]))
 
             self.textureTab.applyIniSettings(csvLines)
+            self.radiosityTab.applyIniSettings(csvLines)
 
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
@@ -319,7 +323,8 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         settings.setValue(App.ActiveDocument.Name, self.pathLineEdit.text())
         settings.endGroup()
 
-        self.textureTab.saveUserInput(settings)
+        self.textureTab.saveQSettings(settings)
+        self.radiosityTab.saveQSettings(settings)
 
     def writeIni(self):
         self.iniFile = open(self.renderSettings.iniPath, "w")
@@ -339,6 +344,11 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         csv += ";stg_expFcView," + str(self.renderSettings.expFcView) + "\n"
 
         csv += self.textureTab.settingsToIniFormat()
+        gaga = self.radiosityTab.settingsToIniFormat()
+
+        App.Console.PrintWarning(gaga)
+
+        csv += gaga
 
         self.csv = csv
 
@@ -373,7 +383,8 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
                                              self.expBg.isChecked(),
                                              self.expLight.isChecked(),
                                              self.repRot.isChecked(),
-                                             self.expFcView.isChecked())
+                                             self.expFcView.isChecked(),
+                                             self.radiosityTab.getRadiosity())
 
         self.textureTab.finish(self.renderSettings)
 
@@ -441,7 +452,7 @@ class TextureTab(QtGui.QWidget):
 
         settingsObject.endGroup()
 
-    def saveUserInput(self, settingsObject):
+    def saveQSettings(self, settingsObject):
         settingsObject.beginGroup(self.qSettingsGroup)
         settingsObject.setValue("previewDisable", self.previewDisableCheckBox.isChecked())
         settingsObject.setValue("previewWidth", self.previewWidth)
@@ -1031,7 +1042,7 @@ class ListObject:
         self.predefObject = predefObject
 
 class RenderSettings:
-    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView):
+    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView, radiosity):
         self.projectName = projectName
         self.directory = directory
 
@@ -1059,3 +1070,94 @@ class RenderSettings:
         self.expLight = expLight
         self.repRot = repRot
         self.expFcView = expFcView
+
+        #radiosity
+        self.radiosity = radiosity
+
+
+class RadiosityTab(QtGui.QWidget):
+    def __init__(self):
+        super(RadiosityTab, self).__init__()
+        #self.exporter = ExportToPovRay()
+        self.qSettingsGroup = "radiosityTab"
+        self.initTab()
+
+    def initTab(self):
+        self.wrapperLayout = QtGui.QVBoxLayout()
+
+        self.groupBox = QtGui.QGroupBox("Use Radiosity (Global Illumination)")
+        self.groupBox.setCheckable(True)
+        self.groupBox.setChecked(False)
+
+        self.groupBoxLayout = QtGui.QVBoxLayout()
+
+        self.radioButtons = []
+        self.radioButtons.append(QtGui.QRadioButton("Default"))
+        self.radioButtons.append(QtGui.QRadioButton("Debug"))
+        self.radioButtons.append(QtGui.QRadioButton("Fast"))
+        self.radioButtons.append(QtGui.QRadioButton("Normal"))
+        self.radioButtons.append(QtGui.QRadioButton("2Bounce"))
+        self.radioButtons.append(QtGui.QRadioButton("Final"))
+        self.radioButtons.append(QtGui.QRadioButton("OutdoorLQ"))
+        self.radioButtons.append(QtGui.QRadioButton("OutdoorHQ"))
+        self.radioButtons.append(QtGui.QRadioButton("OutdoorLight"))
+        self.radioButtons.append(QtGui.QRadioButton("IndoorLQ"))
+        self.radioButtons.append(QtGui.QRadioButton("IndoorHQ"))
+
+        self.radioButtons[0].setChecked(True)
+
+        for radio in self.radioButtons:
+            self.groupBoxLayout.addWidget(radio)
+
+        self.groupBox.setLayout(self.groupBoxLayout)
+        self.wrapperLayout.addWidget(self.groupBox)
+        self.setLayout(self.wrapperLayout)
+
+    def getRadiosity(self):
+        if self.groupBox.isChecked():
+            return "Radiosity_" + self.getRadiosityName()
+        else:
+            return -1
+
+    def getRadiosityName(self):
+        for radio in self.radioButtons:
+            if radio.isChecked():
+                return radio.text()
+
+        # if nothing selected
+        self.radioButtons[0].setChecked(True)
+        return self.radioButtons[0].text()
+
+    def applyIniSettings(self, csvLines):
+        #parse CSV
+        csvReader = csv.reader(csvLines, delimiter=',')
+        for row in csvReader:
+            if row[0] == "radiosity":
+                if row[1] == "on":
+                    self.groupBox.setChecked(True)
+                else:
+                    self.groupBox.setChecked(False)
+
+                for radio in self.radioButtons:
+                    if radio.text() == row[2]:
+                        radio.setChecked(True)
+                        return
+
+    def settingsToIniFormat(self):
+        csv = ";"
+        csv += "radiosity,"
+
+        if self.groupBox.isChecked():
+            csv += "on"
+        else:
+            csv += "off"
+
+        csv += "," + self.getRadiosityName() + "\n"
+
+        return csv
+
+    def saveQSettings(self, qSettingsObject):
+        pass
+
+    def applyQSettings(self, qSettingsObject):
+        pass

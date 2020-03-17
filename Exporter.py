@@ -73,6 +73,9 @@ class ExportToPovRay:
         self.repRot = renderSettings.repRot
         self.expFcView = renderSettings.expFcView
 
+        #radiosity
+        self.radiosity = renderSettings.radiosity
+
         #get camera
         self.CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
         self.CamType = Gui.ActiveDocument.ActiveView.getCameraType()
@@ -154,6 +157,16 @@ class ExportToPovRay:
 
         finalPovCode += "\n//------------------------------------------\n"
         finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
+
+        if self.radiosity != -1:
+            finalPovCode += '\n#include "rad_def.inc"'
+            finalPovCode += "\nglobal_settings {\n"
+            finalPovCode += "\tradiosity {\n"
+            finalPovCode += "\t\tRad_Settings(" + self.radiosity + ", off, off)\n"
+            finalPovCode += "\t}\n"
+            finalPovCode += "}\n"
+
+        finalPovCode += "\n//------------------------------------------\n"
 
         #add textures inc include
         finalPovCode += "#include \"" + self.texIncName + "\"\n"
