@@ -508,7 +508,7 @@ class TextureTab(QtGui.QWidget):
         self.predefines = []
         #add FreeCAD texture
         self.fcTexItem = QtGui.QTreeWidgetItem(self.textureList, ["FreeCAD Texture"])
-        self.predefines.append(Predefined("FreeCAD Texture", None, None, None, None, None, None, None, "", self.fcTexItem))
+        self.predefines.append(Predefined("FreeCAD Texture", None, None, None, None, None, None, None, "", "", self.fcTexItem))
         self.fcTexItem.setSelected(True)
 
         #get the predefined.xml
@@ -574,6 +574,12 @@ class TextureTab(QtGui.QWidget):
         self.listLayout.addWidget(self.objectListLabel, 0, 0)
         self.listLayout.addWidget(self.objectList, 1, 0)
 
+        #add comment label
+        self.commentLabel = QtGui.QLabel()
+        self.commentLabel.setStyleSheet("QLabel { font-weight : bold;}")
+        self.commentLabel.setWordWrap(True)
+        self.listLayout.addWidget(self.commentLabel, 2, 0, 1, 2)
+
     def predefXmlToList(self, xmlNode, parentNode):
         childNodes = xmlNode.getchildren()
 
@@ -621,7 +627,12 @@ class TextureTab(QtGui.QWidget):
             else:
                 inc = ""
 
-            self.predefines.append(Predefined(xmlNode.text, material, texture, pigment, finish, normal, interior, media, inc, treeItem))
+            if "comment" in attr:
+                comment = attr["comment"]
+            else:
+                comment = ""
+
+            self.predefines.append(Predefined(xmlNode.text, material, texture, pigment, finish, normal, interior, media, inc, comment, treeItem))
 
         else:
             categorieItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
@@ -765,6 +776,10 @@ class TextureTab(QtGui.QWidget):
         #expand categories
         self.expandParentItems(listObj.predefObject.treeItem)
 
+        #set comment
+        self.commentLabel.setText(listObj.predefObject.comment)
+
+        #update preview
         self.renderPreview(listObj)
 
         self.connectSignals()
@@ -807,6 +822,10 @@ class TextureTab(QtGui.QWidget):
 
         listObj.predefObject = predefine #apply the read values to the predefObject in the listObject
 
+        #set comment
+        self.commentLabel.setText(listObj.predefObject.comment)
+
+        #update preview
         self.renderPreview(listObj)
 
     def renderPreview(self, listObj):
@@ -968,7 +987,7 @@ class TextureTab(QtGui.QWidget):
 
 
 class Predefined:
-    def __init__(self, identifier, material, texture, pigment, finish, normal, interior, media, inc, treeItem):
+    def __init__(self, identifier, material, texture, pigment, finish, normal, interior, media, inc, comment, treeItem):
         self.identifier = identifier
         self.material = material
         self.texture = texture
@@ -978,13 +997,14 @@ class Predefined:
         self.interior = interior
         self.media = media
         self.inc = inc
+        self.comment = comment
         self.treeItem = treeItem
 
     def getHash(self):
         #parentCategorie = self.treeItem.parent().text(0)
         predefName = self.treeItem.text(0)
 
-        stgStr = str(self.identifier) + str(self.material) + str(self.texture) + str(self.pigment) + str(self.finish) + str(self.normal) + str(self.interior) + str(self.media) + str(self.inc)
+        stgStr = str(self.identifier) + str(self.material) + str(self.texture) + str(self.pigment) + str(self.finish) + str(self.normal) + str(self.interior) + str(self.media) + str(self.inc) + str(self.comment)
         hashStr = hashlib.md5(stgStr.encode("UTF-8")).hexdigest()[:4]
 
         #return parentCategorie + "/" + predefName + hashStr
