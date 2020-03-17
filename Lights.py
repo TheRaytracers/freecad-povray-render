@@ -273,7 +273,16 @@ class ViewProviderSpotLight:
         self.fallOffSep.addChild(fallOffMaterial)
         self.fallOffSep.addChild(fallOffComplexity)
         self.fallOffSep.addChild(self.fallOffCone)
+
+        img = coin.SoImage()
+        img.filename = os.path.join(os.path.dirname(__file__),"icons","pointLight.svg")
+        img.vertAlignment = img.CENTER
+        img.horAlignment = img.CENTER
+        img.width = 16
+        img.height = 16
+
         self.defaultStyle.addChild(self.fallOffSep)
+        self.defaultStyle.addChild(img)
 
         obj.addDisplayMode(self.defaultStyle, "Default")
  
