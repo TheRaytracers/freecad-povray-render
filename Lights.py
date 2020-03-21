@@ -224,6 +224,7 @@ class ViewProviderSpotLight:
         '''Set this object to the proxy object of the actual view provider'''
         obj.addProperty("App::PropertyLength", "RadiusHeight", "SpotLight", "Height of the radius cone").RadiusHeight = 100
         obj.addProperty("App::PropertyLength", "FallOffHeight", "SpotLight", "Height of the fall off cone").FallOffHeight = 100
+        obj.addProperty("App::PropertyBool", "ShowCones", "SpotLight", "Show the cones, that are representing the light").ShowCones = True
 
         obj.Proxy = self
  
@@ -231,6 +232,7 @@ class ViewProviderSpotLight:
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
         self.radiusHeight = 100
         self.fallOffHeight = 100
+        self.showCones = True
         self.defaultStyle = coin.SoGroup()
 
 
@@ -333,7 +335,17 @@ class ViewProviderSpotLight:
             self.fallOffTrans.translation.setValue([0, -height / 2, 0])
             
             self.updateConeRadius()
- 
+
+        elif prop == "ShowCones":
+            self.showCones = vp.getPropertyByName("ShowCones")
+
+            if self.showCones:
+                self.defaultStyle.addChild(self.radiusSep)
+                self.defaultStyle.addChild(self.fallOffSep)
+            else:
+                self.defaultStyle.removeChild(self.radiusSep)
+                self.defaultStyle.removeChild(self.fallOffSep)
+
     def getIcon(self):
         '''Return the icon in XPM format which will appear in the tree view. This method is\
                 optional and if not defined a default icon is shown.'''
