@@ -11,11 +11,24 @@ class PointLight:
 
     def setProperties(self, obj):
         if not "Color" in obj.PropertiesList:
-            obj.addProperty("App::PropertyColor", "Color", "Light", "Color of the Light").Color = (1.0, 1.0, 1.0, 0.0)
+            obj.addProperty("App::PropertyColor",
+                            "Color",
+                            "Light",
+                            "Color of the Light")
+            obj.Color = (1.0, 1.0, 1.0, 0.0)
+
         if not "Fade Distance" in obj.PropertiesList:
-            obj.addProperty("App::PropertyLength", "Fade Distance", "Light", "Distance of full light intensity").Fade_Distance = 0
+            obj.addProperty("App::PropertyLength",
+                            "Fade Distance",
+                            "Light",
+                            "Distance of full light intensity")
+            obj.Fade_Distance = 0
+
         if not "Fade Power" in obj.PropertiesList:
-            obj.addProperty("App::PropertyFloat", "Fade Power", "Light", "Potency of light decrease (2=quadratic, 3=cubic, etc.)").Fade_Power = 0 #XXX negative values are not allowed
+            obj.addProperty("App::PropertyFloat",
+                            "Fade Power", "Light",
+                            "Potency of light decrease (2=quadratic, 3=cubic, etc.)")
+            obj.Fade_Power = 0 #XXX negative values are not allowed
 
     def execute(self, obj):
         return True
@@ -24,55 +37,55 @@ class ViewProviderPointLight:
     def __init__(self, obj):
         '''Set this object to the proxy object of the actual view provider'''
         obj.Proxy = self
- 
+
     def attach(self, obj):
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
         self.defaultStyle = coin.SoGroup()
 
         img = coin.SoImage()
-        img.filename = os.path.join(os.path.dirname(__file__),"icons","pointLight.svg")
+        img.filename = os.path.join(os.path.dirname(__file__), "icons", "pointLight.svg")
         img.vertAlignment = img.CENTER
         img.horAlignment = img.CENTER
         img.width = 16
         img.height = 16
         self.defaultStyle.addChild(img)
         obj.addDisplayMode(self.defaultStyle, "Default")
- 
+
     def updateData(self, fp, prop):
         '''If a property of the handled feature has changed we have the chance to handle this here'''
         pass
- 
-    def getDisplayModes(self,obj):
+
+    def getDisplayModes(self, obj):
         '''Return a list of display modes.'''
-        modes=[]
+        modes = []
         modes.append("Default")
         return modes
- 
+
     def getDefaultDisplayMode(self):
         '''Return the name of the default display mode. It must be defined in getDisplayModes.'''
         return "Default"
- 
-    def setDisplayMode(self,mode):
+
+    def setDisplayMode(self, mode):
         '''Map the display mode defined in attach with those defined in getDisplayModes.\
                 Since they have the same names nothing needs to be done. This method is optional'''
         return mode
- 
+
     def onChanged(self, vp, prop):
         '''Here we can do something when a single property got changed'''
         pass
- 
+
     def getIcon(self):
         '''Return the icon in XPM format which will appear in the tree view. This method is\
                 optional and if not defined a default icon is shown.'''
         return os.path.join(os.path.dirname(__file__),"icons","pointLight.svg")
- 
+
     def __getstate__(self):
         '''When saving the document this object gets stored using Python's json module.\
                 Since we have some un-serializable parts here -- the Coin stuff -- we must define this method\
                 to return a tuple of all serializable objects or None.'''
         return None
- 
-    def __setstate__(self,state):
+
+    def __setstate__(self, state):
         '''When restoring the serialized object from document we have the chance to set some internals here.\
                 Since no data were serialized nothing needs to be done here.'''
         return None
@@ -116,12 +129,12 @@ class ViewProviderAreaLight:
     def __init__(self, obj):
         '''Set this object to the proxy object of the actual view provider'''
         obj.Proxy = self
- 
+
     def attach(self, obj):
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
         self.defaultStyle = coin.SoGroup()
         obj.addDisplayMode(self.defaultStyle, "Default")
- 
+
     def updateData(self, fp, prop):
         '''If a property of the handled feature has changed we have the chance to handle this here'''
         # fp is the handled feature, prop is the name of the property that has changed
@@ -160,9 +173,9 @@ class ViewProviderAreaLight:
 
                 self.defaultStyle.addChild(sep)
  
-    def getDisplayModes(self,obj):
+    def getDisplayModes(self, obj):
         '''Return a list of display modes.'''
-        modes=[]
+        modes = []
         modes.append("Default")
         return modes
  
@@ -170,7 +183,7 @@ class ViewProviderAreaLight:
         '''Return the name of the default display mode. It must be defined in getDisplayModes.'''
         return "Default"
  
-    def setDisplayMode(self,mode):
+    def setDisplayMode(self, mode):
         '''Map the display mode defined in attach with those defined in getDisplayModes.\
                 Since they have the same names nothing needs to be done. This method is optional'''
         return mode
@@ -190,7 +203,7 @@ class ViewProviderAreaLight:
                 to return a tuple of all serializable objects or None.'''
         return None
  
-    def __setstate__(self,state):
+    def __setstate__(self, state):
         '''When restoring the serialized object from document we have the chance to set some internals here.\
                 Since no data were serialized nothing needs to be done here.'''
         return None
@@ -227,7 +240,7 @@ class ViewProviderSpotLight:
         obj.addProperty("App::PropertyBool", "ShowCones", "SpotLight", "Show the cones, that are representing the light").ShowCones = True
 
         obj.Proxy = self
- 
+
     def attach(self, obj):
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
         self.radiusHeight = 100
@@ -277,7 +290,7 @@ class ViewProviderSpotLight:
         self.fallOffSep.addChild(self.fallOffCone)
 
         img = coin.SoImage()
-        img.filename = os.path.join(os.path.dirname(__file__),"icons","pointLight.svg")
+        img.filename = os.path.join(os.path.dirname(__file__), "icons", "pointLight.svg")
         img.vertAlignment = img.CENTER
         img.horAlignment = img.CENTER
         img.width = 16
@@ -287,7 +300,7 @@ class ViewProviderSpotLight:
         self.defaultStyle.addChild(img)
 
         obj.addDisplayMode(self.defaultStyle, "Default")
- 
+
     def updateData(self, fp, prop):
         '''If a property of the handled feature has changed we have the chance to handle this here'''
         # fp is the handled feature, prop is the name of the property that has changed
@@ -302,22 +315,22 @@ class ViewProviderSpotLight:
 
         self.radiusCone.bottomRadius = radius_r
         self.fallOffCone.bottomRadius = fallOff_r
- 
-    def getDisplayModes(self,obj):
+
+    def getDisplayModes(self, obj):
         '''Return a list of display modes.'''
-        modes=[]
+        modes = []
         modes.append("Default")
         return modes
- 
+
     def getDefaultDisplayMode(self):
         '''Return the name of the default display mode. It must be defined in getDisplayModes.'''
         return "Default"
- 
-    def setDisplayMode(self,mode):
+
+    def setDisplayMode(self, mode):
         '''Map the display mode defined in attach with those defined in getDisplayModes.\
                 Since they have the same names nothing needs to be done. This method is optional'''
         return mode
- 
+
     def onChanged(self, vp, prop):
         '''Here we can do something when a single property got changed'''
         if prop == "RadiusHeight":
@@ -325,7 +338,7 @@ class ViewProviderSpotLight:
             self.radiusHeight = height
             self.radiusCone.height = height
             self.radiusTrans.translation.setValue([0, -height / 2, 0])
-            
+
             self.updateConeRadius()
 
         elif prop == "FallOffHeight":
@@ -333,7 +346,7 @@ class ViewProviderSpotLight:
             self.fallOffHeight = height
             self.fallOffCone.height = height
             self.fallOffTrans.translation.setValue([0, -height / 2, 0])
-            
+
             self.updateConeRadius()
 
         elif prop == "ShowCones":
@@ -349,15 +362,15 @@ class ViewProviderSpotLight:
     def getIcon(self):
         '''Return the icon in XPM format which will appear in the tree view. This method is\
                 optional and if not defined a default icon is shown.'''
-        return os.path.join(os.path.dirname(__file__),"icons","spotLight.svg")
- 
+        return os.path.join(os.path.dirname(__file__), "icons", "spotLight.svg")
+
     def __getstate__(self):
         '''When saving the document this object gets stored using Python's json module.\
                 Since we have some un-serializable parts here -- the Coin stuff -- we must define this method\
                 to return a tuple of all serializable objects or None.'''
         return None
- 
-    def __setstate__(self,state):
+
+    def __setstate__(self, state):
         '''When restoring the serialized object from document we have the chance to set some internals here.\
                 Since no data were serialized nothing needs to be done here.'''
         return None

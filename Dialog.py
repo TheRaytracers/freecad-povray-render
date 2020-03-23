@@ -434,11 +434,6 @@ class TextureTab(QtGui.QWidget):
         else:
             self.previewHeight = 225
 
-        if App.ActiveDocument.Name in settingsObject.allKeys():
-            iniPath = settingsObject.value(App.ActiveDocument.Name)
-        else:
-            iniPath = -1
-
         settingsObject.endGroup()
 
     def saveUserInput(self, settingsObject):

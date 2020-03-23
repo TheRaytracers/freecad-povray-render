@@ -35,7 +35,7 @@ class ExportToPovRay:
     """Export the FreeCAD model to POV-Ray"""
     def __init__(self):
         #get default shape color (editable in FreeCAD settings) (default rgb(0.8, 0.8, 0.8))
-        self.DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
+        self.DefaultShapeColor = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
         self.os = platform.system() #get system informations
 
@@ -51,7 +51,7 @@ class ExportToPovRay:
         self.iniPath = renderSettings.iniPath
         self.povName = renderSettings.povName
         self.povPath = renderSettings.povPath
-        
+
         self.incName = renderSettings.incName
         self.incPath = renderSettings.incPath
         self.meshName = renderSettings.meshName
@@ -763,7 +763,6 @@ class ExportToPovRay:
         return False
 
     def hasLinesConstructive(self, lines): #are constructive lines in lines array
-        constructive = False
         for line in lines:
             if line.Construction:
                 return True
@@ -871,7 +870,7 @@ class ExportToPovRay:
                     deviation = fcObj.ViewObject.Deviation
 
                     try:
-                        mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = deviation, AngularDeflection = angularDeflection, Relative = False)
+                        mesh = MeshPart.meshFromShape(Shape=shape, LinearDeflection=deviation, AngularDeflection=angularDeflection, Relative=False)
                     except:
                         mesh = MeshPart.meshFromShape(shape, deviation, angularDeflection)
 
@@ -1079,7 +1078,7 @@ class ExportToPovRay:
             if AspectRatio <= 1:
                 CamAngle = 45
             else:
-                CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
+                CamAngle = math.degrees(math.atan2(AspectRatio/2, 1.2071067812))*2
             PovCamAngle = "\tangle {0:1.2f}".format(CamAngle) + "\n"
 
         elif self.CamType == "Orthographic":
@@ -1181,23 +1180,23 @@ class ExportToPovRay:
         phong = ""
         if appObject.Transparency != 0:
             transparency += " transmit " + str(appObject.Transparency / float(100))
-        ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
+        ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(appObject.ShapeColor[0], appObject.ShapeColor[1], appObject.ShapeColor[2])
         if transparency != "" or ShapeColorRGB != self.uintColorToRGB(self.DefaultShapeColor):
             pigment += "\tpigment { color rgb " + ShapeColorRGB + transparency + " }\n"
         material += pigment
-        if appObject.ShapeMaterial.AmbientColor != (0.20000000298023224,0.20000000298023224,0.20000000298023224,0):
+        if appObject.ShapeMaterial.AmbientColor != (0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0):
             ambient += "ambient rgb<"
             ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.AmbientColor[0],
                                                              appObject.ShapeMaterial.AmbientColor[1],
                                                              appObject.ShapeMaterial.AmbientColor[2])
             ambient += ">"
-        if appObject.ShapeMaterial.EmissiveColor != (0,0,0,0):
+        if appObject.ShapeMaterial.EmissiveColor != (0, 0, 0, 0):
             emission += "emission rgb<"
             emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.EmissiveColor[0],
                                                               appObject.ShapeMaterial.EmissiveColor[1],
                                                               appObject.ShapeMaterial.EmissiveColor[2])
             emission += ">"
-        if appObject.ShapeMaterial.SpecularColor != (0,0,0,0):
+        if appObject.ShapeMaterial.SpecularColor != (0, 0, 0, 0):
             phong += "phong "
             phong += "{0:1.2f}".format((appObject.ShapeMaterial.SpecularColor[0] +
                                         appObject.ShapeMaterial.SpecularColor[1] +
@@ -1336,7 +1335,6 @@ class ExportToPovRay:
 
     def checkErrFile(self): #check error file for errors
         error = ""
-        inPovFile = False
         #open error file
         if os.path.isfile(self.errorPath) == True:
             file = open(self.errorPath, "r")
@@ -1355,7 +1353,7 @@ class ExportToPovRay:
             errorText += "You can see the error message in the error file too."
             showError(errorText, "An error ocurred while rendering")
         else:
-            self.delErrorFile();
+            self.delErrorFile()
 
     def delErrorFile(self): #delete error file
         os.remove(self.errorPath)
