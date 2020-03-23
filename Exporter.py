@@ -475,14 +475,13 @@ class ExportToPovRay:
             povPad += "\t" + str(startHeight) + ", " + str(endHeight) + ", " + str(spline[1])
             povPad += spline[0].replace("\n", "\n\t") + "\n" #add the indents
 
-            if expPlacement:
-                rotation = self.getRotation(fcObj.Base)
-                if rotation != "": #test if the object is rotated
-                    povPad += "\t" + rotation + "\n"
+            rotation = self.getRotation(fcObj.Base)
+            if rotation != "": #test if the object is rotated
+                povPad += "\t" + rotation + "\n"
 
-                translation = self.getTranslation(fcObj.Base)
-                if translation != "": #test if the object is translated
-                    povPad += "\t" + translation + "\n"
+            translation = self.getTranslation(fcObj.Base)
+            if translation != "": #test if the object is translated
+                povPad += "\t" + translation + "\n"
 
             povCode += povPad
 
