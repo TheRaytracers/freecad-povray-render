@@ -709,18 +709,18 @@ class ExportToPovRay:
         #create povSpline
         for line in sortedLines:
             if type(line) == Part.LineSegment:
-                povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
-                povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
-                povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">, "
-                povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">\n"
+                povSpline += "<" + str(round(line.StartPoint.x, 3)) + ", " + str(round(line.StartPoint.y, 3)) + ">, "
+                povSpline += "<" + str(round(line.StartPoint.x, 3)) + ", " + str(round(line.StartPoint.y, 3)) + ">, "
+                povSpline += "<" + str(round(line.EndPoint.x, 3)) + ", " + str(round(line.EndPoint.y, 3)) + ">, "
+                povSpline += "<" + str(round(line.EndPoint.x, 3)) + ", " + str(round(line.EndPoint.y, 3)) + ">//line\n"
 
                 numOfPoints += 4
 
             elif type(line) == Part.Circle:
                 r = line.Radius
-                cx = line.Center.x
-                cy = line.Center.y
-                dTC = (4.0/3.0) * math.tan(math.pi / 8.0) * r #distance to control point
+                cx = round(line.Center.x, 3)
+                cy = round(line.Center.y, 3)
+                dTC = round((4.0/3.0) * math.tan(math.pi / 8.0) * r, 3) #distance to control point
 
                 posP0 = "<" + str(cx) + ", " + str(cy + r) + ">"
                 controlP0_0 = "<" + str(cx - dTC) + ", " + str(cy + r) + ">"
@@ -738,13 +738,84 @@ class ExportToPovRay:
                 controlP3_0 = "<" + str(cx - r) + ", " + str(cy - dTC) + ">"
                 controlP3_1 = "<" + str(cx - r) + ", " + str(cy + dTC) + ">"
 
-                povSpline += posP0 + ", " + controlP0_1 + ", " + controlP1_0 + ", " + posP1 + "\n"
-                povSpline += posP1 + ", " + controlP1_1 + ", " + controlP2_0 + ", " + posP2 + "\n"
-                povSpline += posP2 + ", " + controlP2_1 + ", " + controlP3_0 + ", " + posP3 + "\n"
-                povSpline += posP3 + ", " + controlP3_1 + ", " + controlP0_0 + ", " + posP0 + "\n"
+                povSpline += posP0 + ", " + controlP0_1 + ", " + controlP1_0 + ", " + posP1 + "//circle\n"
+                povSpline += posP1 + ", " + controlP1_1 + ", " + controlP2_0 + ", " + posP2 + "//circle\n"
+                povSpline += posP2 + ", " + controlP2_1 + ", " + controlP3_0 + ", " + posP3 + "//circle\n"
+                povSpline += posP3 + ", " + controlP3_1 + ", " + controlP0_0 + ", " + posP0 + "//circle\n"
 
                 numOfPoints += 16
 
+            elif type(line) == Part.ArcOfCircle:
+                arc = line
+                a = arc.LastParameter - arc.FirstParameter
+
+                #correct direction of arc if necessary
+                if arc.Axis.z < 0:
+                    arc.reverse()
+                    reversed = True
+                else:
+                    reversed = False
+
+                #split arc in segments <90°
+                if a % math.pi / 2 == 0:
+                    numOfSegments = a / (math.pi / 2)
+                else:
+                    numOfSegments = math.floor(a / (math.pi / 2)) + 1
+
+                if numOfSegments % 1 != 0.0:
+                    raise ValueError("numOfSegments is not an integer.")
+
+                numOfSegments = int(numOfSegments)
+                angleOfSegment = a / numOfSegments
+
+                segments = []
+                for i in range(numOfSegments):
+                    if reversed:
+                        segment = {"startAngle": arc.LastParameter - i * angleOfSegment,
+                                   "endAngle": arc.LastParameter - (i+1) * angleOfSegment,
+                                   "direction": "clockwise"}
+
+                        App.Console.PrintWarning("reversed")
+                    else:
+                        segment = {"startAngle": arc.FirstParameter + i * angleOfSegment,
+                                   "endAngle": arc.FirstParameter + (i+1) * angleOfSegment,
+                                   "direction": "anticlockwise"}
+
+                    segments.append(segment)
+
+                #segment to bezier
+                for segment in segments:
+                    numOfSegmentsPerCircle = (2 * math.pi) / angleOfSegment
+                    controlDistance = (4.0/3.0) * math.tan(math.pi / (2 * numOfSegmentsPerCircle)) * arc.Radius
+
+                    startX = round(math.cos(segment["startAngle"]) * arc.Radius + arc.Location.x, 3)
+                    startY = round(math.sin(segment["startAngle"]) * arc.Radius + arc.Location.y, 3)
+                    startControlX = round(-math.cos(math.pi/2 - segment["startAngle"]) * controlDistance, 3)
+                    startControlY = round(math.sin(math.pi/2 - segment["startAngle"]) * controlDistance, 3)
+
+                    endX = round(math.cos(segment["endAngle"]) * arc.Radius + arc.Location.x, 3)
+                    endY = round(math.sin(segment["endAngle"]) * arc.Radius + arc.Location.y, 3)
+                    endControlX = round(math.cos(math.pi/2 - segment["endAngle"]) * controlDistance, 3)
+                    endControlY = round(-math.sin(math.pi/2 - segment["endAngle"]) * controlDistance, 3)
+
+                    if reversed:
+                        startControlX *= -1
+                        startControlY *= -1
+                        endControlX *= -1
+                        endControlY *= -1
+                    
+                    startControlX += startX
+                    startControlY += startY
+                    endControlX += endX
+                    endControlY += endY
+
+                    povSpline += "<" + str(startX) + ", " + str(startY) + ">, "
+                    povSpline += "<" + str(startControlX) + ", " + str(startControlY) + ">, "
+                    povSpline += "<" + str(endControlX) + ", " + str(endControlY) + ">, "
+                    povSpline += "<" + str(endX) + ", " + str(endY) + ">//arc\n"
+
+                    numOfPoints += 4
+                
         return [povSpline, numOfPoints]
 
     def getNextLine(self, lines, lastLine): #get index of next line for the given last line
@@ -845,7 +916,7 @@ class ExportToPovRay:
         return True
 
     def isSketchSupported(self, sketch):
-        supportedGeometryTypes = [Part.LineSegment, Part.Circle, Part.Point]
+        supportedGeometryTypes = [Part.LineSegment, Part.Circle, Part.Point, Part.ArcOfCircle]
         for line in sketch.Geometry:
             if not type(line) in supportedGeometryTypes and not line.Construction:
                 return False
