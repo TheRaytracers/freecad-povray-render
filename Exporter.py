@@ -773,8 +773,6 @@ class ExportToPovRay:
                         segment = {"startAngle": arc.LastParameter - i * angleOfSegment,
                                    "endAngle": arc.LastParameter - (i+1) * angleOfSegment,
                                    "direction": "clockwise"}
-
-                        App.Console.PrintWarning("reversed")
                     else:
                         segment = {"startAngle": arc.FirstParameter + i * angleOfSegment,
                                    "endAngle": arc.FirstParameter + (i+1) * angleOfSegment,
