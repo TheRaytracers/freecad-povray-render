@@ -450,11 +450,11 @@ class ExportToPovRay:
             povCode += povClone
 
         elif fcObj.TypeId == "Part::Extrusion":
-            if not self.isExtrudeSupported(fcObj):
+            spline = self.sketchToBezier(fcObj.Base)
+
+            if not self.isExtrudeSupported(fcObj) or spline == -1:
                 povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
                 return povCode #return because the mesh may not translated and rotated
-
-            spline = self.sketchToBezier(fcObj.Base)
 
             startHeight = 0
             endHeight = fcObj.LengthFwd.getValueAs("mm").Value
