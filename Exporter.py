@@ -21,6 +21,7 @@ import FreeCAD as App
 import FreeCADGui as Gui
 
 from FreeCAD import Base
+from FreeCAD import Part
 from pivy import coin
 import os
 import math
@@ -34,7 +35,7 @@ class ExportToPovRay:
     """Export the FreeCAD model to POV-Ray"""
     def __init__(self):
         #get default shape color (editable in FreeCAD settings) (default rgb(0.8, 0.8, 0.8))
-        self.DefaultShapeColor =  App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
+        self.DefaultShapeColor = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
         self.os = platform.system() #get system informations
 
@@ -50,7 +51,7 @@ class ExportToPovRay:
         self.iniPath = renderSettings.iniPath
         self.povName = renderSettings.povName
         self.povPath = renderSettings.povPath
-        
+
         self.incName = renderSettings.incName
         self.incPath = renderSettings.incPath
         self.meshName = renderSettings.meshName
@@ -465,11 +466,11 @@ class ExportToPovRay:
             povCode += povClone
 
         elif fcObj.TypeId == "Part::Extrusion":
-            if not self.isExtrudeSupported(fcObj):
+            spline = self.sketchToBezier(fcObj.Base)
+
+            if not self.isExtrudeSupported(fcObj) or spline == -1:
                 povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
                 return povCode #return because the mesh may not translated and rotated
-
-            spline = self.sketchToBezier(fcObj.Base)
 
             startHeight = 0
             endHeight = fcObj.LengthFwd.getValueAs("mm").Value
@@ -490,14 +491,13 @@ class ExportToPovRay:
             povPad += "\t" + str(startHeight) + ", " + str(endHeight) + ", " + str(spline[1])
             povPad += spline[0].replace("\n", "\n\t") + "\n" #add the indents
 
-            if expPlacement:
-                rotation = self.getRotation(fcObj.Base)
-                if rotation != "": #test if the object is rotated
-                    povPad += "\t" + rotation + "\n"
+            rotation = self.getRotation(fcObj.Base)
+            if rotation != "": #test if the object is rotated
+                povPad += "\t" + rotation + "\n"
 
-                translation = self.getTranslation(fcObj.Base)
-                if translation != "": #test if the object is translated
-                    povPad += "\t" + translation + "\n"
+            translation = self.getTranslation(fcObj.Base)
+            if translation != "": #test if the object is translated
+                povPad += "\t" + translation + "\n"
 
             povCode += povPad
 
@@ -724,18 +724,18 @@ class ExportToPovRay:
         #create povSpline
         for line in sortedLines:
             if type(line) == Part.LineSegment:
-                povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
-                povSpline += "<" + str(line.StartPoint.x) + ", " + str(line.StartPoint.y) + ">, "
-                povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">, "
-                povSpline += "<" + str(line.EndPoint.x) + ", " + str(line.EndPoint.y) + ">\n"
+                povSpline += "<" + str(round(line.StartPoint.x, 3)) + ", " + str(round(line.StartPoint.y, 3)) + ">, "
+                povSpline += "<" + str(round(line.StartPoint.x, 3)) + ", " + str(round(line.StartPoint.y, 3)) + ">, "
+                povSpline += "<" + str(round(line.EndPoint.x, 3)) + ", " + str(round(line.EndPoint.y, 3)) + ">, "
+                povSpline += "<" + str(round(line.EndPoint.x, 3)) + ", " + str(round(line.EndPoint.y, 3)) + ">//line\n"
 
                 numOfPoints += 4
 
             elif type(line) == Part.Circle:
                 r = line.Radius
-                cx = line.Center.x
-                cy = line.Center.y
-                dTC = (4.0/3.0) * math.tan(math.pi / 8.0) * r #distance to control point
+                cx = round(line.Center.x, 3)
+                cy = round(line.Center.y, 3)
+                dTC = round((4.0/3.0) * math.tan(math.pi / 8.0) * r, 3) #distance to control point
 
                 posP0 = "<" + str(cx) + ", " + str(cy + r) + ">"
                 controlP0_0 = "<" + str(cx - dTC) + ", " + str(cy + r) + ">"
@@ -753,13 +753,82 @@ class ExportToPovRay:
                 controlP3_0 = "<" + str(cx - r) + ", " + str(cy - dTC) + ">"
                 controlP3_1 = "<" + str(cx - r) + ", " + str(cy + dTC) + ">"
 
-                povSpline += posP0 + ", " + controlP0_1 + ", " + controlP1_0 + ", " + posP1 + "\n"
-                povSpline += posP1 + ", " + controlP1_1 + ", " + controlP2_0 + ", " + posP2 + "\n"
-                povSpline += posP2 + ", " + controlP2_1 + ", " + controlP3_0 + ", " + posP3 + "\n"
-                povSpline += posP3 + ", " + controlP3_1 + ", " + controlP0_0 + ", " + posP0 + "\n"
+                povSpline += posP0 + ", " + controlP0_1 + ", " + controlP1_0 + ", " + posP1 + "//circle\n"
+                povSpline += posP1 + ", " + controlP1_1 + ", " + controlP2_0 + ", " + posP2 + "//circle\n"
+                povSpline += posP2 + ", " + controlP2_1 + ", " + controlP3_0 + ", " + posP3 + "//circle\n"
+                povSpline += posP3 + ", " + controlP3_1 + ", " + controlP0_0 + ", " + posP0 + "//circle\n"
 
                 numOfPoints += 16
 
+            elif type(line) == Part.ArcOfCircle:
+                arc = line
+                a = arc.LastParameter - arc.FirstParameter
+
+                #correct direction of arc if necessary
+                if arc.Axis.z < 0:
+                    arc.reverse()
+                    reversed = True
+                else:
+                    reversed = False
+
+                #split arc in segments <90°
+                if a % math.pi / 2 == 0:
+                    numOfSegments = a / (math.pi / 2)
+                else:
+                    numOfSegments = math.floor(a / (math.pi / 2)) + 1
+
+                if numOfSegments % 1 != 0.0:
+                    raise ValueError("numOfSegments is not an integer.")
+
+                numOfSegments = int(numOfSegments)
+                angleOfSegment = a / numOfSegments
+
+                segments = []
+                for i in range(numOfSegments):
+                    if reversed:
+                        segment = {"startAngle": arc.LastParameter - i * angleOfSegment,
+                                   "endAngle": arc.LastParameter - (i+1) * angleOfSegment,
+                                   "direction": "clockwise"}
+                    else:
+                        segment = {"startAngle": arc.FirstParameter + i * angleOfSegment,
+                                   "endAngle": arc.FirstParameter + (i+1) * angleOfSegment,
+                                   "direction": "anticlockwise"}
+
+                    segments.append(segment)
+
+                #segment to bezier
+                for segment in segments:
+                    numOfSegmentsPerCircle = (2 * math.pi) / angleOfSegment
+                    controlDistance = (4.0/3.0) * math.tan(math.pi / (2 * numOfSegmentsPerCircle)) * arc.Radius
+
+                    startX = round(math.cos(segment["startAngle"]) * arc.Radius + arc.Location.x, 3)
+                    startY = round(math.sin(segment["startAngle"]) * arc.Radius + arc.Location.y, 3)
+                    startControlX = round(-math.cos(math.pi/2 - segment["startAngle"]) * controlDistance, 3)
+                    startControlY = round(math.sin(math.pi/2 - segment["startAngle"]) * controlDistance, 3)
+
+                    endX = round(math.cos(segment["endAngle"]) * arc.Radius + arc.Location.x, 3)
+                    endY = round(math.sin(segment["endAngle"]) * arc.Radius + arc.Location.y, 3)
+                    endControlX = round(math.cos(math.pi/2 - segment["endAngle"]) * controlDistance, 3)
+                    endControlY = round(-math.sin(math.pi/2 - segment["endAngle"]) * controlDistance, 3)
+
+                    if reversed:
+                        startControlX *= -1
+                        startControlY *= -1
+                        endControlX *= -1
+                        endControlY *= -1
+                    
+                    startControlX += startX
+                    startControlY += startY
+                    endControlX += endX
+                    endControlY += endY
+
+                    povSpline += "<" + str(startX) + ", " + str(startY) + ">, "
+                    povSpline += "<" + str(startControlX) + ", " + str(startControlY) + ">, "
+                    povSpline += "<" + str(endControlX) + ", " + str(endControlY) + ">, "
+                    povSpline += "<" + str(endX) + ", " + str(endY) + ">//arc\n"
+
+                    numOfPoints += 4
+                
         return [povSpline, numOfPoints]
 
     def getNextLine(self, lines, lastLine): #get index of next line for the given last line
@@ -778,7 +847,6 @@ class ExportToPovRay:
         return False
 
     def hasLinesConstructive(self, lines): #are constructive lines in lines array
-        constructive = False
         for line in lines:
             if line.Construction:
                 return True
@@ -861,7 +929,7 @@ class ExportToPovRay:
         return True
 
     def isSketchSupported(self, sketch):
-        supportedGeometryTypes = [Part.LineSegment, Part.Circle, Part.Point]
+        supportedGeometryTypes = [Part.LineSegment, Part.Circle, Part.Point, Part.ArcOfCircle]
         for line in sketch.Geometry:
             if not type(line) in supportedGeometryTypes and not line.Construction:
                 return False
@@ -886,7 +954,7 @@ class ExportToPovRay:
                     deviation = fcObj.ViewObject.Deviation
 
                     try:
-                        mesh = MeshPart.meshFromShape(Shape = shape, LinearDeflection = deviation, AngularDeflection = angularDeflection, Relative = False)
+                        mesh = MeshPart.meshFromShape(Shape=shape, LinearDeflection=deviation, AngularDeflection=angularDeflection, Relative=False)
                     except:
                         mesh = MeshPart.meshFromShape(shape, deviation, angularDeflection)
 
@@ -1094,7 +1162,7 @@ class ExportToPovRay:
             if AspectRatio <= 1:
                 CamAngle = 45
             else:
-                CamAngle = math.degrees(math.atan2(AspectRatio/2,1.2071067812))*2
+                CamAngle = math.degrees(math.atan2(AspectRatio/2, 1.2071067812))*2
             PovCamAngle = "\tangle {0:1.2f}".format(CamAngle) + "\n"
 
         elif self.CamType == "Orthographic":
@@ -1196,23 +1264,23 @@ class ExportToPovRay:
         phong = ""
         if appObject.Transparency != 0:
             transparency += " transmit " + str(appObject.Transparency / float(100))
-        ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(appObject.ShapeColor[0],appObject.ShapeColor[1],appObject.ShapeColor[2])
+        ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(appObject.ShapeColor[0], appObject.ShapeColor[1], appObject.ShapeColor[2])
         if transparency != "" or ShapeColorRGB != self.uintColorToRGB(self.DefaultShapeColor):
             pigment += "\tpigment { color rgb " + ShapeColorRGB + transparency + " }\n"
         material += pigment
-        if appObject.ShapeMaterial.AmbientColor != (0.20000000298023224,0.20000000298023224,0.20000000298023224,0):
+        if appObject.ShapeMaterial.AmbientColor != (0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0):
             ambient += "ambient rgb<"
             ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.AmbientColor[0],
                                                              appObject.ShapeMaterial.AmbientColor[1],
                                                              appObject.ShapeMaterial.AmbientColor[2])
             ambient += ">"
-        if appObject.ShapeMaterial.EmissiveColor != (0,0,0,0):
+        if appObject.ShapeMaterial.EmissiveColor != (0, 0, 0, 0):
             emission += "emission rgb<"
             emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.EmissiveColor[0],
                                                               appObject.ShapeMaterial.EmissiveColor[1],
                                                               appObject.ShapeMaterial.EmissiveColor[2])
             emission += ">"
-        if appObject.ShapeMaterial.SpecularColor != (0,0,0,0):
+        if appObject.ShapeMaterial.SpecularColor != (0, 0, 0, 0):
             phong += "phong "
             phong += "{0:1.2f}".format((appObject.ShapeMaterial.SpecularColor[0] +
                                         appObject.ShapeMaterial.SpecularColor[1] +
@@ -1351,7 +1419,6 @@ class ExportToPovRay:
 
     def checkErrFile(self): #check error file for errors
         error = ""
-        inPovFile = False
         #open error file
         if os.path.isfile(self.errorPath) == True:
             file = open(self.errorPath, "r")
@@ -1370,7 +1437,7 @@ class ExportToPovRay:
             errorText += "You can see the error message in the error file too."
             showError(errorText, "An error ocurred while rendering")
         else:
-            self.delErrorFile();
+            self.delErrorFile()
 
     def delErrorFile(self): #delete error file
         os.remove(self.errorPath)

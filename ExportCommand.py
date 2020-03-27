@@ -20,7 +20,7 @@
 import FreeCAD as App
 import FreeCADGui as Gui
 
-class Export:
+class ExportCommand:
 	"Open dialog and start export"
 
 	def GetResources(self):
@@ -41,4 +41,4 @@ class Export:
 		dialog = Dialog()
 		dialog.exec_()
 
-Gui.addCommand('Export', Export())
+Gui.addCommand('Export', ExportCommand())

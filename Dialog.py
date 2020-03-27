@@ -441,11 +441,6 @@ class TextureTab(QtGui.QWidget):
         else:
             self.previewHeight = 225
 
-        if App.ActiveDocument.Name in settingsObject.allKeys():
-            iniPath = settingsObject.value(App.ActiveDocument.Name)
-        else:
-            iniPath = -1
-
         settingsObject.endGroup()
 
     def saveQSettings(self, settingsObject):
@@ -474,33 +469,33 @@ class TextureTab(QtGui.QWidget):
         self.objectList.itemSelectionChanged.connect(self.updateTextureSettings)
         self.textureList.itemSelectionChanged.connect(self.updateSelectedListObject)
 
-        self.scaleX.valueChanged.connect(self.updateSelectedListObject)
-        self.scaleY.valueChanged.connect(self.updateSelectedListObject)
-        self.scaleZ.valueChanged.connect(self.updateSelectedListObject)
+        self.scaleX.editingFinished.connect(self.updateSelectedListObject)
+        self.scaleY.editingFinished.connect(self.updateSelectedListObject)
+        self.scaleZ.editingFinished.connect(self.updateSelectedListObject)
 
-        self.rotationX.valueChanged.connect(self.updateSelectedListObject)
-        self.rotationY.valueChanged.connect(self.updateSelectedListObject)
-        self.rotationZ.valueChanged.connect(self.updateSelectedListObject)
+        self.rotationX.editingFinished.connect(self.updateSelectedListObject)
+        self.rotationY.editingFinished.connect(self.updateSelectedListObject)
+        self.rotationZ.editingFinished.connect(self.updateSelectedListObject)
 
-        self.translationX.valueChanged.connect(self.updateSelectedListObject)
-        self.translationY.valueChanged.connect(self.updateSelectedListObject)
-        self.translationZ.valueChanged.connect(self.updateSelectedListObject)
+        self.translationX.editingFinished.connect(self.updateSelectedListObject)
+        self.translationY.editingFinished.connect(self.updateSelectedListObject)
+        self.translationZ.editingFinished.connect(self.updateSelectedListObject)
 
     def disconnectSignals(self): #disconnect all signals for the texture tab
         self.objectList.itemSelectionChanged.disconnect()
         self.textureList.itemSelectionChanged.disconnect()
 
-        self.scaleX.valueChanged.disconnect()
-        self.scaleY.valueChanged.disconnect()
-        self.scaleZ.valueChanged.disconnect()
+        self.scaleX.editingFinished.disconnect()
+        self.scaleY.editingFinished.disconnect()
+        self.scaleZ.editingFinished.disconnect()
 
-        self.rotationX.valueChanged.disconnect()
-        self.rotationY.valueChanged.disconnect()
-        self.rotationZ.valueChanged.disconnect()
+        self.rotationX.editingFinished.disconnect()
+        self.rotationY.editingFinished.disconnect()
+        self.rotationZ.editingFinished.disconnect()
         
-        self.translationX.valueChanged.disconnect()
-        self.translationY.valueChanged.disconnect()
-        self.translationZ.valueChanged.disconnect()
+        self.translationX.editingFinished.disconnect()
+        self.translationY.editingFinished.disconnect()
+        self.translationZ.editingFinished.disconnect()
 
     def addObjectsTexturesLists(self): #add the two lists with the objects and textures
         self.listWidget = QtGui.QWidget() #wrapper widget for the two lists
@@ -659,18 +654,21 @@ class TextureTab(QtGui.QWidget):
         self.scaleX = QtGui.QDoubleSpinBox()
         self.scaleX.setMaximum(9999999)
         self.scaleX.setMinimum(-9999999)
+        self.scaleX.setDecimals(5)
         self.scaleX.setPrefix("x: ")
         self.textureSettingsLayout.addWidget(self.scaleX, 0, 1)
 
         self.scaleY = QtGui.QDoubleSpinBox()
         self.scaleY.setMaximum(9999999)
         self.scaleY.setMinimum(-9999999)
+        self.scaleY.setDecimals(5)
         self.scaleY.setPrefix("y: ")
         self.textureSettingsLayout.addWidget(self.scaleY, 0, 2)
 
         self.scaleZ = QtGui.QDoubleSpinBox()
         self.scaleZ.setMaximum(9999999)
         self.scaleZ.setMinimum(-9999999)
+        self.scaleZ.setDecimals(5)
         self.scaleZ.setPrefix("z: ")
         self.textureSettingsLayout.addWidget(self.scaleZ, 0, 3)
 
@@ -681,6 +679,7 @@ class TextureTab(QtGui.QWidget):
         self.rotationX = QtGui.QDoubleSpinBox()
         self.rotationX.setMaximum(360)
         self.rotationX.setMinimum(-360)
+        self.rotationX.setDecimals(3)
         self.rotationX.setPrefix("x: ")
         self.rotationX.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.rotationX, 1, 1)
@@ -688,6 +687,7 @@ class TextureTab(QtGui.QWidget):
         self.rotationY = QtGui.QDoubleSpinBox()
         self.rotationY.setMaximum(360)
         self.rotationY.setMinimum(-360)
+        self.rotationY.setDecimals(3)
         self.rotationY.setPrefix("y: ")
         self.rotationY.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.rotationY, 1, 2)
@@ -695,6 +695,7 @@ class TextureTab(QtGui.QWidget):
         self.rotationZ = QtGui.QDoubleSpinBox()
         self.rotationZ.setMaximum(360)
         self.rotationZ.setMinimum(-360)
+        self.rotationZ.setDecimals(3)
         self.rotationZ.setPrefix("z: ")
         self.rotationZ.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.rotationZ, 1, 3)
@@ -706,6 +707,7 @@ class TextureTab(QtGui.QWidget):
         self.translationX = QtGui.QDoubleSpinBox()
         self.translationX.setMaximum(9999999)
         self.translationX.setMinimum(-9999999)
+        self.translationX.setDecimals(3)
         self.translationX.setPrefix("x: ")
         #self.translationX.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.translationX, 2, 1)
@@ -713,6 +715,7 @@ class TextureTab(QtGui.QWidget):
         self.translationY = QtGui.QDoubleSpinBox()
         self.translationY.setMaximum(9999999)
         self.translationY.setMinimum(-9999999)
+        self.translationY.setDecimals(3)
         self.translationY.setPrefix("y: ")
         #self.translationY.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.translationY, 2, 2)
@@ -720,6 +723,7 @@ class TextureTab(QtGui.QWidget):
         self.translationZ = QtGui.QDoubleSpinBox()
         self.translationZ.setMaximum(9999999)
         self.translationZ.setMinimum(-9999999)
+        self.translationZ.setDecimals(3)
         self.translationZ.setPrefix("z: ")
         #self.translationZ.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.translationZ, 2, 3)
