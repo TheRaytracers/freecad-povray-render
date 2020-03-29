@@ -130,7 +130,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.tabs = QtGui.QTabWidget(self)
         self.tabs.addTab(self.macroGroup, "General")
         self.tabs.addTab(self.textureTab, "Textures")
-        self.tabs.addTab(self.radiosityTab, "Radiosity")
+        self.tabs.addTab(self.radiosityTab, "Indirect Lighting")
         self.tabs.addTab(self.helpLabel, "Help")
 
         # ok cancel buttons
@@ -1085,7 +1085,26 @@ class RadiosityTab(QtGui.QWidget):
     def initTab(self):
         self.wrapperLayout = QtGui.QVBoxLayout()
 
-        self.groupBox = QtGui.QGroupBox("Use Radiosity (Global Illumination)")
+        #explanation of radiosity
+        explanationText =  "Theoretically there is no light in the shadows and therefore "
+        explanationText += "not directly illuminated objects would be completely black. In reality, of course, this is not the case, "
+        explanationText += "because light from other objects is reflected into the shadow. "
+        explanationText += "Indirect lighting imitates exactly this effect when rendering and thus produces much better images. "
+        explanationText += "Ambient tries to simulate this effect by giving the objects a color even though they are in the dark. "
+        explanationText += "This usually looks very unrealistic, but is not as computationally intensive. "
+        explanationText += "If you activate indirect lighting, you should deactivate ambient so that the image doesn't get too bright. "
+        self.explanationText = QtGui.QLabel(explanationText)
+        self.explanationText.setWordWrap(True)
+
+        self.explanationImg = QtGui.QLabel()
+        pixmap = QtGui.QPixmap(os.path.join(os.path.dirname(
+            __file__), "img/radiosityDescription.png"))
+        self.explanationImg.setPixmap(pixmap)
+
+        self.wrapperLayout.addWidget(self.explanationText)
+        self.wrapperLayout.addWidget(self.explanationImg)
+
+        self.groupBox = QtGui.QGroupBox("Use Indirect Lighting")
         self.groupBox.setCheckable(True)
         self.groupBox.setChecked(False)
 
