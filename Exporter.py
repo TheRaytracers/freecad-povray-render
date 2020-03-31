@@ -601,9 +601,9 @@ class ExportToPovRay:
             povLight += "<0, 0, 0>"
             povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
             
-            if fcObj.Fade_Distance.getValueAs("mm").Value != 0 and fcObj.Fade_Power != 0:
-                povLight += "\n\tfade_distance " + str(fcObj.Fade_Distance.getValueAs("mm").Value)
-                povLight += "\n\tfade_power " + str(fcObj.Fade_Power)
+            if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
+                povLight += "\n\tFadeDistance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
+                povLight += "\n\tFadePower " + str(fcObj.FadePower)
 
             povCode += povLight
 
@@ -626,9 +626,9 @@ class ExportToPovRay:
             if fcObj.Jitter:
                 povLight += "\n\tjitter"
             
-            if fcObj.Fade_Distance.getValueAs("mm").Value != 0 and fcObj.Fade_Power != 0:
-                povLight += "\n\tfade_distance " + str(fcObj.Fade_Distance.getValueAs("mm").Value)
-                povLight += "\n\tfade_power " + str(fcObj.Fade_Power)
+            if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
+                povLight += "\n\tFadeDistance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
+                povLight += "\n\tFadePower " + str(fcObj.FadePower)
 
             povCode += povLight
 

@@ -17,18 +17,18 @@ class PointLight:
                             "Color of the Light")
             obj.Color = (1.0, 1.0, 1.0, 0.0)
 
-        if not "Fade Distance" in obj.PropertiesList:
+        if not "FadeDistance" in obj.PropertiesList:
             obj.addProperty("App::PropertyLength",
-                            "Fade Distance",
+                            "FadeDistance",
                             "Light",
                             "Distance of full light intensity")
-            obj.Fade_Distance = 0
+            obj.FadeDistance = 0
 
-        if not "Fade Power" in obj.PropertiesList:
+        if not "FadePower" in obj.PropertiesList:
             obj.addProperty("App::PropertyFloat",
-                            "Fade Power", "Light",
+                            "FadePower", "Light",
                             "Potency of light decrease (2=quadratic, 3=cubic, etc.)")
-            obj.Fade_Power = 0 #XXX negative values are not allowed
+            obj.FadePower = 0 #XXX negative values are not allowed
 
     def execute(self, obj):
         return True
@@ -99,10 +99,10 @@ class AreaLight:
     def setProperties(self, obj):
         if not "Color" in obj.PropertiesList:
             obj.addProperty("App::PropertyColor", "Color", "Light", "Color of the Light").Color = (1.0, 1.0, 1.0, 0.0)
-        if not "Fade Distance" in obj.PropertiesList:
-            obj.addProperty("App::PropertyLength", "Fade Distance", "Light", "Distance of full light intensity").Fade_Distance = 0
-        if not "Fade Power" in obj.PropertiesList:
-            obj.addProperty("App::PropertyFloat", "Fade Power", "Light", "Potency of light decrease (2=quadratic, 3=cubic, etc.)").Fade_Power = 0 #XXX negative values are not allowed
+        if not "FadeDistance" in obj.PropertiesList:
+            obj.addProperty("App::PropertyLength", "FadeDistance", "Light", "Distance of full light intensity").FadeDistance = 0
+        if not "FadePower" in obj.PropertiesList:
+            obj.addProperty("App::PropertyFloat", "FadePower", "Light", "Potency of light decrease (2=quadratic, 3=cubic, etc.)").FadePower = 0 #XXX negative values are not allowed
 
         if not "Width" in obj.PropertiesList:
             obj.addProperty("App::PropertyLength", "Width", "AreaLight", "The width of the area light").Width = 50
@@ -217,10 +217,10 @@ class SpotLight:
     def setProperties(self, obj):
         if not "Color" in obj.PropertiesList:
             obj.addProperty("App::PropertyColor", "Color", "Light", "Color of the Light").Color = (1.0, 1.0, 1.0, 0.0)
-        if not "Fade Distance" in obj.PropertiesList:
-            obj.addProperty("App::PropertyLength", "Fade Distance", "Light", "Distance of full light intensity").Fade_Distance = 0
-        if not "Fade Power" in obj.PropertiesList:
-            obj.addProperty("App::PropertyFloat", "Fade Power", "Light", "Potency of light decrease (2=quadratic, 3=cubic, etc.)").Fade_Power = 0 #XXX negative values are not allowed
+        if not "FadeDistance" in obj.PropertiesList:
+            obj.addProperty("App::PropertyLength", "FadeDistance", "Light", "Distance of full light intensity").FadeDistance = 0
+        if not "FadePower" in obj.PropertiesList:
+            obj.addProperty("App::PropertyFloat", "FadePower", "Light", "Potency of light decrease (2=quadratic, 3=cubic, etc.)").FadePower = 0 #XXX negative values are not allowed
 
         if not "Radius" in obj.PropertiesList:
             obj.addProperty("App::PropertyAngle", "Radius", "SpotLight", "Angle of the bright center").Radius = 30
