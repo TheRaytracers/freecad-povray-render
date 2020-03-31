@@ -1110,23 +1110,23 @@ class RadiosityTab(QtGui.QWidget):
 
         self.groupBoxLayout = QtGui.QVBoxLayout()
 
-        self.radioButtons = []
-        self.radioButtons.append(QtGui.QRadioButton("Default"))
-        self.radioButtons.append(QtGui.QRadioButton("Debug"))
-        self.radioButtons.append(QtGui.QRadioButton("Fast"))
-        self.radioButtons.append(QtGui.QRadioButton("Normal"))
-        self.radioButtons.append(QtGui.QRadioButton("2Bounce"))
-        self.radioButtons.append(QtGui.QRadioButton("Final"))
-        self.radioButtons.append(QtGui.QRadioButton("OutdoorLQ"))
-        self.radioButtons.append(QtGui.QRadioButton("OutdoorHQ"))
-        self.radioButtons.append(QtGui.QRadioButton("OutdoorLight"))
-        self.radioButtons.append(QtGui.QRadioButton("IndoorLQ"))
-        self.radioButtons.append(QtGui.QRadioButton("IndoorHQ"))
 
-        self.radioButtons[0].setChecked(True)
+        self.radiosityModes = [
+            "Default",
+            "Debug",
+            "Fast",
+            "Normal",
+            "2Bounce",
+            "Final",
+            "OutdoorLQ",
+            "OutdoorHQ",
+            "OutdoorLight",
+            "IndoorLQ",
+            "IndoorHQ"]
 
-        for radio in self.radioButtons:
-            self.groupBoxLayout.addWidget(radio)
+        self.modesComboBox = QtGui.QComboBox()
+        self.modesComboBox.insertItems(0, self.radiosityModes)
+        self.groupBoxLayout.addWidget(self.modesComboBox)
 
         self.ambientTo0 = QtGui.QCheckBox("Set default Ambient to 0")
         self.ambientTo0.setChecked(True)
@@ -1157,13 +1157,7 @@ class RadiosityTab(QtGui.QWidget):
         return radiosity
 
     def getRadiosityName(self):
-        for radio in self.radioButtons:
-            if radio.isChecked():
-                return radio.text()
-
-        # if nothing selected
-        self.radioButtons[0].setChecked(True)
-        return self.radioButtons[0].text()
+        return self.modesComboBox.currentText()
 
     def applyIniSettings(self, csvLines):
         #parse CSV
@@ -1175,9 +1169,10 @@ class RadiosityTab(QtGui.QWidget):
                 else:
                     self.groupBox.setChecked(False)
 
-                for radio in self.radioButtons:
-                    if radio.text() == row[2]:
-                        radio.setChecked(True)
+                for index, text in enumerate(self.radiosityModes):
+                    if text == row[2]:
+                        self.modesComboBox.setCurrentIndex(index)
+                        break
                 
                 if row[3] == "stdAmbient":
                     self.ambientTo0.setChecked(False)
