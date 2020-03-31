@@ -125,10 +125,12 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         #create tabs
         self.textureTab = TextureTab()
+        self.radiosityTab = RadiosityTab()
 
         self.tabs = QtGui.QTabWidget(self)
-        self.tabs.addTab(self.macroGroup, "Macro")
+        self.tabs.addTab(self.macroGroup, "General")
         self.tabs.addTab(self.textureTab, "Textures")
+        self.tabs.addTab(self.radiosityTab, "Indirect Lighting")
         self.tabs.addTab(self.helpLabel, "Help")
 
         # ok cancel buttons
@@ -194,6 +196,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.applyIniSettings(iniPath)
 
         self.textureTab.applyQSettings(settings)
+        self.radiosityTab.applyQSettings(settings)
 
     def applyIniSettings(self, iniPath):
         #set some good standardValues
@@ -263,6 +266,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
                         self.expFcView.setChecked(strToBool(row[1]))
 
             self.textureTab.applyIniSettings(csvLines)
+            self.radiosityTab.applyIniSettings(csvLines)
 
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
@@ -319,7 +323,8 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         settings.setValue(App.ActiveDocument.Name, self.pathLineEdit.text())
         settings.endGroup()
 
-        self.textureTab.saveUserInput(settings)
+        self.textureTab.saveQSettings(settings)
+        self.radiosityTab.saveQSettings(settings)
 
     def writeIni(self):
         self.iniFile = open(self.renderSettings.iniPath, "w")
@@ -339,6 +344,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         csv += ";stg_expFcView," + str(self.renderSettings.expFcView) + "\n"
 
         csv += self.textureTab.settingsToIniFormat()
+        csv += self.radiosityTab.settingsToIniFormat()
 
         self.csv = csv
 
@@ -373,7 +379,8 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
                                              self.expBg.isChecked(),
                                              self.expLight.isChecked(),
                                              self.repRot.isChecked(),
-                                             self.expFcView.isChecked())
+                                             self.expFcView.isChecked(),
+                                             self.radiosityTab.getRadiosity())
 
         self.textureTab.finish(self.renderSettings)
 
@@ -436,7 +443,7 @@ class TextureTab(QtGui.QWidget):
 
         settingsObject.endGroup()
 
-    def saveUserInput(self, settingsObject):
+    def saveQSettings(self, settingsObject):
         settingsObject.beginGroup(self.qSettingsGroup)
         settingsObject.setValue("previewDisable", self.previewDisableCheckBox.isChecked())
         settingsObject.setValue("previewWidth", self.previewWidth)
@@ -1035,7 +1042,7 @@ class ListObject:
         self.predefObject = predefObject
 
 class RenderSettings:
-    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView):
+    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView, radiosity):
         self.projectName = projectName
         self.directory = directory
 
@@ -1063,3 +1070,135 @@ class RenderSettings:
         self.expLight = expLight
         self.repRot = repRot
         self.expFcView = expFcView
+
+        #radiosity
+        self.radiosity = radiosity
+
+
+class RadiosityTab(QtGui.QWidget):
+    def __init__(self):
+        super(RadiosityTab, self).__init__()
+        #self.exporter = ExportToPovRay()
+        self.qSettingsGroup = "radiosityTab"
+        self.initTab()
+
+    def initTab(self):
+        self.wrapperLayout = QtGui.QVBoxLayout()
+
+        #explanation of radiosity
+        explanationText =  "Theoretically there is no light in the shadows and therefore "
+        explanationText += "not directly illuminated objects would be completely black. In reality, of course, this is not the case, "
+        explanationText += "because light from other objects is reflected into the shadow. "
+        explanationText += "Indirect lighting imitates exactly this effect when rendering and thus produces much better images. "
+        explanationText += "Ambient tries to simulate this effect by giving the objects a color even though they are in the dark. "
+        explanationText += "This usually looks very unrealistic, but is not as computationally intensive. "
+        explanationText += "If you activate indirect lighting, you should deactivate ambient so that the image doesn't get too bright. "
+        self.explanationText = QtGui.QLabel(explanationText)
+        self.explanationText.setWordWrap(True)
+
+        self.explanationImg = QtGui.QLabel()
+        pixmap = QtGui.QPixmap(os.path.join(os.path.dirname(
+            __file__), "img/radiosityDescription.png"))
+        self.explanationImg.setPixmap(pixmap)
+
+        self.wrapperLayout.addWidget(self.explanationText)
+        self.wrapperLayout.addWidget(self.explanationImg)
+
+        self.groupBox = QtGui.QGroupBox("Use Indirect Lighting")
+        self.groupBox.setCheckable(True)
+        self.groupBox.setChecked(False)
+
+        self.groupBoxLayout = QtGui.QVBoxLayout()
+
+
+        self.radiosityModes = [
+            "Default",
+            "Debug",
+            "Fast",
+            "Normal",
+            "2Bounce",
+            "Final",
+            "OutdoorLQ",
+            "OutdoorHQ",
+            "OutdoorLight",
+            "IndoorLQ",
+            "IndoorHQ"]
+
+        self.modesComboBox = QtGui.QComboBox()
+        self.modesComboBox.insertItems(0, self.radiosityModes)
+        self.groupBoxLayout.addWidget(self.modesComboBox)
+
+        self.ambientTo0 = QtGui.QCheckBox("Set default Ambient to 0")
+        self.ambientTo0.setChecked(True)
+        self.ambientTo0.setToolTip("Set the color of the objects without any light to 0 (black)")
+
+        self.groupBoxLayout.addWidget(self.ambientTo0)
+
+        self.groupBox.setLayout(self.groupBoxLayout)
+        self.wrapperLayout.addWidget(self.groupBox)
+        self.setLayout(self.wrapperLayout)
+
+    def getRadiosity(self):
+        radiosity = {
+            "radiosityName": "",
+            "ambientTo0": True
+        }
+
+        if self.groupBox.isChecked():
+            radiosity["radiosityName"] = "Radiosity_" + self.getRadiosityName()
+        else:
+            radiosity["radiosityName"] = -1
+
+        if self.ambientTo0.isChecked():
+            radiosity["ambientTo0"] = True
+        else:
+            radiosity["ambientTo0"] = False
+
+        return radiosity
+
+    def getRadiosityName(self):
+        return self.modesComboBox.currentText()
+
+    def applyIniSettings(self, csvLines):
+        #parse CSV
+        csvReader = csv.reader(csvLines, delimiter=',')
+        for row in csvReader:
+            if row[0] == "radiosity":
+                if row[1] == "on":
+                    self.groupBox.setChecked(True)
+                else:
+                    self.groupBox.setChecked(False)
+
+                for index, text in enumerate(self.radiosityModes):
+                    if text == row[2]:
+                        self.modesComboBox.setCurrentIndex(index)
+                        break
+                
+                if row[3] == "stdAmbient":
+                    self.ambientTo0.setChecked(False)
+                else:
+                    self.ambientTo0.setChecked(True)
+
+    def settingsToIniFormat(self):
+        csv = ";"
+        csv += "radiosity"
+
+        if self.groupBox.isChecked():
+            csv += ",on"
+        else:
+            csv += ",off"
+
+        csv += "," + self.getRadiosityName()
+
+        if self.ambientTo0.isChecked():
+            csv += "," + "ambientToZero"
+        else:
+            csv += "," + "stdAmbient"
+
+        return csv + "\n"
+
+    def saveQSettings(self, qSettingsObject):
+        pass
+
+    def applyQSettings(self, qSettingsObject):
+        pass
