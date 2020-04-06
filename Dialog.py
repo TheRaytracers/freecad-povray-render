@@ -541,24 +541,26 @@ class TextureTab(QtGui.QWidget):
         objs = App.ActiveDocument.Objects
         self.listFcObjects = []
         for obj in objs:
-            #has object a shape color
-            try:
-                obj.ViewObject.ShapeColor
-                shapeColor = True
-            except:
-                shapeColor = False
-            #has object a shape
-            try:
-                obj.Shape
-                obj.Shape.Area
-                obj.Shape.isValid()
-                shape = True
-            except:
-                shape = False
+            if obj.ViewObject.Visibility:
+                #has object a shape color
+                try:
+                    obj.ViewObject.ShapeColor
+                    shapeColor = True
+                except:
+                    shapeColor = False
+                #has object a shape
+                try:
+                    obj.Shape
+                    obj.Shape.Area
+                    obj.Shape.Volume
 
-            #test for the conditions for a object for the object list
-            if obj.ViewObject.Visibility and shapeColor and shape:
-                self.listFcObjects.append(obj)
+                    shape = True
+                except:
+                    shape = False
+
+                #test for the conditions for a object for the object list
+                if shapeColor and shape:
+                    self.listFcObjects.append(obj)
 
         self.listObjects = []
         #create the listObjects

@@ -567,7 +567,7 @@ class ExportToPovRay:
             spline = self.sketchToBezier(fcObj.Profile[0])
 
             if (self.isSketchSupported(fcObj.Profile[0]) == False) or spline == -1 or (self.isPadPocketSupported(fcObj) == False):
-                povPad += self.createMesh(fcObj, expPlacement, True, expClose, expMeshDef)
+                povPad += self.createMesh(fcObj, expPlacement, True, expPhotons, expClose, expMeshDef)
                 povCode += povPad
                 return povCode
 
