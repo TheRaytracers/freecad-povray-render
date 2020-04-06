@@ -149,7 +149,7 @@ class ExportToPovRay:
         #create pov code of objects
         objPovCode = ""
         for obj in firstLayer:
-            objPovCode += self.createPovCode(obj, True, True, True, True, True)
+            objPovCode += self.createPovCode(obj, True, True, True, True, True, True)
 
         #add general pov code / "header"
         finalPovCode = "#version 3.6; // 3.7\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
@@ -215,7 +215,7 @@ class ExportToPovRay:
         self.openPovRay() #start povray
 
 
-    def createPovCode(self, fcObj, expPlacement, expPigment, expClose, expLabel, expMeshDef): #returns the povray code for the object
+    def createPovCode(self, fcObj, expPlacement, expPigment, expPhotons, expClose, expLabel, expMeshDef): #returns the povray code for the object
         if expLabel:
             povCode = "\n//----- " + stringCorrection(fcObj.Label) + " -----" #add the name of the object
         else:
@@ -287,7 +287,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCut = "\ndifference {\n"
             for child in childs:
-                childCode = self.createPovCode(child, True, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
+                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
                 povCut += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povCut
@@ -296,7 +296,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povFusion = "\nunion {\n"
             for child in childs:
-                childCode = self.createPovCode(child, True, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
+                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
                 povFusion += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povFusion
@@ -305,7 +305,7 @@ class ExportToPovRay:
             childs = fcObj.OutList
             povCommon = "\nintersection {\n"
             for child in childs:
-                childCode = self.createPovCode(child, True, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
+                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
                 povCommon += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povCommon
@@ -332,7 +332,7 @@ class ExportToPovRay:
 
                 declareName = stringCorrection(child.Label.capitalize()) + "_" + child.Name
                 povArr += "\n#declare " + declareName + " = "
-                childCode = self.createPovCode(child, True, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
+                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
                 povArr += childCode
 
                 povArr += "\n#declare i = 0;\n"
@@ -373,6 +373,11 @@ class ExportToPovRay:
                     if pigment != "": #test if the object has the standard pigment
                         povArr += "\t" + pigment + "\n"
 
+                if expPhotons:
+                    photons = self.getPhotons(fcObj)
+                    if photons != "":
+                        povArr += "\t" + photons + "\n"
+
                 povArr += "    }\n\t#declare i = i + 1;\n"
                 povArr += "#end\n"
 
@@ -397,7 +402,7 @@ class ExportToPovRay:
 
                 declareName = stringCorrection(child.Label.capitalize()) + "_" + child.Name
                 povArr += "\n#declare " + declareName + " = "
-                childCode = self.createPovCode(child, True, expPigment, True, expLabel, True) #call createPovCode for the child
+                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, True) #call createPovCode for the child
                 povArr += childCode
 
                 povArr += "#declare intervalX = " + intervalX + ";\n"
@@ -435,6 +440,11 @@ class ExportToPovRay:
                     if pigment != "": #test if the object has the standard pigment
                         povArr += "\t\t\t\t" + pigment + "\n"
 
+                if expPhotons:
+                    photons = self.getPhotons(fcObj)
+                    if photons != "":
+                        povArr += "\t" + photons + "\n"
+
                 povArr += "\t\t\t}\n"
 
                 povArr += "\t\t\t#declare iz = iz + 1;\n"
@@ -445,20 +455,21 @@ class ExportToPovRay:
                 povArr += "#end\n"
 
             else:
-                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
+                povCode += self.createMesh(fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef)
 
             povArr = povArr.replace("\n", "\n\t")
             povCode += "\nunion {\n"
             povCode += povArr
             expPigment = False
             expPlacement = False
+            expPhotons = False
 
         elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"): #Clone from Draft workbench
             povClone = ""
 
             childs = fcObj.Objects
             for child in childs:
-                povClone += self.createPovCode(child, False, False, False, False, True)
+                povClone += self.createPovCode(child, False, False, False, False, False, True)
 
             if fcObj.Scale.x != 1 or fcObj.Scale.y != 1 or fcObj.Scale.z != 1:
                 povClone += "\n\tscale <" + str(fcObj.Scale.x) + ", " + str(fcObj.Scale.y) + ", " + str(fcObj.Scale.z) + ">"
@@ -469,7 +480,7 @@ class ExportToPovRay:
             spline = self.sketchToBezier(fcObj.Base)
 
             if not self.isExtrudeSupported(fcObj) or spline == -1:
-                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
+                povCode += self.createMesh(fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef)
                 return povCode #return because the mesh may not translated and rotated
 
             startHeight = 0
@@ -532,7 +543,7 @@ class ExportToPovRay:
             for child in childs:
                 guiChild = child.ViewObject
                 if guiChild.Visibility:
-                    childCode = self.createPovCode(child, True, expPigment, True, expLabel, expMeshDef) #call createPovCode for the child
+                    childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
                     povPart += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povPart
@@ -541,12 +552,12 @@ class ExportToPovRay:
 
         elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
             if not self.isBodySupported(fcObj):
-                povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
+                povCode += self.createMesh(fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef)
                 return povCode #return because the mesh may not translated and rotated
 
             povBody = "\nunion {\n"
             if fcObj.Tip != None:
-                povBody += self.createPovCode(fcObj.Tip, True, True, True, True, True).replace("\n", "\n\t") #add chld code and indents
+                povBody += self.createPovCode(fcObj.Tip, True, True, True, True, True, True).replace("\n", "\n\t") #add child code and indents
                 povCode += povBody
             else:
                 return ""
@@ -583,7 +594,7 @@ class ExportToPovRay:
                 povPad += "\nunion {\n"
 
             if fcObj.BaseFeature != None:
-                povBase = self.createPovCode(fcObj.BaseFeature, True, True, True, True, True)
+                povBase = self.createPovCode(fcObj.BaseFeature, True, True, True, True, True, True)
                 povPad += povBase.replace("\n", "\n\t") #add the indents
 
             povPad += "\n\tprism {\n"
@@ -663,7 +674,7 @@ class ExportToPovRay:
 
 
         else: #not a supported object
-            povCode += self.createMesh(fcObj, expPlacement, expPigment, expClose, expMeshDef)
+            povCode += self.createMesh(fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef)
             return povCode #return because the mesh may not translated and rotated
 
         povCode += "\n"
@@ -681,6 +692,11 @@ class ExportToPovRay:
             pigment = self.getPigment(fcObj)
             if pigment != "": #test if the object has the standard pigment
                 povCode += pigment.replace("\n", "\n\t") + "\n"
+
+        if expPhotons:
+            photons = self.getPhotons(fcObj)
+            if photons != "":
+                povCode += photons.replace("\n", "\n\t") + "\n"
 
         if expClose:
             povCode += "}\n"
@@ -936,7 +952,7 @@ class ExportToPovRay:
 
         return True
 
-    def createMesh(self, fcObj, expPlacement, expPigment, expClose, expMeshDef): #create pov mesh from object
+    def createMesh(self, fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef): #create pov mesh from object
         povCode = ""
 
         if expMeshDef:
@@ -1011,6 +1027,11 @@ class ExportToPovRay:
 
         if pigment != "": #test if the object has the standard pigment
             povCode += "\t" + pigment + "\n"
+
+        if expPhotons:
+            photons = self.getPhotons(fcObj)
+            if photons != "":
+                povCode += "\t" + photons + "\n"
 
         if expClose:
             povCode += "}\n"
@@ -1311,12 +1332,34 @@ class ExportToPovRay:
 
         if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
             material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
-        
-        
-            
+
         return material
 
-    
+    def getPhotons(self, fcObj):
+        photons = "\nphotons {"
+
+        if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons") == -1:
+            return ""
+        else:
+            photons += "\n\ttarget"
+
+            if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons_reflection") != -1:
+                photons += "\n\treflection " + \
+                    stringCorrection(fcObj.Label) + "_photons_reflection"
+
+            if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons_refraction") != -1:
+                photons += "\n\trefraction " + \
+                    stringCorrection(fcObj.Label) + "_photons_refraction"
+
+            if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons_collect") != -1:
+                photons += "\n\tcollect " + \
+                    stringCorrection(fcObj.Label) + "_photons_collect"
+
+        photons += "\n}\n"
+
+        return photons
+
+
     def listObjectToPov(self, obj, label=None):
         if label == None:
             label = obj.label
