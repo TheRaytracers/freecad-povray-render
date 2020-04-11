@@ -1,6 +1,6 @@
-# Macro for exporting a FreeCAD model to POV-Ray
+# Workbench for exporting a FreeCAD model to POV-Ray
 
-**This macro exports your FreeCAD model to POV-Ray and is very easy to use, also for absolute beginners in the rendering of images. But advanced users have also the full control about the process & settings and can use all POV-Ray features.**
+**With this workbench you will be able to create easily photorealistic pictures of your model, even if you're a beginner in raytracing. If you're an advanced users with more knowledge, you can get the full control about all detailed settings.**
 
 ![Logo and Renderings](README_img.png)
 
@@ -10,19 +10,18 @@ Until now, the macro supports most objects from the Part Workbench and some feat
 
 To give the user the full control, you can define extra things or another surface as in FreeCAD (Please visit the [Wiki](doc/index.md) for more information).
 
+## Installation
+**Automatic Installation**  
+The recommended way of installing this workbench is to use the addon manager (Tools / Addon Manager). In the addon manager in the workbenches tab, select the XXX-Workbench and click install.
 
-## Content of wiki
+**Manual Installation**  
+Download the repository from [gitlab.com/usbhub/exporttopovray](https://www.gitlab.com/usbhub/exporttopovray) XXX and unpack the zip in ~/.FreeCAD/Mod.
 
-* [Installation](doc/quickstart.md#Installation-of-POV-Ray)
-* [Usage of macro](doc/quickstart.md#Usage)
-* [Adding features like material and textures](doc/quickstart.md#Make-changes)
-* [Tips, Tricks and limitations](doc/tipsAndTricks.md)
-* [Realistic Rendering example](doc/realistic.md)
-* [Supported Features](/doc/supported.md)
-* [FAQ](doc/FAQ.md)
-* [More examples and templates](Examples/index.md)
-* [Contributing](CONTRIBUTING.md)
-* [Future developement](doc/roadmap.md)
+## Features
+* easy applying of textures
+* easy use of indirect lightning to create realistic images
+* the model is not converted into meshes, the model will be converted into a mathematical way of describing the object shape, so you will get a better object and a better picture
+* easy inserting of different types of lights
 
 ## Advantages compared with the Raytracing Workbench
 * You can use **all** POV-Ray features
