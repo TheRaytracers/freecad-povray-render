@@ -20,8 +20,12 @@ Download the repository from [gitlab.com/usbhub/exporttopovray](https://www.gitl
 ## Features
 * easy applying of textures
 * easy use of indirect lightning to create realistic images
+* easy inserting and configuration of different types of lights  
+  **⇨ simple handling and operation**
+* power users can get the full control about the whole configuration with the user inc file (see [Power Users](doc/powerusers.md))  
+  **⇨offering all settings for advanced users**
 * the model is not converted into meshes, the model will be converted into a mathematical way of describing the object shape, so you will get a better object and a better picture
-* easy inserting of different types of lights
+* very good readability of the created files → easy editing of these files
 
 ## Advantages compared with the Raytracing Workbench
 * You can use **all** POV-Ray features
