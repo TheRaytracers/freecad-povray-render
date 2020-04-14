@@ -17,6 +17,13 @@ The recommended way of installing this workbench is to use the addon manager (To
 **Manual Installation**  
 Download the repository from [gitlab.com/usbhub/exporttopovray](https://www.gitlab.com/usbhub/exporttopovray) XXX and unpack the zip in ~/.FreeCAD/Mod.
 
+**Install POV-Ray**  
+In the background, POV-Ray is used to create the images. So you have to install POV-Ray too:
+How you can do this on your system is explained in the [POV-Ray Wik](http://wiki.povray.org/content/HowTo:Install_POV)
+
+**Set the POV-Ray Executable Path**
+After installing POV-Ray, you have to tell the workbench, where you installed POV-Ray. To do this, go into the POV-Ray workbench and go to Edit/Preferences/POV-Ray. Under "POV-Ray Executable" you can define, where you installed POV-Ray. After that, restart FreeCAD and have fun with our workbench :)
+
 ## Features
 * easy applying of textures
 * easy use of indirect lightning to create realistic images
@@ -26,6 +33,7 @@ Download the repository from [gitlab.com/usbhub/exporttopovray](https://www.gitl
   **⇨offering all settings for advanced users**
 * the model is not converted into meshes, the model will be converted into a mathematical way of describing the object shape, so you will get a better object and a better picture
 * very good readability of the created files → easy editing of these files
+* WYSIWYG - You can pan your model and render and you will get this point of view from FreeCAD
 
 ## Advantages compared with the Raytracing Workbench
 * You can use **all** POV-Ray features
