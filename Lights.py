@@ -3,6 +3,7 @@ import FreeCADGui as Gui
 import os
 from pivy import coin
 import math
+from helpDefs import preferences
 
 class PointLight:
     def __init__(self, obj):
@@ -46,8 +47,8 @@ class ViewProviderPointLight:
         img.filename = os.path.join(os.path.dirname(__file__), "icons", "pointLight.svg")
         img.vertAlignment = img.CENTER
         img.horAlignment = img.CENTER
-        img.width = 16
-        img.height = 16
+        img.width = preferences.lightIconSize
+        img.height = preferences.lightIconSize
         self.defaultStyle.addChild(img)
         obj.addDisplayMode(self.defaultStyle, "Default")
 
@@ -165,8 +166,8 @@ class ViewProviderAreaLight:
                 img.filename = os.path.join(os.path.dirname(__file__),"icons","pointLight.svg")
                 img.vertAlignment = img.CENTER
                 img.horAlignment = img.CENTER
-                img.width = 16
-                img.height = 16
+                img.width = preferences.lightIconSize
+                img.height = preferences.lightIconSize
 
                 sep.addChild(trans)
                 sep.addChild(img)
@@ -235,9 +236,14 @@ class SpotLight:
 class ViewProviderSpotLight:
     def __init__(self, obj):
         '''Set this object to the proxy object of the actual view provider'''
-        obj.addProperty("App::PropertyLength", "RadiusHeight", "SpotLight", "Height of the radius cone").RadiusHeight = 100
-        obj.addProperty("App::PropertyLength", "FallOffHeight", "SpotLight", "Height of the fall off cone").FallOffHeight = 100
-        obj.addProperty("App::PropertyBool", "ShowCones", "SpotLight", "Show the cones, that are representing the light").ShowCones = True
+        obj.addProperty("App::PropertyLength", "RadiusHeight", "SpotLight", "Height of the radius cone")
+        obj.RadiusHeight = 100
+
+        obj.addProperty("App::PropertyLength", "FallOffHeight", "SpotLight", "Height of the fall off cone")
+        obj.FallOffHeight = 100
+
+        obj.addProperty("App::PropertyBool", "ShowCones", "SpotLight", "Show the cones, that are representing the light")
+        obj.ShowCones = True
 
         obj.Proxy = self
 
@@ -261,7 +267,7 @@ class ViewProviderSpotLight:
         radiusMaterial.diffuseColor.setValue(coin.SbColor(1, 1, 0))
 
         radiusComplexity = coin.SoComplexity()
-        radiusComplexity.value = 0.9
+        radiusComplexity.value = 0.99
 
         self.radiusSep.addChild(self.radiusTrans)
         self.radiusSep.addChild(radiusMaterial)
@@ -293,8 +299,8 @@ class ViewProviderSpotLight:
         img.filename = os.path.join(os.path.dirname(__file__), "icons", "pointLight.svg")
         img.vertAlignment = img.CENTER
         img.horAlignment = img.CENTER
-        img.width = 16
-        img.height = 16
+        img.width = preferences.lightIconSize
+        img.height = preferences.lightIconSize
 
         self.defaultStyle.addChild(self.fallOffSep)
         self.defaultStyle.addChild(img)

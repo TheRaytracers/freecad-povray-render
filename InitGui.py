@@ -159,6 +159,8 @@ class PovRay (Workbench):
 		self.appendMenu("&POV-Ray", ["Export", "PointLightCommand", "AreaLightCommand", "SpotLightCommand"])
 
 		Gui.addIconPath(helpDefs.initGui__iconPath)
+		
+		Gui.addPreferencePage(helpDefs.initGui__prefPagePath, "POV-Ray")
 
 		Log ("Loading Export to POV-Ray... done\n")
 

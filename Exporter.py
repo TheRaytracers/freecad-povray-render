@@ -1434,18 +1434,15 @@ class ExportToPovRay:
             return -1
 
     def openPovRay(self): #start POV-Ray
-        povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('PovrayExecutable')
+        povExec = preferences.povRayExe
+        povOptions = preferences.renderParameters
+
         if os.path.isfile(povExec) == False:
-            povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('PovrayExecutable')
-            if os.path.isfile(povExec) == False:
-                errorText = "To start the rendering you must\n"
-                errorText += "set the path to the POV-Ray executable\n"
-                errorText += "either in the settings of Render workbench\n"
-                errorText += "or in the settings of Raytracing workbench\n"
-                showError(errorText, "POV-Ray executable not found")
-                return -1
-            povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('OutputParameters')
-        povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('OutputParameters')
+            errorText = "To start the rendering you must\n"
+            errorText += "set the path to the POV-Ray executable\n"
+            errorText += "in the settings of POV-Ray workbench\n"
+            showError(errorText, "POV-Ray executable not found")
+            return -1
 
         #create output directory
         os.chdir(str(self.directory))
