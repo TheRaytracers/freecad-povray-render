@@ -503,7 +503,7 @@ class TextureTab(QtGui.QWidget):
 
         #texture list
         self.textureList = QtGui.QTreeWidget()
-        self.textureList.setHeaderLabel("Type of Predefined")
+        self.textureList.setHeaderLabel("Predefined")
 
         self.textureListLabel = QtGui.QLabel("<b>Texture</b>")
 

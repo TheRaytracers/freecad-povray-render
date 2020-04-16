@@ -21,7 +21,7 @@ Download the repository from [gitlab.com/usbhub/exporttopovray](https://www.gitl
 In the background, POV-Ray is used to create the images. So you have to install POV-Ray too:
 How you can do this on your system is explained in the [POV-Ray Wik](http://wiki.povray.org/content/HowTo:Install_POV)
 
-**Set the POV-Ray Executable Path**
+**Set the POV-Ray Executable Path**  
 After installing POV-Ray, you have to tell the workbench, where you installed POV-Ray. To do this, go into the POV-Ray workbench and go to Edit/Preferences/POV-Ray. Under "POV-Ray Executable" you can define, where you installed POV-Ray. After that, restart FreeCAD and have fun with our workbench :)
 
 ## Features
@@ -34,18 +34,3 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 * the model is not converted into meshes, the model will be converted into a mathematical way of describing the object shape, so you will get a better object and a better picture
 * very good readability of the created files → easy editing of these files
 * WYSIWYG - You can pan your model and render and you will get this point of view from FreeCAD
-
-## Advantages compared with the Raytracing Workbench
-* You can use **all** POV-Ray features
-* Easy changing of materials / textures of objects
-  - To change the material of an object in the Raytracing Workbench, you have to know a lot about POV-Ray and write the changes manually to the created pov file. If you change you model and render again, you have to do all changes again.
-  - With the macro, you can easily choose a material in the textures tab and the changes will be saved (and you don't need any POV-Ray knowledge)
-* The macro is easier to use
-* The macro uses a right handed coordinate system like FreeCAD
-* WYSIWYG
-* The macro is written in Python, so it is easier for extending
-* The macro takes more object properties than the workbench
-* The macro reproduces the tree structure and doesn't create gigantic meshs
-  * → Better understanding & editing of the file
-  * → Better performance
-  * → Better renderings
