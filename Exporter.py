@@ -629,8 +629,8 @@ class ExportToPovRay:
             povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
             
             if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
-                povLight += "\n\tFadeDistance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
-                povLight += "\n\tFadePower " + str(fcObj.FadePower)
+                povLight += "\n\tfade_distance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
+                povLight += "\n\tfade_power " + str(fcObj.FadePower)
 
             povCode += povLight
 
@@ -654,8 +654,8 @@ class ExportToPovRay:
                 povLight += "\n\tjitter"
             
             if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
-                povLight += "\n\tFadeDistance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
-                povLight += "\n\tFadePower " + str(fcObj.FadePower)
+                povLight += "\n\tfade_distance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
+                povLight += "\n\tfade_power " + str(fcObj.FadePower)
 
             povCode += povLight
 
@@ -669,6 +669,10 @@ class ExportToPovRay:
             povLight += "\n\tradius " + str(fcObj.Radius.getValueAs("deg").Value)
             povLight += "\n\tfalloff " + str(fcObj.FallOff.getValueAs("deg").Value)
             povLight += "\n\ttightness " + str(fcObj.Tightness)
+
+            if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
+                povLight += "\n\tfade_distance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
+                povLight += "\n\tfade_power " + str(fcObj.FadePower)
 
             povCode += povLight
 
