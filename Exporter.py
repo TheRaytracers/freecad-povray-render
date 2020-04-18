@@ -1439,8 +1439,8 @@ class ExportToPovRay:
             return -1
 
     def openPovRay(self): #start POV-Ray
-        povExec = preferences.povRayExe
-        povOptions = preferences.renderParameters
+        povExec = App.ParamGet(preferences.prefPath).GetString("PovRayExe", "")
+        povOptions = App.ParamGet(preferences.prefPath).GetString("RenderParameters", "")
 
         if os.path.isfile(povExec) == False:
             errorText = "To start the rendering you must\n"

@@ -73,11 +73,4 @@ class __Preferences__:
     def __init__(self):
         self.prefPath = "User parameter:BaseApp/Preferences/Mod/POV-Ray"
 
-        self.povRayExe = App.ParamGet(
-            self.prefPath).GetString("PovRayExe", "")
-        self.renderParameters = App.ParamGet(
-            self.prefPath).GetString("RenderParameters", "")
-        self.lightIconSize = App.ParamGet(
-            self.prefPath).GetInt("LightIconSize", 16)
-
 preferences = __Preferences__()

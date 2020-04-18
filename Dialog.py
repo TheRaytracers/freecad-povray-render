@@ -908,18 +908,15 @@ class TextureTab(QtGui.QWidget):
         povFile.close()
 
         #render
-        povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('PovrayExecutable')
+        povExec = App.ParamGet(preferences.prefPath).GetString("PovRayExe", "")
         if os.path.isfile(povExec) == False:
-            povExec = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('PovrayExecutable')
-            if os.path.isfile(povExec) == False:
-                errorText = "To get a preview of the texture settings you must\n"
-                errorText += "set the path to the POV-Ray executable\n"
-                errorText += "either in the settings of Render workbench\n"
-                errorText += "or in the settings of Raytracing workbench\n"
-                showError(errorText, "POV-Ray executable not found")
-                return -1
-            povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Render").GetString('OutputParameters')
-        povOptions = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString('OutputParameters')
+            errorText = "To get a preview of the texture settings you must\n"
+            errorText += "set the path to the POV-Ray executable\n"
+            errorText += "either in the settings of Render workbench\n"
+            errorText += "or in the settings of Raytracing workbench\n"
+            showError(errorText, "POV-Ray executable not found")
+            return -1
+        povOptions = App.ParamGet(preferences.prefPath).GetString("RenderParameters", "")
 
         #start povray
         subprocess.call([povExec, "-d", "width=" + str(self.previewWidth), "height=" + str(self.previewHeight), povName])
