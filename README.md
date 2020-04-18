@@ -15,7 +15,7 @@ To give the user the full control, you can define extra things or another surfac
 The recommended way of installing this workbench is to use the addon manager (Tools / Addon Manager). In the addon manager in the workbenches tab, select the XXX-Workbench and click install.
 
 **Manual Installation**  
-Download the repository from [gitlab.com/usbhub/exporttopovray](https://www.gitlab.com/usbhub/exporttopovray) XXX and unpack the zip in ~/.FreeCAD/Mod.
+Download the repository from [gitlab.com/usbhub/exporttopovray](https://gitlab.com/usbhub/exporttopovray) XXX and unpack the zip in ~/.FreeCAD/Mod.
 
 **Install POV-Ray**  
 In the background, POV-Ray is used to create the images. So you have to install POV-Ray too:

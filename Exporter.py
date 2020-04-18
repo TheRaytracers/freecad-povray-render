@@ -1345,7 +1345,8 @@ class ExportToPovRay:
         if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons") == -1:
             return ""
         else:
-            photons += "\n\ttarget"
+            if fcObj.Name.find("Light") == -1: #light objects shouldn't get a target
+                photons += "\n\ttarget"
 
             if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons_reflection") != -1:
                 photons += "\n\treflection " + \

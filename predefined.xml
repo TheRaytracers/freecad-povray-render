@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <Predefined>
     <Glass>
-         <Predef material="M_Glass">Window glass</Predef>
-         <Predef material="M_Glass2">Plexiglas</Predef>
-         <Predef material="M_Glass3">Crystal glass</Predef>
-         <Predef inc="glass.inc" material="M_Glass3" pigment="Col_Glass_Winebottle" interior="I_Glass_Dispersion1">Winebottle glass</Predef>
-         <Predef inc="glass.inc" material="M_Glass" pigment="Col_Glass_Beerbottle">Beerbottle glass</Predef>
-         <Predef media="scattering{1,&lt;0.1,0.1,0.5>} intervals 3 samples 1,1" finish="Glass_Finish"  pigment="rgbf&lt;0.98,0.98,0.98,0.85>">Milky glass</Predef>
+        <Predef material="M_Glass">Window glass</Predef>
+        <Predef material="M_Glass2">Plexiglas</Predef>
+        <Predef material="M_Glass3">Crystal glass</Predef>
+        <Predef inc="glass.inc" material="M_Glass3" pigment="Col_Glass_Winebottle" interior="I_Glass_Dispersion1">Winebottle glass</Predef>
+        <Predef inc="glass.inc" material="M_Glass" pigment="Col_Glass_Beerbottle">Beerbottle glass</Predef>
+        <Predef inc="glass.inc" texture="T_Glass3" normal="bumps 1" interior="ior 1.5">Milky glass</Predef>
     </Glass>
     <Metal>
         <polished>
