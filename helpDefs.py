@@ -65,12 +65,25 @@ def strToBool(str):
 
     return str.lower() in ['true', '1', 'y']
 
-#set the icon path because InitGui.py can't import os
-initGui__iconPath = os.path.join(os.path.dirname(__file__), "icons")
-initGui__prefPagePath = os.path.join(os.path.dirname(__file__), "prefPage.ui")
-
 class __Preferences__:
     def __init__(self):
         self.prefPath = "User parameter:BaseApp/Preferences/Mod/POV-Ray"
 
 preferences = __Preferences__()
+
+def setDefaultPovRayExe():
+    if App.ParamGet(preferences.prefPath).GetString("PovRayExe", "") == "":
+        renderWbExe = App.ParamGet(
+            "User parameter:BaseApp/Preferences/Mod/Render").GetString("PovRayPath", "")
+        if renderWbExe == "":
+            raytracingWbExe = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString("PovrayExecutable", "")
+            
+            if raytracingWbExe != "":
+                App.ParamGet(preferences.prefPath).SetString(
+                    "PovRayExe", raytracingWbExe)
+        else:
+            App.ParamGet(preferences.prefPath).SetString("PovRayExe", renderWbExe)
+
+#set the icon path because InitGui.py can't import os
+initGui__iconPath = os.path.join(os.path.dirname(__file__), "icons")
+initGui__prefPagePath = os.path.join(os.path.dirname(__file__), "prefPage.ui")

@@ -162,6 +162,8 @@ class PovRay (Workbench):
 		
 		Gui.addPreferencePage(helpDefs.initGui__prefPagePath, "POV-Ray")
 
+		helpDefs.setDefaultPovRayExe()
+
 		Log ("Loading Export to POV-Ray... done\n")
 
 	def Activated(self):
