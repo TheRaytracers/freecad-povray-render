@@ -228,7 +228,7 @@ class SpotLight:
         if not "FallOff" in obj.PropertiesList:
             obj.addProperty("App::PropertyAngle", "FallOff", "SpotLight", "Angle of the outer light circle").FallOff = 45
         if not "Tightness" in obj.PropertiesList:
-            obj.addProperty("App::PropertyIntegerConstraint", "Tightness", "SpotLight", "Exponential softening of the edges").Tightness = (0, 0, 100, 1)
+            obj.addProperty("App::PropertyIntegerConstraint", "Tightness", "SpotLight", "Exponential softening of the edges (higher = sharper)").Tightness = (0, 0, 100, 1)
 
     def execute(self, obj):
         return True

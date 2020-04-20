@@ -25,7 +25,7 @@ How you can do this on your system is explained in the [POV-Ray Wik](http://wiki
 After installing POV-Ray, you have to tell the workbench, where you installed POV-Ray. To do this, go into the POV-Ray workbench and go to Edit/Preferences/POV-Ray. Under "POV-Ray Executable" you can define, where you installed POV-Ray. After that, restart FreeCAD and have fun with our workbench :)
 
 ## Features
-* easy applying of textures
+* easy applying of textures including a preview
 * easy use of indirect lightning to create realistic images
 * easy inserting and configuration of different types of lights  
   **⇨ simple handling and operation**

@@ -27,7 +27,7 @@ class ExportCommand:
 		return {"MenuText": "Export Model",
 				"Accel": "Ctrl+E",
 				"ToolTip": "Open Settings Dialog and start Export",
-				"Pixmap"  : "export.svg"}
+				"Pixmap"  : "logo.svg"}
 
 	def IsActive(self):
 		if App.ActiveDocument == None:
