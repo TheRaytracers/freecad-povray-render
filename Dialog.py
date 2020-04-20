@@ -273,7 +273,8 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         fileDialog = QtGui.QFileDialog(self)
         fileDialog.setFileMode(QtGui.QFileDialog.AnyFile)
-        fileDialog.setNameFilter("POV-Ray INI Files (*.ini)")
+        fileDialog.setDefaultSuffix("ini")
+        fileDialog.setNameFilter("POV-Ray ini Files (*.ini)")
         fileDialog.setViewMode(QtGui.QFileDialog.Detail)
         fileDialog.setDirectory(defaultPath)
         fileDialog.setWindowTitle("Select path and name of the *.ini file")
