@@ -23,7 +23,7 @@ The settings dialog is divided into several tabs. Every tab is for its own secti
 
 ## Texture Tab
 
-![Screenshot of Texture Tab](./img/TextureTab.png) XXX
+![Screenshot of Texture Tab](./img/TextureTab.png)
 
 1. **Objects List**  
    On the left side you have a list of all objects that can get texture / material. Every visible, valid 3D object with a shape color should appear there.
@@ -32,10 +32,20 @@ The settings dialog is divided into several tabs. Every tab is for its own secti
 3. **Geometrical Manipulation**  
    Here you can define geometrical manipulation to the texture:
    * Scale  
-   If the texture is too small or too big you can them here in every axis IMAGE
+   If the texture is too small or too big you can them here in every axis  
+   ![Without Translation](img/MaterialPreview.png)
+   ![With Translation](img/MaterialPreviewScaled.png)
    * Rotate  
-   It is possible to rotate materials and textures. This is useful e.g if you want to change the direction of fiber of wood.
+   It is possible to rotate materials and textures. This is useful e.g if you want to change the direction of fiber of wood.  
+   ![Without Translation](img/MaterialPreview.png)
+   ![With Translation](img/MaterialPreviewRotated.png)
    * Translate  
-   You can translate materials and textures. This is useful e.g if you want to move the center of wood rings. IMAGE
+   You can translate materials and textures. This is useful e.g if you want to move the center of wood rings.  
+   ![Without Translation](img/MaterialPreview.png)
+   ![With Translation](img/MaterialPreviewTranslated.png)
 4. **Preview**  
    To know, how the material looks like, here you get a preview. The cube has a length, width and height of 10mm. You can disable the preview, because the live rendering needs a bit of time on every change. With "Zoom In" and "Zoom Out" you can increase of decrease the preview size (bigger = slower).
+
+## Indirect Lightning
+
+This topic is very complex, so we explained it directly in the tab.
