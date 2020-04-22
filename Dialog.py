@@ -901,9 +901,8 @@ class TextureTab(QtGui.QWidget):
         fileContent += '\tmaterial { predef_material }\n'
         fileContent += '}\n'
 
-        povFile = tempfile.NamedTemporaryFile(suffix=".pov") #pov file handler
-        povFile.delete = False
-        povFile.write(fileContent)
+        povFile = tempfile.NamedTemporaryFile(delete=False, suffix=".pov") #pov file handler
+        povFile.write(fileContent.encode())
 
         povName = povFile.name
         povFile.close()
@@ -917,7 +916,6 @@ class TextureTab(QtGui.QWidget):
             errorText += "or in the settings of Raytracing workbench\n"
             showError(errorText, "POV-Ray executable not found")
             return -1
-        povOptions = App.ParamGet(preferences.prefPath).GetString("RenderParameters", "")
 
         #start povray
         subprocess.call([povExec, "-d", "width=" + str(self.previewWidth), "height=" + str(self.previewHeight), povName])
