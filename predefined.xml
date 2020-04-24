@@ -59,6 +59,7 @@
         <Predef pigment="checker color White color Black">Checker</Predef>
         <Predef pigment="tiling 1 color_map{[0 White][0.95 White][0.98 Black][1 Black]} scale 2">Tiles</Predef>
         <Predef pigment="brick color White color rgb &lt;0.9, 0.1, 0.1&gt; mortar 0.1" normal="wrinkles 0.75 scale 0.01" finish="diffuse 0.9 phong 0.2">Red Bricks</Predef>
+        <Predef pigment="gradient &lt;1,0,1>color_map{[ 0.0 color rgbf&lt;1,1,1,1> ][ 0.5 color rgbf&lt;1,1,1,1> ][ 0.5 color rgb&lt;1,0,0> ][ 1.0 color rgb&lt;1,0,0> ]}">Gradient Peel</Predef>
     </Pattern>
     <Media>
         <Predef media="emission color rgb&lt;1.0, 0.75, 0.1>*2.75 intervals 3 samples 32 method 3 aa_threshold 0.1 aa_level 5 density{ crackle  turbulence 0.3 color_map {[0 rgb 0][0.00 rgb 0][0.07 rgb 1][0.10 rgb 1][0.12 rgb 0][1.00 rgb 0]}}density{ spherical color_map {[0 rgb 0][0.7 rgb 1][1 rgb 1]}}" pigment="color rgbf&lt;1,1,1,1>" comment="You have to scale this texture to the size of the object. If you have an object with the dimensions 200mmx50mmx10mm, then you have to put this dimensions into the scale boxes above.">Fire</Predef>
