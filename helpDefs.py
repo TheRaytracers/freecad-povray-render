@@ -86,4 +86,5 @@ def setDefaultPovRayExe():
 
 #set the icon path because InitGui.py can't import os
 initGui__iconPath = os.path.join(os.path.dirname(__file__), "icons")
+initGui__logoPath = os.path.join(os.path.dirname(__file__), "icons", "logo.svg")
 initGui__prefPagePath = os.path.join(os.path.dirname(__file__), "prefPage.ui")
