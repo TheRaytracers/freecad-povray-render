@@ -4,6 +4,7 @@ Even if FreeCAD and POV-Ray both support CSG (**C**onstructive **S**olid **G**eo
 So if your rendering doesn't look like you have expected, it may not be a bug, it can also be a compromise to adapt the different concepts of FreeCAD and POV-Ray.
 
 ## Table of Contents
+
 - [Limitations, Tips & Tricks](#limitations-tips--tricks)
   - [Table of Contents](#table-of-contents)
   - [The camera](#the-camera)
@@ -21,20 +22,24 @@ So if your rendering doesn't look like you have expected, it may not be a bug, i
 
 Normally you won't have to deal with camera settings. The macro supports both, orthographic and perspective view. You just choose the view in FreeCAD and the result of the rendering should have the same point of view and viewing angle. There may be some clipping of the borders of the rendered image, if the size of the viewport in FreeCAD isn't exacly the same size you choose in the macro popup. If you choose the "Export FreeCAD View" option, you will find a image of the FreeCAD view in your output folder with the size of the rendered image. It should match the camera perspective exactly.
 If you define your own camera in the .inc file, the macro will detect this and the camera statement will be outcommented in the .pov file. If you want to use special camera types and effects from POV-Ray, but still want to take the camera point of view from FreeCAD, we provide some declarations in the .pov file that you can use in your .inc file:
-```
+
+```pov
 #declare CamUp = < 0, 0, 1>;
 #declare CamRight = <1.33, 0, 0>;
 #declare CamRotation = <-50, -1, 25>;
 #declare CamPosition = <120, -25.6932964325, 100>;
 ```
+
 The example is also the key to the right handedness of the coordinate system we use. While POV-Ray uses a left handed coordinate system, FreeCAD uses a right handed one, which is the standard for CAD programs. In the declaration above you can see the up vector pointing in the z direction and the right vector in the x direction. In POV-Ray examples you will often find the following declaration:
-```
+
+```pov
 camera {
     up < 0, 1, 0>
     right< 1.33, 0, 0>
     ...
 }
 ```
+
 So y and z axis are switched and the result ist a left handed coordinate system.
 You may ask why right is 1.33. This is the aspect ratio of your image - If the value isn't correct, the rendered image will be streched or compressed.
 
@@ -101,9 +106,10 @@ FreeCAD provides some functions to convert between the systems. Unfortunatly one
 
 There are several ways to get debugging information if an error occures. First it is useful to activate the console output window. The macro will provide some statistical information while converting the scene into a POV-Ray file. If nothing is rendered you should localise the error. A bug in our macro will lead to an empty .pov file and incomplete console output. While a POV-Ray Error appears you will see a popup window with an error message. In most cases the error message will tell you about a wrong syntax in your include file so you have a chance to correct it. The POV-Ray error message will be also written into a file in the output directory. If you want to see the complete debugging information from POV-Ray open a console window and start the rendering from the commandline.
 
-```
+```pov
 povray myPovFile.ini
 ```
+
 You will find more about commandline options in the [POV-Ray wiki](http://www.povray.org/documentation/3.7.0/r3_2.html#r3_2)
 
 If you think you found a bug in our macro we will be happy if you report it to us.

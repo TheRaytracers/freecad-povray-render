@@ -3,24 +3,20 @@
 * **I get no image, only the pov file**
   * See instructions in [Quickstart](quickstart.md)
   * Are you sure, that you installed POV-Ray?
-  * Does the path to the executable exsist in the settings of the raytracing workbench?
+  * Does the path to the executable exists in the settings of the raytracing workbench?
   * Maybe there is an error in your inc file. You will get a error window and a error file can be found in the directory of the .pov file.
   * If there is a mistake in the pov file, then the macro has a bug. Please report the bug (see below), so that other users won't have this problem.
 
-
 * **Which objects are supported?**  
   We created a page with all supported objects and the objects we support hopefully soon: [Supported Features](supported.md)
-
 
 * **The created mesh looks very rough, what can I do?**  
   You can change two parameters to adjust the mesh resolution. Select the object in FreeCAD and go to the view tab, there you can find the two options `Angular Deflection` and `Deviation`, the smaller you set them, the more accurate the mesh becomes, but the longer it takes to create the mesh.  
   Both parameters are related, `Angular Deflection` indicates the maximum deviation of the angle, and `Deviation` indicates the maximum distance between the mesh and the original object.  
   **Tip:** Don't set the parameters too small, instead start with a larger value and first find good textures, etc., when you're done, set the mesh accuracy higher and finish your final rendering. The creation of a mesh needs a lot of time.
 
-
 * **The rendered image doesn't look realistic, but plastic**  
   Look here for tips to [Get a more realistic rendering](realistic.md).
-
 
 * **I found a bug in the macro**  
   Please report the bug to us, so we hopefully can fix it soon.  
@@ -29,13 +25,11 @@
   * Email: usbhub.freecadABCweb.de replace ABC with an @
   * The FreeCAD Forum: XXX
 
-
 * **I want to learn more about POV-Ray**  
   * You can watch this very good tutorial:  
   [http://f-lohmueller.de/pov_tut/pov__eng.htm](http://f-lohmueller.de/pov_tut/pov__eng.htm)  
   * You can find the official POV-Ray documentation here:  
   [http://www.POV-Ray.org/documentation/index-3.6.php](http://www.POV-Ray.org/documentation/index-3.6.php)
-
 
 * **I want to contribute to the macro**  
   Cool, a software is never finished :-)  

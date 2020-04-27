@@ -19,9 +19,9 @@ To close the image click on the image!
 Maybe the result is not very exciting for you. Without any textures and just the basic settings the macro follws the **WYSIWYG** principle. **W**hat **Y**ou **S**ee (in FreeCAD) **I**s **W**hat **Y**ou **G**et (in POV-Ray). If you checked the "Export FreeCAD view" checkbox in the popup window you can find a second picture with the FreeCAD view in the output directory. Both pictures have the same image size and camera view. But if you look carefully you can see litte differences: POV-Ray will not render the outlines of the objects and if you look even closer, the shadows are not the same. It is that way because FreeCAD illuminates each object individually but in POV-Ray we used a single lightsource at the position of the camera. If there are bigger differences you should check our [Tips & Tricks Section](tipsAndTricks.md).
 
 Now let's take the first step into realistic rendering! To add some textures you must change into the texture tab. On the left side of this tab you can see all visible objects of our example. On the right side you can find some predefined textures.
-If you want to add a texture to an object choose it in the left list and then the desired texture in the right list. In our example we take "Crystal glass" for the white pieces and "Shungit" for the black pieces. There is also a predefined texture called "Checker" to be found under the "Pattern" cathegorie. It is important to scale this pattern with factor 20 and translate it 10 units in x and y direction to fit the dimensions of the board. 
+If you want to add a texture to an object choose it in the left list and then the desired texture in the right list. In our example we take "Crystal glass" for the white pieces and "Shungit" for the black pieces. There is also a predefined texture called "Checker" to be found under the "Pattern" cathegorie. It is important to scale this pattern with factor 20 and translate it 10 units in x and y direction to fit the dimensions of the board.
 
-Another thing we did in the following example: We changed the background color in FreeCAD settings by adding a middle color. 
+Another thing we did in the following example: We changed the background color in FreeCAD settings by adding a middle color.
 
 Now start the Rendering again and you will get something like this:
 
@@ -48,9 +48,10 @@ Start your rendering and you should get this result:
 
 If you create your own textures, make sure, you use the right syntax. Replace the "xxx" in the following declaration with the object name from the object tree in FreeCAD:
 
-```
+```pov
 #declare xxx_material = material { }
 ```
+
 Before you create your own textures, take a look at our example which can be downloaded by clicking at [Chess inc File](../Examples/Chess/ChessTextures.inc).
 Just put it in the right folder, rename it and start the macro again. The result should be like this:
 
@@ -59,15 +60,10 @@ Ignoring the material hierarchy will lead to a POV-Ray error and nothing will be
 
 Now let's try to add more reality to the chess Example. You can download another FreeCAD file for a gaming scene and a corresponding include file:
 
-
 In the example we defined our own camera with a focus blur statement so our scene looks more like a photo. If you put your own camera in the user inc file, the macro will detect it and the camera statement in the .pov file will be outcommented. But you can still use camera position and rotation of the FreeCAD viewport because we provide them as declarations. For special effects POV-Ray provides much more camara types then FreeCAD and they can be modified. So lots of fun is waiting for you.
 
 In the last example we added a second light source. It is a spotlight that turns the focus on the white king - maybe he is in danger - what do you think?
 We also added some radiosity for more realistic light. There are different types of lightsources and lightning effects available.
 
-
-
-
 If you don't have that much knowledge about POV-Ray, you can use a few templates, we created. You can find them in the [Template Folder](../Examples/Templates/).  
 And you can find some more examples in the [Examples Folder](../Examples/index.md)
-
