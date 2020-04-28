@@ -39,10 +39,11 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 ### Sketches
 
 - [x] Line Segment
-- [ ] Arc
+- [x] Arc
 - [x] Circle
-- [ ] B-Spline
+- [x] B-Spline
 - [ ] Ellipse
+- [ ] B-Spline
 
 ## Draft Workbench
 
@@ -54,10 +55,19 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 
 - [x] Image Plane
 
+## Lights
+
+- [x] Point Light
+- [x] Area Light
+- [x] Spot Light
+- [x] Light Fading
+- [x] Light Color
+- [x] Indirect Lightning
+
 ## Other
 
 - [x] Group
-- [x] Part
+- [x] Std Part
 
 ## Texture
 

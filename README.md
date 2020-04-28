@@ -11,6 +11,7 @@ Until now, the macro supports most objects from the Part Workbench and some feat
 To give the user the full control, you can define extra things or another surface as in FreeCAD (Please visit the [Wiki](doc/index.md) for more information).
 
 ## Installation
+
 **Automatic Installation**  
 The recommended way of installing this workbench is to use the addon manager (Tools / Addon Manager). In the addon manager in the workbenches tab, select the XXX-Workbench and click install.
 
@@ -25,6 +26,7 @@ How you can do this on your system is explained in the [POV-Ray Wik](http://wiki
 After installing POV-Ray, you have to tell the workbench, where you installed POV-Ray. To do this, go into the POV-Ray workbench and go to Edit/Preferences/POV-Ray. Under "POV-Ray Executable" you can define, where you installed POV-Ray. After that, restart FreeCAD and have fun with our workbench :)
 
 ## Features
+
 * easy applying of textures including a preview
 * easy use of indirect lightning to create realistic images
 * easy inserting and configuration of different types of lights  
