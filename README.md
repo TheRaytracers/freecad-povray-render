@@ -20,7 +20,7 @@ Download the repository from [gitlab.com/usbhub/exporttopovray](https://gitlab.c
 
 **Install POV-Ray**  
 In the background, POV-Ray is used to create the images. So you have to install POV-Ray too:
-How you can do this on your system is explained in the [POV-Ray Wik](http://wiki.povray.org/content/HowTo:Install_POV)
+How you can do this on your system is explained in the [POV-Ray Wiki](http://wiki.povray.org/content/HowTo:Install_POV)
 
 **Set the POV-Ray Executable Path**  
 After installing POV-Ray, you have to tell the workbench, where you installed POV-Ray. To do this, go into the POV-Ray workbench and go to Edit/Preferences/POV-Ray. Under "POV-Ray Executable" you can define, where you installed POV-Ray. After that, restart FreeCAD and have fun with our workbench :)
@@ -32,7 +32,7 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 * easy inserting and configuration of different types of lights  
   **⇨ simple handling and operation**
 * power users can get the full control about the whole configuration with the user inc file (see [Power Users](doc/powerusers.md))  
-  **⇨offering all settings for advanced users**
+  **⇨ offering all settings for advanced users**
 * the model is not converted into meshes, the model will be converted into a mathematical way of describing the object shape, so you will get a better object and a better picture
 * very good readability of the created files → easy editing of these files
 * WYSIWYG - You can pan your model and render and you will get this point of view from FreeCAD
