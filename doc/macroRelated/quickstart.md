@@ -53,7 +53,7 @@ If the raytracing workbench works with these settings, the macro should do also.
 
 1. Open a document or create a new one with some objects
 2. Pan the model in the right view
-3. Start the macro about Macro / Macros… / ExportToPovRay.FCMacro / Execute
+3. Start the macro about Macro / Macros... / ExportToPovRay.FCMacro / Execute
 4. Click on "Browse .pov Output File"
 5. Select / create a file with the ending .pov
 6. Click on Save in the file dialog

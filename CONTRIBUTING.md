@@ -1,6 +1,7 @@
 # Developer Documentation
 
 ## The Goal of the Project
+
 The ExportToPovRay macro is intended to export as many solid CSG objects as possible from the FreeCAD Part workbench into a corresponding POV-Ray.
 Convert scene description. The object tree with its
 Boolean operations in the POV-Ray file.  
@@ -11,14 +12,15 @@ The main principle is to keep the POV-Ray file as clear as possible,
 so that objects can be found quickly.
 A second important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y**ou **G**et).
 The render result of the respective view in FreeCAD Gui looks like this
-as possible (camera perspective, background, object colors…).  
+as possible (camera perspective, background, object colors...).  
 
 Since a complete transfer of all FreeCAD construction possibilities
 would be too complex, the macro is initially limited to CSG objects -
 However, this limitation is clearly comprehensible for the user - either through a good documentation or in the program e.g. through colored
 selection of transferred objects in the object tree.
 
-# You cannot only contribute to the code
+## You cannot only contribute to the code
+
 The documentation is not less important than the code! If you found a thing, which can be improved, clone this repository, do and commit you changes and make a pull request.
 
 But it is not necessary to edit files, make a pull request and so on. If you found an bug and report it, that is contributing too! An improvement suggestion is also a contribution to the macro.
@@ -30,57 +32,68 @@ You see, contribution to a project is not only possible with coding skills. Anyt
 
 Before you create a new issue, please read the [Issue Guidelines](https://gitlab.com/usbhub/exporttopovray/issues/26).
 
-# Contribute to the Code
-## Skeletal structure of the macro
+## Contribute to the Code
+
+### Skeletal structure of the macro
+
 The macro works in this order:
+
 1. Open the dialog and get the parameters from the user
 2. Create the skeletal structure of the POV-Ray file
 3. Try whether the pov and inc file exists
 4. Add [global settings](#global-settings) to the .pov file
 5. Add the [camera](#camera)
-6. Add the [lightsource](#lightsource)
+6. Add the [light source](#light-source)
 7. Add the [background](#background)
 8. Add the [objects from the scene](#objects-from-scene)
    1. create the basing object
    2. rotate the object
-   3.  transform the object
-   4.  add texture properties from FreeCAD or user declaration from .inc file
-9.  Write the pov file
+   3. transform the object
+   4. add texture properties from FreeCAD or user declaration from .inc file
+9. Write the pov file
 10. Start POV-Ray
 
 Here's a flowchart of the rough **program structure**:
 ![Flowchart of the macro](/doc/img/programFlow.svg)
 
 ## General Characteristics
-* The macro uses a right handed koordinate system like FreeCAD (specified in [However, this limitation is clearly comprehensible for the user - either
+
+* The macro uses a right handed coordinate system like FreeCAD (specified in [However, this limitation is clearly comprehensible for the user - either
 through a good documentation or in the program e.g. through colored
 selection of transferred objects in the object tree.camera](#camera))
 * All objects are created at <0, 0, 0> and translated later to the right position (see [Characteristics](#general-characteristics))
 
 ## Global settings
+
 First, some general settings are added to the .pov file.
 The important one is the standard object color from the settings dialog.
 In objects with standard color and texture the `getPigment()` function will skip color and finish declaration of the pov object.
 
 ## Camera
+
 The idea for creation of the camera is to create a camera at <0, 0, 0> and translate and rotate them into the right position.
 global
 
-## Lightsource
-The lightsource position is the same as the camera position.
+## Light source
+
+The light source position is the same as the camera position.
 
 ## Background
+
 All FreeCAD background color modes from the settings dialog are supported.
 The color(s) are mapped on the POV-Ray sky-sphere and afterwards the skysphere is rotated in the camera direction to fit to the horizon.
 
 ## Objects from Scene
+
 First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovCode()` which creates the real POV-Ray code. The `main()` function calls it for every object in the `firstLayer`. `createPovCode()` calls itself for every child, so a recursive function.
 
 ### Characteristics
+
 The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently of the position of it <0, 0, 0>, FreeCAD rotates relative to the object.
 
 ### `createPovCode()`
-1. The variable povCode will be initialised with the label / name of the object.
+
+1. The variable povCode will be initialized with the label / name of the object.
 2. Add the basing POV-Ray object to povCode but don't close the object
 3. Add the rotation to the POV-Ray object
 4. Add the translation to the POV-Ray object

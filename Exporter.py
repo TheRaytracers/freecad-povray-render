@@ -791,7 +791,7 @@ class ExportToPovRay:
                 else:
                     reversed = False
 
-                #split arc in segments <90°
+                #split arc in segments <90deg
                 if a % math.pi / 2 == 0:
                     numOfSegments = a / (math.pi / 2)
                 else:

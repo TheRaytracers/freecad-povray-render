@@ -162,7 +162,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         seperate .inc file that won't be overwritten.</p>
         <h3>Pov File Selection</h3>
         <p>Select the ini file by typing the path into the text field or choose a .ini file <br>
-        with the '…' button.<br>
+        with the '...' button.<br>
         Be careful not to use spaces or special chars in pathname for POV-Ray compatibility.</p>
         <h3>Width and Height of the Image</h3>
         <p>Select the width and height in pixels of the image to be rendered with POV-Ray.</p>
@@ -312,7 +312,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         else:
             self.renderButton.setEnabled(False)
             if path == "":
-                self.warnLabel.setText("Please type a path or get one with clicking on '…'")
+                self.warnLabel.setText("Please type a path or get one with clicking on '...'")
             else:
                 self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .ini file")
 
