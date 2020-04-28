@@ -53,8 +53,8 @@ The macro works in this order:
 9. Write the pov file
 10. Start POV-Ray
 
-Here's a flowchart of the rough **program structure**:
-![Flowchart of the macro](/doc/img/programFlow.svg)
+Here's a flowchart of the rough **program structure** (if you need a higher resolution, in the doc/img folder is an additional pdf file of this chart):
+![Flowchart of the macro](/doc/img/Workbench%20Structure.png)
 
 ## General Characteristics
 
