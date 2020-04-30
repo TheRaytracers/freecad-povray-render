@@ -6,7 +6,7 @@
 
 The export macro is intended to export the FreeCAD model structure with their equivalent in POV-Ray.
 In contrast to other solutions for exporting FreeCAD models to POV-Ray, this macro tries to make the file clearly and easy to edit. For that, it doesn't create gigantic meshes, it moves the tree structure with the boolean operations into a POV-Ray file.  
-Until now, the macro supports most objects from the Part Workbench and some features from the Part design and Draft workbench. Not supported objects are simulated with meshes (see [Supported Objects](#supportedObjects)).
+Until now, the macro supports most objects from the Part Workbench and some features from the Part design and Draft workbench. Not supported objects are simulated with meshes (see [Supported Objects](doc/Supported.md)).
 
 To give the user the full control, you can define extra things or another surface as in FreeCAD (Please visit the [Wiki](doc/index.md) for more information).
 
@@ -36,3 +36,28 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 * the model is not converted into meshes, the model will be converted into a mathematical way of describing the object shape, so you will get a better object and a better picture
 * very good readability of the created files → easy editing of these files
 * WYSIWYG - You can pan your model and render and you will get this point of view from FreeCAD
+
+## Get your first image
+
+1. open your model you want to render
+2. go to the POV-Ray workbench
+3. click on ![Settings & Render Icon](icons/logo.svg) after that a dialog should appear
+4. click on the "..." button to select, where you want to store the ini file (something like a project file), all other files that are created during the rendering process will be also stored there
+5. make sure you have the following settings:
+  
+   * Width: 800px
+   * Height: 600px
+   * [x] Export FreeCAD Background
+   * [x] Export FreeCAD Light
+   * [ ] Repair Rotation
+   * [ ] Export FreeCAD View
+  
+6. press "Start Render"
+7. depending on the complexity of the model it can take a while until a window appears, where you see how the rendered image are growing until the rendering process is finished. Now click on the window and it will close itself
+8. go into the folder you selected, there you will find all files including the image
+
+You will see, your image won't look much nicer than the FreeCAD view. To get a better image, you have to apply textures and lights, etc. How to do that is explained in the [Wiki](doc/).
+
+## Wiki
+
+The workbench have a lot of features that cannot explained all in the README. So we created a wiki with tutorials and a explanation of all features: [POV-Ray Workbench Wiki](doc/)
