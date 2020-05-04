@@ -13,7 +13,7 @@ In reality the light intensity decreases with distance. With Fading Distance and
 * **Fading Distance**  
   This is the distance from the light to where the light has the intensity of the light without fading.
 * **Fading Power**  
-  This is the exponent of the decreasing. Higher the value, higher the decreasing.
+  This is the exponent of the decreasing. Higher the value, higher the decreasing.  
   ![Comparison between different fading powers](img/LightFadingPower.png)  
   **Tip**: A good starting point for fading power is 2.
 
