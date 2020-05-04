@@ -4,9 +4,9 @@
 
 ![Logo and Renderings](README_img.png)
 
-The export macro is intended to export the FreeCAD model structure with their equivalent in POV-Ray.
-In contrast to other solutions for exporting FreeCAD models to POV-Ray, this macro tries to make the file clearly and easy to edit. For that, it doesn't create gigantic meshes, it moves the tree structure with the boolean operations into a POV-Ray file.  
-Until now, the macro supports most objects from the Part Workbench and some features from the Part design and Draft workbench. Not supported objects are simulated with meshes (see [Supported Objects](doc/Supported.md)).
+In contrast to the other rendering solutions of FreeCAD we are fokused on using POV-Ray as the only renderer.
+The workbench is intended to map the FreeCAD model on the POV-Ray equivalent as good as possible.
+Besides the rendered image the result will be a well organized file structure that gives the user a chance to understand and manipulate the content. For that, the render project is divided into different files for a better overview. Until now most objects from the Part Workbench are supported and the tree structure with the boolean operations can be found in the POV-Ray file. Not supported objects will be simulated with meshes and outsourced to an include file. (see [Supported Objects](doc/Supported.md) and [file structure](doc/filestructure.md)).
 
 To give the user the full control, you can define extra things or another surface as in FreeCAD (Please visit the [Wiki](doc/index.md) for more information).
 
@@ -28,8 +28,8 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 ## Features
 
 * easy applying of textures including a preview
-* easy use of indirect lightning to create realistic images
-* easy inserting and configuration of different types of lights  
+* easy inserting and configuration of different types of lights
+* easy use of indirect lightning to create realistic images  
   **⇨ simple handling and operation**
 * power users can get the full control about the whole configuration with the user inc file (see [Power Users](doc/powerusers.md))  
   **⇨ offering all settings for advanced users**
@@ -53,7 +53,7 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
    * [ ] Export FreeCAD View
   
 6. press "Start Render"
-7. depending on the complexity of the model it can take a while until a window appears, where you see how the rendered image are growing until the rendering process is finished. Now click on the window and it will close itself
+7. depending on the complexity of the model it can take a while until a window appears, where you see how the rendered image is growing until the rendering process is finished. To close the rendering window click in the middle of the image.
 8. go into the folder you selected, there you will find all files including the image
 
 You will see, your image won't look much nicer than the FreeCAD view. To get a better image, you have to apply textures and lights, etc. How to do that is explained in the [Wiki](doc/).
