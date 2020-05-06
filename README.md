@@ -43,7 +43,7 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 2. go to the POV-Ray workbench
 3. click on ![Settings & Render Icon](icons/logo.svg) after that a dialog should appear
 4. click on the "..." button to select, where you want to store the ini file (something like a project file), all other files that are created during the rendering process will be also stored there
-5. make sure you have the following settings:
+5. the following settings will be good for initial render:
   
    * Width: 800px
    * Height: 600px
