@@ -17,6 +17,8 @@ In reality the light intensity decreases with distance. With Fading Distance and
   ![Comparison between different fading powers](img/LightFadingPower.png)  
   **Tip**: A good starting point for fading power is 2.
 
+**Tip**: You can adjust the size of the light icon in the scene in the settings.
+
 ## Point Light
 
 The point light has no additional properties (except the placement).
