@@ -34,4 +34,4 @@ One goal of the workbench is to be easy to use and without any special knowledge
 
 ## More tabs were added
 
-With time, more tabs were added, e.g the tab for configuring indirect lightning. 
+With time, more tabs were added, e.g the tab for configuring indirect lightning.

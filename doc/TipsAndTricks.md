@@ -8,6 +8,7 @@ So if your rendering doesn't look like you have expected, it may not be a bug, i
 - [Limitations, Tips & Tricks](#limitations-tips--tricks)
   - [Table of Contents](#table-of-contents)
   - [The camera](#the-camera)
+    - [Save views](#save-views)
   - [Background](#background)
   - [Lights](#lights)
   - [Textures and materials](#textures-and-materials)
@@ -50,6 +51,14 @@ If you want to know more about the coordinate system, check out these two links:
 and
 
 [POV-Ray Tutorial](http://www.povray.org/documentation/3.7.0/t2_2.html#t2_2_1_1)
+
+### Save views
+
+During the creation of the scene, you will often pan your model, zoom in and out and it is very hard to find a good view. To avoid searching after every little change, you can use this great FreeCAD feature:
+
+Under View / Freeze display you can save the current view and load it later again. You can also save the views in a .cam file.
+
+We hope, that we can introduce a camera object soon, that makes it unnecessary to use the freeze display, but this is still not implemented.
 
 ## Background
 
