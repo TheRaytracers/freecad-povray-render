@@ -8,13 +8,13 @@ So our chess example is based on CSG and each solid we have implemented in our m
 
 ## The first rendering
 
-You can download the chess example: [Chess FreeCAD File](../Examples/Chess/Chess.FCStd).
+You can download the chess example: [Chess FreeCAD File](Examples/Chess/Chess.FCStd).
 
-![Chess Match in FreeCAD](Examples/../Examples/Chess/FirstImage/FirstImage_FC-View.png "The view of the chess match in FreeCAD")
+![Chess Match in FreeCAD](Examples/Chess/FirstImage/FirstImage_FC-View.png "The view of the chess match in FreeCAD")
 
 If you just render the image without adjusting any settings, you will get this image:
 
-![First Rendering](Examples/../Examples/Chess/FirstImage/FirstImage.png "The first rendering of the chess match in POV-Ray")
+![First Rendering](Examples/Chess/FirstImage/FirstImage.png "The first rendering of the chess match in POV-Ray")
 
 Maybe the result is not very exciting for you. Without any textures and just the basic settings the workbench follows the **WYSIWYG** principle. **W**hat **Y**ou **S**ee (in FreeCAD) **I**s **W**hat **Y**ou **G**et (in POV-Ray). If you checked the "Export FreeCAD view" checkbox in the popup window you can find a second picture with the FreeCAD view in the output directory. Both pictures have the same image size and camera view. But if you look carefully you can see little differences: POV-Ray will not render the outlines of the objects and if you look even closer, the shadows are not the same. It is that way because FreeCAD illuminates each object individually but in POV-Ray we used a single light source at the position of the camera. If there are bigger differences you should check our [Tips & Tricks Section](tipsAndTricks.md).
 
