@@ -634,6 +634,8 @@ class ExportToPovRay:
 
             povCode += povLight
 
+            expPigment = False
+
         elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("AreaLight"):
             povLight = "\nlight_source { "
             povLight += "<0, 0, 0>"
@@ -659,6 +661,8 @@ class ExportToPovRay:
 
             povCode += povLight
 
+            expPigment = False
+
         elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("SpotLight"):
             povLight = "\nlight_source { "
             povLight += "<0, 0, 0>"
@@ -675,6 +679,8 @@ class ExportToPovRay:
                 povLight += "\n\tfade_power " + str(fcObj.FadePower)
 
             povCode += povLight
+
+            expPigment = False
 
 
         else: #not a supported object
