@@ -6,7 +6,7 @@
 
 In contrast to the other rendering solutions of FreeCAD we are focused on using POV-Ray as the only renderer.
 The workbench is intended to map the FreeCAD model on the POV-Ray equivalent as good as possible.
-Besides the rendered image the result will be a well organized file structure that gives the user a chance to understand and manipulate the content. For that, the render project is divided into different files for a better overview. Until now most objects from the Part Workbench are supported and the tree structure with the boolean operations can be found in the POV-Ray file. Not supported objects will be simulated with meshes and outsourced to an include file. (see [Supported Objects](doc/Supported.md) and [file structure](doc/filestructure.md)).
+Besides the rendered image the result will be a well organized file structure that gives the user a chance to understand and manipulate the content. For that, the render project is divided into different files for a better overview. Until now most objects from the "Part Workbench" and some important featuers vom "Part design" are supported and the tree structure with the boolean operations can be found in the POV-Ray file. Not supported objects will be simulated with meshes and outsourced to an include file. (see [Supported Objects](doc/Supported.md) and [file structure](doc/filestructure.md)).
 
 To give the user the full control, you can define extra things or another surface as in FreeCAD (Please visit the [Wiki](doc/index.md) for more information).
 
@@ -43,7 +43,7 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 2. go to the POV-Ray workbench
 3. click on ![Settings & Render Icon](icons/logo.svg) after that a dialog should appear
 4. click on the "..." button to select, where you want to store the ini file (something like a project file), all other files that are created during the rendering process will be also stored there
-5. make sure you have the following settings:
+5. the following settings will be good for initial render:
   
    * Width: 800px
    * Height: 600px
