@@ -1,20 +1,24 @@
 #version 3.6; // 3.7
-global_settings{assumed_gamma 1.0}
-#default{ finish{ ambient 0.2 diffuse 0.9 }}
-#default{pigment{rgb <0.800, 0.800, 0.800>}}
+global_settings { assumed_gamma 1.0 }
+#default { finish { ambient 0.2 diffuse 0.9 } }
+#default { pigment { rgb <0.800, 0.800, 0.800> } }
+
 //------------------------------------------
 #include "colors.inc"
 #include "textures.inc"
 
 //------------------------------------------
-// camera ----------------------------------
-#declare CamUp = < 0, 0, 1>;
+#include "Lens_textures.inc"
+
+//------------------------------------------
+// Camera ----------------------------------
+#declare CamUp = <0, 0, 1>;
 #declare CamRight = <1.33, 0, 0>;
 #declare CamRotation = <0.0, 0.0, 0.0>;
 #declare CamPosition = <0.253216475248, -9.33913040161, 1.22930979729>;
 camera {
 	location <0, 0, 0>
-	direction < 0, 1, 0>
+	direction <0, 1, 0>
 	up CamUp
 	right CamRight
 	rotate CamRotation
@@ -22,7 +26,7 @@ camera {
 	angle 57.82
 }
 
-// background ------------------------------
+// Background ------------------------------
 sky_sphere {
 	pigment {
 		gradient z
@@ -40,9 +44,9 @@ sky_sphere {
 
 //------------------------------------------
 
-#include "Lens.inc"
+#include "Lens_user.inc"
 
-// objects in scene ------------------------
+// Objects in Scene ------------------------
 
 //----- Lens -----
 intersection {
@@ -59,49 +63,53 @@ intersection {
 	
 	translate <0.0, 0.0, 1.2>
 
-	material {Lens_material}
+	material {Lens_material }
 	
 }
 
 //----- Cube -----
-box{ <0,0,0>, <3.0, 1.5, 1.5>
+box { <0,0,0>, <3.0, 1.5, 1.5>
 	translate <0.0, 4.0, 0.0>
 
-	material {Cube_material}
+	material {Cube_material }
 	
 }
 
 //----- Spheres -----
-#declare Sphere002_Sphere002 = 
-//----- Sphere002 -----
-sphere { <0, 0, 0> 0.35 
-}
-#declare intervalX = <1.0, 0.0, 0.0>;
-#declare intervalY = <0.0, 1.0, 0.0>;
-#declare intervalZ = <0.0, 0.0, 1.0>;
+union {
 
-#declare numX = 1;
-#declare ix = 0;
-#while (ix < numX)
-	#declare numY = 10;
-	#declare iy = 0;
-	#while (iy < numY)
-		#declare numZ = 1;
-		#declare iz = 0;
-		#while (iz < numZ)
-			object { Sphere002_Sphere002
-				translate intervalX * ix
-				translate intervalY * iy
-				translate intervalZ * iz
-				translate <-3.0, -2.0, 0.5>
-				rotate <0.0, 0.0, -13.0>
-				
-material {Spheres_material}
-
-			}
-			#declare iz = iz + 1;
+	#declare Sphere002_Sphere002 = 
+	//----- Sphere002 -----
+	sphere { <0, 0, 0> 0.35 
+	}
+	#declare intervalX = <1.0, 0.0, 0.0>;
+	#declare intervalY = <0.0, 1.0, 0.0>;
+	#declare intervalZ = <0.0, 0.0, 1.0>;
+	
+	#declare numX = 1;
+	#declare ix = 0;
+	#while (ix < numX)
+		#declare numY = 10;
+		#declare iy = 0;
+		#while (iy < numY)
+			#declare numZ = 1;
+			#declare iz = 0;
+			#while (iz < numZ)
+				object { Sphere002_Sphere002
+					translate intervalX * ix
+					translate intervalY * iy
+					translate intervalZ * iz
+					translate <-3.0, -2.0, 0.5>
+					rotate <0.0, 0.0, -13.0>
+					
+	material {Spheres_material }
+	
+				}
+				#declare iz = iz + 1;
+			#end
+			#declare iy = iy + 1;
 		#end
-		#declare iy = iy + 1;
+		#declare ix = ix + 1;
 	#end
-	#declare ix = ix + 1;
-#end
+	
+}
