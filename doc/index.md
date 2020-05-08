@@ -9,18 +9,22 @@ This can be done by adding an include file with the additional contents.
 
 ## Get started
 
-A quick overview about [installation and usage](quickstart.md)
+Look in the [README](../README.md) if you want to know, how to install and get started.
 
 ## How to render a photorealistic Scene from your FreeCAD model
 
 You are just a few steps away from rendering realistic scenes with our macro.  
 Read how it works in the [step by step description](realistic.md) of the following example:
 
-![Step by step]( ./img/Chess/Chess_steps.png "Step by step from FreeCAD CSG Objects to a photorealistic POV-Ray scene")
+![Step by step]( ./img/Chess_steps.png "Step by step from FreeCAD CSG Objects to a photorealistic POV-Ray scene")
 
 ## Limitations, tips and tricks
 
 Learn more about the concepts of FreeCAD and POV-Ray and our way we adapted them for the features of the scene description. [read more](tipsAndTricks.md)
+
+## Power User
+
+If you want to learn more about advanced techniques and settings, checkout the [Power User](PowerUser.md) section.
 
 ## Supported features
 
@@ -32,5 +36,5 @@ We made a little FAQ for you: [FAQ](FAQ.md)
 
 ## For developers
 
-![Flowchart of the macro](/doc/img/programFlow_small.png)  
+![Flowchart of the macro](img/Workbench%20Structure.png)  
 You want to contribute to our macro? Great! Here you can find [CONTRIBUTING.md](../CONTRIBUTING.md)
