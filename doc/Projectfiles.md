@@ -28,6 +28,6 @@ Here you can define your own stuff. You find more information at [Power User](Po
 
 This is the rendered image.
 
-## _FC-View.png 
+## _FC-View.png
 
 This is a screenshot of the view in FreeCAD but with the same dimensions as the rendered image.

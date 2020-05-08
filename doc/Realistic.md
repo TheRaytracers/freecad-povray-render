@@ -81,6 +81,8 @@ You can see, that we used constants like "CamPosition" instead of the position i
 
 To learn more about the options, please look here: XXX LINK
 
+![The Chess Game with Focal Blur](Examples/Chess/FocalBlur/ChessFocalBlur.png)
+
 ## Other stuff
 
 The possibilities are just infinite! To example you could put the chess game into this outdoor scene.

@@ -4,7 +4,7 @@ global_settings { assumed_gamma 1.0 }
 #default { pigment { rgb <0.800, 0.800, 0.800> } }
 
 //------------------------------------------
-#include "colors.inc"
+#include "colors.inc"gagaga
 #include "textures.inc"
 
 //------------------------------------------
@@ -46,6 +46,9 @@ sky_sphere {
 }
 
 //------------------------------------------
+
+#include "FirstImage_user.inc"
+
 // Objects in Scene ------------------------
 
 //----- Board -----
@@ -959,7 +962,7 @@ union {
 					
 					//----- Zylinder012 -----
 					cylinder { <0, 0, 0>, <0, 0, 6.0>, 1.2
-						rotate <-3.82328603144e-14, -45.0, -135.0>
+						rotate <-4.49798356639e-15, -45.0, -135.0>
 						translate <-4.94974746831, -4.94974746831, 26.5>
 					}
 					
