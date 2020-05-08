@@ -1049,7 +1049,7 @@ class RenderSettings:
         self.povName = self.projectName + ".pov"
         self.povPath = self.directory + self.povName
         
-        self.incName = self.projectName + ".inc"
+        self.incName = self.projectName + "_user.inc"
         self.incPath = self.directory + self.incName
         self.meshName = self.projectName + "_meshes.inc"
         self.meshPath = self.directory + self.meshName

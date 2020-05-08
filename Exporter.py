@@ -37,7 +37,7 @@ class ExportToPovRay:
         #get default shape color (editable in FreeCAD settings) (default rgb(0.8, 0.8, 0.8))
         self.DefaultShapeColor = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
 
-        self.os = platform.system() #get system informations
+        self.os = platform.system() #get system information
 
     def initExport(self, renderSettings):
         self.doc = App.ActiveDocument
@@ -84,9 +84,6 @@ class ExportToPovRay:
         self.CamNode = Gui.ActiveDocument.ActiveView.getCameraNode()
         self.EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
 
-        #exist a user inc file
-        self.userInc = False
-
         if self.povPath != -1 and self.povPath != "" and self.povPath != " ": #is there a pov file
             try: #try to open pov file
                 file = open(self.povPath, "w+") #XXX really "w+"?
@@ -95,16 +92,12 @@ class ExportToPovRay:
                 App.Console.PrintError("Can't open the pov file\n\n")
                 return -1
 
-            try: #try to open inc file
-                file = open(self.incPath, "r")
-                self.incContent = file.read()
-                file.close()
+            #open inc file
+            file = open(self.incPath, "a+")
+            self.incContent = file.read()
+            file.close()
 
-                App.Console.PrintMessage("Include file found: " + self.incPath + "\n")
-                self.incContent = self.delComments(self.incContent)
-                self.userInc = True
-            except:
-                self.incContent = ""
+            self.incContent = self.delComments(self.incContent)
 
             #open texture inc file
             file = open(self.texIncPath, "r")
@@ -193,8 +186,8 @@ class ExportToPovRay:
 
         finalPovCode += "\n//------------------------------------------\n"
 
-        if self.userInc: #include user inc file if there is a file
-            finalPovCode += "\n#include \"" + self.incName + "\"\n\n"
+        #include user inc file
+        finalPovCode += "\n#include \"" + self.incName + "\"\n\n"
 
         finalPovCode += "// Objects in Scene ------------------------\n"
 
