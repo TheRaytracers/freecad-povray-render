@@ -56,7 +56,17 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 7. depending on the complexity of the model it can take a while until a window appears, where you see how the rendered image is growing until the rendering process is finished. To close the rendering window click in the middle of the image.
 8. go into the folder you selected, there you will find all files including the image
 
-You will see, your image won't look much nicer than the FreeCAD view. To get a better image, you have to apply textures and lights, etc. How to do that is explained in the [Wiki](doc/).
+The rendered image will look nearly the same than the FreeCAD view. The following steps will change this dramatically:
+
+## Add textures
+
+Adding Textures is easy: Go to the dialog window again and switch to the texture tab. In the left list you will find all objects to which you can apply textures. **First** select an object in the left list. **Second** select a texture in the right list. These two steps can be repeated.
+Start the rendering again.
+
+## Add lights
+
+Lights are Objects and can be added via the workbench. You can move them to the desired positon as you are used to do with other FreeCAD objects.
+Whant to know more about lights? Look in the [Light properties chapter](doc/LightProperties.md). The effects of light to your scene are explained in [... chapter]().
 
 ## Wiki
 
