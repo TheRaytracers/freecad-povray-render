@@ -10,7 +10,7 @@ The following five files contain the rendering project. The main reason for spli
 
 ### .ini file
 
-The heart of the project. Here are also the settings stored that will be read by the workbench to restore the settings.
+This is the central project file. Normally this file is used for POV-Ray to store some basic render settings like the size of the image. We make improper use of it by storing other project information for the workbench in this place. The .ini file can be processed by FreeCAD **and** POV-Ray. So you can render your project indepentent of FreeCAD by just typing "povray myRenderproject.ini" at the commandline.
 
 ### .pov file
 
