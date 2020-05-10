@@ -70,7 +70,7 @@ It is like an infinite sphere around the scene. The sky sphere is rotated accord
 A further problem was the background for the orthographic camera. The sky sphere won't render a color gradient even, if declared. So we placed a patch (internally a polygon) with exactly the size of the orthographic camera view behind the scene. But we also added the sky sphere for realistic reflection on the objects.
 This "outside-look" illustrates the "orthographic background":
 
-![Orthographic background illustration]( ./img/Chess/Orthographic_background.png "Orthographic background")
+![Orthographic background illustration]( ./img/Orthographic_background.png "Orthographic background")
 
 ## Lights
 
