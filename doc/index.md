@@ -13,9 +13,9 @@ Look in the [README](../README.md) if you want to know, how to install and get s
 ## How to render a photorealistic Scene from your FreeCAD model
 
 You are just a few steps away from rendering realistic scenes.  
-Read how it works in the [step by step description](realistic.md) of the following example:
+Read how it works in the [step by step description](Realistic.md) of the following example:
 
-![Step by step]( ./img/Chess_steps.png "Step by step from FreeCAD CSG Objects to a photorealistic POV-Ray scene")
+![Step by step](./img/Chess_steps.png "Step by step from FreeCAD CSG Objects to a photorealistic POV-Ray scene")
 
 ## More examples
 
@@ -23,11 +23,11 @@ Some more [examples](./Examples/index.md) to play with.
 
 ## Limitations, tips and tricks
 
-Learn more about the concepts of FreeCAD and POV-Ray and our way we adapted them for the features of the scene description. [read more](tipsAndTricks.md)
+Learn more about the concepts of FreeCAD and POV-Ray and our way we adapted them for the features of the scene description. [read more](TipsAndTricks.md)
 
 ## Supported features
 
-A list of all [features the workbench supports](supported.md)
+A list of all [features the workbench supports](Supported.md)
 
 ## Files
 
