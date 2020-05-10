@@ -28,11 +28,11 @@ The point light has no additional properties (except the placement).
 ![Image to explain Area Light](img/AreaLight.png)
 
 * **Adaptive**  
-  XXX
+  Influences the number of ray that will be shot from area light into scene. Setting Adaptive to 1 normally will do a good job. Higher values cause better quality but slower rendering. You can find detailed explanation at [POV-Ray Documentation](http://www.povray.org/documentation/3.7.0/r3_4.html#r3_4_4_1_5)  
 * **Area Illumination**  
-  XXX
+  Normally area lights only have influence to the shadows. Die direct illumination of surfaces will look like a point light. With area illumination on you can change this.
 * **Jitter**  
-  XXX
+  if turned on it causes a random movement of each light of the area while rendering. Shadows will get softer.
 * **Length**  
   The length (x axis) of the area light.
 * **Length Lights**  
