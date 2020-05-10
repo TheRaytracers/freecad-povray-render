@@ -8,7 +8,7 @@ So our chess example is based on CSG and each solid we have implemented in our m
 
 ## The first rendering
 
-You can download the chess example: [Chess FreeCAD File](Examples/Chess/Chess.FCStd).
+You can download the chess example: [Chess FreeCAD File](Examples/Chess/Chess.FCStd) or the whole bunch of all files we create in this tutorial as a zip: [Chess ZIP](Examples/Chess.zip).
 
 ![Chess Match in FreeCAD](Examples/Chess/FirstImage/FirstImage_FC-View.png "The view of the chess match in FreeCAD")
 

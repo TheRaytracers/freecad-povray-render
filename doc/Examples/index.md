@@ -8,7 +8,7 @@ For each of the following examples we provide the FreeCAD model, the .pov file a
 
 ![Lens example](./Dice/Dice.png "Lens example")
 
-* [Dice.fcstd](./Dice/Dice.fcstd)  
+* [Dice.FCStd](./Dice/Dice.FCStd)  
 * [Dice.pov](./Dice/Dice.pov)  
 * [Dice.inc](./Dice/Dice.inc)  
 * [Dice.png](./Dice/Dice.png)  
@@ -19,7 +19,7 @@ For each of the following examples we provide the FreeCAD model, the .pov file a
 
 ![Lens example](./Lens/withRipples/Lens.png "Lens example")
 
-* [Lens.fcstd](./Lens/Lens.fcstd)  
+* [Lens.FCStd](./Lens/Lens.FCStd)  
 * [Lens.pov](./Lens/Lens.pov)  
 * [Lens.inc](./Lens/Lens.inc)  
 * [Lens.png](./Lens/Lens.png)  
@@ -35,7 +35,7 @@ We know we are not the first who modelled chess pieces.
 
 ![Chess example](./Chess/Chess.png "Chess example")
 
-* [Chess.fcstd](./Chess/Chess.fcstd)  
+* [Chess.FCStd](./Chess/Chess.FCStd)  
 * [Chess.pov](./Chess/Chess.pov)  
 * [Chess.inc](./Chess/Chess.inc)  
 * [Chess.png](./Chess/Chess.png)  
@@ -48,7 +48,7 @@ The developement of POV-Ray started 30 years ago. At this time virtual reality a
 
 ![Architecture example](./Hall/Hall.png "Architecture example")
 
-* [Hall.fcstd](./Hall/Hall.fcstd)  
+* [Hall.FCStd](./Hall/Hall.FCStd)  
 * [Hall.pov](./Hall/Hall.pov)  
 * [Hall.inc](./Hall/Hall.inc)  
 * [Hall.png](./Hall/Hall.png)  
