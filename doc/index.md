@@ -44,7 +44,7 @@ It took more than a year to develop this workbench. We explain some milestones f
 ## Power User
 
 If you want to learn more about advanced techniques and settings, checkout the [Power User](PowerUser.md) section.
+
 ## For developers
 
-![Flowchart of the macro](img/Workbench%20Structure.png)  
 You want to contribute to our macro? Great! Here you can find [CONTRIBUTING.md](../CONTRIBUTING.md)
