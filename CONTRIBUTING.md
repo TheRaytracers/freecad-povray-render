@@ -19,7 +19,7 @@ would be too complex, the macro is initially limited to CSG objects -
 However, this limitation is clearly comprehensible for the user - either through a good documentation or in the program e.g. through colored
 selection of transferred objects in the object tree.
 
-## You cannot only contribute to the code
+## Working on the code is not the only way to contribute
 
 The documentation is not less important than the code! If you found a thing, which can be improved, clone this repository, do and commit you changes and make a pull request.
 
@@ -34,7 +34,7 @@ Before you create a new issue, please read the [Issue Guidelines](https://gitlab
 
 ## Contribute to the Code
 
-### Skeletal structure of the macro
+### Skeletal structure of the workbench
 
 The macro works in this order:
 
