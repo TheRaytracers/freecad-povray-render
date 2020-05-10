@@ -29,9 +29,6 @@
             <Predef inc="metals.inc" texture="Spun_Brass">Spun Brass</Predef>
             <Predef inc="metals.inc" texture="Rusty_Iron">Rusty iron</Predef>
         </oxidized>
-        <tryThis>
-            <Predef material="" texture="T_Chrome_1A" pigment="color Red" normal="bumps 0.25" inc="metals.inc">My super metal</Predef>
-        </tryThis>
     </Metal>
     <Stone>
         <Predef pigment="White_Marble">White Marble</Predef>

@@ -31,7 +31,7 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 * easy inserting and configuration of different types of lights
 * easy use of indirect lightning to create realistic images  
   **⇨ simple handling and operation**
-* power users can get the full control about the whole configuration with the user inc file (see [Power Users](doc/powerusers.md))  
+* power users can get the full control about the whole configuration with the user inc file (see [Power Users](doc/PowerUser.md))  
   **⇨ offering all settings for advanced users**
 * the model is not converted into meshes, the model will be converted into a mathematical way of describing the object shape, so you will get a better object and a better picture
 * very good readability of the created files → easy editing of these files
