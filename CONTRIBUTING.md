@@ -19,7 +19,7 @@ would be too complex, the macro is initially limited to CSG objects -
 However, this limitation is clearly comprehensible for the user - either through a good documentation or in the program e.g. through colored
 selection of transferred objects in the object tree.
 
-## You cannot only contribute to the code
+## Working on the code is not the only way to contribute
 
 The documentation is not less important than the code! If you found a thing, which can be improved, clone this repository, do and commit you changes and make a pull request.
 
@@ -34,7 +34,7 @@ Before you create a new issue, please read the [Issue Guidelines](https://gitlab
 
 ## Contribute to the Code
 
-### Skeletal structure of the macro
+### Skeletal structure of the workbench
 
 The macro works in this order:
 
@@ -87,9 +87,9 @@ The color(s) are mapped on the POV-Ray sky-sphere and afterwards the skysphere i
 
 First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovCode()` which creates the real POV-Ray code. The `main()` function calls it for every object in the `firstLayer`. `createPovCode()` calls itself for every child, so a recursive function.
 
-### Characteristics
+### Object transformation
 
-The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently of the position of it <0, 0, 0>, FreeCAD rotates relative to the object.
+The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently from its position around <0, 0, 0>, FreeCAD rotates relative to the object.
 
 ### `createPovCode()`
 
