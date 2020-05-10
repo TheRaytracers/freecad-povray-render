@@ -36,7 +36,7 @@ This is the rendered image.
 
 ### _FC-View.png
 
-This is a screenshot of the view in FreeCAD but with the same dimensions as the rendered image. It will be directly exported by FreeCAD but only if you check the box in the "Settings" tab of the dialoh.
+This is a screenshot of the view in FreeCAD but with the same dimensions as the rendered image. It will be directly exported by FreeCAD but only if you check the box in the "Settings" tab of the dialog.
 
 ## Other important files
 
