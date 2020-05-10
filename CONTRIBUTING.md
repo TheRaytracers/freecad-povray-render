@@ -2,22 +2,18 @@
 
 ## The Goal of the Project
 
-The ExportToPovRay macro is intended to export as many solid CSG objects as possible from the FreeCAD Part workbench into a corresponding POV-Ray.
-Convert scene description. The object tree with its
-Boolean operations in the POV-Ray file.  
-The user should be able to modify the POV-Ray file so that the
-extensive possibilities of POV-Ray for a photorealistic display
-can be used (textures, light effects, etc.)  
-The main principle is to keep the POV-Ray file as clear as possible,
-so that objects can be found quickly.
-A second important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y**ou **G**et).
-The render result of the respective view in FreeCAD Gui looks like this
-as possible (camera perspective, background, object colors...).  
+The ExportToPovRay workbench is intended to export as many solid CSG objects as possible from the FreeCAD object tree with its
+Boolean operations into a corresponding POV-Ray scene description file.
+The user should be able to render realistic scenes by easy adding of textures und lights.
+Because of the unnumbered POV-Ray features that would be hard to implement there should be a kind of backdor to make them accessible. 
 
-Since a complete transfer of all FreeCAD construction possibilities
-would be too complex, the macro is initially limited to CSG objects -
-However, this limitation is clearly comprehensible for the user - either through a good documentation or in the program e.g. through colored
-selection of transferred objects in the object tree.
+The main principle is to keep the POV-Ray file as clear as possible, so that objects can be found quickly.
+A second important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y**ou **G**et).
+So without textures the render result of POV-Ray should look the same as in FreeCAD view
+(camera perspective, background, object colors...).  
+
+Since a complete transfer of all FreeCAD construction possibilities would be too complex, the workbench should initially be focused on CSG objects -
+This limitation should be clearly comprehensible for the user for example through a good documentation.
 
 ## Working on the code is not the only way to contribute
 
