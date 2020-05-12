@@ -122,7 +122,7 @@ class ExportToPovRay:
 
         self.startExport() #start the export
 
-    def startExport(self): #start the export to POV-Ray
+    def startExport(self): #start the export to POV-Ray by using the settings did in initExport()
         firstLayer = [] #the highest objects in the model tree
 
         #repair rotation (see documentation)

@@ -65,8 +65,8 @@ Start the rendering again.
 
 ## Add lights
 
-Lights are Objects and can be added via the workbench. You can move them to the desired positon as you are used to do with other FreeCAD objects.
-Whant to know more about lights? Look in the [Light properties chapter](doc/LightProperties.md). The effects of light to your scene are explained in [... chapter]().
+Lights are Objects and can be added via the workbench. You can move them to the desired position as you are used to do with other FreeCAD objects.
+Want to know more about lights? Look in the [Light properties chapter](doc/LightProperties.md). The effects of light to your scene are explained in [Realistic.md](doc/Realistic.md).
 
 ## Wiki
 

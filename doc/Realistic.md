@@ -4,7 +4,7 @@ POV-Ray is a very powerful renderer developed in the early 90'ys. It has a mathe
 
 In the Part Workbench of FreeCAD you can also find objects which can be described by a mathematical function. A sphere for example is described by a centerpoint and a radius. If we combine different mathematical described objects with boolean operations we come to the concept of **CSG** (**C**onstructive **S**olid **G**eometry). The Part Workbench of FreeCAD and the object description language of POV-Ray both share the **CSG** concept.
 
-So our chess example is based on CSG and each solid we have implemented in our macro is at least used once.
+So our chess example is based on CSG and each solid we have implemented in our workbench is at least used once.
 
 ## The first rendering
 

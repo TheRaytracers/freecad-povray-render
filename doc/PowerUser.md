@@ -41,7 +41,7 @@ This is the content of the _user.inc file for the following example:
 
 ![Object labels]( ./img/textures_1.png "Object labels")
 
-In the next step, the macro will look for material declarations in the .inc file matching the object labels.
+In the next step, the workbench will look for material declarations in the .inc file matching the object labels.
 If found, the FreeCAD textures in the .pov file will be replaced:
 
 ```pov
@@ -61,7 +61,7 @@ sphere { <0, 0, 0> 5
 }
 ```
 
-It is important to take care of the material hierarchy. The macro only looks for the material statement to be replaced. In our example we use a predefined pigment and finish for the sphere. Both are two levels lower than the material statement. And they need an additional include file. Put this line at the top of the inc file to include the file:
+It is important to take care of the material hierarchy. The workbench only looks for the material statement to be replaced. In our example we use a predefined pigment and finish for the sphere. Both are two levels lower than the material statement. And they need an additional include file. Put this line at the top of the inc file to include the file:
 
 ```pov
 "metals.inc"

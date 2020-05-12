@@ -1,6 +1,6 @@
 # Examples and templates
 
-For each of the following examples we provide the FreeCAD model, the .pov file as a result of our macro, the corresponding _user.inc file and the final image.
+For each of the following examples we provide the FreeCAD model, the .pov file as a result of our workbench, the corresponding _user.inc file and the final image.
 
 ## Easy examples
 

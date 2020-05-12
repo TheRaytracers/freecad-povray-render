@@ -15,12 +15,12 @@ Since a complete transfer of all FreeCAD construction possibilities would be too
 
 The documentation is not less important than the code! If you found a thing, which can be improved, clone this repository, do and commit you changes and make a pull request.
 
-But it is not necessary to edit files, make a pull request and so on. If you found an bug and report it, that is contributing too! An improvement suggestion is also a contribution to the macro.
+But it is not necessary to edit files, make a pull request and so on. If you found an bug and report it, that is contributing too! An improvement suggestion is also a contribution to the workbench.
 And often forgotten: If someone has a problem and ask in the forum and you help to solve the problem, you contributed!
 
-You see, contribution to a project is not only possible with coding skills. Anything that advances our macro in any way is a contribution.
+You see, contribution to a project is not only possible with coding skills. Anything that advances our workbench in any way is a contribution.
 
-**Without your reports, ideas, etc. the macro won't get better or only very slow. So report all, that comes to your mind.**
+**Without your reports, ideas, etc. the workbench won't get better or only very slow. So report all, that comes to your mind.**
 
 Before you create a new issue, please read the [Issue Guidelines](https://gitlab.com/usbhub/exporttopovray/issues/26).
 
@@ -55,8 +55,8 @@ This method is the heart of the exporter. It takes a FreeCAD object and several 
 
 ##### General Characteristics of the Creation
 
-* The macro uses a right handed coordinate system like FreeCAD (specified in [However, this limitation is clearly comprehensible for the user - either through a good documentation or in the program e.g. through colored selection of transferred objects in the object tree.camera](#camera))
-* The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently from its position around <0, 0, 0>, FreeCAD rotates relative to the object.
+* The workbench uses a right handed coordinate system like FreeCAD (specified in [However, this limitation is clearly comprehensible for the user - either through a good documentation or in the program e.g. through colored selection of transferred objects in the object tree.camera](#camera))
+* The workbench creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently from its position around <0, 0, 0>, FreeCAD rotates relative to the object.
 
 ##### Rough Steps
 

@@ -116,9 +116,9 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.mainLayout.addWidget(self.WHImageGroup)
         self.mainLayout.addWidget(self.optionGroups)
 
-        #create macro group
-        self.macroGroup = QtGui.QGroupBox("")
-        self.macroGroup.setLayout(self.mainLayout)
+        #create general group
+        self.generalGroup = QtGui.QGroupBox("")
+        self.generalGroup.setLayout(self.mainLayout)
 
         #crate help group
         self.helpLabel = QtGui.QLabel("")
@@ -128,7 +128,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.radiosityTab = RadiosityTab()
 
         self.tabs = QtGui.QTabWidget(self)
-        self.tabs.addTab(self.macroGroup, "General")
+        self.tabs.addTab(self.generalGroup, "General")
         self.tabs.addTab(self.textureTab, "Textures")
         self.tabs.addTab(self.radiosityTab, "Indirect Lighting")
         self.tabs.addTab(self.helpLabel, "Help")
@@ -156,7 +156,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         </style>
         <div>
         <h3>General</h3>
-        <p>This macro exports solid CSG primitives to POV-Ray.<br>
+        <p>This workbench exports solid CSG primitives to POV-Ray.<br>
         The resulting POV code is readable and intended for further editing.<br>
         You can add user defined material for each object in a <br>
         seperate .inc file that won't be overwritten.</p>
@@ -515,7 +515,7 @@ class TextureTab(QtGui.QWidget):
         self.fcTexItem.setSelected(True)
 
         #get the predefined.xml
-        predefinedPath = os.path.join(os.path.dirname(__file__), "predefined.xml") #get macro path
+        predefinedPath = os.path.join(os.path.dirname(__file__), "predefined.xml") #get workbench path
         
         predefined = xml.parse(predefinedPath).getroot()
         categories = predefined.getchildren()

@@ -1,6 +1,6 @@
 # Supported Features
 
-The macro supports many objects from FreeCAD but not all. Here's a list of the supported objects (checked) and the not supported objects (unchecked) we hope to support soon.
+The workbench supports many objects from FreeCAD but not all. Here's a list of the supported objects (checked) and the not supported objects (unchecked) we hope to support soon.
 
 ## Part Workbench
 
@@ -18,7 +18,7 @@ The macro supports many objects from FreeCAD but not all. Here's a list of the s
 - [x] Compound
 - [x] Extrude (only sketches as base)
 
-The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sphere, cone, torus and ellipsoid
+The workbench doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sphere, cone, torus and ellipsoid
 
 ### Boolean
 
@@ -91,4 +91,4 @@ The macro doesn't support AngleN (Angle, Angle1, Angle2, etc.) for cylinder, sph
 
 - [x] will be rendered as mesh
 
-The macro simulates objects which aren't supported already with a mesh. The meshes are in an extra file with the name `name_meshes.inc`. But doubt, that the creation of a mesh needs a lot of cpu time. See [Mesh resolution and rendering time](tipsAndTricks.md#mesh-resolution-and-rendering-time)
+The workbench simulates objects which aren't supported already with a mesh. The meshes are in an extra file with the name `name_meshes.inc`. But doubt, that the creation of a mesh needs a lot of cpu time. See [Mesh resolution and rendering time](tipsAndTricks.md#mesh-resolution-and-rendering-time)
