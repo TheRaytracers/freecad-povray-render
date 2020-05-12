@@ -2,22 +2,12 @@
 
 ## The Goal of the Project
 
-The ExportToPovRay macro is intended to export as many solid CSG objects as possible from the FreeCAD Part workbench into a corresponding POV-Ray.
-Convert scene description. The object tree with its
-Boolean operations in the POV-Ray file.  
-The user should be able to modify the POV-Ray file so that the
-extensive possibilities of POV-Ray for a photorealistic display
-can be used (textures, light effects, etc.)  
-The main principle is to keep the POV-Ray file as clear as possible,
-so that objects can be found quickly.
-A second important principle is WYSIWYG (**W**hat **Y**ou **S**ee **I**s **W**hat **Y**ou **G**et).
-The render result of the respective view in FreeCAD Gui looks like this
-as possible (camera perspective, background, object colors...).  
+This workbench is intended to export as many objects as possible from FreeCAD into a corresponding mathematical POV-Ray object.
 
-Since a complete transfer of all FreeCAD construction possibilities
-would be too complex, the macro is initially limited to CSG objects -
-However, this limitation is clearly comprehensible for the user - either through a good documentation or in the program e.g. through colored
-selection of transferred objects in the object tree.
+The object tree with its boolean operations, pads, pockets, extrudes, arrays, etc. will be converted with the same structure in the POV-Ray file. The user should be able to modify the POV-Ray file so that the
+extensive possibilities of POV-Ray for a photorealistic display can be used (textures, light effects, etc.) For this, one of the main principle is to keep the POV-Ray file as clear as possible, so that objects can be found quickly.
+
+Since a complete transfer of all FreeCAD construction possibilities would be too complex, the workbench was initially limited to CSG objects, but with time we supported more objects (including the most important features of PartDesign).
 
 ## Working on the code is not the only way to contribute
 
@@ -34,69 +24,57 @@ Before you create a new issue, please read the [Issue Guidelines](https://gitlab
 
 ## Contribute to the Code
 
-### Skeletal structure of the workbench
-
-The macro works in this order:
-
-1. Open the dialog and get the parameters from the user
-2. Create the skeletal structure of the POV-Ray file
-3. Try whether the pov and inc file exists
-4. Add [global settings](#global-settings) to the .pov file
-5. Add the [camera](#camera)
-6. Add the [light source](#light-source)
-7. Add the [background](#background)
-8. Add the [objects from the scene](#objects-from-scene)
-   1. create the basing object
-   2. rotate the object
-   3. transform the object
-   4. add texture properties from FreeCAD or user declaration from .inc file
-9. Write the pov file
-10. Start POV-Ray
-
 Here's a flowchart of the rough **program structure** (if you need a higher resolution, in the doc/img folder is an additional pdf file of this chart):
-![Flowchart of the macro](/doc/img/Workbench%20Structure.png)
 
-## General Characteristics
+![Flowchart of the workbench](/doc/img/Workbench%20Structure.png)
 
-* The macro uses a right handed coordinate system like FreeCAD (specified in [However, this limitation is clearly comprehensible for the user - either
-through a good documentation or in the program e.g. through colored
-selection of transferred objects in the object tree.camera](#camera))
-* All objects are created at <0, 0, 0> and translated later to the right position (see [Characteristics](#general-characteristics))
+### Structure of the Dialog
 
-## Global settings
+Everything concerning the dialog is programmed in Dialog.py. There you have the main class `Dialog`. This class creates the dialog window and the general tab and the help tab. The texture tab and the indirect lightning tab are defined in its own classes (`TextureTab` and `RadiosityTab`). They are derived by QWidget, so they can be added to the tabs directly by the main class.
 
-First, some general settings are added to the .pov file.
-The important one is the standard object color from the settings dialog.
-In objects with standard color and texture the `getPigment()` function will skip color and finish declaration of the pov object.
+In addition there are three little help classes:
 
-## Camera
+* **`Predefined`**  
+  An instance of this class represents an conditioned predefined material from `predefined.xml`.
+* **`ListObject`**  
+  An instance of this class saves all information regarding to one object showed in the list of objects in the texture tab.
+* **`RenderSettings`**  
+  This object is given to the exporter class and saves all settings and file paths and names.
 
-The idea for creation of the camera is to create a camera at <0, 0, 0> and translate and rotate them into the right position.
-global
+### Structure of the Exporter
 
-## Light source
+Everything that creates POV-Ray code is stored in `Exporter.py`.
 
-The light source position is the same as the camera position.
+The most important methods are `initExport()` and `createPovCode()`.
 
-## Background
+#### `createPovCode`
 
-All FreeCAD background color modes from the settings dialog are supported.
-The color(s) are mapped on the POV-Ray sky-sphere and afterwards the skysphere is rotated in the camera direction to fit to the horizon.
+This method is the heart of the exporter. It takes a FreeCAD object and several parameters to specify what will be exported in which way. `createPovCode()` is a recursive method: It calls itself for every child object of the given object. For example if you give a boolean operation to `createPovCode()`, the method will call itself again with the child objects of the boolean operation.
 
-## Objects from Scene
+##### General Characteristics of the Creation
 
-First the macro gets the `firstLayer`, the highest level in the tree view in FreeCAD. The macro calls and recursive function `createPovCode()` which creates the real POV-Ray code. The `main()` function calls it for every object in the `firstLayer`. `createPovCode()` calls itself for every child, so a recursive function.
+* The macro uses a right handed coordinate system like FreeCAD (specified in [However, this limitation is clearly comprehensible for the user - either through a good documentation or in the program e.g. through colored selection of transferred objects in the object tree.camera](#camera))
+* The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently from its position around <0, 0, 0>, FreeCAD rotates relative to the object.
 
-### Object transformation
+##### Rough Steps
 
-The macro creates all objects at <0, 0, 0> and translates the objects later. The reason for that is, that POV-Ray rotates an object independently from its position around <0, 0, 0>, FreeCAD rotates relative to the object.
+1. `initExport()`
+   1. apply all settings from `renderSettings` to fields of the class
+   2. call `startExport()`
+2. `startExport()`
+   1. create the `firstLayer` array
+   2. create the POV-Ray code of the objects
+      1. `createPovCode`
+         1. create the basing object
+         2. rotate the object
+         3. translate the object
+         4. add material
+         5. add photons
+   3. create the skeletal structure of the POV-Ray file
+   4. write files
+   5. start POV-Ray
 
-### `createPovCode()`
 
-1. The variable povCode will be initialized with the label / name of the object.
-2. Add the basing POV-Ray object to povCode but don't close the object
-3. Add the rotation to the POV-Ray object
-4. Add the translation to the POV-Ray object
-5. Add the look to the POV-Ray object
-6. Close the POV-Ray object by adding `}`
-7. Return the created code
+#### `initExport`
+
+This method is called by the `Dialog` class with the `RenderSettings` object as argument. It initializes the exporting process for the current FreeCAD model.
