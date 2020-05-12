@@ -32,8 +32,8 @@ This is the content of the _user.inc file for the following example:
 #declare My_Box_material = material{
     texture {
         checker
-        texture { pigment{ color rgb <0,0,0> } }
-        texture { pigment{ color rgb <1,1,1> } }
+        texture { pigment{ color rgb <0, 0, 0> } }
+        texture { pigment{ color rgb <1, 1, 1> } }
     }
 }
 
@@ -131,6 +131,24 @@ But it is a little bit more tricky for metals:
 
 Here you need the include file and pigment and finish are two levels below 'material{}'.
 This makes sense, because you can combine different metal colors with the way of surface treatment like polishing or brushing.
+
+### Use own Camera
+
+If you define an own camera in the _user.inc file, the workbench will detect this and won't export the FreeCAD camera, so yours will be used. Don't forget to make sure, that the camera uses a right handed coordinate system like FreeCAD (a good tip is to copy the camera from the pov file, paste it into the inc file and edit it).
+
+### Use Photons
+
+Please read [POV-Ray Wiki: Photons](http://wiki.povray.org/content/Reference:Photons) if you don't know, what photons are and how to use it. In short version, with photons it is possible to create realistic caustics and reflections.
+
+You can use them by defining the photons block in the _user.inc file. But how to set the photons blocks per object: Declaring them like materials is not possible, because POV-Ray throws an error if you do that. So we introduced another syntax. This is an example for an object with the label "myObject":
+
+```pov
+#declare myObject_photons_reflection = off;
+#declare myObject_photons_refraction = on;
+#declare myObject_photons_collect = off;
+```
+
+The conversion of the label is the same as for materials. If you know photons, this syntax should be self explaining. It is not necessary to turn the `target` on, because the workbench does this automatically (the `target` keyword isn't added to light sources of course).
 
 ### Where is the advantage of using the inc file
 
