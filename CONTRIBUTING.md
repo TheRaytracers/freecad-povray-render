@@ -4,13 +4,13 @@
 
 This workbench is intended to export as many objects as possible from FreeCAD into a corresponding mathematical POV-Ray object.
 
-The object tree with its boolean operations should be converted with the same structure in the POV-Ray file. 
+The object tree with its boolean operations and other objects should be converted with the same structure in the POV-Ray file.
 
-The user must be able to modify the POV-Ray file and include own pov-Code so that the extensive possibilities of POV-Ray for a photorealistic presentation can be used (e.g. textures and light effects). For this, one of the main principle is to keep the POV-Ray file as clear as possible, so that objects can be found quickly.
+The user must be able to modify the POV-Ray file and include own pov-code so that the extensive possibilities of POV-Ray for a photorealistic presentation can be used (e.g. textures and light effects). For this, one of the main principle is to keep the POV-Ray file as clear as possible, so that objects can be found quickly.
 
-The user should be able to render realistic scenes easily by adding of textures und lights without needing to write POV-Ray code.
+The user should be able to render realistic scenes easily by adding of textures und lights without needing to write POV-Ray code. As many as possible POV-Ray features should be available via the GUI, but due to the amount of POV-Ray features, only the most important ones are implemented.
 
-Since a complete transfer of all FreeCAD construction possibilities would be too complex, the workbench will be initially fokused to CSG objects, depending on time other features e.g. from PartDesign workbench could be implemented.
+Since a complete transfer of all FreeCAD construction possibilities would be too complex, the workbench was initially focused to CSG objects, but with time other features e.g. from PartDesign workbench were implemented. Depending on time more features will be implemented.
 
 The limitations of the workbench must not lead to missing objects in the rendered scene. So not supported objects must be rendered as mesh but this limitation should be clearly comprehensible for the user for example through a good documentation.
 
@@ -78,7 +78,6 @@ This method is the heart of the exporter. It takes a FreeCAD object and several 
    3. create the skeletal structure of the POV-Ray file
    4. write files
    5. start POV-Ray
-
 
 #### `initExport`
 
