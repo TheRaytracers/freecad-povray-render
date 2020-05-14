@@ -4,12 +4,15 @@
 
 This workbench is intended to export as many objects as possible from FreeCAD into a corresponding mathematical POV-Ray object.
 
-The object tree with its boolean operations, pads, pockets, extrudes, arrays, etc. will be converted with the same structure in the POV-Ray file. The user should be able to modify the POV-Ray file so that the
-extensive possibilities of POV-Ray for a photorealistic display can be used (textures, light effects, etc.) For this, one of the main principle is to keep the POV-Ray file as clear as possible, so that objects can be found quickly.
+The object tree with its boolean operations should be converted with the same structure in the POV-Ray file. 
 
-The user should be able to render realistic scenes easily by e.g adding of textures und lights without needing to write POV-Ray code.
+The user must be able to modify the POV-Ray file and include own pov-Code so that the extensive possibilities of POV-Ray for a photorealistic presentation can be used (e.g. textures and light effects). For this, one of the main principle is to keep the POV-Ray file as clear as possible, so that objects can be found quickly.
 
-Since a complete transfer of all FreeCAD construction possibilities would be too complex, the workbench was initially limited to CSG objects, but with time we supported more objects (including the most important features of PartDesign). There should be a kind of backdoor to make also not supported features accessible, so we implemented meshes. This limitation should be clearly comprehensible for the user for example through a good documentation.
+The user should be able to render realistic scenes easily by adding of textures und lights without needing to write POV-Ray code.
+
+Since a complete transfer of all FreeCAD construction possibilities would be too complex, the workbench will be initially fokused to CSG objects, depending on time other features e.g. from PartDesign workbench could be implemented.
+
+The limitations of the workbench must not lead to missing objects in the rendered scene. So not supported objects must be rendered as mesh but this limitation should be clearly comprehensible for the user for example through a good documentation.
 
 ## Working on the code is not the only way to contribute
 
