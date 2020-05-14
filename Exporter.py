@@ -32,7 +32,8 @@ import subprocess
 from helpDefs import *
 
 class ExportToPovRay:
-    """Export the FreeCAD model to POV-Ray"""
+    """Export a FreeCAD model to POV-Ray"""
+
     def __init__(self):
         #get default shape color (editable in FreeCAD settings) (default rgb(0.8, 0.8, 0.8))
         self.DefaultShapeColor = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
@@ -40,6 +41,8 @@ class ExportToPovRay:
         self.os = platform.system() #get system information
 
     def initExport(self, renderSettings):
+        """Export the current FreeCAD model with the settings given by the Settings object (defined in Dialog.py)."""
+
         self.doc = App.ActiveDocument
         self.objs = self.doc.Objects
 
@@ -122,7 +125,9 @@ class ExportToPovRay:
 
         self.startExport() #start the export
 
-    def startExport(self): #start the export to POV-Ray by using the settings did in initExport()
+    def startExport(self):
+        """Start the export to POV-Ray by using the settings did in initExport()."""
+
         firstLayer = [] #the highest objects in the model tree
 
         #repair rotation (see documentation)
@@ -208,7 +213,23 @@ class ExportToPovRay:
         self.openPovRay() #start povray
 
 
-    def createPovCode(self, fcObj, expPlacement, expPigment, expPhotons, expClose, expLabel, expMeshDef): #returns the povray code for the object
+    def createPovCode(self, fcObj, expPlacement, expPigment, expPhotons, expClose, expLabel, expMeshDef):
+        """
+        Return the POV-Ray code for the given FreeCAD object.
+        
+        ARGUMENTS
+        fcObj              : The FreeCAD App object that will be converted
+        expPlacement (bool): Should the placement of the given FreeCAD object be exported.
+        expPigment   (bool): Should the pigment/material of the given FreeCAD object be exported.
+        expPhotons   (bool): Should photons be applied to the given FreeCAD object.
+        expClose     (bool): Should the closing bracket of the POV-Ray object be written.
+        expLabel     (bool): Should the labe of the given FreeCAD object be exported.
+        expMeshDef   (bool): Should the mesh of the given FreeCAD object be created (if it is necessary to create a mesh).
+
+        RETURN
+        povCode (str): The POV-Ray code of the given FreeCAD object.
+        """
+
         if expLabel:
             povCode = "\n//----- " + stringCorrection(fcObj.Label) + " -----" #add the name of the object
         else:
@@ -707,7 +728,9 @@ class ExportToPovRay:
         return povCode
 
 
-    def sketchToBezier(self, sketch): #create pov bezier_spline from sketch
+    def sketchToBezier(self, sketch):
+        """Create a pov bezier_spline from a sketch."""
+
         try:
             povSpline = "\n"
 
@@ -850,7 +873,9 @@ class ExportToPovRay:
                 
         return [povSpline, numOfPoints]
 
-    def getNextLine(self, lines, lastLine): #get index of next line for the given last line
+    def getNextLine(self, lines, lastLine):
+        """Get index of next line for the given last line."""
+
         #returns index
         i = 0
         for line in lines:
@@ -859,19 +884,25 @@ class ExportToPovRay:
             i += 1
         return -1
 
-    def isSamePoint(self, point1, point2): #are two points equal
+    def isSamePoint(self, point1, point2):
+        """Check if two points are equal."""
+
         #round because FreeCAD has rounding mistakes
         if round(point1.x, 3) == round(point2.x, 3) and round(point1.y, 3) == round(point2.y, 3) and round(point1.z, 3) == round(point2.z, 3):
             return True
         return False
 
-    def hasLinesConstructive(self, lines): #are constructive lines in lines array
+    def hasLinesConstructive(self, lines):
+        """Has the given lines array constructive lines in it."""
+
         for line in lines:
             if line.Construction:
                 return True
         return False
 
-    def isBodySupported(self, body): #is a body full supported
+    def isBodySupported(self, body):
+        """Is the given body fully supported."""
+
         supportedTypeIds = ["App::Origin",
                             "App::Line",
                             "App::Plane",
@@ -915,6 +946,8 @@ class ExportToPovRay:
         return True
 
     def isPadPocketSupported(self, fcObj):
+        """Check if the given pad or pocket from PartDesign is fully supported."""
+
         supportedTypes = ["Length"]
 
         if not (fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket"):
@@ -929,6 +962,8 @@ class ExportToPovRay:
         return True
 
     def isExtrudeSupported(self, fcObj):
+        """Check if the given extrude from Part is fully supported."""
+
         #test mode of direction
         if fcObj.DirMode != "Normal":
             return False
@@ -948,6 +983,8 @@ class ExportToPovRay:
         return True
 
     def isSketchSupported(self, sketch):
+        """Check if the given sketch is fully supported."""
+
         supportedGeometryTypes = [Part.LineSegment, Part.Circle, Part.Point, Part.ArcOfCircle]
         for line in sketch.Geometry:
             if not type(line) in supportedGeometryTypes and not line.Construction:
@@ -955,7 +992,9 @@ class ExportToPovRay:
 
         return True
 
-    def createMesh(self, fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef): #create pov mesh from object
+    def createMesh(self, fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef):
+        """Create a pov mesh from the given FreeCAD object. Arguments are the same as for createPovCode()."""
+
         povCode = ""
 
         if expMeshDef:
@@ -1042,7 +1081,9 @@ class ExportToPovRay:
         return povCode
 
 
-    def getStatistics(self, objs): #get statistics about the model the user want to render
+    def getStatistics(self, objs):
+        """Return the statistics of the current FreeCAD model."""
+
         statistics = ""
         noCsgCount = 0
         CsgCount = 0
@@ -1096,14 +1137,18 @@ class ExportToPovRay:
 
         return statistics
 
-    def getFCLight(self): #get the FreeCAD light
+    def getFCLight(self):
+        """Return the FreeCAD light in pov code."""
+
         povLight = ""
 
         povLight += "light_source { CamPosition color rgb <0.5, 0.5, 0.5> }\n"
 
         return povLight
 
-    def getBackground(self): #get the FreeCAD background
+    def getBackground(self):
+        """Return the FreeCAD background as pov code."""
+
         bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
         bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
         bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
@@ -1168,7 +1213,9 @@ class ExportToPovRay:
 
         return povBg
 
-    def getCam(self): #get the FreeCAD camera
+    def getCam(self):
+        """Return the current FreeCAD model as pov code."""
+
         AspectRatio = self.width / float(self.height)
 
         PovCam = ""
@@ -1225,7 +1272,9 @@ class ExportToPovRay:
         return PovCam
 
 
-    def getTranslation(self, fcObj): #get the translation of an object
+    def getTranslation(self, fcObj):
+        """Return the translation of the given FreeCAD object in pov code."""
+
         translation = ""
         x = fcObj.Placement.Base.x #get the position in every axis
         y = fcObj.Placement.Base.y
@@ -1235,7 +1284,9 @@ class ExportToPovRay:
 
         return translation
 
-    def getRotation(self, fcObj): #get the rotation of an object
+    def getRotation(self, fcObj):
+        """Return the rotation of the given FreeCAD object in pov code."""
+
         rotate = ""
         eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
         x = eulerRot[2] #get rotation in every axis
@@ -1254,6 +1305,7 @@ class ExportToPovRay:
         return rotate
 
     def getInvertedRotation(self, fcObj):
+        """Return the inverted rotation of the given FreeCAD object in pov code."""
         rotate = ""
         eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
         x = eulerRot[2] #get rotation in every axis
@@ -1277,7 +1329,9 @@ class ExportToPovRay:
 
         return rotate
 
-    def getPigment(self, fcObj): #get the pigment of an object
+    def getPigment(self, fcObj):
+        """Return the pigment/material of the given FreeCAD object in pov code."""
+
         appObject = fcObj.ViewObject
         material = ""
         pigment = ""
@@ -1339,6 +1393,8 @@ class ExportToPovRay:
         return material
 
     def getPhotons(self, fcObj):
+        """Return the photons block of the given FreeCAD object in pov code."""
+
         photons = "\nphotons {"
 
         if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons") == -1:
@@ -1365,6 +1421,8 @@ class ExportToPovRay:
 
 
     def listObjectToPov(self, obj, label=None):
+        """Convert the predefined object (defined in Dialog.py) from a listObject (defined in Dialog.py) into pov code."""
+
         if label == None:
             label = obj.label
 
@@ -1428,7 +1486,9 @@ class ExportToPovRay:
 
         return povContent
 
-    def writeFile(self, povText): #write the final pov file
+    def writeFile(self, povText):
+        """Write the final pov file."""
+
         #povText: the code for POV-Ray
         try:
             file = open(self.povPath, "w+") #XXX open file (Really "w+"?)
@@ -1437,7 +1497,9 @@ class ExportToPovRay:
         except:
             return -1
 
-    def openPovRay(self): #start POV-Ray
+    def openPovRay(self):
+        """Start POV-Ray."""
+
         povExec = App.ParamGet(preferences.prefPath).GetString("PovRayExe", "")
         povOptions = App.ParamGet(preferences.prefPath).GetString("RenderParameters", "")
 
@@ -1461,7 +1523,9 @@ class ExportToPovRay:
 
         self.checkErrFile()
 
-    def checkErrFile(self): #check error file for errors
+    def checkErrFile(self):
+        """Check error file for errors and show info box."""
+
         error = ""
         #open error file
         if os.path.isfile(self.errorPath) == True:
@@ -1483,10 +1547,14 @@ class ExportToPovRay:
         else:
             self.delErrorFile()
 
-    def delErrorFile(self): #delete error file
+    def delErrorFile(self):
+        """Delete error file."""
+
         os.remove(self.errorPath)
 
-    def repairRotation(self, objs): #repair the rotation of objects (likely a bug in FreeCAD)
+    def repairRotation(self, objs):
+        """Repair the rotation of objects (likely a bug in FreeCAD)."""
+
         for obj in objs:
             if hasattr(obj, 'Placement'):
                 ObjLocation = obj.Placement
@@ -1499,10 +1567,14 @@ class ExportToPovRay:
                 rotAngle = math.degrees(ObjLocation.Rotation.Angle)
                 obj.Placement = App.Placement(App.Vector(posX, posY, posZ), App.Rotation(App.Vector(rotX, rotY, rotZ), rotAngle), App.Vector(0, 0, 0))
 
-    def exportFcView(self): #export the current FreeCAD view like Tools / Save Picture...
+    def exportFcView(self):
+        """Write the current FreeCAD view like Tools / Save Picture... to the file."""
+
         Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
 
     def hasPartAsParent(self, fcObj):
+        """Check if the given FreeCAD object has a std part as parent object."""
+
         for parent in fcObj.InList:
             if parent.TypeId == "App::Part":
                 return True
@@ -1510,20 +1582,26 @@ class ExportToPovRay:
         return False
 
     def hasBodyAsParent(self, fcObj):
+        """Check if the given FreeCAD object has a body as parent object."""
+
         for parent in fcObj.InList:
             if parent.TypeId == "PartDesign::Body":
                 return True
 
         return False
 
-    def uintColorToRGB(self, uintColor): #convert uint color to a rgb color
+    def uintColorToRGB(self, uintColor):
+        """Convert uint color to a rgb color."""
+
         Blue = (uintColor >> 8) & 255
         Green = (uintColor >> 16) & 255
         Red = (uintColor >> 24) & 255
         rgbString = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(Red / float(255), Green / float(255), Blue / float(255))
         return rgbString
 
-    def delComments(self, code): #delete the comments in incContent
+    def delComments(self, code):
+        """Delete the comments in the given code (pov syntax)."""
+
         #delete big comments
         while code.find("/*") is not -1:
             comStart = code.find("/*")
@@ -1545,7 +1623,9 @@ class ExportToPovRay:
             code = code[0:comStart] + code[comEnd:]
         return code
 
-    def isNameSupported(self, objName, supportedNames): #is fcObj.Name part of the supported names
+    def isNameSupported(self, objName, supportedNames):
+        """Is fcObj.Name part of the supported names."""
+
         for name in supportedNames:
             if objName.startswith(name):
                 return True
