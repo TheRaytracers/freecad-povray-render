@@ -1,5 +1,17 @@
 # Developer Documentation
 
+- [Developer Documentation](#developer-documentation)
+  - [The Goal of the Project](#the-goal-of-the-project)
+  - [Working on the code is not the only way to contribute](#working-on-the-code-is-not-the-only-way-to-contribute)
+  - [Contribute to the Code](#contribute-to-the-code)
+    - [Structure of the Dialog](#structure-of-the-dialog)
+      - [Structure of Tab Classes](#structure-of-tab-classes)
+    - [Structure of the Exporter](#structure-of-the-exporter)
+      - [`createPovCode`](#createpovcode)
+        - [General Characteristics of the Creation](#general-characteristics-of-the-creation)
+        - [Rough Steps](#rough-steps)
+      - [`initExport`](#initexport)
+
 ## The Goal of the Project
 
 This workbench is intended to export as many objects as possible from FreeCAD into a corresponding mathematical POV-Ray object.
@@ -45,6 +57,29 @@ In addition there are three little help classes:
   An instance of this class saves all information regarding to one object showed in the list of objects in the texture tab.
 * **`RenderSettings`**  
   This object is given to the exporter class and saves all settings and file paths and names.
+
+#### Structure of Tab Classes
+
+As said above, the class has to be derived by QWidget, so that it can be added to the tabs. The methods
+
+* `applyQSettings(qSettingsObject)`
+* `saveQSettings(qSettingsObject)`
+* `applyIniSettings(csvLines)`
+* `settingsToIniFormat()`
+
+are mandatory. They are called to give the tab the chance to save the settings of the tab.
+
+In `applyQSettings` and `saveQSettings` the method takes a QSettingsObject that should be used to save/read the settings, that are project independent, e.g. the size of the preview image. Be aware, that you have to begin and end a group, we recommend to name the group with the same name as the tab. If you don't want to save any things via QSettings, just put a `pass` command in the method.
+
+`applyIniSettings` and `settingsToIniFormat` are a bit different. They should be used to save/read the settings, that are different for every project, e.g. the textures. At the beginning of the ini file, a section is commented out where all these things are stored in CSV format. To make clear, which settings are for which tab, it is good to add a prefix to the entry in the first column.
+
+`settingsToIniFormat` returns the csv string with an `;` at the beginning (to comment out), this csv string will be added to the beginning of the ini file (the delimiter should be a `,`). Example (from the texture tab):
+
+```csv
+;obj_Plane,Checkerb166,20.0,20.0,20.0,0.0,0.0,0.0,10.0,10.0,0.0
+```
+
+`applyIniSettings` is to read the settings from the ini file and apply them to the tab. This method takes the csv lines, they should be given to csv.reader and then you iterate over the rows. Then you check for the prefix and read the rest of the columns and apply the read settings to your tab.
 
 ### Structure of the Exporter
 
