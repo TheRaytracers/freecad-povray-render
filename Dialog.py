@@ -57,13 +57,13 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.warnLabel = QtGui.QLabel("")
         self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
 
-        self.horizLayout1 = QtGui.QGridLayout()
-        self.horizLayout1.addWidget(self.pathLineEdit, 0, 0)
-        self.horizLayout1.addWidget(self.openFileDialogButton, 0, 1)
-        self.horizLayout1.addWidget(self.warnLabel, 1, 0, 1, 2)
+        self.iniSelectionLayout = QtGui.QGridLayout()
+        self.iniSelectionLayout.addWidget(self.pathLineEdit, 0, 0)
+        self.iniSelectionLayout.addWidget(self.openFileDialogButton, 0, 1)
+        self.iniSelectionLayout.addWidget(self.warnLabel, 1, 0, 1, 2)
 
         self.pathGroup = QtGui.QGroupBox("Output File Selection")
-        self.pathGroup.setLayout(self.horizLayout1)
+        self.pathGroup.setLayout(self.iniSelectionLayout)
 
         #Width & Height of rendered image
         self.imageWidthLabel = QtGui.QLabel("Width")
@@ -91,10 +91,10 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         #Options
         self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
-        self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via the settings)<br>Define your own background if you uncheck this option")
+        self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via the settings)<br>Define your own background if you unchecked this option")
         
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
-        self.expLight.setToolTip("Export the light FreeCAD uses. Define your own light if you uncheck this option")
+        self.expLight.setToolTip("Export the light FreeCAD uses. Define your own light if you unchecked this option")
 
         self.repRot = QtGui.QCheckBox("Repair Rotation")
         self.repRot.setToolTip("Repair the rotation of all objects. Visit the Help tab for more information.")
@@ -159,7 +159,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         <p>This workbench exports solid CSG primitives to POV-Ray.<br>
         The resulting POV code is readable and intended for further editing.<br>
         You can add user defined material for each object in a <br>
-        seperate .inc file that won't be overwritten.</p>
+        separate .inc file that won't be overwritten.</p>
         <h3>Pov File Selection</h3>
         <p>Select the ini file by typing the path into the text field or choose a .ini file <br>
         with the '...' button.<br>
@@ -170,7 +170,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         <h5>Export Background</h5>
         <p>Export the FreeCAD background</p>
         <h5>Export Light</h5>
-        <p>Export the FreeCAD light. Define your own light in the inc file if you uncheck this option</p>
+        <p>Export the FreeCAD light. Define your own light in the inc file if you unchecked this option</p>
         <h5>Repair Rotation</h5>
         <p>Use this option if objects in your scene appear in a wrong rotation.<br>
         This is a workaround for a FreeCAD bug.</p>
@@ -521,10 +521,8 @@ class TextureTab(QtGui.QWidget):
         categories = predefined.getchildren()
 
         #read the predefined.xml and add the predefined defined in the XML
-        for categorie in categories:
-            #categorieItem = QtGui.QTreeWidgetItem(self.textureList, [categorie.tag])
-            #predefs = categorie.getchildren()
-            self.predefXmlToList(categorie, self.textureList)
+        for category in categories:
+            self.predefXmlToList(category, self.textureList)
 
 
         #add the list to the layouts and widgets
@@ -640,10 +638,10 @@ class TextureTab(QtGui.QWidget):
             self.predefines.append(Predefined(xmlNode.text, material, texture, pigment, finish, normal, interior, media, inc, comment, treeItem))
 
         else:
-            categorieItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
+            categoryItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
             for node in childNodes:
                 #call method for child nodes
-                self.predefXmlToList(node, categorieItem)
+                self.predefXmlToList(node, categoryItem)
 
     def addScaleRotateTranslate(self): #add the scale and rotate menu
         # scale, rotate, preview
@@ -808,8 +806,8 @@ class TextureTab(QtGui.QWidget):
         listObj = self.getSelectedListObject()
         predefine = self.getSelectedPredefined()
         if listObj == -1 or predefine == -1: #is no object or predefine selected
-            if predefine == -1: #is only a categorie selected
-                #expand and select predef under the categorie
+            if predefine == -1: #is only a category selected
+                #expand and select predef under the category
                 self.disconnectSignals()
                 selectedItems = self.textureList.selectedItems()
                 selected = selectedItems[0]
@@ -1010,13 +1008,20 @@ class Predefined:
         self.treeItem = treeItem
 
     def getHash(self):
-        #parentCategorie = self.treeItem.parent().text(0)
         predefName = self.treeItem.text(0)
 
-        stgStr = str(self.identifier) + str(self.material) + str(self.texture) + str(self.pigment) + str(self.finish) + str(self.normal) + str(self.interior) + str(self.media) + str(self.inc) + str(self.comment)
+        stgStr = (str(self.identifier) +
+            str(self.material) +
+            str(self.texture) +
+            str(self.pigment) +
+            str(self.finish) +
+            str(self.normal) +
+            str(self.interior) +
+            str(self.media) +
+            str(self.inc) +
+            str(self.comment))
         hashStr = hashlib.md5(stgStr.encode("UTF-8")).hexdigest()[:4]
 
-        #return parentCategorie + "/" + predefName + hashStr
         return predefName + hashStr
 
 class ListObject:
