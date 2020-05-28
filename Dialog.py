@@ -311,7 +311,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
             return True
         else:
             self.renderButton.setEnabled(False)
-            if path == "":
+            if path == "" or os.path.isdir(path):
                 self.warnLabel.setText("Please type a path or get one with clicking on '...'")
             else:
                 self.warnLabel.setText("Your path contains a space or a mutated vowel or is not a .ini file")
