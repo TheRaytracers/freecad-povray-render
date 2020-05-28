@@ -25,7 +25,7 @@ class PointLightCommand:
 
     def GetResources(self):
         return {"MenuText": "Insert Point Light",
-				"Accel": "Ctrl+P",
+				"Accel": "L,P",
 				"ToolTip": "Insert a point light (shining in every direction)",
 				"Pixmap"  : "pointLight.svg"}
                 
@@ -52,7 +52,7 @@ class AreaLightCommand:
 
     def GetResources(self):
         return {"MenuText": "Insert an Area Light",
-				"Accel": "Ctrl+A",
+				"Accel": "L,A",
 				"ToolTip": "Insert an area light (array of lights)",
 				"Pixmap"  : "areaLight.svg"}
                 
@@ -79,7 +79,7 @@ class SpotLightCommand:
 
     def GetResources(self):
         return {"MenuText": "Insert a Spot Light",
-				"Accel": "Ctrl+S",
+				"Accel": "L,S",
 				"ToolTip": "Insert a spot light",
 				"Pixmap"  : "spotLight.svg"}
                 
