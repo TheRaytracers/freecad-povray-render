@@ -1022,7 +1022,7 @@ class Predefined:
             str(self.comment))
         hashStr = hashlib.md5(stgStr.encode("UTF-8")).hexdigest()[:4]
 
-        return predefName + hashStr
+        return stringCorrection(predefName) + hashStr
 
 class ListObject:
     def __init__(self, fcObj, listItem, predefObject, scaleX, scaleY, scaleZ, rotationX, rotationY, rotationZ, translationX, translationY, translationZ):
