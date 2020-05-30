@@ -1570,7 +1570,11 @@ class ExportToPovRay:
     def exportFcView(self):
         """Write the current FreeCAD view like Tools / Save Picture... to the file."""
 
-        Gui.ActiveDocument.ActiveView.saveImage(self.fcViewPath, self.width, self.height)
+        try:
+            Gui.ActiveDocument.ActiveView.saveImage(
+                self.fcViewPath, self.width, self.height)
+        except:
+            App.Console.PrintError("\nExport of FreeCAD view failed!\n")
 
     def hasPartAsParent(self, fcObj):
         """Check if the given FreeCAD object has a std part as parent object."""
