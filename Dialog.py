@@ -206,13 +206,18 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         defaultPath = os.path.dirname(App.ActiveDocument.FileName)
 
         if defaultPath == "":
-            system = platform.system()
-            if system == "Linux":
-                defaultPath = "/home/"
-            elif system == "Darwin":
-                defaultPath = "/Users/"
-            elif system == "Windows":
-                defaultPath = "C:\\Users\\%UserName%\\"
+            if App.ActiveDocument.FileName == u"":
+                system = platform.system()
+                if system == "Linux":
+                    defaultPath = "/home/"
+                elif system == "Darwin":
+                    defaultPath = "/Users/"
+                elif system == "Windows":
+                    defaultPath = "C:\\Users\\%UserName%\\"
+            else:
+                #create ini path from FreeCAD file
+                defaultPath = os.path.splitext(
+                    App.ActiveDocument.FileName)[0] + ".ini"
 
 
         self.pathLineEdit.setText(defaultPath)
