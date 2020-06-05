@@ -46,8 +46,6 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.pathLineEdit = QtGui.QLineEdit()
         self.pathLineEdit.setPlaceholderText("Path to INI File")
         self.pathLineEdit.setToolTip("Path to the INI file (kind of a project file)")
-        self.pathLineEdit.setFixedWidth(300)
-        #self.pathLineEdit.textChanged.connect(self.handlePath)
         self.pathLineEdit.setEnabled(False)
 
         self.openFileDialogButton = QtGui.QPushButton("Select Project File (*.ini)")
