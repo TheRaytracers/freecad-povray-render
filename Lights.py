@@ -267,7 +267,7 @@ class ViewProviderSpotLight:
         radiusMaterial.diffuseColor.setValue(coin.SbColor(1, 1, 0))
 
         radiusComplexity = coin.SoComplexity()
-        radiusComplexity.value = 0.99
+        radiusComplexity.value = 1.0
 
         self.radiusSep.addChild(self.radiusTrans)
         self.radiusSep.addChild(radiusMaterial)
@@ -288,7 +288,7 @@ class ViewProviderSpotLight:
         fallOffMaterial.diffuseColor.setValue(coin.SbColor(1, 1, 0))
 
         fallOffComplexity = coin.SoComplexity()
-        fallOffComplexity.value = 0.9
+        fallOffComplexity.value = 1.0
 
         self.fallOffSep.addChild(self.fallOffTrans)
         self.fallOffSep.addChild(fallOffMaterial)
