@@ -52,7 +52,8 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         self.openFileDialogButton = QtGui.QPushButton("Select Project File (*.ini)")
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
-        self.openFileDialogButton.setToolTip("Open file dialog for choosing a INI file")
+        self.openFileDialogButton.setToolTip("Open file dialog for choosing a INI file.\n"\
+            "Be careful to not use spaces or special chars in pathname for POV-Ray compatibility.")
 
         self.warnLabel = QtGui.QLabel("")
         self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
@@ -91,13 +92,16 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         #Options
         self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
-        self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via the settings)<br>Define your own background if you unchecked this option")
+        self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via the settings)\n"\
+            "Define your own background if you unchecked this option")
         
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
-        self.expLight.setToolTip("Export the light FreeCAD uses. Define your own light if you unchecked this option")
+        self.expLight.setToolTip("Export the light FreeCAD uses. Define your own light via a light object in FreeCAD or a light in the user inc file if you unchecked this option")
 
         self.repRot = QtGui.QCheckBox("Repair Rotation")
-        self.repRot.setToolTip("Repair the rotation of all objects. Visit the Help tab for more information.")
+        self.repRot.setToolTip("Repair the rotation of all objects.\n"\
+            "Use this option if objects in your scene appear in a wrong rotation.\n"\
+            "This is a workaround for a FreeCAD bug. Visit the Help tab for more information.")
         
         self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
         self.expFcView.setToolTip("Take a screenshot of the scene view and save it with the same resolution as the image")
