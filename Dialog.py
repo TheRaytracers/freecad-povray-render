@@ -362,6 +362,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.iniContent = ""
         self.iniContent += self.csv + "\n"
         self.iniContent += "Input_File_Name='" + self.renderSettings.povName + "'\n"
+        self.iniContent += "Output_File_Name='" + self.renderSettings.pngName + "'\n"
         self.iniContent += "Width=" + str(self.renderSettings.width) + "\n"
         self.iniContent += "Height=" + str(self.renderSettings.height) + "\n"
         self.iniContent += "Fatal_File='" + self.renderSettings.errorName + "'\n"
@@ -1062,6 +1063,22 @@ class RenderSettings:
         self.iniPath = self.directory + self.iniName
         self.povName = self.projectName + ".pov"
         self.povPath = self.directory + self.povName
+
+        import re
+        numOfImages = 0
+
+        for fileName in os.listdir(self.directory):
+            # is a file
+            if os.path.isfile(os.path.join(self.directory, fileName)):
+                # does the filename fits the regex pattern
+                matchObj = re.search(self.projectName.encode('unicode_escape') + r' \(([0-9]+)\)\.png', fileName)
+                if matchObj:
+                    # is the number bigger than the number of the other images
+                    if int(matchObj.group(1)) > numOfImages:
+                        numOfImages = int(matchObj.group(1))
+
+        self.pngName = self.projectName + " (" + str(numOfImages + 1) + ").png"
+        self.pngPath = self.directory + self.pngName
         
         self.incName = self.projectName + "_user.inc"
         self.incPath = self.directory + self.incName
