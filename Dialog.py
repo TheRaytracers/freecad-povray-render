@@ -90,7 +90,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         #Options
         self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
-        self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via the settings)\n"\
+        self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via FreeCAD settings)\n"\
             "Define your own background if you unchecked this option")
         
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
@@ -158,27 +158,22 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         </style>
         <div>
         <h3>General</h3>
-        <p>This workbench exports solid CSG primitives to POV-Ray.<br>
-        The resulting POV code is readable and intended for further editing.<br>
-        You can add user defined material for each object in a <br>
-        separate .inc file that won't be overwritten.</p>
-        <h3>Pov File Selection</h3>
-        <p>Select the ini file by typing the path into the text field or choose a .ini file <br>
-        with the '...' button.<br>
+        <p>This workbench is specialised for rendering with <a href='http://povray.org/'>POV-Ray</a>.<br>
+        You will get best results if you focus on using solid CSG primitives from the part workbench.<br>
+        The resulting POV code is readable and can be modified with a 
+        separate include file that <br> won't be overwritten.</p>
+        <h3>Output File Selection</h3>
+        <p>The *.ini file sticks your render project together. Select an existing file or create a new one. <br>
         Be careful not to use spaces or special chars in pathname for POV-Ray compatibility.</p>
-        <h3>Width and Height of the Image</h3>
-        <p>Select the width and height in pixels of the image to be rendered with POV-Ray.</p>
-        <h3>Options</h3>
-        <h5>Export Background</h5>
-        <p>Export the FreeCAD background</p>
-        <h5>Export Light</h5>
-        <p>Export the FreeCAD light. Define your own light in the inc file if you unchecked this option</p>
-        <h5>Repair Rotation</h5>
-        <p>Use this option if objects in your scene appear in a wrong rotation.<br>
-        This is a workaround for a FreeCAD bug.</p>
-        <h5>Export FreeCAD View</h5>
-        <p>Export the current FreeCAD view in the same size as the image rendered by POV-Ray<br></p>
-        <p>For more information look in our <a href='https://gitlab.com/usbhub/exporttopovray/blob/master/doc/index.md'>Wiki</a></p>
+        <h3>Textures</h3>
+        <p>Textures can be easily added by choosing an object from the left list and after that<br>
+        choosing a texture from the right list. These two steps can be repeated for all objects</p>
+        <h3>Lights</h3>
+        <p>Lightsources can be added via the workbench and will appear as objects in your FreeCAD model.<br>
+        Overall lightning can be influenced via the "Indirect Lightning" Tab.<br>
+        Usage is directly explained in the tab.</p>
+        <h3>Help</h3>
+        <p>For detailed information look in our <a href='https://gitlab.com/usbhub/exporttopovray/blob/master/doc/index.md'>Wiki</a></p>
         </div>"""
         self.helpLabel.setText(helpText)
         self.helpLabel.setOpenExternalLinks(True)
