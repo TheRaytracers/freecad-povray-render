@@ -1501,6 +1501,7 @@ class ExportToPovRay:
         """Start POV-Ray."""
 
         povExec = App.ParamGet(preferences.prefPath).GetString("PovRayExe", "")
+        execMode = App.ParamGet(preferences.prefPath).GetInt("ExecMode", 0)
         povOptions = App.ParamGet(preferences.prefPath).GetString("RenderParameters", "")
 
         if os.path.isfile(povExec) == False:
@@ -1519,9 +1520,11 @@ class ExportToPovRay:
         iniHandler.close()
 
         #start povray
-        subprocess.call([povExec, self.iniName])
-
-        self.checkErrFile()
+        if execMode == 0: #wait until finished
+            subprocess.call([povExec, self.iniName])
+            self.checkErrFile()
+        else:
+            subprocess.Popen([povExec, self.iniName])
 
     def checkErrFile(self):
         """Check error file for errors and show info box."""
