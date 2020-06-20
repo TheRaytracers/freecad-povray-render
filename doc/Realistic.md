@@ -14,7 +14,7 @@ You can download the chess example: [Chess FreeCAD File](Examples/Chess/Chess.FC
 
 If you just render the image without adjusting any settings, you will get this image:
 
-![First Rendering](Examples/Chess/FirstImage/FirstImage.png "The first rendering of the chess match in POV-Ray")
+![First Rendering](Examples/Chess/FirstImage/FirstImage%20(1).png "The first rendering of the chess match in POV-Ray")
 
 Maybe the result is not very exciting for you. Without any textures and just the basic settings the workbench follows the **WYSIWYG** principle. **W**hat **Y**ou **S**ee (in FreeCAD) **I**s **W**hat **Y**ou **G**et (in POV-Ray). If you checked the "Export FreeCAD view" checkbox in the popup window you can find a second picture with the FreeCAD view in the output directory. Both pictures have the same image size and camera view. But if you look carefully you can see little differences: POV-Ray will not render the outlines of the objects and if you look even closer, the shadows are not the same. It is that way because FreeCAD illuminates each object individually but in POV-Ray we used a single light source at the position of the camera. If there are bigger differences you should check our [Tips & Tricks Section](tipsAndTricks.md).
 
@@ -27,7 +27,7 @@ Another thing we did in the following example: We changed the background color i
 
 Now start the Rendering again and you will get something like this:
 
-![First texture](Examples/Chess/TexturesAndBackground/TexturesAndBackground.png "The chess model with textures and another background")
+![First texture](Examples/Chess/TexturesAndBackground/TexturesAndBackground%20(1).png "The chess model with textures and another background")
 
 This is a lot better, isn't it? But there is still a lot to improve.
 
@@ -36,19 +36,19 @@ This is a lot better, isn't it? But there is still a lot to improve.
 Let's do the next step in realistic rendering. By defining a better lightning you can give the image an atmosphere.  
 We introduced the light objects to do this easily. Until now, the only light source in the scene is the FreeCAD light at the same position as the camera. You see, that we defined two lights for you in the model already: one spot light and one point light. Make the spot light visible and render again (don't uncheck the "Export FreeCAD light option"). You should get an image like that:
 
-![Spot Light](Examples/Chess/SpotLight/SpotLight.png "The chess model a spot light pointing a the white king")
+![Spot Light](Examples/Chess/SpotLight/SpotLight%20(1).png "The chess model a spot light pointing a the white king")
 
 Like you see, we defined a spot light that points at the white king. To make the rest of the scene darker to set the focus even more on the king, make the point light visible and uncheck the option for exporting the FreeCAD light.
 
-![New Global Light](Examples/Chess/PointLight/PointLight.png "The chess model with a new global light")
+![New Global Light](Examples/Chess/PointLight/PointLight%20(1).png "The chess model with a new global light")
 
-The next step is to adjust the indirect lightning. If you don't know, what indirect lightning (also known as "Global Illumination" or "Radiosity") is, just look in the tab, we explained it directly there. Indirect lightning is an important step for creating realistic images because it calculates the indirect lightning physically correct. Choose the "Normal" option and check "Ambient to 0". Now you will an image like this:
+The next step is to adjust the indirect lightning. If you don't know, what indirect lightning (also known as "Global Illumination" or "Radiosity") is, just look in the tab, we explained it directly there. Indirect lightning is an important step for creating realistic images because it calculates the indirect lightning physically correct. Choose the "Normal" option and check "Ambient to 0". Now you will get an image like this:
 
-![Indirect Lightning turned on](Examples/Chess/Radiosity/Radiosity.png "The chess match with indirect lightning")
+![Indirect Lightning turned on](Examples/Chess/Radiosity/Radiosity%20(1).png "The chess match with indirect lightning")
 
 You can also play a bit with the options. To example if you make the global point light invisible, you get this image:
 
-![Indirect Lightning turned on](Examples/Chess/Radiosity/Radiosity_globalLight_off.png "The chess match with indirect lightning")
+![Indirect Lightning turned on](Examples/Chess/Radiosity/Radiosity_globalLight_off%20(1).png "The chess match with indirect lightning")
 
 Or you can insert an area light, or something else. Just play around to get the best option. We're sure, that you become addicted.
 
@@ -81,7 +81,7 @@ You can see, that we used constants like "CamPosition" instead of the position i
 
 To learn more about the options, please look here: XXX LINK
 
-![The Chess Game with Focal Blur](Examples/Chess/FocalBlur/ChessFocalBlur.png)
+![The Chess Game with Focal Blur](Examples/Chess/FocalBlur/ChessFocalBlur%20(1).png)
 
 ## Other stuff
 

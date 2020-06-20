@@ -4,7 +4,7 @@ global_settings { assumed_gamma 1.0 }
 #default { pigment { rgb <0.800, 0.800, 0.800> } }
 
 //------------------------------------------
-#include "colors.inc"gagaga
+#include "colors.inc"
 #include "textures.inc"
 
 //------------------------------------------
