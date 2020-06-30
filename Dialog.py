@@ -38,6 +38,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.exporter = ExportToPovRay()
         self.initUI()
         self.applyQSettings()
+        self.textureTab.objectList.setCurrentRow(0) #XXX very dirty
 
     def initUI(self): #create the objects in the dialog window
         self.setWindowTitle("Export to POV-Ray")
@@ -575,8 +576,6 @@ class TextureTab(QtGui.QWidget):
             self.listObjects.append(ListObject(obj, listItem, self.predefines[0], 1, 1, 1, 0, 0, 0, 0, 0, 0))
 
             self.objectList.addItem(listItem)
-
-        self.objectList.setCurrentRow(0)
         
         #add the object list to the layouts
         self.listLayout.addWidget(self.objectListLabel, 0, 0)
