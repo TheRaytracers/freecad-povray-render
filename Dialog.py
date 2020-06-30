@@ -407,68 +407,25 @@ class TextureTab(QtGui.QWidget):
         
         self.addObjectsTexturesLists() #add the two lists at the top
         self.addScaleRotateTranslate() #add the menu for scaling and rotating at the bottom
-        self.addPreview()
+        
+        self.preview = Preview()
 
         # signals and slots
         self.connectSignals()
 
-        self.previewDisableCheckBox.stateChanged.connect(self.updateSelectedListObject)
-        self.zoomIn.pressed.connect(self.largerPreview)
-        self.zoomOut.pressed.connect(self.smallerPreview)
-
         #set layouts
         self.textureLayout.addWidget(self.listWidget)
         self.textureLayout.addWidget(self.textureSettingsWidget)
-        self.textureLayout.addWidget(self.previewWidget)
+        self.textureLayout.addWidget(self.preview)
 
         self.setLayout(self.textureLayout)
 
     def applyQSettings(self, settingsObject):
-        #get saved input
-        settingsObject.beginGroup(self.qSettingsGroup)
-
-        #set preview disable checkbox
-        previewDisable = settingsObject.value("previewDisable")
-        if previewDisable != None:
-            self.previewDisableCheckBox.setChecked(strToBool(previewDisable))
-        else:
-            self.previewDisableCheckBox.setChecked(False)
-
-        previewWidth = settingsObject.value("previewWidth")
-        if previewWidth != None and previewWidth != 0 and previewWidth != -1:
-            self.previewWidth = int(previewWidth)
-        else:
-            self.previewWidth = 300
-
-        previewHeight = settingsObject.value("previewHeight")
-        if previewHeight != None and previewHeight != 0 and previewHeight != -1:
-            self.previewHeight = int(previewHeight)
-        else:
-            self.previewHeight = 225
-
-        settingsObject.endGroup()
+        self.preview.applyQSettings(settingsObject)
 
     def saveQSettings(self, settingsObject):
-        settingsObject.beginGroup(self.qSettingsGroup)
-        settingsObject.setValue("previewDisable", self.previewDisableCheckBox.isChecked())
-        settingsObject.setValue("previewWidth", self.previewWidth)
-        settingsObject.setValue("previewHeight", self.previewHeight)
-        settingsObject.endGroup()
+        self.preview.saveQSettings(settingsObject)
 
-    def largerPreview(self):
-        self.previewWidth += 40
-        self.previewHeight += 30
-
-        self.updateSelectedListObject()
-
-    def smallerPreview(self):
-        if self.previewWidth < 45:
-            return
-
-        self.previewWidth -= 40
-        self.previewHeight -= 30
-
-        self.updateSelectedListObject()
 
     def connectSignals(self): #connect all necessary signals for the texture tab
         self.objectList.itemSelectionChanged.connect(self.updateTextureSettings)
@@ -648,7 +605,7 @@ class TextureTab(QtGui.QWidget):
                 self.predefXmlToList(node, categoryItem)
 
     def addScaleRotateTranslate(self): #add the scale and rotate menu
-        # scale, rotate, preview
+        # scale, rotate, translate
         self.textureSettingsWidget = QtGui.QWidget()
         self.textureSettingsLayout = QtGui.QGridLayout()
 
@@ -735,32 +692,6 @@ class TextureTab(QtGui.QWidget):
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
-    def addPreview(self):
-        #disable checkbox
-        self.previewDisableCheckBox = QtGui.QCheckBox("Disable Live Preview")
-
-        #zoom buttons
-        self.zoomIn = QtGui.QPushButton("Zoom In")
-        self.zoomOut = QtGui.QPushButton("Zoom Out")
-
-        #preview setting layout
-        self.previewSettingsLayout = QtGui.QHBoxLayout()
-        self.previewSettingsLayout.addWidget(self.previewDisableCheckBox)
-        self.previewSettingsLayout.addWidget(self.zoomIn)
-        self.previewSettingsLayout.addWidget(self.zoomOut)
-
-        #preview image
-        self.previewLabel = QtGui.QLabel()
-        self.previewLabel.setStyleSheet("QLabel { color : #ff0000; }")
-
-        #main layout
-        self.previewLayout = QtGui.QVBoxLayout()
-        self.previewLayout.addLayout(self.previewSettingsLayout)
-        self.previewLayout.addWidget(self.previewLabel)
-
-        self.previewWidget = QtGui.QWidget()
-        self.previewWidget.setLayout(self.previewLayout)
-
     def updateTextureSettings(self): #get the selected object and select the right predefined
         self.disconnectSignals()
         listObj = self.getSelectedListObject() #get the current selected object
@@ -796,7 +727,7 @@ class TextureTab(QtGui.QWidget):
         self.commentLabel.setText(listObj.predefObject.comment)
 
         #update preview
-        self.renderPreview(listObj)
+        self.updatePreview(listObj)
 
         self.connectSignals()
 
@@ -842,21 +773,17 @@ class TextureTab(QtGui.QWidget):
         self.commentLabel.setText(listObj.predefObject.comment)
 
         #update preview
-        self.renderPreview(listObj)
+        self.updatePreview(listObj)
 
-    def renderPreview(self, listObj):
-        if self.previewDisableCheckBox.isChecked():
-            self.previewLabel.setText(" ")
-            return
-
+    def updatePreview(self, listObj):
         if listObj.predefObject.material == None: #for FreeCAD materials
-            self.previewLabel.setText("The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled.")
+            self.preview.setErrorText("The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled.")
             return
         elif listObj.predefObject.media != "":
-            self.previewLabel.setText("The texture is too complex for a preview and would need a lot of time\nso this texture is disabled.")
+            self.preview.setErrorText("The texture is too complex for a preview and would need a lot of time\nso this texture is disabled.")
             return
 
-        #write file
+        # create content of pov file
         fileContent =""
         fileContent += '#version 3.6; // 3.7\n'
         fileContent += 'global_settings { assumed_gamma 1.0 }\n'
@@ -903,28 +830,7 @@ class TextureTab(QtGui.QWidget):
         fileContent += '\tmaterial { predef_material }\n'
         fileContent += '}\n'
 
-        povFile = tempfile.NamedTemporaryFile(delete=False, suffix=".pov") #pov file handler
-        povFile.write(fileContent.encode())
-
-        povName = povFile.name
-        povFile.close()
-
-        #render
-        povExec = App.ParamGet(preferences.prefPath).GetString("PovRayExe", "")
-        if os.path.isfile(povExec) == False:
-            errorText = "To get a preview of the texture settings you must\n"
-            errorText += "set the path to the POV-Ray executable\n"
-            errorText += "either in the settings of Render workbench\n"
-            errorText += "or in the settings of Raytracing workbench\n"
-            showError(errorText, "POV-Ray executable not found")
-            return -1
-
-        #start povray
-        subprocess.call([povExec, "-d", "width=" + str(self.previewWidth), "height=" + str(self.previewHeight), povName])
-        
-        #update preview widget
-        pixmap = QtGui.QPixmap(povName[:-4])
-        self.previewLabel.setPixmap(pixmap)
+        self.preview.render(fileContent)
 
     def getSelectedListObject(self): #get the current selected listObject
         for listObj in self.listObjects:
@@ -996,6 +902,133 @@ class TextureTab(QtGui.QWidget):
         self.createTexIncContent()
         self.writeTextureInc()
 
+
+class Preview(QtGui.QWidget):
+    def __init__(self):
+        super(Preview, self).__init__()
+        self.qSettingsGroup = "preview"
+        self.initUIElements()
+        self.connectSignals()
+    
+    def initUIElements(self):
+        #disable checkbox
+        self.disableCheckBox = QtGui.QCheckBox("Disable Live Preview")
+
+        #zoom buttons
+        self.zoomIn = QtGui.QPushButton("Larger")
+        self.zoomOut = QtGui.QPushButton("Smaller")
+
+        #preview settings layout
+        self.settingsLayout = QtGui.QHBoxLayout()
+        self.settingsLayout.addWidget(self.disableCheckBox)
+        self.settingsLayout.addWidget(self.zoomIn)
+        self.settingsLayout.addWidget(self.zoomOut)
+
+        #preview image
+        self.imageLabel = QtGui.QLabel()
+        self.imageLabel.setStyleSheet("QLabel { color : #ff0000; }")
+
+        #main layout
+        self.wrapperLayout = QtGui.QVBoxLayout()
+        self.wrapperLayout.addLayout(self.settingsLayout)
+        self.wrapperLayout.addWidget(self.imageLabel)
+
+        self.setLayout(self.wrapperLayout)
+
+    def render(self, povCode):
+        self.povCode = povCode
+
+        if self.disableCheckBox.isChecked():
+            #self.imageLabel.setText(" ")
+            return
+
+        povFile = tempfile.NamedTemporaryFile(
+            delete=False, suffix=".pov")  # pov file handler
+        povFile.write(self.povCode.encode())
+
+        povName = povFile.name
+        povFile.close()
+
+        #render
+        povExec = App.ParamGet(preferences.prefPath).GetString("PovRayExe", "")
+        if os.path.isfile(povExec) == False:
+            errorText = "To get a preview of the texture settings you must\n"
+            errorText += "set the path to the POV-Ray executable\n"
+            errorText += "either in the settings of Render workbench\n"
+            errorText += "or in the settings of Raytracing workbench\n"
+            showError(errorText, "POV-Ray executable not found")
+            return -1
+
+        #start povray
+        subprocess.call([povExec, "-d", "width=" + str(self.previewWidth),
+                         "height=" + str(self.previewHeight), povName])
+
+        #update image
+        pixmap = QtGui.QPixmap(povName[:-4])
+        self.imageLabel.setPixmap(pixmap)
+
+    def setErrorText(self, text):
+        self.imageLabel.setText(text)
+
+    def connectSignals(self):
+        self.disableCheckBox.stateChanged.connect(self.disableChanged)
+        self.zoomIn.pressed.connect(self.largerPreview)
+        self.zoomOut.pressed.connect(self.smallerPreview)
+
+    def disableChanged(self):
+
+        if self.disableCheckBox.isChecked():
+            self.imageLabel.setText(" ")
+        else:
+            self.render(self.povCode)
+
+    def largerPreview(self):
+        self.previewWidth += 40
+        self.previewHeight += 30
+
+        self.render(self.povCode)
+
+    def smallerPreview(self):
+        if self.previewWidth < 45:
+            return
+
+        self.previewWidth -= 40
+        self.previewHeight -= 30
+
+        self.render(self.povCode)
+
+    def applyQSettings(self, settingsObject):
+        #get saved input
+        settingsObject.beginGroup(self.qSettingsGroup)
+
+        #set preview disable checkbox
+        previewDisable = settingsObject.value("previewDisable")
+        if previewDisable != None:
+            self.disableCheckBox.setChecked(strToBool(previewDisable))
+        else:
+            self.disableCheckBox.setChecked(False)
+
+        previewWidth = settingsObject.value("previewWidth")
+        if previewWidth != None and previewWidth != 0 and previewWidth != -1:
+            self.previewWidth = int(previewWidth)
+        else:
+            self.previewWidth = 300
+
+        previewHeight = settingsObject.value("previewHeight")
+        if previewHeight != None and previewHeight != 0 and previewHeight != -1:
+            self.previewHeight = int(previewHeight)
+        else:
+            self.previewHeight = 225
+
+        settingsObject.endGroup()
+
+    def saveQSettings(self, settingsObject):
+        settingsObject.beginGroup(self.qSettingsGroup)
+        settingsObject.setValue(
+            "previewDisable", self.disableCheckBox.isChecked())
+        settingsObject.setValue("previewWidth", self.previewWidth)
+        settingsObject.setValue("previewHeight", self.previewHeight)
+        settingsObject.endGroup()
 
 class Predefined:
     def __init__(self, identifier, material, texture, pigment, finish, normal, interior, media, inc, comment, treeItem):
