@@ -400,37 +400,37 @@ class TextureTab(QtGui.QWidget):
         super(TextureTab, self).__init__()
         self.exporter = ExportToPovRay()
         self.qSettingsGroup = "textureTab"
-        self.initTab()
+        self.initUIElements()
 
 
     ### Create the tab ###
     ######################
 
-    def initTab(self):
+    def initUIElements(self):
         """Wrapper method to create the tab and the signals, etc."""
 
-        self.textureLayout = QtGui.QVBoxLayout() #the wrapper layout for the tab
+        self.wrapperLayout = QtGui.QVBoxLayout()
         
         self.addObjectsTexturesLists() #add the two lists at the top
         self.addScaleRotateTranslate() #add the menu for scaling and rotating at the bottom
         
-        self.preview = Preview()
+        self.preview = Preview() #preview widget
 
         # signals and slots
         self.connectSignals()
 
         #set layouts
-        self.textureLayout.addWidget(self.listWidget)
-        self.textureLayout.addWidget(self.textureSettingsWidget)
-        self.textureLayout.addWidget(self.preview)
+        self.wrapperLayout.addWidget(self.listsWidget)
+        self.wrapperLayout.addWidget(self.textureSettingsWidget)
+        self.wrapperLayout.addWidget(self.preview)
 
-        self.setLayout(self.textureLayout)
+        self.setLayout(self.wrapperLayout)
 
     def addObjectsTexturesLists(self):
         """Add the two lists with the objects and textures."""
 
-        self.listWidget = QtGui.QWidget() #wrapper widget for the two lists
-        self.listLayout = QtGui.QGridLayout() #wrapper layout for the two lists
+        self.listsWidget = QtGui.QWidget() #wrapper widget for the two lists
+        self.listsLayout = QtGui.QGridLayout() #wrapper layout for the two lists
 
         self.addTextureList()
         self.addObjectList()
@@ -442,7 +442,7 @@ class TextureTab(QtGui.QWidget):
         self.textureList = QtGui.QTreeWidget()
         self.textureList.setHeaderLabel("Predefined")
 
-        self.textureListLabel = QtGui.QLabel("<b>Texture</b>")
+        self.textureListHeading = QtGui.QLabel("<b>Texture</b>")
 
         self.predefines = []
         #add FreeCAD texture
@@ -462,10 +462,10 @@ class TextureTab(QtGui.QWidget):
 
 
         #add the list to the layouts and widgets
-        self.listLayout.addWidget(self.textureListLabel, 0, 1)
-        self.listLayout.addWidget(self.textureList, 1, 1)
+        self.listsLayout.addWidget(self.textureListHeading, 0, 1)
+        self.listsLayout.addWidget(self.textureList, 1, 1)
 
-        self.listWidget.setLayout(self.listLayout)
+        self.listsWidget.setLayout(self.listsLayout)
 
     def addObjectList(self):
         """Add the list with the FreeCAD objects on the left side."""
@@ -473,12 +473,12 @@ class TextureTab(QtGui.QWidget):
         #object list
         self.objectList = QtGui.QListWidget()
 
-        self.objectListLabel = QtGui.QLabel("<b>Object</b>")
+        self.objectListHeading = QtGui.QLabel("<b>Object</b>")
 
         #get objects
-        objs = App.ActiveDocument.Objects
+        fcObjs = App.ActiveDocument.Objects
         self.listFcObjects = []
-        for obj in objs:
+        for obj in fcObjs:
             if obj.ViewObject.Visibility:
                 #has object a shape color
                 try:
@@ -513,14 +513,14 @@ class TextureTab(QtGui.QWidget):
             self.objectList.addItem(listItem)
         
         #add the object list to the layouts
-        self.listLayout.addWidget(self.objectListLabel, 0, 0)
-        self.listLayout.addWidget(self.objectList, 1, 0)
+        self.listsLayout.addWidget(self.objectListHeading, 0, 0)
+        self.listsLayout.addWidget(self.objectList, 1, 0)
 
         #add comment label
         self.commentLabel = QtGui.QLabel()
         self.commentLabel.setStyleSheet("QLabel { font-weight : bold;}")
         self.commentLabel.setWordWrap(True)
-        self.listLayout.addWidget(self.commentLabel, 2, 0, 1, 2)
+        self.listsLayout.addWidget(self.commentLabel, 2, 0, 1, 2)
 
     def addScaleRotateTranslate(self):
         """Add the scale, rotate, translate menu."""
@@ -725,41 +725,41 @@ class TextureTab(QtGui.QWidget):
         """Set the predefined settings for the currently selected FreeCAD
         object, when the object selection changed."""
 
-        self.disconnectSignals()
-        listObj = self.getSelectedListObject() #get the current selected object
+        self.disconnectSignals() #disconnect to avoid infinite recursive calls
+        selectedListObj = self.getSelectedListObject() #get the current selected object
 
-        if listObj == -1: #is an object selected
+        if selectedListObj == -1: #is an object selected
             self.connectSignals()
             return -1
 
         #set all values for scaling and rotating
-        self.scaleX.setValue(listObj.scaleX)
-        self.scaleY.setValue(listObj.scaleY)
-        self.scaleZ.setValue(listObj.scaleZ)
+        self.scaleX.setValue(selectedListObj.scaleX)
+        self.scaleY.setValue(selectedListObj.scaleY)
+        self.scaleZ.setValue(selectedListObj.scaleZ)
 
-        self.rotationX.setValue(listObj.rotationX)
-        self.rotationY.setValue(listObj.rotationY)
-        self.rotationZ.setValue(listObj.rotationZ)
+        self.rotationX.setValue(selectedListObj.rotationX)
+        self.rotationY.setValue(selectedListObj.rotationY)
+        self.rotationZ.setValue(selectedListObj.rotationZ)
 
-        self.translationX.setValue(listObj.translationX)
-        self.translationY.setValue(listObj.translationY)
-        self.translationZ.setValue(listObj.translationZ)
+        self.translationX.setValue(selectedListObj.translationX)
+        self.translationY.setValue(selectedListObj.translationY)
+        self.translationZ.setValue(selectedListObj.translationZ)
 
         #unselect all textures
         for predefine in self.predefines:
             predefine.treeItem.setSelected(False)
 
         #select the right predefined
-        listObj.predefObject.treeItem.setSelected(True)
+        selectedListObj.predefObject.treeItem.setSelected(True)
 
         #expand categories
-        self.expandParentItems(listObj.predefObject.treeItem)
+        self.expandParentItems(selectedListObj.predefObject.treeItem)
 
         #set comment
-        self.commentLabel.setText(listObj.predefObject.comment)
+        self.commentLabel.setText(selectedListObj.predefObject.comment)
 
         #update preview
-        self.updatePreview(listObj)
+        self.updatePreview(selectedListObj)
 
         self.connectSignals()
 
@@ -767,10 +767,10 @@ class TextureTab(QtGui.QWidget):
         """Update the listObject of the currently selected FreeCAD
         object when a predefined setting changed."""
 
-        listObj = self.getSelectedListObject()
-        predefine = self.getSelectedPredefined()
-        if listObj == -1 or predefine == -1: #is no object or predefine selected
-            if predefine == -1: #is only a category selected
+        selectedListObj = self.getSelectedListObject()
+        selectedPredefine = self.getSelectedPredefined()
+        if selectedListObj == -1 or selectedPredefine == -1: #is no object or predefine selected
+            if selectedPredefine == -1: #is only a category selected
                 #expand and select predef under the category
                 self.disconnectSignals()
                 selectedItems = self.textureList.selectedItems()
@@ -784,25 +784,25 @@ class TextureTab(QtGui.QWidget):
             return -1 #abort
 
         #get the values for scaling and rotating
-        listObj.scaleX = self.scaleX.value()
-        listObj.scaleY = self.scaleY.value()
-        listObj.scaleZ = self.scaleZ.value()
+        selectedListObj.scaleX = self.scaleX.value()
+        selectedListObj.scaleY = self.scaleY.value()
+        selectedListObj.scaleZ = self.scaleZ.value()
 
-        listObj.rotationX = self.rotationX.value()
-        listObj.rotationY = self.rotationY.value()
-        listObj.rotationZ = self.rotationZ.value()
+        selectedListObj.rotationX = self.rotationX.value()
+        selectedListObj.rotationY = self.rotationY.value()
+        selectedListObj.rotationZ = self.rotationZ.value()
 
-        listObj.translationX = self.translationX.value()
-        listObj.translationY = self.translationY.value()
-        listObj.translationZ = self.translationZ.value()
+        selectedListObj.translationX = self.translationX.value()
+        selectedListObj.translationY = self.translationY.value()
+        selectedListObj.translationZ = self.translationZ.value()
 
-        listObj.predefObject = predefine #apply the read values to the predefObject in the listObject
+        selectedListObj.predefObject = selectedPredefine #apply the read values to the predefObject in the listObject
 
         #set comment
-        self.commentLabel.setText(listObj.predefObject.comment)
+        self.commentLabel.setText(selectedListObj.predefObject.comment)
 
         #update preview
-        self.updatePreview(listObj)
+        self.updatePreview(selectedListObj)
 
     def updatePreview(self, listObj):
         """Render the preview for the given FreeCAD listObject.
