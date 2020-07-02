@@ -911,6 +911,8 @@ class Preview(QtGui.QWidget):
         self.connectSignals()
     
     def initUIElements(self):
+        """Create the UI elements and set the layouts."""
+
         #disable checkbox
         self.disableCheckBox = QtGui.QCheckBox("Disable Live Preview")
 
@@ -936,10 +938,15 @@ class Preview(QtGui.QWidget):
         self.setLayout(self.wrapperLayout)
 
     def render(self, povCode):
+        """Render an image by the given POV-Ray code and show it.
+
+        Args:
+            povCode (string): The code for POV-Ray for the image
+        """
+
         self.povCode = povCode
 
         if self.disableCheckBox.isChecked():
-            #self.imageLabel.setText(" ")
             return
 
         povFile = tempfile.NamedTemporaryFile(
@@ -968,14 +975,23 @@ class Preview(QtGui.QWidget):
         self.imageLabel.setPixmap(pixmap)
 
     def setErrorText(self, text):
+        """Shows an error in red text and remove the image.
+
+        Args:
+            text (string): error message
+        """
+
         self.imageLabel.setText(text)
 
     def connectSignals(self):
+        """Connect all necessary signals to all slots."""
+
         self.disableCheckBox.stateChanged.connect(self.disableChanged)
         self.zoomIn.pressed.connect(self.largerPreview)
         self.zoomOut.pressed.connect(self.smallerPreview)
 
     def disableChanged(self):
+        """Slot, called when the state of the disable checkbox changes."""
 
         if self.disableCheckBox.isChecked():
             self.imageLabel.setText(" ")
@@ -983,12 +999,16 @@ class Preview(QtGui.QWidget):
             self.render(self.povCode)
 
     def largerPreview(self):
+        """Increase the size of the preview image. Called when the "Larger" button is pressed."""
+
         self.previewWidth += 40
         self.previewHeight += 30
 
         self.render(self.povCode)
 
     def smallerPreview(self):
+        """Decrease the size of the preview image. Called when the "Smaller" button is pressed."""
+
         if self.previewWidth < 45:
             return
 
@@ -998,6 +1018,12 @@ class Preview(QtGui.QWidget):
         self.render(self.povCode)
 
     def applyQSettings(self, settingsObject):
+        """Apply the settings stored with QSettings to the preview.
+
+        Args:
+            settingsObject (QSettings Object): The QSettings Object to read the data from
+        """
+
         #get saved input
         settingsObject.beginGroup(self.qSettingsGroup)
 
@@ -1023,6 +1049,11 @@ class Preview(QtGui.QWidget):
         settingsObject.endGroup()
 
     def saveQSettings(self, settingsObject):
+        """Save the settings from the preview with QSettings.
+
+        Args:
+            settingsObject (QSettings Object): QSettings object to store the data
+        """
         settingsObject.beginGroup(self.qSettingsGroup)
         settingsObject.setValue(
             "previewDisable", self.disableCheckBox.isChecked())
