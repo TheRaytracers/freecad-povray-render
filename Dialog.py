@@ -123,18 +123,16 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.generalGroup = QtGui.QGroupBox("")
         self.generalGroup.setLayout(self.mainLayout)
 
-        #crate help group
-        self.helpLabel = QtGui.QLabel("")
-
         #create tabs
         self.textureTab = TextureTab()
         self.radiosityTab = RadiosityTab()
+        self.helpTab = HelpTab()
 
         self.tabs = QtGui.QTabWidget(self)
         self.tabs.addTab(self.generalGroup, "General")
         self.tabs.addTab(self.textureTab, "Textures")
         self.tabs.addTab(self.radiosityTab, "Indirect Lighting")
-        self.tabs.addTab(self.helpLabel, "Help")
+        self.tabs.addTab(self.helpTab, "Help")
 
         # ok cancel buttons
         self.renderButton = QtGui.QPushButton("Start Rendering")
@@ -153,33 +151,6 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.show()
 
     def applyQSettings(self): #set the default values of the input objects
-        helpText = """
-        <style>
-        div { margin: 15;}
-        </style>
-        <div>
-        <h3>General</h3>
-        <p>This workbench is specialised for rendering with <a href='http://povray.org/'>POV-Ray</a>.<br>
-        You will get best results if you focus on using solid CSG primitives from the part workbench.<br>
-        The resulting POV code is readable and can be modified with a 
-        separate include file that <br> won't be overwritten.</p>
-        <h3>Output File Selection</h3>
-        <p>The *.ini file sticks your render project together. Select an existing file or create a new one. <br>
-        Be careful not to use spaces or special chars in pathname for POV-Ray compatibility.</p>
-        <h3>Textures</h3>
-        <p>Textures can be easily added by choosing an object from the left list and after that<br>
-        choosing a texture from the right list. These two steps can be repeated for all objects</p>
-        <h3>Lights</h3>
-        <p>Lightsources can be added via the workbench and will appear as objects in your FreeCAD model.<br>
-        Overall lightning can be influenced via the "Indirect Lightning" Tab.<br>
-        Usage is directly explained in the tab.</p>
-        <h3>Help</h3>
-        <p>For detailed information look in our <a href='https://gitlab.com/usbhub/exporttopovray/blob/master/doc/index.md'>Wiki</a></p>
-        </div>"""
-        self.helpLabel.setText(helpText)
-        self.helpLabel.setOpenExternalLinks(True)
-
-
         #get saved input
         settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
         settings.beginGroup("userInput")
@@ -195,6 +166,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         self.textureTab.applyQSettings(settings)
         self.radiosityTab.applyQSettings(settings)
+        self.helpTab.applyQSettings(settings)
 
     def applyIniSettings(self, iniPath):
         #set some good standardValues
@@ -270,6 +242,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
             self.textureTab.applyIniSettings(csvLines)
             self.radiosityTab.applyIniSettings(csvLines)
+            self.helpTab.applyIniSettings(csvLines)
 
     def openFileDialog(self): #open the file dialog for the pov file
         defaultPath = self.pathLineEdit.text()
@@ -329,6 +302,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         self.textureTab.saveQSettings(settings)
         self.radiosityTab.saveQSettings(settings)
+        self.helpTab.saveQSettings(settings)
 
     def writeIni(self):
         self.iniFile = open(self.renderSettings.iniPath, "w")
@@ -349,6 +323,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
         csv += self.textureTab.settingsToIniFormat()
         csv += self.radiosityTab.settingsToIniFormat()
+        csv += self.helpTab.settingsToIniFormat()
 
         self.csv = csv
 
@@ -1270,6 +1245,88 @@ class RenderSettings:
 
         #radiosity
         self.radiosity = radiosity
+
+
+class HelpTab(QtGui.QWidget):
+    def __init__(self):
+        super(HelpTab, self).__init__()
+        self.qSettingsGroup = "helpTab"
+        self.initUIElements()
+
+    def initUIElements(self):
+        """Create all UI elements for the tab."""
+
+        self.wrapperLayout = QtGui.QVBoxLayout()
+
+        self.label = QtGui.QLabel("")  # label to show the text
+
+        helpText = """
+        <style>
+        div { margin: 15;}
+        </style>
+        <div>
+        <h3>General</h3>
+        <p>This workbench is specialized for rendering with <a href='http://povray.org/'>POV-Ray</a>.<br>
+        You will get best results if you focus on using solid CSG primitives from the part workbench.<br>
+        The resulting POV code is readable and can be modified with a 
+        separate include file that <br> won't be overwritten.</p>
+        <h3>Output File Selection</h3>
+        <p>The *.ini file sticks your render project together. Select an existing file or create a new one. <br>
+        Be careful not to use spaces or special chars in pathname for POV-Ray compatibility.</p>
+        <h3>Textures</h3>
+        <p>Textures can be easily added by choosing an object from the left list and after that<br>
+        choosing a texture from the right list. These two steps can be repeated for all objects</p>
+        <h3>Lights</h3>
+        <p>Lightsources can be added via the workbench and will appear as objects in your FreeCAD model.<br>
+        Overall lightning can be influenced via the "Indirect Lightning" Tab.<br>
+        Usage is directly explained in the tab.</p>
+        <h3>Help</h3>
+        <p>For detailed information look in our <a href='https://gitlab.com/usbhub/exporttopovray/blob/master/doc/index.md'>Wiki</a></p>
+        </div>"""
+        self.label.setText(helpText)
+        self.label.setOpenExternalLinks(True)
+
+        self.wrapperLayout.addWidget(self.label)
+        self.setLayout(self.wrapperLayout)
+
+
+    def applyIniSettings(self, csvLines):
+        """Apply the settings from the given lines from the ini file
+        to the tab (unnecessary for this tab).
+
+        Args:
+            csvLines (Array): Array of lines for the CSV parser
+        """
+
+        pass
+
+    def settingsToIniFormat(self):
+        """Convert the settings from the tab to CSV.
+
+        Returns:
+            String: The created CSV with ";" for the ini file at the
+            beginning (unnecessary for this tab)
+        """
+
+        return ""
+
+    def applyQSettings(self, settingsObject):
+        """Apply the settings stored with QSettings to the tab (unnecessary for this tab).
+
+        Args:
+            settingsObject (QSettings Object): The QSettings Object to read the data from
+        """
+
+        pass
+
+    def saveQSettings(self, settingsObject):
+        """Save the settings from the tab with QSettings (unnecessary for this tab).
+
+        Args:
+            settingsObject (QSettings Object): QSettings object to store the data
+        """
+
+        pass
 
 
 class RadiosityTab(QtGui.QWidget):
