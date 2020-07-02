@@ -40,7 +40,9 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.applyQSettings()
         self.textureTab.objectList.setCurrentRow(0) #XXX very dirty
 
-    def initUI(self): #create the objects in the dialog window
+    def initUI(self):
+        """Create the dialog window with its tabs, buttons, etc."""
+
         self.setWindowTitle("Export to POV-Ray")
 
         #create tabs
@@ -76,10 +78,22 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
 
     def setDialogAcceptable(self, acceptable):
+        """Set if the "Start Rendering" button should be enabled.
+
+        Args:
+            acceptable (bool): True: Enabled; False: Disabled
+        """
+
         self.renderButton.setEnabled(acceptable)
 
 
+    ### Settings Stuff ###
+    ######################
+
     def saveQSettings(self):
+        """Call the saveQSettings() method from the tab classes to save
+        the project independent settings with QSettings."""
+
         settings = QtCore.QSettings(
             "Usb Hub, DerUhrmacher", "Export to POV-Ray")
         
@@ -89,7 +103,9 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.helpTab.saveQSettings(settings)
 
     def applyQSettings(self):
-        #get saved input
+        """Call the applyQSettings() method from the tab classes to read
+        the project independent settings and apply them to the UI."""
+
         settings = QtCore.QSettings(
             "Usb Hub, DerUhrmacher", "Export to POV-Ray")
 
@@ -99,6 +115,8 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.helpTab.applyQSettings(settings)
 
     def settingsToIniFormat(self):
+        """Call the tab classes to convert the settings to the ini format."""
+
         csv = ""
 
         csv += self.generalTab.settingsToIniFormat()
@@ -109,20 +127,20 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.csv = csv
 
     def applyIniSettings(self, iniPath):
-        print("applyIniSettings")
-        print(iniPath)
+        """Open the ini file and apply the settings stored in the file.
+
+        Args:
+            iniPath (String): Path to the ini file.
+        """
+
         #open ini file and extract CSV
         try:
             iniFile = open(iniPath, "r")
         except:
             App.Console.PrintWarning("Could not open ini file\n")
-            iniPath = -1 #XXX
             iniFile = None
 
         if iniFile and iniPath != -1 and iniPath != "" and iniPath != None:
-            #self.pathLineEdit.setText(iniPath)
-            #self.checkPath(iniPath)
-
             lines = iniFile.readlines()
             iniFile.close()
 
@@ -138,12 +156,19 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
             self.helpTab.applyIniSettings(csvLines)
 
 
+    ### Handling the ini file ###
+    #############################
+
     def writeIni(self):
+        """Write the content of the ini file into it."""
+
         self.iniFile = open(self.renderSettings.iniPath, "w")
         self.iniFile.write(self.iniContent)
         self.iniFile.close()
 
     def createIniContent(self):
+        """Create the content of the ini file."""
+
         self.settingsToIniFormat()
         
         self.iniContent = ""
@@ -155,12 +180,19 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.iniContent += "Fatal_File='" + self.renderSettings.errorName + "'\n"
 
 
-    def onCancel(self): #called if "Cancel" button is pressed
+    ### Slots for rendering start and cancelling ###
+    ################################################
+
+    def onCancel(self):
+        """Called if "Cancel" button is pressed."""
+
         self.result = "Canceled"
         self.close()
         App.Console.PrintMessage("\n\nCanceled\n\n")
 
-    def onOk(self): #called if "OK" button is pressed
+    def onOk(self):
+        """Called if "Start Rendering" button is pressed."""
+
         self.result = "OK"
         self.close()
         self.saveQSettings()
@@ -188,8 +220,15 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
 
 
 class GeneralTab(QtGui.QWidget):
+
+    ### Signals ###
+    ###############
     iniPathChanged = QtCore.Signal(str) #emitted when ini path changed and ini file should be applied
     iniPathValidityChanged = QtCore.Signal(bool) #emitted when the validity of the ini path changed
+
+
+    ### Init UI elements and other stuff ###
+    ########################################
 
     def __init__(self):
         super(GeneralTab, self).__init__()
@@ -198,29 +237,31 @@ class GeneralTab(QtGui.QWidget):
         self.initUIElements()
 
     def initUIElements(self):
-        #pov file selection
-        self.pathLineEdit = QtGui.QLineEdit()
-        self.pathLineEdit.setPlaceholderText("Path to INI File")
-        self.pathLineEdit.setToolTip(
+        """Create all UI elements and set layouts, signals, slots, etc."""
+
+        #ini file selection
+        self.iniPathLineEdit = QtGui.QLineEdit()
+        self.iniPathLineEdit.setPlaceholderText("Path to INI File")
+        self.iniPathLineEdit.setToolTip(
             "Path to the INI file (kind of a project file)")
-        self.pathLineEdit.setEnabled(False)
+        self.iniPathLineEdit.setEnabled(False)
 
         self.openFileDialogButton = QtGui.QPushButton(
             "Select Project File (*.ini)")
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
         self.openFileDialogButton.setToolTip("Open file dialog for choosing a INI file.\n"
-                                             "Be careful to not use spaces or special chars in pathname for POV-Ray compatibility.")
+            "Be careful to not use spaces or special chars in pathname for POV-Ray compatibility.")
 
         self.warnLabel = QtGui.QLabel("")
         self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
 
         self.iniSelectionLayout = QtGui.QGridLayout()
-        self.iniSelectionLayout.addWidget(self.pathLineEdit, 0, 0)
+        self.iniSelectionLayout.addWidget(self.iniPathLineEdit, 0, 0)
         self.iniSelectionLayout.addWidget(self.openFileDialogButton, 0, 1)
         self.iniSelectionLayout.addWidget(self.warnLabel, 1, 0, 1, 2)
 
-        self.pathGroup = QtGui.QGroupBox("Output File Selection")
-        self.pathGroup.setLayout(self.iniSelectionLayout)
+        self.iniSelectionGroup = QtGui.QGroupBox("Output File Selection")
+        self.iniSelectionGroup.setLayout(self.iniSelectionLayout)
 
         #Width & Height of rendered image
         self.imageWidthLabel = QtGui.QLabel("Width")
@@ -238,19 +279,19 @@ class GeneralTab(QtGui.QWidget):
         self.imageHeight.setValue(600)
         self.imageHeight.setToolTip("Height of the rendered image in pixels")
 
-        self.vertLayout1 = QtGui.QVBoxLayout()
-        self.vertLayout1.addWidget(self.imageWidthLabel)
-        self.vertLayout1.addWidget(self.imageWidth)
-        self.vertLayout1.addWidget(self.imageHeightLabel)
-        self.vertLayout1.addWidget(self.imageHeight)
+        self.WHImageLayout = QtGui.QVBoxLayout()
+        self.WHImageLayout.addWidget(self.imageWidthLabel)
+        self.WHImageLayout.addWidget(self.imageWidth)
+        self.WHImageLayout.addWidget(self.imageHeightLabel)
+        self.WHImageLayout.addWidget(self.imageHeight)
         self.WHImageGroup = QtGui.QGroupBox(
             "Width and Height of rendered Image")
-        self.WHImageGroup.setLayout(self.vertLayout1)
+        self.WHImageGroup.setLayout(self.WHImageLayout)
 
         #Options
         self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
         self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via FreeCAD settings)\n"
-                              "Define your own background if you unchecked this option")
+            "Define your own background if you unchecked this option")
 
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
         self.expLight.setToolTip(
@@ -258,35 +299,37 @@ class GeneralTab(QtGui.QWidget):
 
         self.repRot = QtGui.QCheckBox("Repair Rotation")
         self.repRot.setToolTip("Repair the rotation of all objects.\n"
-                               "Use this option if objects in your scene appear in a wrong rotation.\n"
-                               "This is a workaround for a FreeCAD bug. Visit the Help tab for more information.")
+            "Use this option if objects in your scene appear in a wrong rotation.\n"
+            "This is a workaround for a FreeCAD bug. Visit the Help tab for more information.")
 
         self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
         self.expFcView.setToolTip(
             "Take a screenshot of the scene view and save it with the same resolution as the image")
 
-        self.vertLayout2 = QtGui.QVBoxLayout()
-        self.vertLayout2.addWidget(self.expBg)
-        self.vertLayout2.addWidget(self.expLight)
-        self.vertLayout2.addWidget(self.repRot)
-        self.vertLayout2.addWidget(self.expFcView)
+        self.optionLayout = QtGui.QVBoxLayout()
+        self.optionLayout.addWidget(self.expBg)
+        self.optionLayout.addWidget(self.expLight)
+        self.optionLayout.addWidget(self.repRot)
+        self.optionLayout.addWidget(self.expFcView)
         self.optionGroups = QtGui.QGroupBox("Options")
-        self.optionGroups.setLayout(self.vertLayout2)
+        self.optionGroups.setLayout(self.optionLayout)
 
         #add widgets to the main layout
-        self.mainLayout = QtGui.QVBoxLayout()
-        self.mainLayout.addWidget(self.pathGroup)
-        self.mainLayout.addWidget(self.WHImageGroup)
-        self.mainLayout.addWidget(self.optionGroups)
+        self.wrapperLayout = QtGui.QVBoxLayout()
+        self.wrapperLayout.addWidget(self.iniSelectionGroup)
+        self.wrapperLayout.addWidget(self.WHImageGroup)
+        self.wrapperLayout.addWidget(self.optionGroups)
 
-        #create general group
-        #self.generalGroup = QtGui.QGroupBox("")
-        #self.generalGroup.setLayout(self.mainLayout)
-        self.setLayout(self.mainLayout)
+        self.setLayout(self.wrapperLayout)
 
 
-    def openFileDialog(self):  # open the file dialog for the pov file
-        defaultPath = self.pathLineEdit.text()
+    ### Handling of ini file selection ###
+    ######################################
+
+    def openFileDialog(self):
+        """Open the file dialog to select a ini file."""
+
+        defaultPath = self.iniPathLineEdit.text()
 
         fileDialog = QtGui.QFileDialog(self)
         fileDialog.setFileMode(QtGui.QFileDialog.AnyFile)
@@ -303,10 +346,16 @@ class GeneralTab(QtGui.QWidget):
 
         if fileName and fileName != (u'', u''):
             self.iniPath = str(fileName[0])
-            self.pathLineEdit.setText(self.iniPath)
+            self.iniPathLineEdit.setText(self.iniPath)
             self.handlePath(self.iniPath)
 
     def handlePath(self, path):
+        """Check for validity and ask for applying the ini file settings.
+
+        Args:
+            path (String): Path of ini file
+        """
+
         pathLegal = self.checkPath(path)
 
         if pathLegal and os.path.isfile(path):
@@ -323,7 +372,16 @@ class GeneralTab(QtGui.QWidget):
             if answer == QtGui.QMessageBox.Apply:
                 self.iniPathChanged.emit(self.iniPath)
 
-    def checkPath(self, path):  # check if the path to pov file is valid
+    def checkPath(self, path):
+        """Check if the path to the ini file is valid.
+
+        Args:
+            path (String): Path to ini file
+
+        Returns:
+            bool: False: not valid; True: valid
+        """
+
         if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:].lower() == ".ini":
             self.iniPathValidityChanged.emit(True)
             
@@ -341,6 +399,9 @@ class GeneralTab(QtGui.QWidget):
 
             return False
 
+
+    ### Getter Methods ###
+    ######################
 
     def getIniPath(self):
         return self.iniPath
@@ -364,25 +425,48 @@ class GeneralTab(QtGui.QWidget):
         return self.expFcView.isChecked()
 
 
+    ### Settings Stuff ###
+    ######################
 
-    def saveQSettings(self, settingsObject):  # save the user inputs
+    def saveQSettings(self, settingsObject):
+        """Save the settings from the tab with QSettings.
+
+        Args:
+            settingsObject (QSettings Object): QSettings object to store the data
+        """
+
+        # The name of the active document together with the ini file is saved, to 
+        # make it possible to assign the ini file to the FreeCAD model at the next opening.
+
         settingsObject.beginGroup(self.qSettingsGroup)
-        settingsObject.setValue(App.ActiveDocument.Name, self.pathLineEdit.text())
+        settingsObject.setValue(App.ActiveDocument.Name, self.iniPathLineEdit.text())
         settingsObject.endGroup()
 
     def applyQSettings(self, settingsObject):
+        """Apply the settings stored with QSettings to the tab.
+
+        Args:
+            settingsObject (QSettings Object): The QSettings Object to read the data from
+        """
+
         settingsObject.beginGroup(self.qSettingsGroup)
 
         if App.ActiveDocument.Name in settingsObject.allKeys():
             self.iniPath = settingsObject.value(App.ActiveDocument.Name)
         else:
-            self.iniPath = ""
+            self.setDefaultValues()
 
         settingsObject.endGroup()
 
         self.iniPathChanged.emit(self.iniPath)
 
     def settingsToIniFormat(self):
+        """Convert the settings from the tab to CSV.
+
+        Returns:
+            String: The created CSV with ";" for the ini file at the beginning.
+        """
+
         csv = ""
 
         #add render settings
@@ -396,35 +480,11 @@ class GeneralTab(QtGui.QWidget):
         return csv
 
     def applyIniSettings(self, csvLines):
-        #set some good default values
-        if self.iniPath == "" or self.iniPath == -1:
-            self.iniPath = os.path.dirname(App.ActiveDocument.FileName)
+        """Apply the settings from the given lines from the ini file to the tab.
 
-            if self.iniPath == "":
-                if App.ActiveDocument.FileName == u"":
-                    system = platform.system()
-                    if system == "Linux":
-                        self.iniPath = "/home/"
-                    elif system == "Darwin":
-                        self.iniPath = "/Users/"
-                    elif system == "Windows":
-                        self.iniPath = "C:\\Users\\%UserName%\\"
-                else:
-                    #create ini path from FreeCAD file
-                    self.iniPath = os.path.splitext(
-                        App.ActiveDocument.FileName)[0] + ".ini"
-
-        self.pathLineEdit.setText(self.iniPath)
-        self.checkPath(self.iniPath)
-
-        self.imageWidth.setValue(800)
-        self.imageHeight.setValue(600)
-
-        self.expBg.setChecked(True)
-        self.expLight.setChecked(True)
-        self.expFcView.setChecked(False)
-        self.repRot.setChecked(False)
-
+        Args:
+            csvLines (Array): Array of lines for the CSV parser
+        """
 
         #parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
@@ -445,6 +505,36 @@ class GeneralTab(QtGui.QWidget):
                     self.repRot.setChecked(strToBool(row[1]))
                 elif name == "expFcView":
                     self.expFcView.setChecked(strToBool(row[1]))
+
+    def setDefaultValues(self):
+        """Set some good default values for the tab (check "Export FreeCAD Light, etc.)."""
+        
+        self.iniPath = os.path.dirname(App.ActiveDocument.FileName)
+
+        if self.iniPath == "":
+            if App.ActiveDocument.FileName == u"":
+                system = platform.system()
+                if system == "Linux":
+                    self.iniPath = "/home/"
+                elif system == "Darwin":
+                    self.iniPath = "/Users/"
+                elif system == "Windows":
+                    self.iniPath = "C:\\Users\\%UserName%\\"
+            else:
+                #create ini path from FreeCAD file
+                self.iniPath = os.path.splitext(
+                    App.ActiveDocument.FileName)[0] + ".ini"
+
+        self.iniPathLineEdit.setText(self.iniPath)
+        self.checkPath(self.iniPath)
+
+        self.imageWidth.setValue(800)
+        self.imageHeight.setValue(600)
+
+        self.expBg.setChecked(True)
+        self.expLight.setChecked(True)
+        self.expFcView.setChecked(False)
+        self.repRot.setChecked(False)
 
 
 
