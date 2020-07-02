@@ -387,7 +387,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
                                              self.expFcView.isChecked(),
                                              self.radiosityTab.getRadiosity())
 
-        self.textureTab.finish(self.renderSettings)
+        self.textureTab.createTextureInc(self.renderSettings)
 
         self.createIniContent()
         self.writeIni()
@@ -402,7 +402,13 @@ class TextureTab(QtGui.QWidget):
         self.qSettingsGroup = "textureTab"
         self.initTab()
 
-    def initTab(self): #create all necessary stuff for texture tab and connect signals
+
+    ### Create the tab ###
+    ######################
+
+    def initTab(self):
+        """Wrapper method to create the tab and the signals, etc."""
+
         self.textureLayout = QtGui.QVBoxLayout() #the wrapper layout for the tab
         
         self.addObjectsTexturesLists() #add the two lists at the top
@@ -420,48 +426,17 @@ class TextureTab(QtGui.QWidget):
 
         self.setLayout(self.textureLayout)
 
-    def applyQSettings(self, settingsObject):
-        self.preview.applyQSettings(settingsObject)
+    def addObjectsTexturesLists(self):
+        """Add the two lists with the objects and textures."""
 
-    def saveQSettings(self, settingsObject):
-        self.preview.saveQSettings(settingsObject)
-
-
-    def connectSignals(self): #connect all necessary signals for the texture tab
-        self.objectList.itemSelectionChanged.connect(self.updateTextureSettings)
-        self.textureList.itemSelectionChanged.connect(self.updateSelectedListObject)
-
-        self.scaleX.editingFinished.connect(self.updateSelectedListObject)
-        self.scaleY.editingFinished.connect(self.updateSelectedListObject)
-        self.scaleZ.editingFinished.connect(self.updateSelectedListObject)
-
-        self.rotationX.editingFinished.connect(self.updateSelectedListObject)
-        self.rotationY.editingFinished.connect(self.updateSelectedListObject)
-        self.rotationZ.editingFinished.connect(self.updateSelectedListObject)
-
-        self.translationX.editingFinished.connect(self.updateSelectedListObject)
-        self.translationY.editingFinished.connect(self.updateSelectedListObject)
-        self.translationZ.editingFinished.connect(self.updateSelectedListObject)
-
-    def disconnectSignals(self): #disconnect all signals for the texture tab
-        self.objectList.itemSelectionChanged.disconnect()
-        self.textureList.itemSelectionChanged.disconnect()
-
-        self.scaleX.editingFinished.disconnect()
-        self.scaleY.editingFinished.disconnect()
-        self.scaleZ.editingFinished.disconnect()
-
-        self.rotationX.editingFinished.disconnect()
-        self.rotationY.editingFinished.disconnect()
-        self.rotationZ.editingFinished.disconnect()
-        
-        self.translationX.editingFinished.disconnect()
-        self.translationY.editingFinished.disconnect()
-        self.translationZ.editingFinished.disconnect()
-
-    def addObjectsTexturesLists(self): #add the two lists with the objects and textures
         self.listWidget = QtGui.QWidget() #wrapper widget for the two lists
         self.listLayout = QtGui.QGridLayout() #wrapper layout for the two lists
+
+        self.addTextureList()
+        self.addObjectList()
+
+    def addTextureList(self):
+        """Add the nested list with the predefined textures on the right side."""
 
         #texture list
         self.textureList = QtGui.QTreeWidget()
@@ -491,6 +466,9 @@ class TextureTab(QtGui.QWidget):
         self.listLayout.addWidget(self.textureList, 1, 1)
 
         self.listWidget.setLayout(self.listLayout)
+
+    def addObjectList(self):
+        """Add the list with the FreeCAD objects on the left side."""
 
         #object list
         self.objectList = QtGui.QListWidget()
@@ -529,7 +507,7 @@ class TextureTab(QtGui.QWidget):
                 listItem = QtGui.QListWidgetItem(obj.ViewObject.Icon, obj.Label)
             except:
                 listItem = QtGui.QListWidgetItem(obj.Label)
-            predefined = self.predefines[0]
+
             self.listObjects.append(ListObject(obj, listItem, self.predefines[0], 1, 1, 1, 0, 0, 0, 0, 0, 0))
 
             self.objectList.addItem(listItem)
@@ -544,68 +522,9 @@ class TextureTab(QtGui.QWidget):
         self.commentLabel.setWordWrap(True)
         self.listLayout.addWidget(self.commentLabel, 2, 0, 1, 2)
 
-    def predefXmlToList(self, xmlNode, parentNode):
-        childNodes = xmlNode.getchildren()
+    def addScaleRotateTranslate(self):
+        """Add the scale, rotate, translate menu."""
 
-        if childNodes == []:
-            treeItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.text])
-            #get all attributes
-            attr = xmlNode.attrib
-            if "material" in attr:
-                material = attr["material"]
-            else:
-                material = ""
-
-            if "texture" in attr:
-                texture = attr["texture"]
-            else:
-                texture = ""
-
-            if "pigment" in attr:
-                pigment = attr["pigment"]
-            else:
-                pigment = ""
-
-            if "finish" in attr:
-                finish = attr["finish"]
-            else:
-                finish = ""
-            
-            if "normal" in attr:
-                normal = attr["normal"]
-            else:
-                normal = ""
-
-            if "interior" in attr:
-                interior = attr["interior"]
-            else:
-                interior = ""
-                
-            if "media" in attr:
-                media = attr["media"]
-            else:
-                media = ""    
-
-            if "inc" in attr:
-                inc = attr["inc"]
-            else:
-                inc = ""
-
-            if "comment" in attr:
-                comment = attr["comment"]
-            else:
-                comment = ""
-
-            self.predefines.append(Predefined(xmlNode.text, material, texture, pigment, finish, normal, interior, media, inc, comment, treeItem))
-
-        else:
-            categoryItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
-            for node in childNodes:
-                #call method for child nodes
-                self.predefXmlToList(node, categoryItem)
-
-    def addScaleRotateTranslate(self): #add the scale and rotate menu
-        # scale, rotate, translate
         self.textureSettingsWidget = QtGui.QWidget()
         self.textureSettingsLayout = QtGui.QGridLayout()
 
@@ -671,7 +590,6 @@ class TextureTab(QtGui.QWidget):
         self.translationX.setMinimum(-9999999)
         self.translationX.setDecimals(3)
         self.translationX.setPrefix("x: ")
-        #self.translationX.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.translationX, 2, 1)
 
         self.translationY = QtGui.QDoubleSpinBox()
@@ -679,7 +597,6 @@ class TextureTab(QtGui.QWidget):
         self.translationY.setMinimum(-9999999)
         self.translationY.setDecimals(3)
         self.translationY.setPrefix("y: ")
-        #self.translationY.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.translationY, 2, 2)
 
         self.translationZ = QtGui.QDoubleSpinBox()
@@ -687,12 +604,127 @@ class TextureTab(QtGui.QWidget):
         self.translationZ.setMinimum(-9999999)
         self.translationZ.setDecimals(3)
         self.translationZ.setPrefix("z: ")
-        #self.translationZ.setSuffix(" deg")
         self.textureSettingsLayout.addWidget(self.translationZ, 2, 3)
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
-    def updateTextureSettings(self): #get the selected object and select the right predefined
+    def predefXmlToList(self, xmlNode, parentNode):
+        """Convert the given XML node to a predefined object and add an item to the predef list (recursive method).
+
+        Args:
+            xmlNode (xmlNode Object): The XML node that should be converted.
+            parentNode (QTreeWidgetItem): QTreeWidgetItem to which the newly created item should be added as a child.
+        """
+
+        childNodes = xmlNode.getchildren()
+
+        if childNodes == []:
+            treeItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.text])
+            #get all attributes
+            attr = xmlNode.attrib
+            if "material" in attr:
+                material = attr["material"]
+            else:
+                material = ""
+
+            if "texture" in attr:
+                texture = attr["texture"]
+            else:
+                texture = ""
+
+            if "pigment" in attr:
+                pigment = attr["pigment"]
+            else:
+                pigment = ""
+
+            if "finish" in attr:
+                finish = attr["finish"]
+            else:
+                finish = ""
+
+            if "normal" in attr:
+                normal = attr["normal"]
+            else:
+                normal = ""
+
+            if "interior" in attr:
+                interior = attr["interior"]
+            else:
+                interior = ""
+
+            if "media" in attr:
+                media = attr["media"]
+            else:
+                media = ""
+
+            if "inc" in attr:
+                inc = attr["inc"]
+            else:
+                inc = ""
+
+            if "comment" in attr:
+                comment = attr["comment"]
+            else:
+                comment = ""
+
+            self.predefines.append(Predefined(xmlNode.text, material, texture,
+                                              pigment, finish, normal, interior, media, inc, comment, treeItem))
+
+        else:
+            categoryItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
+            for node in childNodes:
+                #call method for child nodes
+                self.predefXmlToList(node, categoryItem)
+
+    def connectSignals(self):
+        """Connect all necessary signals for the texture tab."""
+
+        self.objectList.itemSelectionChanged.connect(
+            self.updateTextureSettings)
+        self.textureList.itemSelectionChanged.connect(
+            self.updateSelectedListObject)
+
+        self.scaleX.editingFinished.connect(self.updateSelectedListObject)
+        self.scaleY.editingFinished.connect(self.updateSelectedListObject)
+        self.scaleZ.editingFinished.connect(self.updateSelectedListObject)
+
+        self.rotationX.editingFinished.connect(self.updateSelectedListObject)
+        self.rotationY.editingFinished.connect(self.updateSelectedListObject)
+        self.rotationZ.editingFinished.connect(self.updateSelectedListObject)
+
+        self.translationX.editingFinished.connect(
+            self.updateSelectedListObject)
+        self.translationY.editingFinished.connect(
+            self.updateSelectedListObject)
+        self.translationZ.editingFinished.connect(
+            self.updateSelectedListObject)
+
+    def disconnectSignals(self):
+        """Connect all necessary signals for the texture tab."""
+
+        self.objectList.itemSelectionChanged.disconnect()
+        self.textureList.itemSelectionChanged.disconnect()
+
+        self.scaleX.editingFinished.disconnect()
+        self.scaleY.editingFinished.disconnect()
+        self.scaleZ.editingFinished.disconnect()
+
+        self.rotationX.editingFinished.disconnect()
+        self.rotationY.editingFinished.disconnect()
+        self.rotationZ.editingFinished.disconnect()
+
+        self.translationX.editingFinished.disconnect()
+        self.translationY.editingFinished.disconnect()
+        self.translationZ.editingFinished.disconnect()
+
+
+    ### Slots and their helping methods ###
+    #######################################
+
+    def updateTextureSettings(self):
+        """Set the predefined settings for the currently selected FreeCAD
+        object, when the object selection changed."""
+
         self.disconnectSignals()
         listObj = self.getSelectedListObject() #get the current selected object
 
@@ -731,13 +763,10 @@ class TextureTab(QtGui.QWidget):
 
         self.connectSignals()
 
-    def expandParentItems(self, item):
-        parent = item.parent()
-        if type(parent) == QtGui.QTreeWidgetItem:
-            parent.setExpanded(True)
-            self.expandParentItems(parent)
+    def updateSelectedListObject(self):
+        """Update the listObject of the currently selected FreeCAD
+        object when a predefined setting changed."""
 
-    def updateSelectedListObject(self): #get the selected predefined and update the listObject
         listObj = self.getSelectedListObject()
         predefine = self.getSelectedPredefined()
         if listObj == -1 or predefine == -1: #is no object or predefine selected
@@ -776,6 +805,12 @@ class TextureTab(QtGui.QWidget):
         self.updatePreview(listObj)
 
     def updatePreview(self, listObj):
+        """Render the preview for the given FreeCAD listObject.
+
+        Args:
+            listObj (ListObject): ListObject that should be previewed.
+        """
+
         if listObj.predefObject.material == None: #for FreeCAD materials
             self.preview.setErrorText("The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled.")
             return
@@ -832,21 +867,86 @@ class TextureTab(QtGui.QWidget):
 
         self.preview.render(fileContent)
 
-    def getSelectedListObject(self): #get the current selected listObject
+    def getSelectedListObject(self):
+        """Get the currently selected listObject.
+
+        Returns:
+            ListObject or int: Currently selected ListObject, if nothing selected -1.
+        """
+
         for listObj in self.listObjects:
             if listObj.listItem.isSelected():
                 return listObj
 
         return -1
 
-    def getSelectedPredefined(self): #get the current selected predefined
+    def getSelectedPredefined(self):
+        """Get the currently selected Predefined object.
+
+        Returns:
+            Predefined or int: Currently selected Predefined, if nothing selected -1.
+        """
+
         for predefine in self.predefines:
             if predefine.treeItem.isSelected():
                 return predefine
 
         return -1
 
+    def expandParentItems(self, item):
+        """Expand the parent item (recursive method).
+
+        Args:
+            item (QTreeWidgetItem): Child item
+        """
+
+        parent = item.parent()
+        if type(parent) == QtGui.QTreeWidgetItem:
+            parent.setExpanded(True)
+            self.expandParentItems(parent)
+
+
+    ### Stuff done at the end ###
+    #############################
+
+    def writeTextureInc(self):
+        """Write the content of the texture inc file into the file."""
+
+        self.texIncFile = open(self.renderSettings.texIncPath, "w")
+        self.texIncFile.write(self.texIncContent)
+        self.texIncFile.close()
+
+    def createTexIncContent(self):
+        """Create the content of the texture inc file."""
+
+        self.texIncContent = ""
+
+        for obj in self.listObjects: #iterate over all listObjects
+            self.texIncContent += self.exporter.listObjectToPov(obj)
+
+    def createTextureInc(self, renderSettings):
+        """Do the stuff for the texture inc file.
+
+        Args:
+            renderSettings (RenderSettings): The RenderSettings object for the rendering.
+        """
+
+        self.renderSettings = renderSettings
+
+        self.createTexIncContent()
+        self.writeTextureInc()
+
+
+    ### Stuff for saving and reading settings ###
+    #############################################
+
     def applyIniSettings(self, csvLines):
+        """Apply the settings from the given lines from the ini file to the tab.
+
+        Args:
+            csvLines (Array): Array of lines for the CSV parser
+        """
+
         #parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
         for row in csvReader:
@@ -874,33 +974,43 @@ class TextureTab(QtGui.QWidget):
                         listObj.translationZ = float(row[10])
 
     def settingsToIniFormat(self):
+        """Convert the settings from the tab to CSV.
+
+        Returns:
+            String: The created CSV with ";" for the ini file at the beginning.
+        """
+
         csv = ""
 
         #add settings for every listobject
         for obj in self.listObjects:
             csv += ";obj_" + obj.fcObj.Name + "," + obj.predefObject.getHash() + ","
-            csv += str(obj.scaleX) + "," + str(obj.scaleY) + "," + str(obj.scaleZ) + ","
-            csv += str(obj.rotationX) + "," + str(obj.rotationY) + "," + str(obj.rotationZ) + ","
-            csv += str(obj.translationX) + "," + str(obj.translationY) + "," + str(obj.translationZ) + "\n"
+            csv += str(obj.scaleX) + "," + str(obj.scaleY) + \
+                "," + str(obj.scaleZ) + ","
+            csv += str(obj.rotationX) + "," + str(obj.rotationY) + \
+                "," + str(obj.rotationZ) + ","
+            csv += str(obj.translationX) + "," + \
+                str(obj.translationY) + "," + str(obj.translationZ) + "\n"
 
         return csv
+    
+    def applyQSettings(self, settingsObject):
+        """Apply the settings stored with QSettings to the tab.
 
-    def writeTextureInc(self): #write the texture in content to a file
-        self.texIncFile = open(self.renderSettings.texIncPath, "w")
-        self.texIncFile.write(self.texIncContent)
-        self.texIncFile.close()
+        Args:
+            settingsObject (QSettings Object): The QSettings Object to read the data from
+        """
 
-    def createTexIncContent(self): #create the content of the texture inc file
-        self.texIncContent = ""
+        self.preview.applyQSettings(settingsObject)
 
-        for obj in self.listObjects: #iterate over all listObjects
-            self.texIncContent += self.exporter.listObjectToPov(obj)
+    def saveQSettings(self, settingsObject):
+        """Save the settings from the tab with QSettings.
 
-    def finish(self, renderSettings):
-        self.renderSettings = renderSettings
+        Args:
+            settingsObject (QSettings Object): QSettings object to store the data
+        """
 
-        self.createTexIncContent()
-        self.writeTextureInc()
+        self.preview.saveQSettings(settingsObject)
 
 
 class Preview(QtGui.QWidget):
