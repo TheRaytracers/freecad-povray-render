@@ -137,7 +137,7 @@ class Dialog(QtGui.QDialog):
         """Open the ini file and apply the settings stored in the file.
 
         Args:
-            iniPath (String): Path to the ini file.
+            iniPath (str): Path to the ini file.
         """
 
         #open ini file and extract CSV
@@ -367,7 +367,7 @@ class GeneralTab(QtGui.QWidget):
         """Check for validity and ask for applying the ini file settings.
 
         Args:
-            path (String): Path of ini file
+            path (str): Path of ini file
         """
 
         pathLegal = self.checkPath(path)
@@ -390,7 +390,7 @@ class GeneralTab(QtGui.QWidget):
         """Check if the path to the ini file is valid.
 
         Args:
-            path (String): Path to ini file
+            path (str): Path to ini file
 
         Returns:
             bool: False: not valid; True: valid
@@ -476,7 +476,7 @@ class GeneralTab(QtGui.QWidget):
         """Convert the settings from the tab to CSV.
 
         Returns:
-            String: The created CSV with ";" for the ini file at the beginning.
+            str: The created CSV with ";" for the ini file at the beginning.
         """
 
         csv = ""
@@ -1138,7 +1138,7 @@ class TextureTab(QtGui.QWidget):
         """Convert the settings from the tab to CSV.
 
         Returns:
-            String: The created CSV with ";" for the ini file at the beginning.
+            str: The created CSV with ";" for the ini file at the beginning.
         """
 
         csv = ""
@@ -1214,7 +1214,7 @@ class Preview(QtGui.QWidget):
         """Render an image by the given POV-Ray code and show it.
 
         Args:
-            povCode (string): The code for POV-Ray for the image
+            povCode (str): The code for POV-Ray for the image
         """
 
         self.povCode = povCode
@@ -1251,7 +1251,7 @@ class Preview(QtGui.QWidget):
         """Shows an error in red text and remove the image.
 
         Args:
-            text (string): error message
+            text (str): error message
         """
 
         self.imageLabel.setText(text)
@@ -1509,7 +1509,7 @@ class HelpTab(QtGui.QWidget):
         """Convert the settings from the tab to CSV.
 
         Returns:
-            String: The created CSV with ";" for the ini file at the
+            str: The created CSV with ";" for the ini file at the
             beginning (unnecessary for this tab)
         """
 
