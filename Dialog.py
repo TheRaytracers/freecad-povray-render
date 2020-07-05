@@ -32,7 +32,14 @@ import tempfile
 from helpDefs import *
 from Exporter import ExportToPovRay
 
-class Dialog(QtGui.QDialog): #the pyside class for the dialog window
+
+#########################
+### Main Dialog Class ###
+#########################
+
+class Dialog(QtGui.QDialog):
+    """The main class for the dialog. It creates only the tab independent elements."""
+
     def __init__(self):
         super(Dialog, self).__init__()
         self.exporter = ExportToPovRay()
@@ -138,6 +145,7 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
             iniFile = open(iniPath, "r")
         except:
             App.Console.PrintWarning("Could not open ini file\n")
+            self.generalTab.setDefaultValues()
             iniFile = None
 
         if iniFile and iniPath != -1 and iniPath != "" and iniPath != None:
@@ -219,7 +227,13 @@ class Dialog(QtGui.QDialog): #the pyside class for the dialog window
         self.exporter.initExport(self.renderSettings)
 
 
+###################
+### General Tab ###
+###################
+
 class GeneralTab(QtGui.QWidget):
+    """The class for the general tab (derived by QWidget)."""
+
 
     ### Signals ###
     ###############
@@ -453,8 +467,6 @@ class GeneralTab(QtGui.QWidget):
 
         if App.ActiveDocument.Name in settingsObject.allKeys():
             self.iniPath = settingsObject.value(App.ActiveDocument.Name)
-        else:
-            self.setDefaultValues()
 
         settingsObject.endGroup()
 
@@ -489,6 +501,8 @@ class GeneralTab(QtGui.QWidget):
         #parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
 
+        self.iniPathLineEdit.setText(self.iniPath)
+
         for row in csvReader:
             if row[0].startswith("stg_"):
                 name = row[0][4:]
@@ -509,21 +523,20 @@ class GeneralTab(QtGui.QWidget):
     def setDefaultValues(self):
         """Set some good default values for the tab (check "Export FreeCAD Light, etc.)."""
         
-        self.iniPath = os.path.dirname(App.ActiveDocument.FileName)
-
-        if self.iniPath == "":
-            if App.ActiveDocument.FileName == u"":
-                system = platform.system()
-                if system == "Linux":
-                    self.iniPath = "/home/"
-                elif system == "Darwin":
-                    self.iniPath = "/Users/"
-                elif system == "Windows":
-                    self.iniPath = "C:\\Users\\%UserName%\\"
+        if App.ActiveDocument.FileName == u"":
+            system = platform.system()
+            if system == "Linux":
+                self.iniPath = "/home/"
+            elif system == "Darwin":
+                self.iniPath = "/Users/"
+            elif system == "Windows":
+                self.iniPath = "C:\\Users\\%UserName%\\"
             else:
-                #create ini path from FreeCAD file
-                self.iniPath = os.path.splitext(
-                    App.ActiveDocument.FileName)[0] + ".ini"
+                self.iniPath = ""
+        else:
+            #create ini path from FreeCAD file
+            self.iniPath = os.path.splitext(
+                App.ActiveDocument.FileName)[0] + ".ini"
 
         self.iniPathLineEdit.setText(self.iniPath)
         self.checkPath(self.iniPath)
@@ -537,8 +550,13 @@ class GeneralTab(QtGui.QWidget):
         self.repRot.setChecked(False)
 
 
+###################
+### Texture Tab ###
+###################
 
 class TextureTab(QtGui.QWidget):
+    """The class for the texture tab (derived by QWidget)."""
+
     def __init__(self):
         super(TextureTab, self).__init__()
         self.exporter = ExportToPovRay()
@@ -1157,6 +1175,8 @@ class TextureTab(QtGui.QWidget):
 
 
 class Preview(QtGui.QWidget):
+    """Class for the preview. It is derived by QWidget."""
+
     def __init__(self):
         super(Preview, self).__init__()
         self.qSettingsGroup = "preview"
@@ -1315,6 +1335,8 @@ class Preview(QtGui.QWidget):
         settingsObject.endGroup()
 
 class Predefined:
+    """Class to store all stuff from a predefined (stored in predefined.xml)."""
+
     def __init__(self, identifier, material, texture, pigment, finish, normal, interior, media, inc, comment, treeItem):
         self.identifier = identifier
         self.material = material
@@ -1329,6 +1351,11 @@ class Predefined:
         self.treeItem = treeItem
 
     def getHash(self):
+        """Create a hash from all parts of the predefined (for identifying the predefined later).
+
+        Returns:
+            str: The hash
+        """
         predefName = self.treeItem.text(0)
 
         stgStr = (str(self.identifier) +
@@ -1346,6 +1373,8 @@ class Predefined:
         return stringCorrection(predefName) + hashStr
 
 class ListObject:
+    """Class to store all stuff of an object in the object list of the texture tab."""
+
     def __init__(self, fcObj, listItem, predefObject, scaleX, scaleY, scaleZ, rotationX, rotationY, rotationZ, translationX, translationY, translationZ):
         self.fcObj = fcObj
         self.label = stringCorrection(fcObj.Label)
@@ -1366,6 +1395,8 @@ class ListObject:
         self.predefObject = predefObject
 
 class RenderSettings:
+    """Class to store all settings from the dialog, passed to Exporter as argument."""
+
     def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView, radiosity):
         self.projectName = projectName
         self.directory = directory
@@ -1415,7 +1446,13 @@ class RenderSettings:
         self.radiosity = radiosity
 
 
+################
+### Help Tab ###
+################
+
 class HelpTab(QtGui.QWidget):
+    """The class for the help tab (derived by QWidget)."""
+
     def __init__(self):
         super(HelpTab, self).__init__()
         self.qSettingsGroup = "helpTab"
@@ -1497,7 +1534,13 @@ class HelpTab(QtGui.QWidget):
         pass
 
 
+#####################
+### Radiosity Tab ###
+#####################
+
 class RadiosityTab(QtGui.QWidget):
+    """The class for the radiosity / indirect lightning tab (derived by QWidget)."""
+
     def __init__(self):
         super(RadiosityTab, self).__init__()
         self.qSettingsGroup = "radiosityTab"
@@ -1600,7 +1643,7 @@ class RadiosityTab(QtGui.QWidget):
         Args:
             csvLines (Array): Array of lines from the settings part of the ini file.
         """
-        
+
         #parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
         for row in csvReader:
