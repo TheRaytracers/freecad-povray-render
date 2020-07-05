@@ -1500,11 +1500,12 @@ class HelpTab(QtGui.QWidget):
 class RadiosityTab(QtGui.QWidget):
     def __init__(self):
         super(RadiosityTab, self).__init__()
-        #self.exporter = ExportToPovRay()
         self.qSettingsGroup = "radiosityTab"
-        self.initTab()
+        self.initUIElements()
 
-    def initTab(self):
+    def initUIElements(self):
+        """Generate all UI elements for the tab."""
+
         self.wrapperLayout = QtGui.QVBoxLayout()
 
         #explanation of radiosity
@@ -1561,6 +1562,12 @@ class RadiosityTab(QtGui.QWidget):
         self.setLayout(self.wrapperLayout)
 
     def getRadiosity(self):
+        """Returns the current radiosity settings from the tab.
+
+        Returns:
+            dict: Dictionary with "radiosityName" and "ambientTo0"
+        """
+
         radiosity = {
             "radiosityName": "",
             "ambientTo0": True
@@ -1579,9 +1586,21 @@ class RadiosityTab(QtGui.QWidget):
         return radiosity
 
     def getRadiosityName(self):
+        """Return the currently selected name of the radiosity template.
+
+        Returns:
+            str: Name of the radiosity mode
+        """
+        
         return self.modesComboBox.currentText()
 
     def applyIniSettings(self, csvLines):
+        """Read and apply the setting from the given CSV lines.
+
+        Args:
+            csvLines (Array): Array of lines from the settings part of the ini file.
+        """
+        
         #parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
         for row in csvReader:
@@ -1602,6 +1621,12 @@ class RadiosityTab(QtGui.QWidget):
                     self.ambientTo0.setChecked(True)
 
     def settingsToIniFormat(self):
+        """Convert the current project dependent settings to the ini file format (CSV).
+
+        Returns:
+            str: Settings in ini format (CSV) with ";" at the beginning.
+        """
+
         csv = ";"
         csv += "radiosity"
 
@@ -1620,7 +1645,19 @@ class RadiosityTab(QtGui.QWidget):
         return csv + "\n"
 
     def saveQSettings(self, qSettingsObject):
+        """Save the project independent settings with QSettings (nothing).
+
+        Args:
+            qSettingsObject (QSettings Object): QSettings object that should be used to save the settings.
+        """
+
         pass
 
     def applyQSettings(self, qSettingsObject):
+        """Read and apply the project independent settings with QSettings (nothing).
+
+        Args:
+            qSettingsObject (QSettings Object): QSettings object that should be used to save the settings.
+        """
+
         pass
