@@ -51,7 +51,7 @@ class Dialog(QtGui.QDialog):
 
         self.setWindowTitle("Export to POV-Ray")
 
-        #create tabs
+        # create tabs
         self.generalTab = GeneralTab()
         self.textureTab = TextureTab()
         self.radiosityTab = RadiosityTab()
@@ -102,7 +102,7 @@ class Dialog(QtGui.QDialog):
 
         settings = QtCore.QSettings(
             "Usb Hub, DerUhrmacher", "Export to POV-Ray")
-        
+
         self.generalTab.saveQSettings(settings)
         self.textureTab.saveQSettings(settings)
         self.radiosityTab.saveQSettings(settings)
@@ -139,7 +139,7 @@ class Dialog(QtGui.QDialog):
             iniPath (str): Path to the ini file.
         """
 
-        #open ini file and extract CSV
+        # open ini file and extract CSV
         try:
             iniFile = open(iniPath, "r")
         except:
@@ -177,7 +177,7 @@ class Dialog(QtGui.QDialog):
         """Create the content of the ini file."""
 
         self.settingsToIniFormat()
-        
+
         self.iniContent = ""
         self.iniContent += self.csv + "\n"
         self.iniContent += "Input_File_Name='" + self.renderSettings.povName + "'\n"
@@ -208,7 +208,7 @@ class Dialog(QtGui.QDialog):
         directory = os.path.dirname(iniPath) + os.sep
         projectName = os.path.basename(iniPath)[:-4]
 
-        #create renderSettings object
+        # create renderSettings object
         self.renderSettings = RenderSettings(directory, projectName,
                                              self.generalTab.getImageWidth(),
                                              self.generalTab.getImageHeight(),
@@ -236,8 +236,10 @@ class GeneralTab(QtGui.QWidget):
 
     ### Signals ###
     ###############
-    iniPathChanged = QtCore.Signal(str) #emitted when ini path changed and ini file should be applied
-    iniPathValidityChanged = QtCore.Signal(bool) #emitted when the validity of the ini path changed
+    # emitted when ini path changed and ini file should be applied
+    iniPathChanged = QtCore.Signal(str)
+    # emitted when the validity of the ini path changed
+    iniPathValidityChanged = QtCore.Signal(bool)
 
 
     ### Init UI elements and other stuff ###
@@ -252,7 +254,7 @@ class GeneralTab(QtGui.QWidget):
     def initUIElements(self):
         """Create all UI elements and set layouts, signals, slots, etc."""
 
-        #ini file selection
+        # ini file selection
         self.iniPathLineEdit = QtGui.QLineEdit()
         self.iniPathLineEdit.setPlaceholderText("Path to INI File")
         self.iniPathLineEdit.setToolTip(
@@ -263,7 +265,7 @@ class GeneralTab(QtGui.QWidget):
             "Select Project File (*.ini)")
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
         self.openFileDialogButton.setToolTip("Open file dialog for choosing a INI file.\n"
-            "Be careful to not use spaces or special chars in pathname for POV-Ray compatibility.")
+                                             "Be careful to not use spaces or special chars in pathname for POV-Ray compatibility.")
 
         self.warnLabel = QtGui.QLabel("")
         self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
@@ -276,7 +278,7 @@ class GeneralTab(QtGui.QWidget):
         self.iniSelectionGroup = QtGui.QGroupBox("Output File Selection")
         self.iniSelectionGroup.setLayout(self.iniSelectionLayout)
 
-        #Width & Height of rendered image
+        # Width & Height of rendered image
         self.imageWidthLabel = QtGui.QLabel("Width")
         self.imageWidth = QtGui.QSpinBox()
         self.imageWidth.setMinimum(1)
@@ -301,19 +303,20 @@ class GeneralTab(QtGui.QWidget):
             "Width and Height of rendered Image")
         self.WHImageGroup.setLayout(self.WHImageLayout)
 
-        #Options
+        # Options
         self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
         self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via FreeCAD settings)\n"
-            "Define your own background if you unchecked this option")
+                              "Define your own background if you unchecked this option")
 
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
         self.expLight.setToolTip(
-            "Export the light FreeCAD uses. Define your own light via a light object in FreeCAD or a light in the user inc file if you unchecked this option")
+            "Export the light FreeCAD uses. Define your own light via a light object in FreeCAD "
+            "or a light in the user inc file if you unchecked this option")
 
         self.repRot = QtGui.QCheckBox("Repair Rotation")
         self.repRot.setToolTip("Repair the rotation of all objects.\n"
-            "Use this option if objects in your scene appear in a wrong rotation.\n"
-            "This is a workaround for a FreeCAD bug. Visit the Help tab for more information.")
+                               "Use this option if objects in your scene appear in a wrong rotation.\n"
+                               "This is a workaround for a FreeCAD bug. Visit the Help tab for more information.")
 
         self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
         self.expFcView.setToolTip(
@@ -327,7 +330,7 @@ class GeneralTab(QtGui.QWidget):
         self.optionGroups = QtGui.QGroupBox("Options")
         self.optionGroups.setLayout(self.optionLayout)
 
-        #add widgets to the main layout
+        # add widgets to the main layout
         self.wrapperLayout = QtGui.QVBoxLayout()
         self.wrapperLayout.addWidget(self.iniSelectionGroup)
         self.wrapperLayout.addWidget(self.WHImageGroup)
@@ -372,7 +375,7 @@ class GeneralTab(QtGui.QWidget):
         pathLegal = self.checkPath(path)
 
         if pathLegal and os.path.isfile(path):
-            #ask to apply settings from selected file
+            # ask to apply settings from selected file
             content = ""
             content += "Do you want to overwrite the current settings with those from the selected file?\n"
             content += "Settings not made in the selected file will not be overwritten.\n"
@@ -397,12 +400,12 @@ class GeneralTab(QtGui.QWidget):
 
         if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:].lower() == ".ini":
             self.iniPathValidityChanged.emit(True)
-            
+
             self.warnLabel.setText("")
             return True
         else:
             self.iniPathValidityChanged.emit(False)
-            
+
             if path == "" or os.path.isdir(path):
                 self.warnLabel.setText(
                     "Please type a path or get one with clicking on '...'")
@@ -448,11 +451,12 @@ class GeneralTab(QtGui.QWidget):
             settingsObject (QSettings Object): QSettings object to store the data
         """
 
-        # The name of the active document together with the ini file is saved, to 
+        # The name of the active document together with the ini file is saved, to
         # make it possible to assign the ini file to the FreeCAD model at the next opening.
 
         settingsObject.beginGroup(self.qSettingsGroup)
-        settingsObject.setValue(App.ActiveDocument.Name, self.iniPathLineEdit.text())
+        settingsObject.setValue(App.ActiveDocument.Name,
+                                self.iniPathLineEdit.text())
         settingsObject.endGroup()
 
     def applyQSettings(self, settingsObject):
@@ -480,7 +484,7 @@ class GeneralTab(QtGui.QWidget):
 
         csv = ""
 
-        #add render settings
+        # add render settings
         csv += ";stg_width," + str(self.getImageWidth()) + "\n"
         csv += ";stg_height," + str(self.getImageHeight()) + "\n"
         csv += ";stg_expBg," + str(self.isExpBgChecked()) + "\n"
@@ -497,7 +501,7 @@ class GeneralTab(QtGui.QWidget):
             csvLines (Array): Array of lines for the CSV parser
         """
 
-        #parse CSV
+        # parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
 
         self.iniPathLineEdit.setText(self.iniPath)
@@ -521,7 +525,7 @@ class GeneralTab(QtGui.QWidget):
 
     def setDefaultValues(self):
         """Set some good default values for the tab (check "Export FreeCAD Light, etc.)."""
-        
+
         if App.ActiveDocument.FileName == u"":
             system = platform.system()
             if system == "Linux":
@@ -533,7 +537,7 @@ class GeneralTab(QtGui.QWidget):
             else:
                 self.iniPath = ""
         else:
-            #create ini path from FreeCAD file
+            # create ini path from FreeCAD file
             self.iniPath = os.path.splitext(
                 App.ActiveDocument.FileName)[0] + ".ini"
 
@@ -570,16 +574,17 @@ class TextureTab(QtGui.QWidget):
         """Wrapper method to create the tab and the signals, etc."""
 
         self.wrapperLayout = QtGui.QVBoxLayout()
-        
-        self.addObjectsTexturesLists() #add the two lists at the top
-        self.addScaleRotateTranslate() #add the menu for scaling and rotating at the bottom
-        
-        self.preview = Preview() #preview widget
+
+        self.addObjectsTexturesLists()  # add the two lists at the top
+        # add the menu for scaling and rotating at the bottom
+        self.addScaleRotateTranslate()
+
+        self.preview = Preview()  # preview widget
 
         # signals and slots
         self.connectSignals()
 
-        #set layouts
+        # set layouts
         self.wrapperLayout.addWidget(self.listsWidget)
         self.wrapperLayout.addWidget(self.textureSettingsWidget)
         self.wrapperLayout.addWidget(self.preview)
@@ -589,8 +594,8 @@ class TextureTab(QtGui.QWidget):
     def addObjectsTexturesLists(self):
         """Add the two lists with the objects and textures."""
 
-        self.listsWidget = QtGui.QWidget() #wrapper widget for the two lists
-        self.listsLayout = QtGui.QGridLayout() #wrapper layout for the two lists
+        self.listsWidget = QtGui.QWidget()  # wrapper widget for the two lists
+        self.listsLayout = QtGui.QGridLayout()  # wrapper layout for the two lists
 
         self.addTextureList()
         self.addObjectList()
@@ -598,25 +603,28 @@ class TextureTab(QtGui.QWidget):
     def addTextureList(self):
         """Add the nested list with the predefined textures on the right side."""
 
-        #texture list
+        # texture list
         self.textureList = QtGui.QTreeWidget()
         self.textureList.setHeaderLabel("Predefined")
 
         self.textureListHeading = QtGui.QLabel("<b>Texture</b>")
 
         self.predefines = []
-        #add FreeCAD texture
-        self.fcTexItem = QtGui.QTreeWidgetItem(self.textureList, ["FreeCAD Texture"])
-        self.predefines.append(Predefined("FreeCAD Texture", None, None, None, None, None, None, None, "", "", self.fcTexItem))
+        # add FreeCAD texture
+        self.fcTexItem = QtGui.QTreeWidgetItem(
+            self.textureList, ["FreeCAD Texture"])
+        self.predefines.append(Predefined(
+            "FreeCAD Texture", None, None, None, None, None, None, None, "", "", self.fcTexItem))
         self.fcTexItem.setSelected(True)
 
-        #get the predefined.xml
-        predefinedPath = os.path.join(os.path.dirname(__file__), "predefined.xml") #get workbench path
-        
+        # get the predefined.xml
+        predefinedPath = os.path.join(os.path.dirname(
+            __file__), "predefined.xml")  # get workbench path
+
         predefined = xml.parse(predefinedPath).getroot()
         categories = predefined.getchildren()
 
-        #read the predefined.xml and add the predefined defined in the XML
+        # read the predefined.xml and add the predefined defined in the XML
         for category in categories:
             self.predefXmlToList(category, self.textureList)
 
@@ -630,23 +638,23 @@ class TextureTab(QtGui.QWidget):
     def addObjectList(self):
         """Add the list with the FreeCAD objects on the left side."""
 
-        #object list
+        # object list
         self.objectList = QtGui.QListWidget()
 
         self.objectListHeading = QtGui.QLabel("<b>Object</b>")
 
-        #get objects
+        # get objects
         fcObjs = App.ActiveDocument.Objects
         self.listFcObjects = []
         for obj in fcObjs:
             if obj.ViewObject.Visibility:
-                #has object a shape color
+                # has object a shape color
                 try:
                     obj.ViewObject.ShapeColor
                     shapeColor = True
                 except:
                     shapeColor = False
-                #has object a shape
+                # has object a shape
                 try:
                     obj.Shape
                     obj.Shape.Area
@@ -656,27 +664,28 @@ class TextureTab(QtGui.QWidget):
                 except:
                     shape = False
 
-                #test for the conditions for a object for the object list
+                # test for the conditions for a object for the object list
                 if shapeColor and shape:
                     self.listFcObjects.append(obj)
 
         self.listObjects = []
-        #create the listObjects
+        # create the listObjects
         for obj in self.listFcObjects:
             try:
                 listItem = QtGui.QListWidgetItem(obj.ViewObject.Icon, obj.Label)
             except:
                 listItem = QtGui.QListWidgetItem(obj.Label)
 
-            self.listObjects.append(ListObject(obj, listItem, self.predefines[0], 1, 1, 1, 0, 0, 0, 0, 0, 0))
+            self.listObjects.append(ListObject(
+                obj, listItem, self.predefines[0], 1, 1, 1, 0, 0, 0, 0, 0, 0))
 
             self.objectList.addItem(listItem)
-        
-        #add the object list to the layouts
+
+        # add the object list to the layouts
         self.listsLayout.addWidget(self.objectListHeading, 0, 0)
         self.listsLayout.addWidget(self.objectList, 1, 0)
 
-        #add comment label
+        # add comment label
         self.commentLabel = QtGui.QLabel()
         self.commentLabel.setStyleSheet("QLabel { font-weight : bold;}")
         self.commentLabel.setWordWrap(True)
@@ -780,7 +789,7 @@ class TextureTab(QtGui.QWidget):
 
         if childNodes == []:
             treeItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.text])
-            #get all attributes
+            # get all attributes
             attr = xmlNode.attrib
             if "material" in attr:
                 material = attr["material"]
@@ -833,7 +842,7 @@ class TextureTab(QtGui.QWidget):
         else:
             categoryItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
             for node in childNodes:
-                #call method for child nodes
+                # call method for child nodes
                 self.predefXmlToList(node, categoryItem)
 
     def connectSignals(self):
@@ -885,14 +894,14 @@ class TextureTab(QtGui.QWidget):
         """Set the predefined settings for the currently selected FreeCAD
         object, when the object selection changed."""
 
-        self.disconnectSignals() #disconnect to avoid infinite recursive calls
-        selectedListObj = self.getSelectedListObject() #get the current selected object
+        self.disconnectSignals()  # disconnect to avoid infinite recursive calls
+        selectedListObj = self.getSelectedListObject()  # get the current selected object
 
-        if selectedListObj == -1: #is an object selected
+        if selectedListObj == -1:  # is an object selected
             self.connectSignals()
             return -1
 
-        #set all values for scaling and rotating
+        # set all values for scaling and rotating
         self.scaleX.setValue(selectedListObj.scaleX)
         self.scaleY.setValue(selectedListObj.scaleY)
         self.scaleZ.setValue(selectedListObj.scaleZ)
@@ -905,20 +914,20 @@ class TextureTab(QtGui.QWidget):
         self.translationY.setValue(selectedListObj.translationY)
         self.translationZ.setValue(selectedListObj.translationZ)
 
-        #unselect all textures
+        # unselect all textures
         for predefine in self.predefines:
             predefine.treeItem.setSelected(False)
 
-        #select the right predefined
+        # select the right predefined
         selectedListObj.predefObject.treeItem.setSelected(True)
 
-        #expand categories
+        # expand categories
         self.expandParentItems(selectedListObj.predefObject.treeItem)
 
-        #set comment
+        # set comment
         self.commentLabel.setText(selectedListObj.predefObject.comment)
 
-        #update preview
+        # update preview
         self.updatePreview(selectedListObj)
 
         self.connectSignals()
@@ -929,9 +938,9 @@ class TextureTab(QtGui.QWidget):
 
         selectedListObj = self.getSelectedListObject()
         selectedPredefine = self.getSelectedPredefined()
-        if selectedListObj == -1 or selectedPredefine == -1: #is no object or predefine selected
-            if selectedPredefine == -1: #is only a category selected
-                #expand and select predef under the category
+        if selectedListObj == -1 or selectedPredefine == -1:  # is no object or predefine selected
+            if selectedPredefine == -1:  # is only a category selected
+                # expand and select predef under the category
                 self.disconnectSignals()
                 selectedItems = self.textureList.selectedItems()
                 selected = selectedItems[0]
@@ -941,9 +950,9 @@ class TextureTab(QtGui.QWidget):
                 self.connectSignals()
                 childItem.setSelected(True)
 
-            return -1 #abort
+            return -1  # abort
 
-        #get the values for scaling and rotating
+        # get the values for scaling and rotating
         selectedListObj.scaleX = self.scaleX.value()
         selectedListObj.scaleY = self.scaleY.value()
         selectedListObj.scaleZ = self.scaleZ.value()
@@ -956,12 +965,13 @@ class TextureTab(QtGui.QWidget):
         selectedListObj.translationY = self.translationY.value()
         selectedListObj.translationZ = self.translationZ.value()
 
-        selectedListObj.predefObject = selectedPredefine #apply the read values to the predefObject in the listObject
+        # apply the read values to the predefObject in the listObject
+        selectedListObj.predefObject = selectedPredefine
 
-        #set comment
+        # set comment
         self.commentLabel.setText(selectedListObj.predefObject.comment)
 
-        #update preview
+        # update preview
         self.updatePreview(selectedListObj)
 
     def updatePreview(self, listObj):
@@ -971,15 +981,17 @@ class TextureTab(QtGui.QWidget):
             listObj (ListObject): ListObject that should be previewed.
         """
 
-        if listObj.predefObject.material == None: #for FreeCAD materials
-            self.preview.setErrorText("The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled.")
+        if listObj.predefObject.material == None:  # for FreeCAD materials
+            self.preview.setErrorText(
+                "The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled.")
             return
         elif listObj.predefObject.media != "":
-            self.preview.setErrorText("The texture is too complex for a preview and would need a lot of time\nso this texture is disabled.")
+            self.preview.setErrorText(
+                "The texture is too complex for a preview and would need a lot of time\nso this texture is disabled.")
             return
 
         # create content of pov file
-        fileContent =""
+        fileContent = ""
         fileContent += '#version 3.6; // 3.7\n'
         fileContent += 'global_settings { assumed_gamma 1.0 }\n'
         fileContent += '#default { finish { ambient 0.2 diffuse 0.9 } }\n'
@@ -1017,7 +1029,7 @@ class TextureTab(QtGui.QWidget):
 
         fileContent += self.exporter.listObjectToPov(listObj, "predef")
 
-        fileContent+= 'box { <0,0,0>, <10.0, 10.0, 10.0>\n'
+        fileContent += 'box { <0,0,0>, <10.0, 10.0, 10.0>\n'
         fileContent += '\ttranslate <5.0, 5.0, -5.0>\n'
         fileContent += '\tmaterial { predef_material }\n'
         fileContent += '}\n'
@@ -1081,7 +1093,7 @@ class TextureTab(QtGui.QWidget):
 
         self.texIncContent = ""
 
-        for obj in self.listObjects: #iterate over all listObjects
+        for obj in self.listObjects:  # iterate over all listObjects
             self.texIncContent += self.exporter.listObjectToPov(obj)
 
     def createTextureInc(self, renderSettings):
@@ -1107,7 +1119,7 @@ class TextureTab(QtGui.QWidget):
             csvLines (Array): Array of lines for the CSV parser
         """
 
-        #parse CSV
+        # parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
         for row in csvReader:
             if row[0].startswith("obj_"):
@@ -1146,7 +1158,7 @@ class TextureTab(QtGui.QWidget):
 
         csv = ""
 
-        #add settings for every listobject
+        # add settings for every listobject
         for obj in self.listObjects:
             csv += ";obj_" + obj.fcObj.Name + "," + obj.predefObject.getHash() + ","
             csv += str(obj.scaleX) + "," + str(obj.scaleY) + \
@@ -1157,7 +1169,7 @@ class TextureTab(QtGui.QWidget):
                 str(obj.translationY) + "," + str(obj.translationZ) + "\n"
 
         return csv
-    
+
     def applyQSettings(self, settingsObject):
         """Apply the settings stored with QSettings to the tab.
 
@@ -1185,28 +1197,28 @@ class Preview(QtGui.QWidget):
         self.qSettingsGroup = "preview"
         self.initUIElements()
         self.connectSignals()
-    
+
     def initUIElements(self):
         """Create the UI elements and set the layouts."""
 
-        #disable checkbox
+        # disable checkbox
         self.disableCheckBox = QtGui.QCheckBox("Disable Live Preview")
 
-        #zoom buttons
+        # zoom buttons
         self.zoomIn = QtGui.QPushButton("Larger")
         self.zoomOut = QtGui.QPushButton("Smaller")
 
-        #preview settings layout
+        # preview settings layout
         self.settingsLayout = QtGui.QHBoxLayout()
         self.settingsLayout.addWidget(self.disableCheckBox)
         self.settingsLayout.addWidget(self.zoomIn)
         self.settingsLayout.addWidget(self.zoomOut)
 
-        #preview image
+        # preview image
         self.imageLabel = QtGui.QLabel()
         self.imageLabel.setStyleSheet("QLabel { color : #ff0000; }")
 
-        #main layout
+        # main layout
         self.wrapperLayout = QtGui.QVBoxLayout()
         self.wrapperLayout.addLayout(self.settingsLayout)
         self.wrapperLayout.addWidget(self.imageLabel)
@@ -1232,7 +1244,7 @@ class Preview(QtGui.QWidget):
         povName = povFile.name
         povFile.close()
 
-        #render
+        # render
         povExec = App.ParamGet(preferences.prefPath).GetString("PovRayExe", "")
         if os.path.isfile(povExec) == False:
             errorText = "To get a preview of the texture settings you must\n"
@@ -1242,11 +1254,11 @@ class Preview(QtGui.QWidget):
             showError(errorText, "POV-Ray executable not found")
             return -1
 
-        #start povray
+        # start povray
         subprocess.call([povExec, "-d", "width=" + str(self.previewWidth),
                          "height=" + str(self.previewHeight), povName])
 
-        #update image
+        # update image
         pixmap = QtGui.QPixmap(povName[:-4])
         self.imageLabel.setPixmap(pixmap)
 
@@ -1300,10 +1312,10 @@ class Preview(QtGui.QWidget):
             settingsObject (QSettings Object): The QSettings Object to read the data from
         """
 
-        #get saved input
+        # get saved input
         settingsObject.beginGroup(self.qSettingsGroup)
 
-        #set preview disable checkbox
+        # set preview disable checkbox
         previewDisable = settingsObject.value("previewDisable")
         if previewDisable != None:
             self.disableCheckBox.setChecked(strToBool(previewDisable))
@@ -1337,6 +1349,7 @@ class Preview(QtGui.QWidget):
         settingsObject.setValue("previewHeight", self.previewHeight)
         settingsObject.endGroup()
 
+
 class Predefined:
     """Class to store all stuff from a predefined (stored in predefined.xml)."""
 
@@ -1362,18 +1375,19 @@ class Predefined:
         predefName = self.treeItem.text(0)
 
         stgStr = (str(self.identifier) +
-            str(self.material) +
-            str(self.texture) +
-            str(self.pigment) +
-            str(self.finish) +
-            str(self.normal) +
-            str(self.interior) +
-            str(self.media) +
-            str(self.inc) +
-            str(self.comment))
+                  str(self.material) +
+                  str(self.texture) +
+                  str(self.pigment) +
+                  str(self.finish) +
+                  str(self.normal) +
+                  str(self.interior) +
+                  str(self.media) +
+                  str(self.inc) +
+                  str(self.comment))
         hashStr = hashlib.md5(stgStr.encode("UTF-8")).hexdigest()[:4]
 
         return stringCorrection(predefName) + hashStr
+
 
 class ListObject:
     """Class to store all stuff of an object in the object list of the texture tab."""
@@ -1397,6 +1411,7 @@ class ListObject:
         self.listItem = listItem
         self.predefObject = predefObject
 
+
 class RenderSettings:
     """Class to store all settings from the dialog, passed to Exporter as argument."""
 
@@ -1416,7 +1431,8 @@ class RenderSettings:
             # is a file
             if os.path.isfile(os.path.join(self.directory, fileName)):
                 # does the filename fits the regex pattern
-                matchObj = re.search(self.projectName.encode('unicode_escape') + r' \(([0-9]+)\)\.png', fileName)
+                matchObj = re.search(self.projectName.encode(
+                    'unicode_escape') + r' \(([0-9]+)\)\.png', fileName)
                 if matchObj:
                     # is the number bigger than the number of the other images
                     if int(matchObj.group(1)) > numOfImages:
@@ -1424,7 +1440,7 @@ class RenderSettings:
 
         self.pngName = self.projectName + " (" + str(numOfImages + 1) + ").png"
         self.pngPath = self.directory + self.pngName
-        
+
         self.incName = self.projectName + "_user.inc"
         self.incPath = self.directory + self.incName
         self.meshName = self.projectName + "_meshes.inc"
@@ -1436,7 +1452,7 @@ class RenderSettings:
         self.texIncName = self.projectName + "_textures.inc"
         self.texIncPath = self.directory + self.texIncName
 
-        #get all output options
+        # get all output options
         self.width = width
         self.height = height
 
@@ -1445,7 +1461,7 @@ class RenderSettings:
         self.repRot = repRot
         self.expFcView = expFcView
 
-        #radiosity
+        # radiosity
         self.radiosity = radiosity
 
 
@@ -1554,8 +1570,8 @@ class RadiosityTab(QtGui.QWidget):
 
         self.wrapperLayout = QtGui.QVBoxLayout()
 
-        #explanation of radiosity
-        explanationText =  "Theoretically there is no light in the shadows and therefore "
+        # explanation of radiosity
+        explanationText = "Theoretically there is no light in the shadows and therefore "
         explanationText += "not directly illuminated objects would be completely black. In reality, of course, this is not the case, "
         explanationText += "because light from other objects is reflected into the shadow. "
         explanationText += "Indirect lighting imitates exactly this effect when rendering and thus produces much better images. "
@@ -1599,7 +1615,8 @@ class RadiosityTab(QtGui.QWidget):
 
         self.ambientTo0 = QtGui.QCheckBox("Set default Ambient to 0")
         self.ambientTo0.setChecked(True)
-        self.ambientTo0.setToolTip("Set the color of the objects without any light to 0 (black)")
+        self.ambientTo0.setToolTip(
+            "Set the color of the objects without any light to 0 (black)")
 
         self.groupBoxLayout.addWidget(self.ambientTo0)
 
@@ -1637,7 +1654,7 @@ class RadiosityTab(QtGui.QWidget):
         Returns:
             str: Name of the radiosity mode
         """
-        
+
         return self.modesComboBox.currentText()
 
 
@@ -1648,7 +1665,7 @@ class RadiosityTab(QtGui.QWidget):
             csvLines (Array): Array of lines from the settings part of the ini file.
         """
 
-        #parse CSV
+        # parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
         for row in csvReader:
             if row[0] == "radiosity":
@@ -1661,7 +1678,7 @@ class RadiosityTab(QtGui.QWidget):
                     if text == row[2]:
                         self.modesComboBox.setCurrentIndex(index)
                         break
-                
+
                 if row[3] == "stdAmbient":
                     self.ambientTo0.setChecked(False)
                 else:
