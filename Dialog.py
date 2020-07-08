@@ -115,10 +115,12 @@ class Dialog(QtGui.QDialog):
         settings = QtCore.QSettings(
             "Usb Hub, DerUhrmacher", "Export to POV-Ray")
 
-        self.generalTab.applyQSettings(settings)
         self.textureTab.applyQSettings(settings)
         self.radiosityTab.applyQSettings(settings)
         self.helpTab.applyQSettings(settings)
+        # general tab as last one to avoid conflicts with order
+        # (signal emitted by general tab, consequencing applyIniSettings() before QSettings)
+        self.generalTab.applyQSettings(settings)
 
     def settingsToIniFormat(self):
         """Call the tab classes to convert the settings to the ini format."""
@@ -1410,59 +1412,6 @@ class ListObject:
 
         self.listItem = listItem
         self.predefObject = predefObject
-
-
-class RenderSettings:
-    """Class to store all settings from the dialog, passed to Exporter as argument."""
-
-    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView, radiosity):
-        self.projectName = projectName
-        self.directory = directory
-
-        self.iniName = self.projectName + ".ini"
-        self.iniPath = self.directory + self.iniName
-        self.povName = self.projectName + ".pov"
-        self.povPath = self.directory + self.povName
-
-        import re
-        numOfImages = 0
-
-        for fileName in os.listdir(self.directory):
-            # is a file
-            if os.path.isfile(os.path.join(self.directory, fileName)):
-                # does the filename fits the regex pattern
-                matchObj = re.search(self.projectName.encode(
-                    'unicode_escape') + r' \(([0-9]+)\)\.png', fileName)
-                if matchObj:
-                    # is the number bigger than the number of the other images
-                    if int(matchObj.group(1)) > numOfImages:
-                        numOfImages = int(matchObj.group(1))
-
-        self.pngName = self.projectName + " (" + str(numOfImages + 1) + ").png"
-        self.pngPath = self.directory + self.pngName
-
-        self.incName = self.projectName + "_user.inc"
-        self.incPath = self.directory + self.incName
-        self.meshName = self.projectName + "_meshes.inc"
-        self.meshPath = self.directory + self.meshName
-        self.errorName = self.projectName + "_FatalError.out"
-        self.errorPath = self.directory + self.errorName
-        self.fcViewName = self.projectName + "_FC-View.png"
-        self.fcViewPath = self.directory + self.fcViewName
-        self.texIncName = self.projectName + "_textures.inc"
-        self.texIncPath = self.directory + self.texIncName
-
-        # get all output options
-        self.width = width
-        self.height = height
-
-        self.expBg = expBg
-        self.expLight = expLight
-        self.repRot = repRot
-        self.expFcView = expFcView
-
-        # radiosity
-        self.radiosity = radiosity
 
 
 ################
