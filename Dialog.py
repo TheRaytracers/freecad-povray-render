@@ -45,7 +45,6 @@ class Dialog(QtGui.QDialog):
         self.exporter = ExportToPovRay()
         self.initUI()
         self.applyQSettings()
-        self.textureTab.objectList.setCurrentRow(0) #XXX very dirty
 
     def initUI(self):
         """Create the dialog window with its tabs, buttons, etc."""
@@ -1134,6 +1133,10 @@ class TextureTab(QtGui.QWidget):
                         listObj.translationY = float(row[9])
                         listObj.translationZ = float(row[10])
 
+        # select first listObject
+        if self.objectList.count() > 0:
+            self.objectList.setCurrentRow(0)
+
     def settingsToIniFormat(self):
         """Convert the settings from the tab to CSV.
 
@@ -1636,6 +1639,7 @@ class RadiosityTab(QtGui.QWidget):
         """
         
         return self.modesComboBox.currentText()
+
 
     def applyIniSettings(self, csvLines):
         """Read and apply the setting from the given CSV lines.
