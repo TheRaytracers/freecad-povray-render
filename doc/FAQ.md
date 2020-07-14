@@ -22,8 +22,8 @@
   Please report the bug to us, so we hopefully can fix it soon.  
   You can report the bug via
   * A GitLab Issue: [Create an Issue](https://gitlab.com/usbhub/exporttoPOV-Ray/issues) (Green button top right)
-  * Email: usbhub.freecadABCweb.de replace ABC with an @
-  * The FreeCAD Forum: XXX
+  * Email: the.raytracersABCweb.de replace ABC with an @
+  * The FreeCAD Forum: [Publishing Post](https://forum.freecadweb.org/viewtopic.php?f=9&t=48629)
 
 * **I want to learn more about POV-Ray**  
   * You can watch this very good tutorial:  
