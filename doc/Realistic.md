@@ -2,7 +2,7 @@
 
 POV-Ray is a very powerful renderer developed in the early 90'ys. It has a mathematical approach not only for description of objects but also for textures an even for the visualization of mathematical functions. So with adding only a few lines you can create great effects.
 
-In the Part Workbench of FreeCAD you can also find objects which can be described by a mathematical function. A sphere for example is described by a centerpoint and a radius. If we combine different mathematical described objects with boolean operations we come to the concept of **CSG** (**C**onstructive **S**olid **G**eometry). The Part Workbench of FreeCAD and the object description language of POV-Ray both share the **CSG** concept.
+In the Part Workbench of FreeCAD you can also find objects which can be described by a mathematical function. A sphere for example is described by a central point and a radius. If we combine different mathematical described objects with boolean operations we come to the concept of **CSG** (**C**onstructive **S**olid **G**eometry). The Part Workbench of FreeCAD and the object description language of POV-Ray both share the **CSG** concept.
 
 So our chess example is based on CSG and each solid we have implemented in our workbench is at least used once.
 
@@ -34,11 +34,11 @@ This is a lot better, isn't it? But there is still a lot to improve.
 ## Lightning
 
 Let's do the next step in realistic rendering. By defining a better lightning you can give the image an atmosphere.  
-We introduced the light objects to do this easily. Until now, the only light source in the scene is the FreeCAD light at the same position as the camera. You see, that we defined two lights for you in the model already: one spot light and one point light. Make the spot light visible and render again (don't uncheck the "Export FreeCAD light option"). You should get an image like that:
+We introduced the light objects to do this easily. Until now, the only light source in the scene is the FreeCAD light at the same position as the camera. You see, that we defined two lights for you in the model already: one spot light and one point light. Make the spot light visible and render again (don't disable the "Export FreeCAD light option"). You should get an image like that:
 
 ![Spot Light](Examples/Chess/SpotLight/SpotLight%20(1).png "The chess model a spot light pointing a the white king")
 
-Like you see, we defined a spot light that points at the white king. To make the rest of the scene darker to set the focus even more on the king, make the point light visible and uncheck the option for exporting the FreeCAD light.
+Like you see, we defined a spot light that points at the white king. To make the rest of the scene darker to set the focus even more on the king, make the point light visible and disable the option for exporting the FreeCAD light.
 
 ![New Global Light](Examples/Chess/PointLight/PointLight%20(1).png "The chess model with a new global light")
 
