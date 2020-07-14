@@ -30,7 +30,7 @@ import hashlib
 import tempfile
 
 from helpDefs import *
-from Exporter import ExportToPovRay
+from exporter import ExportToPovRay
 
 class Dialog(QtGui.QDialog): #the pyside class for the dialog window
     def __init__(self):
