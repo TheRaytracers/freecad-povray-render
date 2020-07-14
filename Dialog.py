@@ -15,7 +15,8 @@
 #
 #  You should have received a copy of the GNU Lesser General Public
 #  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301  USA
 
 import FreeCAD as App
 import FreeCADGui as Gui
@@ -68,8 +69,12 @@ class Dialog(QtGui.QDialog):
         self.cancelButton = QtGui.QPushButton("Cancel")
 
         self.buttonBox = QtGui.QDialogButtonBox()
-        self.buttonBox.addButton(self.renderButton, QtGui.QDialogButtonBox.AcceptRole)
-        self.buttonBox.addButton(self.cancelButton, QtGui.QDialogButtonBox.RejectRole)
+        self.buttonBox.addButton(
+            self.renderButton,
+            QtGui.QDialogButtonBox.AcceptRole)
+        self.buttonBox.addButton(
+            self.cancelButton,
+            QtGui.QDialogButtonBox.RejectRole)
         self.buttonBox.accepted.connect(self.onOk)
         self.buttonBox.rejected.connect(self.onCancel)
 
@@ -80,7 +85,8 @@ class Dialog(QtGui.QDialog):
         self.show()
 
         self.generalTab.iniPathChanged.connect(self.applyIniSettings)
-        self.generalTab.iniPathValidityChanged.connect(self.setDialogAcceptable)
+        self.generalTab.iniPathValidityChanged.connect(
+            self.setDialogAcceptable)
 
 
     def setDialogAcceptable(self, acceptable):
@@ -149,7 +155,7 @@ class Dialog(QtGui.QDialog):
             self.generalTab.setDefaultValues()
             iniFile = None
 
-        if iniFile and iniPath != -1 and iniPath != "" and iniPath != None:
+        if iniFile and iniPath != -1 and iniPath != "" and iniPath is not None:
             lines = iniFile.readlines()
             iniFile.close()
 
@@ -211,14 +217,16 @@ class Dialog(QtGui.QDialog):
         projectName = os.path.basename(iniPath)[:-4]
 
         # create renderSettings object
-        self.renderSettings = RenderSettings(directory, projectName,
-                                             self.generalTab.getImageWidth(),
-                                             self.generalTab.getImageHeight(),
-                                             self.generalTab.isExpBgChecked(),
-                                             self.generalTab.isExpFcLightChecked(),
-                                             self.generalTab.isRepRotChecked(),
-                                             self.generalTab.isExpFcViewChecked(),
-                                             self.radiosityTab.getRadiosity())
+        self.renderSettings = RenderSettings(
+            directory,
+            projectName,
+            self.generalTab.getImageWidth(),
+            self.generalTab.getImageHeight(),
+            self.generalTab.isExpBgChecked(),
+            self.generalTab.isExpFcLightChecked(),
+            self.generalTab.isRepRotChecked(),
+            self.generalTab.isExpFcViewChecked(),
+            self.radiosityTab.getRadiosity())
 
         self.textureTab.createTextureInc(self.renderSettings)
 
@@ -266,8 +274,9 @@ class GeneralTab(QtGui.QWidget):
         self.openFileDialogButton = QtGui.QPushButton(
             "Select Project File (*.ini)")
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
-        self.openFileDialogButton.setToolTip("Open file dialog for choosing a INI file.\n"
-                                             "Be careful to not use spaces or special chars in pathname for POV-Ray compatibility.")
+        self.openFileDialogButton.setToolTip(
+            "Open file dialog for choosing a INI file.\n"
+            "Be careful to not use spaces or special chars in pathname for POV-Ray compatibility.")
 
         self.warnLabel = QtGui.QLabel("")
         self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
@@ -307,8 +316,9 @@ class GeneralTab(QtGui.QWidget):
 
         # Options
         self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
-        self.expBg.setToolTip("Export the FreeCAD background like you see it (editable via FreeCAD settings)\n"
-                              "Define your own background if you unchecked this option")
+        self.expBg.setToolTip(
+            "Export the FreeCAD background like you see it (editable via FreeCAD settings)\n"
+            "Define your own background if you unchecked this option")
 
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
         self.expLight.setToolTip(
@@ -316,9 +326,10 @@ class GeneralTab(QtGui.QWidget):
             "or a light in the user inc file if you unchecked this option")
 
         self.repRot = QtGui.QCheckBox("Repair Rotation")
-        self.repRot.setToolTip("Repair the rotation of all objects.\n"
-                               "Use this option if objects in your scene appear in a wrong rotation.\n"
-                               "This is a workaround for a FreeCAD bug. Visit the Help tab for more information.")
+        self.repRot.setToolTip(
+            "Repair the rotation of all objects.\n"
+            "Use this option if objects in your scene appear in a wrong rotation.\n"
+            "This is a workaround for a FreeCAD bug. Visit the Help tab for more information.")
 
         self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
         self.expFcView.setToolTip(
@@ -382,8 +393,11 @@ class GeneralTab(QtGui.QWidget):
             content += "Do you want to overwrite the current settings with those from the selected file?\n"
             content += "Settings not made in the selected file will not be overwritten.\n"
             content += "Click 'Apply' if you want to apply the settings from the file."
-            dialog = QtGui.QMessageBox(QtGui.QMessageBox.Question, "Apply settings from file?",
-                                       content, QtGui.QMessageBox.Apply | QtGui.QMessageBox.No)
+            dialog = QtGui.QMessageBox(
+                QtGui.QMessageBox.Question,
+                "Apply settings from file?",
+                content,
+                QtGui.QMessageBox.Apply | QtGui.QMessageBox.No)
             dialog.setWindowModality(QtCore.Qt.ApplicationModal)
             answer = dialog.exec_()
 
@@ -400,7 +414,8 @@ class GeneralTab(QtGui.QWidget):
             bool: False: not valid; True: valid
         """
 
-        if path.find(" ") == -1 and isAscii(path) == True and path != "" and path[-4:].lower() == ".ini":
+        if path.find(
+                " ") == -1 and isAscii(path) and path != "" and path[-4:].lower() == ".ini":
             self.iniPathValidityChanged.emit(True)
 
             self.warnLabel.setText("")
@@ -454,7 +469,8 @@ class GeneralTab(QtGui.QWidget):
         """
 
         # The name of the active document together with the ini file is saved, to
-        # make it possible to assign the ini file to the FreeCAD model at the next opening.
+        # make it possible to assign the ini file to the FreeCAD model at the
+        # next opening.
 
         settingsObject.beginGroup(self.qSettingsGroup)
         settingsObject.setValue(App.ActiveDocument.Name,
@@ -615,8 +631,19 @@ class TextureTab(QtGui.QWidget):
         # add FreeCAD texture
         self.fcTexItem = QtGui.QTreeWidgetItem(
             self.textureList, ["FreeCAD Texture"])
-        self.predefines.append(Predefined(
-            "FreeCAD Texture", None, None, None, None, None, None, None, "", "", self.fcTexItem))
+        self.predefines.append(
+            Predefined(
+                "FreeCAD Texture",
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                "",
+                "",
+                self.fcTexItem))
         self.fcTexItem.setSelected(True)
 
         # get the predefined.xml
@@ -630,8 +657,7 @@ class TextureTab(QtGui.QWidget):
         for category in categories:
             self.predefXmlToList(category, self.textureList)
 
-
-        #add the list to the layouts and widgets
+        # add the list to the layouts and widgets
         self.listsLayout.addWidget(self.textureListHeading, 0, 1)
         self.listsLayout.addWidget(self.textureList, 1, 1)
 
@@ -838,8 +864,19 @@ class TextureTab(QtGui.QWidget):
             else:
                 comment = ""
 
-            self.predefines.append(Predefined(xmlNode.text, material, texture,
-                                              pigment, finish, normal, interior, media, inc, comment, treeItem))
+            self.predefines.append(
+                Predefined(
+                    xmlNode.text,
+                    material,
+                    texture,
+                    pigment,
+                    finish,
+                    normal,
+                    interior,
+                    media,
+                    inc,
+                    comment,
+                    treeItem))
 
         else:
             categoryItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
@@ -983,7 +1020,7 @@ class TextureTab(QtGui.QWidget):
             listObj (ListObject): ListObject that should be previewed.
         """
 
-        if listObj.predefObject.material == None:  # for FreeCAD materials
+        if listObj.predefObject.material is None:  # for FreeCAD materials
             self.preview.setErrorText(
                 "The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled.")
             return
@@ -1075,7 +1112,7 @@ class TextureTab(QtGui.QWidget):
         """
 
         parent = item.parent()
-        if type(parent) == QtGui.QTreeWidgetItem:
+        if isinstance(parent, QtGui.QTreeWidgetItem):
             parent.setExpanded(True)
             self.expandParentItems(parent)
 
@@ -1319,19 +1356,19 @@ class Preview(QtGui.QWidget):
 
         # set preview disable checkbox
         previewDisable = settingsObject.value("previewDisable")
-        if previewDisable != None:
+        if previewDisable is not None:
             self.disableCheckBox.setChecked(strToBool(previewDisable))
         else:
             self.disableCheckBox.setChecked(False)
 
         previewWidth = settingsObject.value("previewWidth")
-        if previewWidth != None and previewWidth != 0 and previewWidth != -1:
+        if previewWidth is not None and previewWidth != 0 and previewWidth != -1:
             self.previewWidth = int(previewWidth)
         else:
             self.previewWidth = 300
 
         previewHeight = settingsObject.value("previewHeight")
-        if previewHeight != None and previewHeight != 0 and previewHeight != -1:
+        if previewHeight is not None and previewHeight != 0 and previewHeight != -1:
             self.previewHeight = int(previewHeight)
         else:
             self.previewHeight = 225
@@ -1355,7 +1392,19 @@ class Preview(QtGui.QWidget):
 class Predefined:
     """Class to store all stuff from a predefined (stored in predefined.xml)."""
 
-    def __init__(self, identifier, material, texture, pigment, finish, normal, interior, media, inc, comment, treeItem):
+    def __init__(
+            self,
+            identifier,
+            material,
+            texture,
+            pigment,
+            finish,
+            normal,
+            interior,
+            media,
+            inc,
+            comment,
+            treeItem):
         self.identifier = identifier
         self.material = material
         self.texture = texture
@@ -1394,7 +1443,20 @@ class Predefined:
 class ListObject:
     """Class to store all stuff of an object in the object list of the texture tab."""
 
-    def __init__(self, fcObj, listItem, predefObject, scaleX, scaleY, scaleZ, rotationX, rotationY, rotationZ, translationX, translationY, translationZ):
+    def __init__(
+            self,
+            fcObj,
+            listItem,
+            predefObject,
+            scaleX,
+            scaleY,
+            scaleZ,
+            rotationX,
+            rotationY,
+            rotationZ,
+            translationX,
+            translationY,
+            translationZ):
         self.fcObj = fcObj
         self.label = stringCorrection(fcObj.Label)
 
@@ -1441,7 +1503,7 @@ class HelpTab(QtGui.QWidget):
         <h3>General</h3>
         <p>This workbench is specialized for rendering with <a href='http://povray.org/'>POV-Ray</a>.<br>
         You will get best results if you focus on using solid CSG primitives from the part workbench.<br>
-        The resulting POV code is readable and can be modified with a 
+        The resulting POV code is readable and can be modified with a
         separate include file that <br> won't be overwritten.</p>
         <h3>Output File Selection</h3>
         <p>The *.ini file sticks your render project together. Select an existing file or create a new one. <br>
@@ -1543,7 +1605,6 @@ class RadiosityTab(QtGui.QWidget):
         self.groupBox.setChecked(False)
 
         self.groupBoxLayout = QtGui.QVBoxLayout()
-
 
         self.radiosityModes = [
             "Default",
