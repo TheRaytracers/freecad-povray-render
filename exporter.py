@@ -41,7 +41,7 @@ class ExportToPovRay:
         self.os = platform.system() #get system information
 
     def initExport(self, renderSettings):
-        """Export the current FreeCAD model with the settings given by the Settings object (defined in Dialog.py)."""
+        """Export the current FreeCAD model with the settings given by the Settings object (defined in helpDefs.py)."""
 
         self.doc = App.ActiveDocument
         self.objs = self.doc.Objects

@@ -34,10 +34,10 @@ def isAscii(string): #test whether the string is an ASCII string
 def stringCorrection(inputString): # String correction for compatibility with POV-Ray 
         utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
         uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
-        firstchar = ord(uniString[0])                         # POV-Ray doesn't like numbers as first charakter
+        firstchar = ord(uniString[0])                         # POV-Ray doesn't like numbers as first character
         if firstchar >= 48 and firstchar <= 57:
             uniString = "_" + uniString
-        uniString = uniString.replace(u"Ä", "Ae")             # replacement of german "Umlaute"
+        uniString = uniString.replace(u"Ä", "Ae")             # replacement of mutated vowels (german "Umlaute")
         uniString = uniString.replace(u"ä", "ae")
         uniString = uniString.replace(u"Ü", "Ue")
         uniString = uniString.replace(u"ü", "ue")
@@ -83,6 +83,59 @@ def setDefaultPovRayExe():
                     "PovRayExe", raytracingWbExe)
         else:
             App.ParamGet(preferences.prefPath).SetString("PovRayExe", renderWbExe)
+
+
+class RenderSettings:
+    """Class to store all settings from the dialog, passed to Exporter as argument."""
+
+    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView, radiosity):
+        self.projectName = projectName
+        self.directory = directory
+
+        self.iniName = self.projectName + ".ini"
+        self.iniPath = self.directory + self.iniName
+        self.povName = self.projectName + ".pov"
+        self.povPath = self.directory + self.povName
+
+        import re
+        numOfImages = 0
+
+        for fileName in os.listdir(self.directory):
+            # is a file
+            if os.path.isfile(os.path.join(self.directory, fileName)):
+                # does the filename fits the regex pattern
+                matchObj = re.search(self.projectName.encode(
+                    'unicode_escape') + r' \(([0-9]+)\)\.png', fileName)
+                if matchObj:
+                    # is the number bigger than the number of the other images
+                    if int(matchObj.group(1)) > numOfImages:
+                        numOfImages = int(matchObj.group(1))
+
+        self.pngName = self.projectName + " (" + str(numOfImages + 1) + ").png"
+        self.pngPath = self.directory + self.pngName
+
+        self.incName = self.projectName + "_user.inc"
+        self.incPath = self.directory + self.incName
+        self.meshName = self.projectName + "_meshes.inc"
+        self.meshPath = self.directory + self.meshName
+        self.errorName = self.projectName + "_FatalError.out"
+        self.errorPath = self.directory + self.errorName
+        self.fcViewName = self.projectName + "_FC-View.png"
+        self.fcViewPath = self.directory + self.fcViewName
+        self.texIncName = self.projectName + "_textures.inc"
+        self.texIncPath = self.directory + self.texIncName
+
+        # get all output options
+        self.width = width
+        self.height = height
+
+        self.expBg = expBg
+        self.expLight = expLight
+        self.repRot = repRot
+        self.expFcView = expFcView
+
+        # radiosity
+        self.radiosity = radiosity
 
 #set the icon path because InitGui.py can't import os
 initGui__iconPath = os.path.join(os.path.dirname(__file__), "icons")
