@@ -104,8 +104,8 @@ class RenderSettings:
             # is a file
             if os.path.isfile(os.path.join(self.directory, fileName)):
                 # does the filename fits the regex pattern
-                matchObj = re.search(self.projectName.encode(
-                    'unicode_escape') + r' \(([0-9]+)\)\.png', fileName)
+                matchObj = re.search(self.projectName +
+                                     ' \(([0-9]+)\)\.png', fileName)
                 if matchObj:
                     # is the number bigger than the number of the other images
                     if int(matchObj.group(1)) > numOfImages:
