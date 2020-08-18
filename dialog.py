@@ -90,6 +90,9 @@ class Dialog(QtGui.QDialog):
         self.generalTab.iniPathValidityChanged.connect(
             self.setDialogAcceptable)
 
+        self.environmentTab.hdrPathValidityChanged.connect(
+            self.setDialogAcceptable)
+
 
     def setDialogAcceptable(self, acceptable):
         """Set if the "Start Rendering" button should be enabled.
@@ -1753,10 +1756,12 @@ class RadiosityTab(QtGui.QWidget):
 class EnvironmentTab(QtGui.QWidget):
     """The class for the environment tab (derived by QWidget)."""
 
+    # emitted when the validity of the hdr path changed
+    hdrPathValidityChanged = QtCore.Signal(bool)
+
     def __init__(self):
         super(EnvironmentTab, self).__init__()
         self.qSettingsGroup = "environmentTab"
-        self.hdriPath = ""
         self.initUIElements()
 
     def initUIElements(self):
@@ -1764,14 +1769,57 @@ class EnvironmentTab(QtGui.QWidget):
 
         self.wrapperLayout = QtGui.QVBoxLayout()
 
+        self.helpLabel = QtGui.QLabel()
+        self.helpLabel.setText("Text to explain the concept of HDRI environment and a few tips.")
+        self.wrapperLayout.addWidget(self.helpLabel)
+
+
+        self.fileChoosingLayout = QtGui.QGridLayout()
+
+        self.hdriPathLabel = QtGui.QLabel("HDRI Path (*.hdr)")
+
         self.hdriPathLineEdit = QtGui.QLineEdit()
         self.hdriPathLineEdit.setPlaceholderText("Path to the *.hdr file")
-        self.wrapperLayout.addWidget(self.hdriPathLineEdit)
 
-        # self.hdriPathLineEdit.clicked.textEdited(self.method)
+        self.openFileDialogButton = QtGui.QPushButton("...")
+
+        self.invalidPathLabel = QtGui.QLabel()
+        self.invalidPathLabel.setStyleSheet("QLabel { color : #ff0000; }")
+        self.invalidPathLabel.setWordWrap(True)
+
+        self.fileChoosingLayout.addWidget(self.hdriPathLabel, 0, 0, 1, 2)
+        self.fileChoosingLayout.addWidget(self.hdriPathLineEdit, 1, 0)
+        self.fileChoosingLayout.addWidget(self.openFileDialogButton, 1, 1)
+        self.fileChoosingLayout.addWidget(self.invalidPathLabel, 2, 0, 1, 2)
+
+        self.wrapperLayout.addLayout(self.fileChoosingLayout)
 
         self.setLayout(self.wrapperLayout)
-        pass
+
+        # Connect Signals
+        self.openFileDialogButton.clicked.connect(self.handleFileDialog)
+        self.hdriPathLineEdit.textChanged.connect(self.handleFileName)
+
+    def handleFileDialog(self):
+        defaultPath = self.hdriPathLineEdit.text()
+
+        fileName = QtGui.QFileDialog.getOpenFileName(
+            self, "Select a HDRI File", defaultPath, "HDR Images (*.hdr)")[0]
+
+        self.handleFileName(fileName)
+
+    def handleFileName(self, fileName):
+        if fileName and fileName != u'' and fileName != '':
+            self.hdriPathLineEdit.setText(fileName)
+            
+            if isAscii(fileName) and os.path.isfile(fileName):
+                self.hdrPathValidityChanged.emit(True)
+                self.invalidPathLabel.setText("")
+            else:
+                self.hdrPathValidityChanged.emit(False)
+                self.invalidPathLabel.setText("The name of the *.hdr file contains mutated vowels,"\
+                    "POV-Ray isn't able to handle or the file doesn't exist."\
+                    "Please rename / create the file and open it again.")
 
     def getHdriPath(self):
         """Return path to *.hdr file.
@@ -1796,7 +1844,7 @@ class EnvironmentTab(QtGui.QWidget):
             if row[0] == "hdriPath":
                 print(row[1])
                 if row[1] == "" or row[1] == "None":
-                    self.hdriPathLineEdit.setText("gaga")
+                    self.hdriPathLineEdit.setText("")
                 else:
                     self.hdriPathLineEdit.setText(row[1])
 
