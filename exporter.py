@@ -80,6 +80,9 @@ class ExportToPovRay:
         #radiosity
         self.radiosity = renderSettings.radiosity
 
+        #environment
+        self.hdriPath = renderSettings.hdriPath
+
         #get camera
         self.CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
         self.CamType = Gui.ActiveDocument.ActiveView.getCameraType()
@@ -150,7 +153,7 @@ class ExportToPovRay:
             objPovCode += self.createPovCode(obj, True, True, True, True, True, True)
 
         #add general pov code / "header"
-        finalPovCode = "#version 3.6; // 3.7\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
+        finalPovCode = "#version 3.7; // 3.6\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
 
         finalPovCode += "#default { pigment { rgb " + self.uintColorToRGB(self.DefaultShapeColor) + " } }\n"
 
@@ -1211,7 +1214,17 @@ class ExportToPovRay:
             povBg += "\t\trotate<" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
         povBg += "\t}\n}\n"
 
-        return povBg
+        #return povBg
+
+        return '''// hdr environment -----------------------
+            sky_sphere{
+            pigment{
+                image_map{ hdr "''' + self.hdriPath + '''"
+                        gamma 1.1
+                        map_type 1 interpolate 2}
+                }// end pigment
+                rotate <0,40,0> //
+            }'''
 
     def getCam(self):
         """Return the current FreeCAD model as pov code."""

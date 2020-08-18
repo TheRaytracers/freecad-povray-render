@@ -55,12 +55,14 @@ class Dialog(QtGui.QDialog):
         # create tabs
         self.generalTab = GeneralTab()
         self.textureTab = TextureTab()
+        self.environmentTab = EnvironmentTab()
         self.radiosityTab = RadiosityTab()
         self.helpTab = HelpTab()
 
         self.tabs = QtGui.QTabWidget(self)
         self.tabs.addTab(self.generalTab, "General")
         self.tabs.addTab(self.textureTab, "Textures")
+        self.tabs.addTab(self.environmentTab, "Environment")
         self.tabs.addTab(self.radiosityTab, "Indirect Lighting")
         self.tabs.addTab(self.helpTab, "Help")
 
@@ -111,6 +113,7 @@ class Dialog(QtGui.QDialog):
 
         self.generalTab.saveQSettings(settings)
         self.textureTab.saveQSettings(settings)
+        self.environmentTab.saveQSettings(settings)
         self.radiosityTab.saveQSettings(settings)
         self.helpTab.saveQSettings(settings)
 
@@ -122,6 +125,7 @@ class Dialog(QtGui.QDialog):
             "Usb Hub, DerUhrmacher", "Export to POV-Ray")
 
         self.textureTab.applyQSettings(settings)
+        self.environmentTab.applyQSettings(settings)
         self.radiosityTab.applyQSettings(settings)
         self.helpTab.applyQSettings(settings)
         # general tab as last one to avoid conflicts with order
@@ -135,6 +139,7 @@ class Dialog(QtGui.QDialog):
 
         csv += self.generalTab.settingsToIniFormat()
         csv += self.textureTab.settingsToIniFormat()
+        csv += self.environmentTab.settingsToIniFormat()
         csv += self.radiosityTab.settingsToIniFormat()
         csv += self.helpTab.settingsToIniFormat()
 
@@ -167,6 +172,7 @@ class Dialog(QtGui.QDialog):
 
             self.generalTab.applyIniSettings(csvLines)
             self.textureTab.applyIniSettings(csvLines)
+            self.environmentTab.applyIniSettings(csvLines)
             self.radiosityTab.applyIniSettings(csvLines)
             self.helpTab.applyIniSettings(csvLines)
 
@@ -226,7 +232,10 @@ class Dialog(QtGui.QDialog):
             self.generalTab.isExpFcLightChecked(),
             self.generalTab.isRepRotChecked(),
             self.generalTab.isExpFcViewChecked(),
-            self.radiosityTab.getRadiosity())
+            self.radiosityTab.getRadiosity(),
+            self.environmentTab.getHdriPath())
+
+        print(self.environmentTab.getHdriPath())
 
         self.textureTab.createTextureInc(self.renderSettings)
 
@@ -1732,6 +1741,94 @@ class RadiosityTab(QtGui.QWidget):
 
         Args:
             qSettingsObject (QSettings Object): QSettings object that should be used to save the settings.
+        """
+
+        pass
+
+
+#######################
+### Environment Tab ###
+#######################
+
+class EnvironmentTab(QtGui.QWidget):
+    """The class for the environment tab (derived by QWidget)."""
+
+    def __init__(self):
+        super(EnvironmentTab, self).__init__()
+        self.qSettingsGroup = "environmentTab"
+        self.hdriPath = ""
+        self.initUIElements()
+
+    def initUIElements(self):
+        """Create all UI elements for the tab."""
+
+        self.wrapperLayout = QtGui.QVBoxLayout()
+
+        self.hdriPathLineEdit = QtGui.QLineEdit()
+        self.hdriPathLineEdit.setPlaceholderText("Path to the *.hdr file")
+        self.wrapperLayout.addWidget(self.hdriPathLineEdit)
+
+        # self.hdriPathLineEdit.clicked.textEdited(self.method)
+
+        self.setLayout(self.wrapperLayout)
+        pass
+
+    def getHdriPath(self):
+        """Return path to *.hdr file.
+
+        Returns:
+            str: Path to *.hdr file
+        """
+
+        return self.hdriPathLineEdit.text()
+
+    def applyIniSettings(self, csvLines):
+        """Apply the settings from the given lines from the ini file
+        to the tab.
+
+        Args:
+            csvLines (Array): Array of lines for the CSV parser
+        """
+
+        # parse CSV
+        csvReader = csv.reader(csvLines, delimiter=',')
+        for row in csvReader:
+            if row[0] == "hdriPath":
+                print(row[1])
+                if row[1] == "" or row[1] == "None":
+                    self.hdriPathLineEdit.setText("gaga")
+                else:
+                    self.hdriPathLineEdit.setText(row[1])
+
+    def settingsToIniFormat(self):
+        """Convert the settings from the tab to CSV.
+
+        Returns:
+            str: The created CSV with ";" for the ini file at the
+            beginning
+        """
+
+        csv = ";"
+        csv += "hdriPath"
+
+        csv += "," + self.getHdriPath()
+
+        return csv + "\n"
+
+    def applyQSettings(self, settingsObject):
+        """Apply the settings stored with QSettings to the tab.
+
+        Args:
+            settingsObject (QSettings Object): The QSettings Object to read the data from
+        """
+
+        pass
+
+    def saveQSettings(self, settingsObject):
+        """Save the settings from the tab with QSettings.
+
+        Args:
+            settingsObject (QSettings Object): QSettings object to store the data
         """
 
         pass

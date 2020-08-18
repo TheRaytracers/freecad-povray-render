@@ -88,7 +88,7 @@ def setDefaultPovRayExe():
 class RenderSettings:
     """Class to store all settings from the dialog, passed to Exporter as argument."""
 
-    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView, radiosity):
+    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView, radiosity, hdriPath):
         self.projectName = projectName
         self.directory = directory
 
@@ -136,6 +136,9 @@ class RenderSettings:
 
         # radiosity
         self.radiosity = radiosity
+
+        # environment
+        self.hdriPath = hdriPath
 
 #set the icon path because InitGui.py can't import os
 initGui__iconPath = os.path.join(os.path.dirname(__file__), "icons")
