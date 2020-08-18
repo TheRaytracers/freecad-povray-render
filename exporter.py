@@ -81,7 +81,10 @@ class ExportToPovRay:
         self.radiosity = renderSettings.radiosity
 
         #environment
-        self.hdriPath = renderSettings.hdriPath
+        self.hdriPath = renderSettings.hdriDict["hdrPath"]
+        self.hdriRotX = renderSettings.hdriDict["rotX"]
+        self.hdriRotY = renderSettings.hdriDict["rotY"]
+        self.hdriRotZ = renderSettings.hdriDict["rotZ"]
 
         #get camera
         self.CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
@@ -1163,6 +1166,7 @@ class ExportToPovRay:
             povBg += "\t\t\tmap_type 1 interpolate 2\n"
             povBg += "\t\t}\n"
             povBg += "\t}\n"
+            povBg += "\trotate <" + str(self.hdriRotX) + ", " + str(self.hdriRotY) + ", " + str(self.hdriRotZ) + ">\n"
             povBg += "}\n"
 
             return povBg

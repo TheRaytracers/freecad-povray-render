@@ -236,9 +236,7 @@ class Dialog(QtGui.QDialog):
             self.generalTab.isRepRotChecked(),
             self.generalTab.isExpFcViewChecked(),
             self.radiosityTab.getRadiosity(),
-            self.environmentTab.getHdriPath())
-
-        print(self.environmentTab.getHdriPath())
+            self.environmentTab.getHdriDict())
 
         self.textureTab.createTextureInc(self.renderSettings)
 
@@ -1769,11 +1767,12 @@ class EnvironmentTab(QtGui.QWidget):
 
         self.wrapperLayout = QtGui.QVBoxLayout()
 
+        # Help Label
         self.helpLabel = QtGui.QLabel()
         self.helpLabel.setText("Text to explain the concept of HDRI environment and a few tips.")
         self.wrapperLayout.addWidget(self.helpLabel)
 
-
+        # HDR File Choosing
         self.fileChoosingLayout = QtGui.QGridLayout()
 
         self.hdriPathLabel = QtGui.QLabel("HDRI Path (*.hdr)")
@@ -1794,6 +1793,38 @@ class EnvironmentTab(QtGui.QWidget):
 
         self.wrapperLayout.addLayout(self.fileChoosingLayout)
 
+        # Rotation
+        self.rotationLayout = QtGui.QHBoxLayout()
+
+        self.rotationLabel = QtGui.QLabel("Rotation of HDRI Environment")
+        self.rotationLayout.addWidget(self.rotationLabel)
+
+        self.rotationX = QtGui.QDoubleSpinBox()
+        self.rotationX.setMaximum(360)
+        self.rotationX.setMinimum(-360)
+        self.rotationX.setDecimals(3)
+        self.rotationX.setPrefix("x: ")
+        self.rotationX.setSuffix(" deg")
+        self.rotationLayout.addWidget(self.rotationX)
+
+        self.rotationY = QtGui.QDoubleSpinBox()
+        self.rotationY.setMaximum(360)
+        self.rotationY.setMinimum(-360)
+        self.rotationY.setDecimals(3)
+        self.rotationY.setPrefix("y: ")
+        self.rotationY.setSuffix(" deg")
+        self.rotationLayout.addWidget(self.rotationY)
+
+        self.rotationZ = QtGui.QDoubleSpinBox()
+        self.rotationZ.setMaximum(360)
+        self.rotationZ.setMinimum(-360)
+        self.rotationZ.setDecimals(3)
+        self.rotationZ.setPrefix("z: ")
+        self.rotationZ.setSuffix(" deg")
+        self.rotationLayout.addWidget(self.rotationZ)
+
+        self.wrapperLayout.addLayout(self.rotationLayout)
+
         self.setLayout(self.wrapperLayout)
 
         # Connect Signals
@@ -1811,7 +1842,7 @@ class EnvironmentTab(QtGui.QWidget):
     def handleFileName(self, fileName):
         if fileName and fileName != u'' and fileName != '':
             self.hdriPathLineEdit.setText(fileName)
-            
+
             if isAscii(fileName) and os.path.isfile(fileName):
                 self.hdrPathValidityChanged.emit(True)
                 self.invalidPathLabel.setText("")
@@ -1821,14 +1852,17 @@ class EnvironmentTab(QtGui.QWidget):
                     "POV-Ray isn't able to handle or the file doesn't exist."\
                     "Please rename / create the file and open it again.")
 
-    def getHdriPath(self):
-        """Return path to *.hdr file.
+    def getHdriDict(self):
+        """Return dictionary with path to *.hdr file and the rotation.
 
         Returns:
-            str: Path to *.hdr file
+            str: Dictionary with path to *.hdr ("hdrPath") file and the rotation ("rotX", "rotY", "rotZ")
         """
 
-        return self.hdriPathLineEdit.text()
+        return {"hdrPath": self.hdriPathLineEdit.text(),
+            "rotX": self.rotationX.value(),
+            "rotY": self.rotationY.value(),
+            "rotZ": self.rotationZ.value()}
 
     def applyIniSettings(self, csvLines):
         """Apply the settings from the given lines from the ini file
@@ -1845,8 +1879,14 @@ class EnvironmentTab(QtGui.QWidget):
                 print(row[1])
                 if row[1] == "" or row[1] == "None":
                     self.hdriPathLineEdit.setText("")
+                    self.rotationX.setValue(0.0)
+                    self.rotationY.setValue(0.0)
+                    self.rotationZ.setValue(0.0)
                 else:
                     self.hdriPathLineEdit.setText(row[1])
+                    self.rotationX.setValue(float(row[2]))
+                    self.rotationY.setValue(float(row[3]))
+                    self.rotationZ.setValue(float(row[4]))
 
     def settingsToIniFormat(self):
         """Convert the settings from the tab to CSV.
@@ -1859,7 +1899,8 @@ class EnvironmentTab(QtGui.QWidget):
         csv = ";"
         csv += "hdriPath"
 
-        csv += "," + self.getHdriPath()
+        hdriDict = self.getHdriDict()
+        csv += "," + hdriDict["hdrPath"] + "," + str(hdriDict["rotX"]) + "," + str(hdriDict["rotY"]) + "," + str(hdriDict["rotZ"])
 
         return csv + "\n"
 
