@@ -1152,6 +1152,21 @@ class ExportToPovRay:
     def getBackground(self):
         """Return the FreeCAD background as pov code."""
 
+        povBg = ""
+
+        if self.hdriPath != None and self.hdriPath != "":
+            povBg = "// HDRI Environment ----------------------------------\n"
+            povBg += "sky_sphere {\n"
+            povBg += "\tpigment {\n"
+            povBg += "\t\timage_map { hdr \"" + self.hdriPath + "\"\n"
+            povBg += "\t\t\tgamma 1.1\n"
+            povBg += "\t\t\tmap_type 1 interpolate 2\n"
+            povBg += "\t\t}\n"
+            povBg += "\t}\n"
+            povBg += "}\n"
+
+            return povBg
+
         bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
         bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
         bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
@@ -1159,7 +1174,6 @@ class ExportToPovRay:
         ViewDir = Gui.ActiveDocument.ActiveView.getViewDirection()
 
         AspectRatio = self.width / float(self.height)
-        povBg = ""
 
         if self.CamType == "Orthographic":
             if AspectRatio >= 1:
@@ -1214,17 +1228,7 @@ class ExportToPovRay:
             povBg += "\t\trotate<" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
         povBg += "\t}\n}\n"
 
-        #return povBg
-
-        return '''// hdr environment -----------------------
-            sky_sphere{
-            pigment{
-                image_map{ hdr "''' + self.hdriPath + '''"
-                        gamma 1.1
-                        map_type 1 interpolate 2}
-                }// end pigment
-                rotate <0,40,0> //
-            }'''
+        return povBg
 
     def getCam(self):
         """Return the current FreeCAD model as pov code."""
