@@ -1867,6 +1867,7 @@ class EnvironmentTab(QtGui.QWidget):
                     "Please rename / create the file and open it again.")
         else:
             self.hdrPathValidityChanged.emit(True)
+            self.invalidPathLabel.setText("")
 
         self.updatePreview()
 
@@ -1885,31 +1886,47 @@ class EnvironmentTab(QtGui.QWidget):
     def updatePreview(self):
         hdriPath = self.hdriPathLineEdit.text()
 
-        # create content of pov file
-        povCode = ""
-        povCode += '#version 3.7;\n'
-        povCode += 'global_settings { assumed_gamma 1.0 }\n'
-        povCode += '#default { finish { ambient 0.2 diffuse 0.9 } }\n'
-        povCode += '#default { pigment { rgb <0.871, 0.871, 0.871> } }\n'
-        povCode += '//------------------------------------------\n'
-        povCode += '#include "colors.inc"\n'
-        povCode += '#include "textures.inc"\n'
-        povCode += '#declare CamUp = <0, 0, 1>;\n'
-        povCode += '#declare CamRight = <1.33, 0, 0>;\n'
-        povCode += '#declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;\n'
-        povCode += '#declare CamPosition = <25.9077129364, -15.9076957703, 20.907699585>;\n'
-        povCode += 'camera {\n'
-        povCode += '\tlocation <0, 0, 0>\n'
-        povCode += '\tdirection <0, 1, 0>\n'
-        povCode += '\tup CamUp\n'
-        povCode += '\tright CamRight\n'
-        povCode += '\trotate CamRotation\n'
-        povCode += '\ttranslate CamPosition\n'
-        povCode += '\tangle 57.82\n'
-        povCode += '}\n'
-
         if hdriPath == "" or hdriPath == u'':
             # show FreeCAD Background
+
+            povCode = '''#version 3.7;
+                global_settings { assumed_gamma 1.0 }
+                #default { finish { ambient 0.2 diffuse 0.9 } }
+                #default { pigment { rgb <0.800, 0.800, 0.800> } }
+
+                #include "colors.inc"
+                #include "textures.inc"
+
+                // Camera ----------------------------------
+                #declare CamUp = <0, 0, 1>;
+                #declare CamRight = <1.33, 0, 0>;
+                #declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;
+                #declare CamPosition = <12.0710725784, -12.0710668564, 12.0710678101>;
+                camera {
+                    location <0, 0, 0>
+                    direction <0, 1, 0>
+                    up CamUp
+                    right CamRight
+                    rotate CamRotation
+                    translate CamPosition
+                    angle 57.82
+                }
+
+                // Background ------------------------------
+                sky_sphere {
+                    pigment {
+                        gradient z
+                        color_map {
+                            [ 0.00  color rgb<0.592, 0.592, 0.667> ]
+                            [ 0.30  color rgb<0.592, 0.592, 0.667> ]
+                            [ 0.70  color rgb<0.200, 0.200, 0.396> ]
+                            [ 1.00  color rgb<0.200, 0.200, 0.396> ]
+                        }
+                        scale 2
+                        translate -1
+                        rotate<-35.264390534, 1.9538003485e-05, 45.0000026303>
+                    }
+                }'''
 
             bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
             bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
@@ -1946,6 +1963,75 @@ class EnvironmentTab(QtGui.QWidget):
             # preview HDRI environment
             hdriDict = self.getHdriDict()
 
+            povCode = '''#version 3.7;
+                global_settings { assumed_gamma 1.0 }
+                #default { finish { ambient 0.2 diffuse 0.9 } }
+                #default { pigment { rgb <0.800, 0.800, 0.800> } }
+
+                #include "colors.inc"
+                #include "textures.inc"
+
+                #declare CamUp = <0, 0, 1>;
+                #declare CamRight = <1.33, 0, 0>;
+                #declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;
+                #declare CamPosition = <15.3931512833, -12.0864868164, 16.4180793762>;
+                camera {
+                    location <0, 0, 0>
+                    direction <0, 1, 0>
+                    up CamUp
+                    right CamRight
+                    rotate CamRotation
+                    translate CamPosition
+                    angle 57.82
+                }
+
+                //----- z -----
+                union {
+
+                    cone { <0, 0, 0>, 0.2
+                        <0, 0, 0.5>, 0.0
+                        translate <0.0, 0.0, 10.0>
+                    }
+                    
+                    cylinder { <0, 0, 0>, <0, 0, 10.0>, 0.1
+                    }
+                    
+                    pigment { color rgb <0.000, 0.000, 1.000> }
+                    
+                }
+
+                //----- y -----
+                union {
+
+                    cone { <0, 0, 0>, 0.2
+                        <0, 0, 0.5>, 0.0
+                        translate <0.0, 0.0, 10.0>
+                    }
+                    
+                    cylinder { <0, 0, 0>, <0, 0, 10.0>, 0.1
+                    }
+                    
+                    rotate <-90.0, -0.0, 0.0>
+                    pigment { color rgb <0.000, 0.670, 0.000> }
+                    
+                }
+
+                //----- x -----
+                union {
+
+                    cone { <0, 0, 0>, 0.2
+                        <0, 0, 0.5>, 0.0
+                        translate <0.0, 0.0, 10.0>
+                    }
+                    
+                    cylinder { <0, 0, 0>, <0, 0, 10.0>, 0.1
+                    }
+                    
+                    rotate <0.0, 90.0, 0.0>
+                    pigment { color rgb <1.000, 0.000, 0.000> }
+                    
+                }'''
+
             povCode += "sky_sphere {\n"
             povCode += "\tpigment {\n"
             povCode += "\t\timage_map { hdr \"" + hdriDict["hdrPath"] + "\"\n"
@@ -1954,7 +2040,7 @@ class EnvironmentTab(QtGui.QWidget):
             povCode += "\t\t}\n"
             povCode += "\t}\n"
             povCode += "\trotate <" + \
-                str(hdriDict["rotX"]) + ", " + str(hdriDict["rotY"]) + \
+                str(hdriDict["rotX"] + 90) + ", " + str(hdriDict["rotY"]) + \
                 ", " + str(hdriDict["rotZ"]) + ">\n"
             povCode += "}\n"
 
@@ -1978,15 +2064,15 @@ class EnvironmentTab(QtGui.QWidget):
             if row[0] == "hdriPath":
                 print(row[1])
                 if row[1] == "" or row[1] == "None":
-                    self.hdriPathLineEdit.setText("")
                     self.rotationX.setValue(0.0)
                     self.rotationY.setValue(0.0)
                     self.rotationZ.setValue(0.0)
+                    self.hdriPathLineEdit.setText("") # at the end to avoid updatePreview to early
                 else:
-                    self.hdriPathLineEdit.setText(row[1])
                     self.rotationX.setValue(float(row[2]))
                     self.rotationY.setValue(float(row[3]))
                     self.rotationZ.setValue(float(row[4]))
+                    self.hdriPathLineEdit.setText(row[1]) # at the end to avoid updatePreview to early
 
     def settingsToIniFormat(self):
         """Convert the settings from the tab to CSV.
