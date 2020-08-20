@@ -607,7 +607,7 @@ class TextureTab(QtGui.QWidget):
         # add the menu for scaling and rotating at the bottom
         self.addScaleRotateTranslate()
 
-        self.preview = Preview()  # preview widget
+        self.preview = Preview("texture")  # preview widget
 
         # signals and slots
         self.connectSignals()
@@ -1241,9 +1241,10 @@ class TextureTab(QtGui.QWidget):
 class Preview(QtGui.QWidget):
     """Class for the preview. It is derived by QWidget."""
 
-    def __init__(self):
+    def __init__(self, name):
         super(Preview, self).__init__()
         self.qSettingsGroup = "preview"
+        self.name = name
         self.initUIElements()
         self.connectSignals()
 
@@ -1264,7 +1265,7 @@ class Preview(QtGui.QWidget):
         self.settingsLayout.addWidget(self.zoomOut)
 
         # preview image
-        self.imageLabel = QtGui.QLabel()
+        self.imageLabel = QtGui.QLabel("No Preview to show")
         self.imageLabel.setStyleSheet("QLabel { color : #ff0000; }")
 
         # main layout
@@ -1319,6 +1320,7 @@ class Preview(QtGui.QWidget):
         """
 
         self.imageLabel.setText(text)
+        self.povCode = ""
 
     def connectSignals(self):
         """Connect all necessary signals to all slots."""
@@ -1331,9 +1333,12 @@ class Preview(QtGui.QWidget):
         """Slot, called when the state of the disable checkbox changes."""
 
         if self.disableCheckBox.isChecked():
-            self.imageLabel.setText(" ")
+            self.imageLabel.setVisible(False)
         else:
-            self.render(self.povCode)
+            self.imageLabel.setVisible(True)
+
+            if self.povCode != "" and self.imageLabel.pixmap() == None:
+                self.render(self.povCode)
 
     def largerPreview(self):
         """Increase the size of the preview image. Called when the "Larger" button is pressed."""
@@ -1362,7 +1367,7 @@ class Preview(QtGui.QWidget):
         """
 
         # get saved input
-        settingsObject.beginGroup(self.qSettingsGroup)
+        settingsObject.beginGroup(self.qSettingsGroup + self.name)
 
         # set preview disable checkbox
         previewDisable = settingsObject.value("previewDisable")
@@ -1391,7 +1396,7 @@ class Preview(QtGui.QWidget):
         Args:
             settingsObject (QSettings Object): QSettings object to store the data
         """
-        settingsObject.beginGroup(self.qSettingsGroup)
+        settingsObject.beginGroup(self.qSettingsGroup + self.name)
         settingsObject.setValue(
             "previewDisable", self.disableCheckBox.isChecked())
         settingsObject.setValue("previewWidth", self.previewWidth)
@@ -1760,6 +1765,7 @@ class EnvironmentTab(QtGui.QWidget):
     def __init__(self):
         super(EnvironmentTab, self).__init__()
         self.qSettingsGroup = "environmentTab"
+        self.exporter = ExportToPovRay()
         self.initUIElements()
 
     def initUIElements(self):
@@ -1825,11 +1831,18 @@ class EnvironmentTab(QtGui.QWidget):
 
         self.wrapperLayout.addLayout(self.rotationLayout)
 
+        # Preview
+        self.preview = Preview("environment")
+        self.wrapperLayout.addWidget(self.preview)
+
         self.setLayout(self.wrapperLayout)
 
         # Connect Signals
         self.openFileDialogButton.clicked.connect(self.handleFileDialog)
         self.hdriPathLineEdit.textChanged.connect(self.handleFileName)
+        self.rotationX.editingFinished.connect(self.updatePreview)
+        self.rotationY.editingFinished.connect(self.updatePreview)
+        self.rotationZ.editingFinished.connect(self.updatePreview)
 
     def handleFileDialog(self):
         defaultPath = self.hdriPathLineEdit.text()
@@ -1837,7 +1850,8 @@ class EnvironmentTab(QtGui.QWidget):
         fileName = QtGui.QFileDialog.getOpenFileName(
             self, "Select a HDRI File", defaultPath, "HDR Images (*.hdr)")[0]
 
-        self.handleFileName(fileName)
+        if fileName and fileName != u'' and fileName != '':
+            self.handleFileName(fileName)
 
     def handleFileName(self, fileName):
         if fileName and fileName != u'' and fileName != '':
@@ -1851,6 +1865,10 @@ class EnvironmentTab(QtGui.QWidget):
                 self.invalidPathLabel.setText("The name of the *.hdr file contains mutated vowels,"\
                     "POV-Ray isn't able to handle or the file doesn't exist."\
                     "Please rename / create the file and open it again.")
+        else:
+            self.hdrPathValidityChanged.emit(True)
+
+        self.updatePreview()
 
     def getHdriDict(self):
         """Return dictionary with path to *.hdr file and the rotation.
@@ -1863,6 +1881,88 @@ class EnvironmentTab(QtGui.QWidget):
             "rotX": self.rotationX.value(),
             "rotY": self.rotationY.value(),
             "rotZ": self.rotationZ.value()}
+
+    def updatePreview(self):
+        hdriPath = self.hdriPathLineEdit.text()
+
+        # create content of pov file
+        povCode = ""
+        povCode += '#version 3.7;\n'
+        povCode += 'global_settings { assumed_gamma 1.0 }\n'
+        povCode += '#default { finish { ambient 0.2 diffuse 0.9 } }\n'
+        povCode += '#default { pigment { rgb <0.871, 0.871, 0.871> } }\n'
+        povCode += '//------------------------------------------\n'
+        povCode += '#include "colors.inc"\n'
+        povCode += '#include "textures.inc"\n'
+        povCode += '#declare CamUp = <0, 0, 1>;\n'
+        povCode += '#declare CamRight = <1.33, 0, 0>;\n'
+        povCode += '#declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;\n'
+        povCode += '#declare CamPosition = <25.9077129364, -15.9076957703, 20.907699585>;\n'
+        povCode += 'camera {\n'
+        povCode += '\tlocation <0, 0, 0>\n'
+        povCode += '\tdirection <0, 1, 0>\n'
+        povCode += '\tup CamUp\n'
+        povCode += '\tright CamRight\n'
+        povCode += '\trotate CamRotation\n'
+        povCode += '\ttranslate CamPosition\n'
+        povCode += '\tangle 57.82\n'
+        povCode += '}\n'
+
+        if hdriPath == "" or hdriPath == u'':
+            # show FreeCAD Background
+
+            bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
+            bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
+            bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
+            bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
+
+            povCode += "sky_sphere {\n\tpigment {\n"
+            if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
+                povCode += "\t\tcolor rgb" + self.exporter.uintColorToRGB(bgColor1) + "\n"
+
+            elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
+                povCode += "\t\tgradient z\n"
+                povCode += "\t\tcolor_map {\n"
+                povCode += "\t\t\t[ 0.00  color rgb" + \
+                    self.exporter.uintColorToRGB(bgColor3) + " ]\n"
+                povCode += "\t\t\t[ 0.30  color rgb" + \
+                    self.exporter.uintColorToRGB(bgColor3) + " ]\n"
+                if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
+                    povCode += "\t\t\t[ 0.50  color rgb" + \
+                        self.exporter.uintColorToRGB(bgColor4) + " ]\n"
+                povCode += "\t\t\t[ 0.70  color rgb" + \
+                    self.exporter.uintColorToRGB(bgColor2) + " ]\n"
+                povCode += "\t\t\t[ 1.00  color rgb" + \
+                    self.exporter.uintColorToRGB(bgColor2) + " ]\n"
+                povCode += "\t\t}\n"
+                povCode += "\t\tscale 2\n"
+                povCode += "\t\ttranslate -1\n"
+                povCode += "\t\trotate CamRotation\n"
+            povCode += "\t}\n}\n"
+
+            self.preview.render(povCode)
+
+        elif isAscii(hdriPath) and os.path.isfile(hdriPath):
+            # preview HDRI environment
+            hdriDict = self.getHdriDict()
+
+            povCode += "sky_sphere {\n"
+            povCode += "\tpigment {\n"
+            povCode += "\t\timage_map { hdr \"" + hdriDict["hdrPath"] + "\"\n"
+            povCode += "\t\t\tgamma 1.1\n"
+            povCode += "\t\t\tmap_type 1 interpolate 2\n"
+            povCode += "\t\t}\n"
+            povCode += "\t}\n"
+            povCode += "\trotate <" + \
+                str(hdriDict["rotX"]) + ", " + str(hdriDict["rotY"]) + \
+                ", " + str(hdriDict["rotZ"]) + ">\n"
+            povCode += "}\n"
+
+            self.preview.render(povCode)
+        else:
+            # show error text because it is an invalid path
+            self.preview.setErrorText("Without a valid path, it is not possible "\
+                "to preview the environment.")
 
     def applyIniSettings(self, csvLines):
         """Apply the settings from the given lines from the ini file
@@ -1911,7 +2011,7 @@ class EnvironmentTab(QtGui.QWidget):
             settingsObject (QSettings Object): The QSettings Object to read the data from
         """
 
-        pass
+        self.preview.applyQSettings(settingsObject)
 
     def saveQSettings(self, settingsObject):
         """Save the settings from the tab with QSettings.
@@ -1920,4 +2020,4 @@ class EnvironmentTab(QtGui.QWidget):
             settingsObject (QSettings Object): QSettings object to store the data
         """
 
-        pass
+        self.preview.saveQSettings(settingsObject)
