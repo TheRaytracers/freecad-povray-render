@@ -85,6 +85,9 @@ class ExportToPovRay:
         self.hdriRotX = renderSettings.hdriDict["rotX"]
         self.hdriRotY = renderSettings.hdriDict["rotY"]
         self.hdriRotZ = renderSettings.hdriDict["rotZ"]
+        self.hdriTransX = renderSettings.hdriDict["transX"]
+        self.hdriTransY = renderSettings.hdriDict["transY"]
+        self.hdriTransZ = renderSettings.hdriDict["transZ"]
 
         #get camera
         self.CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
@@ -1167,6 +1170,7 @@ class ExportToPovRay:
             povBg += "\t\t}\n"
             povBg += "\t}\n"
             povBg += "\trotate <" + str(self.hdriRotX) + ", " + str(self.hdriRotY) + ", " + str(self.hdriRotZ) + ">\n"
+            povBg += "\ttranslate <" + str(self.hdriTransX) + ", " + str(self.hdriTransY) + ", " + str(self.hdriTransZ) + ">\n"
             povBg += "}\n"
 
             return povBg

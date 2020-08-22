@@ -1245,6 +1245,7 @@ class Preview(QtGui.QWidget):
         super(Preview, self).__init__()
         self.qSettingsGroup = "preview"
         self.name = name
+        self.povCode = ""
         self.initUIElements()
         self.connectSignals()
 
@@ -1799,10 +1800,39 @@ class EnvironmentTab(QtGui.QWidget):
 
         self.wrapperLayout.addLayout(self.fileChoosingLayout)
 
+        # Translation
+        self.translationLayout = QtGui.QHBoxLayout()
+
+        self.translationLabel = QtGui.QLabel("Translation")
+        self.translationLayout.addWidget(self.translationLabel)
+
+        self.translationX = QtGui.QDoubleSpinBox()
+        self.translationX.setMaximum(999999)
+        self.translationX.setMinimum(-999999)
+        self.translationX.setDecimals(3)
+        self.translationX.setPrefix("x: ")
+        self.translationLayout.addWidget(self.translationX)
+
+        self.translationY = QtGui.QDoubleSpinBox()
+        self.translationY.setMaximum(999999)
+        self.translationY.setMinimum(-999999)
+        self.translationY.setDecimals(3)
+        self.translationY.setPrefix("y: ")
+        self.translationLayout.addWidget(self.translationY)
+
+        self.translationZ = QtGui.QDoubleSpinBox()
+        self.translationZ.setMaximum(999999)
+        self.translationZ.setMinimum(-999999)
+        self.translationZ.setDecimals(3)
+        self.translationZ.setPrefix("z: ")
+        self.translationLayout.addWidget(self.translationZ)
+
+        self.wrapperLayout.addLayout(self.translationLayout)
+
         # Rotation
         self.rotationLayout = QtGui.QHBoxLayout()
 
-        self.rotationLabel = QtGui.QLabel("Rotation of HDRI Environment")
+        self.rotationLabel = QtGui.QLabel("Rotation")
         self.rotationLayout.addWidget(self.rotationLabel)
 
         self.rotationX = QtGui.QDoubleSpinBox()
@@ -1843,6 +1873,9 @@ class EnvironmentTab(QtGui.QWidget):
         self.rotationX.editingFinished.connect(self.updatePreview)
         self.rotationY.editingFinished.connect(self.updatePreview)
         self.rotationZ.editingFinished.connect(self.updatePreview)
+        self.translationX.editingFinished.connect(self.updatePreview)
+        self.translationY.editingFinished.connect(self.updatePreview)
+        self.translationZ.editingFinished.connect(self.updatePreview)
 
     def handleFileDialog(self):
         defaultPath = self.hdriPathLineEdit.text()
@@ -1879,6 +1912,9 @@ class EnvironmentTab(QtGui.QWidget):
         """
 
         return {"hdrPath": self.hdriPathLineEdit.text(),
+            "transX": self.translationX.value(),
+            "transY": self.translationY.value(),
+            "transZ": self.translationZ.value(),
             "rotX": self.rotationX.value(),
             "rotY": self.rotationY.value(),
             "rotZ": self.rotationZ.value()}
@@ -2040,8 +2076,11 @@ class EnvironmentTab(QtGui.QWidget):
             povCode += "\t\t}\n"
             povCode += "\t}\n"
             povCode += "\trotate <" + \
-                str(hdriDict["rotX"] + 90) + ", " + str(hdriDict["rotY"]) + \
+                str(hdriDict["rotX"]) + ", " + str(hdriDict["rotY"]) + \
                 ", " + str(hdriDict["rotZ"]) + ">\n"
+            povCode += "\ttranslate <" + \
+                str(hdriDict["transX"]) + ", " + str(hdriDict["transY"]) + \
+                ", " + str(hdriDict["transZ"]) + ">\n"
             povCode += "}\n"
 
             self.preview.render(povCode)
@@ -2064,14 +2103,24 @@ class EnvironmentTab(QtGui.QWidget):
             if row[0] == "hdriPath":
                 print(row[1])
                 if row[1] == "" or row[1] == "None":
-                    self.rotationX.setValue(0.0)
+                    self.rotationX.setValue(90.0)
                     self.rotationY.setValue(0.0)
                     self.rotationZ.setValue(0.0)
+
+                    self.translationX.setValue(0.0)
+                    self.translationY.setValue(0.0)
+                    self.translationZ.setValue(0.0)
+
                     self.hdriPathLineEdit.setText("") # at the end to avoid updatePreview to early
                 else:
-                    self.rotationX.setValue(float(row[2]))
-                    self.rotationY.setValue(float(row[3]))
-                    self.rotationZ.setValue(float(row[4]))
+                    self.translationX.setValue(float(row[2]))
+                    self.translationY.setValue(float(row[3]))
+                    self.translationZ.setValue(float(row[4]))
+
+                    self.rotationX.setValue(float(row[5]))
+                    self.rotationY.setValue(float(row[6]))
+                    self.rotationZ.setValue(float(row[7]))
+
                     self.hdriPathLineEdit.setText(row[1]) # at the end to avoid updatePreview to early
 
     def settingsToIniFormat(self):
@@ -2086,7 +2135,9 @@ class EnvironmentTab(QtGui.QWidget):
         csv += "hdriPath"
 
         hdriDict = self.getHdriDict()
-        csv += "," + hdriDict["hdrPath"] + "," + str(hdriDict["rotX"]) + "," + str(hdriDict["rotY"]) + "," + str(hdriDict["rotZ"])
+
+        csv += "," + hdriDict["hdrPath"] + "," + str(hdriDict["transX"]) + "," + str(hdriDict["transY"]) + "," + str(hdriDict["transZ"]) + "," + str(hdriDict["rotX"]) + "," + str(
+            hdriDict["rotY"]) + "," + str(hdriDict["rotZ"])
 
         return csv + "\n"
 
