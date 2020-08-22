@@ -692,8 +692,14 @@ class TextureTab(QtGui.QWidget):
                 except:
                     shape = False
 
+                # is it child of Body
+                childOfBody = False
+                for parent in obj.InList:
+                    if parent.TypeId == "PartDesign::Body":
+                        childOfBody = True
+
                 # test for the conditions for a object for the object list
-                if shapeColor and shape:
+                if shapeColor and shape and not childOfBody:
                     self.listFcObjects.append(obj)
 
         self.listObjects = []
