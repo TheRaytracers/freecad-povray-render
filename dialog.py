@@ -1775,8 +1775,20 @@ class EnvironmentTab(QtGui.QWidget):
         self.wrapperLayout = QtGui.QVBoxLayout()
 
         # Help Label
+        helpText = """<div>
+            HDRI images are 360° images with min 10 bits per color (but 32 bits are very 
+            common for HDRI images) and not 8 as usual pictures like JPG. So the contrast 
+            is a lot better and the images can be used to do the lightning of the scene.
+            <h4>Tips</h4>
+            <ul>
+                <li>turn on indirect lightning (other tab)</li>
+                <li>turn of every global light, only flash lights (the HDRI environment <i>is</i> the global light)</li>
+            </ul>
+        </div>"""
+
         self.helpLabel = QtGui.QLabel()
-        self.helpLabel.setText("Text to explain the concept of HDRI environment and a few tips.")
+        self.helpLabel.setWordWrap(True)
+        self.helpLabel.setText(helpText)
         self.wrapperLayout.addWidget(self.helpLabel)
 
         # HDR File Choosing
