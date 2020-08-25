@@ -36,7 +36,7 @@ class ExportCommand:
 			return True
 
 	def Activated(self):
-		from dialog import Dialog
+		from Dialog import Dialog
 		
 		dialog = Dialog()
 		dialog.exec_()

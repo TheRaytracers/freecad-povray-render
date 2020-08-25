@@ -31,7 +31,7 @@ import hashlib
 import tempfile
 
 from helpDefs import *
-from exporter import ExportToPovRay
+from Exporter import ExportToPovRay
 
 
 #########################
