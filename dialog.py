@@ -1882,6 +1882,12 @@ class EnvironmentTab(QtGui.QWidget):
 
         self.hdriLayout.addLayout(self.rotationLayout)
 
+        # Preview Warning
+        self.previewWarning = QtGui.QLabel("Warning: Large HDR files can lead to long freezes with turned preview on because POV-Ray takes long to load the file.")
+        self.previewWarning.setStyleSheet("QLabel { color : #ff6600; }")
+        self.previewWarning.setWordWrap(True)
+        self.wrapperGroupBoxLayout.addWidget(self.previewWarning)
+
         # Preview
         self.preview = Preview("environment")
         self.wrapperGroupBoxLayout.addWidget(self.preview)
