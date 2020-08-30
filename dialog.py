@@ -1773,6 +1773,7 @@ class EnvironmentTab(QtGui.QWidget):
 
         for option in self.options:
             radioButton = QtGui.QRadioButton(option)
+            radioButton.toggled.connect(self.checkTabValidity)
             self.wrapperGroupBoxLayout.addWidget(radioButton)
             self.radioButtonOptions.append(radioButton)
 
@@ -1890,6 +1891,8 @@ class EnvironmentTab(QtGui.QWidget):
         # Connect Signals
         self.radioButtonOptions[1].toggled.connect(self.hdriWidget.setEnabled)
 
+        self.wrapperGroupBox.toggled.connect(self.checkTabValidity)
+
         self.openFileDialogButton.clicked.connect(self.handleFileDialog)
         self.hdriPathLineEdit.textChanged.connect(self.handleFileName)
         self.rotationX.editingFinished.connect(self.updatePreview)
@@ -1903,6 +1906,16 @@ class EnvironmentTab(QtGui.QWidget):
         self.radioButtonOptions[0].setChecked(True)
         self.hdriWidget.setEnabled(False)
 
+    def checkTabValidity(self):
+        fileName = self.hdriPathLineEdit.text()
+        radioButton = self.radioButtonOptions[0]
+        enabled = self.wrapperGroupBox.isChecked()
+
+        if radioButton.isChecked() or (isAscii(fileName) and os.path.isfile(fileName) and fileName != "") or not enabled:
+            self.hdrPathValidityChanged.emit(True)
+        else:
+            self.hdrPathValidityChanged.emit(False)
+
     def handleFileDialog(self):
         defaultPath = self.hdriPathLineEdit.text()
 
@@ -1910,23 +1923,17 @@ class EnvironmentTab(QtGui.QWidget):
             self, "Select a HDRI File", defaultPath, "HDR Images (*.hdr)")[0]
 
         if fileName and fileName != u'' and fileName != '':
-            self.handleFileName(fileName)
-
-    def handleFileName(self, fileName):
-        if fileName and fileName != u'' and fileName != '':
             self.hdriPathLineEdit.setText(fileName)
 
-            if isAscii(fileName) and os.path.isfile(fileName):
-                self.hdrPathValidityChanged.emit(True)
-                self.invalidPathLabel.setText("")
-            else:
-                self.hdrPathValidityChanged.emit(False)
-                self.invalidPathLabel.setText("The name of the *.hdr file contains mutated vowels,"\
-                    "POV-Ray isn't able to handle or the file doesn't exist."\
-                    "Please rename / create the file and open it again.")
-        else:
-            self.hdrPathValidityChanged.emit(True)
+    def handleFileName(self, fileName):
+        self.checkTabValidity()
+
+        if isAscii(fileName) and os.path.isfile(fileName):
             self.invalidPathLabel.setText("")
+        else:
+            self.invalidPathLabel.setText("The name of the *.hdr file contains mutated vowels,"\
+                "POV-Ray isn't able to handle, you typed no path or the file doesn't exist."\
+                "Please rename / create the file and open it again.")
 
         self.updatePreview()
 
@@ -2158,8 +2165,6 @@ class EnvironmentTab(QtGui.QWidget):
                     for radioButton in self.radioButtonOptions:
                         if row[2] == radioButton.text():
                             radioButton.setChecked(True)
-                            print(row[2])
-                            print("ini checked")
                             break
 
                     self.translationX.setValue(float(row[4]))
