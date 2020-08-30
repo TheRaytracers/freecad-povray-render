@@ -1896,8 +1896,10 @@ class EnvironmentTab(QtGui.QWidget):
 
         # Connect Signals
         self.radioButtonOptions[1].toggled.connect(self.hdriWidget.setEnabled)
+        self.radioButtonOptions[1].toggled.connect(self.updatePreview)
 
         self.wrapperGroupBox.toggled.connect(self.checkTabValidity)
+        self.wrapperGroupBox.toggled.connect(self.updatePreview)
 
         self.openFileDialogButton.clicked.connect(self.handleFileDialog)
         self.hdriPathLineEdit.textChanged.connect(self.handleFileName)
@@ -1982,11 +1984,14 @@ class EnvironmentTab(QtGui.QWidget):
             "rotZ": self.rotationZ.value()}
 
     def updatePreview(self):
-        return 
-
         hdriPath = self.hdriPathLineEdit.text()
+        radioButton = self.radioButtonOptions[0]
+        enabled = self.wrapperGroupBox.isChecked()
 
-        if hdriPath == "" or hdriPath == u'':
+        if not enabled:
+            self.preview.setErrorText("No Preview to Show.")
+
+        elif radioButton.isChecked():
             # show FreeCAD Background
 
             povCode = '''#version 3.7;
