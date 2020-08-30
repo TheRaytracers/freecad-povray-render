@@ -62,7 +62,7 @@ class Dialog(QtGui.QDialog):
         self.tabs = QtGui.QTabWidget(self)
         self.tabs.addTab(self.generalTab, "General")
         self.tabs.addTab(self.textureTab, "Textures")
-        self.tabs.addTab(self.environmentTab, "Environment")
+        self.tabs.addTab(self.environmentTab, "Environment (beta)")
         self.tabs.addTab(self.radiosityTab, "Indirect Lighting")
         self.tabs.addTab(self.helpTab, "Help")
 
@@ -1774,6 +1774,29 @@ class EnvironmentTab(QtGui.QWidget):
 
         self.wrapperLayout = QtGui.QVBoxLayout()
 
+        self.wrapperGroupBox = QtGui.QGroupBox("Export Environment")
+        self.wrapperGroupBox.setCheckable(True)
+        self.wrapperGroupBoxLayout = QtGui.QVBoxLayout()
+        self.wrapperGroupBox.setLayout(self.wrapperGroupBoxLayout)
+        self.wrapperLayout.addWidget(self.wrapperGroupBox)
+
+        # Radio Buttons
+        self.options = ["Transparent Background",
+            "FreeCAD Background",
+            "HDRI Environment"]
+        self.radioButtonOptions = []
+
+        for option in self.options:
+            radioButton = QtGui.QRadioButton(option)
+            self.wrapperGroupBoxLayout.addWidget(radioButton)
+            self.radioButtonOptions.append(radioButton)
+
+        # HDRI Widget
+        self.hdriWidget = QtGui.QWidget()
+        self.hdriLayout = QtGui.QVBoxLayout()
+        self.hdriWidget.setLayout(self.hdriLayout)
+        self.wrapperGroupBoxLayout.addWidget(self.hdriWidget)
+
         # Help Label
         helpText = """<div>
             HDRI images are 360° images with min 10 bits per color (but 32 bits are very 
@@ -1789,7 +1812,7 @@ class EnvironmentTab(QtGui.QWidget):
         self.helpLabel = QtGui.QLabel()
         self.helpLabel.setWordWrap(True)
         self.helpLabel.setText(helpText)
-        self.wrapperLayout.addWidget(self.helpLabel)
+        self.hdriLayout.addWidget(self.helpLabel)
 
         # HDR File Choosing
         self.fileChoosingLayout = QtGui.QGridLayout()
@@ -1810,7 +1833,7 @@ class EnvironmentTab(QtGui.QWidget):
         self.fileChoosingLayout.addWidget(self.openFileDialogButton, 1, 1)
         self.fileChoosingLayout.addWidget(self.invalidPathLabel, 2, 0, 1, 2)
 
-        self.wrapperLayout.addLayout(self.fileChoosingLayout)
+        self.hdriLayout.addLayout(self.fileChoosingLayout)
 
         # Translation
         self.translationLayout = QtGui.QHBoxLayout()
@@ -1839,7 +1862,7 @@ class EnvironmentTab(QtGui.QWidget):
         self.translationZ.setPrefix("z: ")
         self.translationLayout.addWidget(self.translationZ)
 
-        self.wrapperLayout.addLayout(self.translationLayout)
+        self.hdriLayout.addLayout(self.translationLayout)
 
         # Rotation
         self.rotationLayout = QtGui.QHBoxLayout()
@@ -1871,15 +1894,17 @@ class EnvironmentTab(QtGui.QWidget):
         self.rotationZ.setSuffix(" deg")
         self.rotationLayout.addWidget(self.rotationZ)
 
-        self.wrapperLayout.addLayout(self.rotationLayout)
+        self.hdriLayout.addLayout(self.rotationLayout)
 
         # Preview
         self.preview = Preview("environment")
-        self.wrapperLayout.addWidget(self.preview)
+        self.wrapperGroupBoxLayout.addWidget(self.preview)
 
         self.setLayout(self.wrapperLayout)
 
         # Connect Signals
+        self.radioButtonOptions[2].toggled.connect(self.hdriWidget.setEnabled)
+
         self.openFileDialogButton.clicked.connect(self.handleFileDialog)
         self.hdriPathLineEdit.textChanged.connect(self.handleFileName)
         self.rotationX.editingFinished.connect(self.updatePreview)
@@ -1888,6 +1913,10 @@ class EnvironmentTab(QtGui.QWidget):
         self.translationX.editingFinished.connect(self.updatePreview)
         self.translationY.editingFinished.connect(self.updatePreview)
         self.translationZ.editingFinished.connect(self.updatePreview)
+
+        # check FreeCAD Background
+        self.radioButtonOptions[1].setChecked(True)
+        self.hdriWidget.setEnabled(False)
 
     def handleFileDialog(self):
         defaultPath = self.hdriPathLineEdit.text()
@@ -1923,7 +1952,14 @@ class EnvironmentTab(QtGui.QWidget):
             str: Dictionary with path to *.hdr ("hdrPath") file and the rotation ("rotX", "rotY", "rotZ")
         """
 
-        return {"hdrPath": self.hdriPathLineEdit.text(),
+        option = "FreeCAD Background"
+        for radioButton in self.radioButtonOptions:
+            if radioButton.isChecked():
+                option = radioButton.text()
+                break
+
+        return {"option": option,
+            "hdrPath": self.hdriPathLineEdit.text(),
             "transX": self.translationX.value(),
             "transY": self.translationY.value(),
             "transZ": self.translationZ.value(),
@@ -1932,6 +1968,8 @@ class EnvironmentTab(QtGui.QWidget):
             "rotZ": self.rotationZ.value()}
 
     def updatePreview(self):
+        return 
+        
         hdriPath = self.hdriPathLineEdit.text()
 
         if hdriPath == "" or hdriPath == u'':
@@ -2112,9 +2150,14 @@ class EnvironmentTab(QtGui.QWidget):
         # parse CSV
         csvReader = csv.reader(csvLines, delimiter=',')
         for row in csvReader:
-            if row[0] == "hdriPath":
-                print(row[1])
-                if row[1] == "" or row[1] == "None":
+            if row[0] == "environment":
+
+                for radioButton in self.radioButtonOptions:
+                    if row[1] == radioButton.text():
+                        radioButton.setChecked(True)
+                        break
+
+                if row[2] == "" or row[2] == "None":
                     self.rotationX.setValue(90.0)
                     self.rotationY.setValue(0.0)
                     self.rotationZ.setValue(0.0)
@@ -2125,15 +2168,17 @@ class EnvironmentTab(QtGui.QWidget):
 
                     self.hdriPathLineEdit.setText("") # at the end to avoid updatePreview to early
                 else:
-                    self.translationX.setValue(float(row[2]))
-                    self.translationY.setValue(float(row[3]))
-                    self.translationZ.setValue(float(row[4]))
+                    self.radioButtonOptions[1].setChecked(True)
 
-                    self.rotationX.setValue(float(row[5]))
-                    self.rotationY.setValue(float(row[6]))
-                    self.rotationZ.setValue(float(row[7]))
+                    self.translationX.setValue(float(row[3]))
+                    self.translationY.setValue(float(row[4]))
+                    self.translationZ.setValue(float(row[5]))
 
-                    self.hdriPathLineEdit.setText(row[1]) # at the end to avoid updatePreview to early
+                    self.rotationX.setValue(float(row[6]))
+                    self.rotationY.setValue(float(row[7]))
+                    self.rotationZ.setValue(float(row[8]))
+
+                    self.hdriPathLineEdit.setText(row[2]) # at the end to avoid updatePreview to early
 
     def settingsToIniFormat(self):
         """Convert the settings from the tab to CSV.
@@ -2144,11 +2189,11 @@ class EnvironmentTab(QtGui.QWidget):
         """
 
         csv = ";"
-        csv += "hdriPath"
+        csv += "environment"
 
         hdriDict = self.getHdriDict()
 
-        csv += "," + hdriDict["hdrPath"] + "," + str(hdriDict["transX"]) + "," + str(hdriDict["transY"]) + "," + str(hdriDict["transZ"]) + "," + str(hdriDict["rotX"]) + "," + str(
+        csv += "," + hdriDict["option"] + "," + hdriDict["hdrPath"] + "," + str(hdriDict["transX"]) + "," + str(hdriDict["transY"]) + "," + str(hdriDict["transZ"]) + "," + str(hdriDict["rotX"]) + "," + str(
             hdriDict["rotY"]) + "," + str(hdriDict["rotZ"])
 
         return csv + "\n"
