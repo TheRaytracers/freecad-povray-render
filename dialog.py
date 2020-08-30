@@ -1902,6 +1902,21 @@ class EnvironmentTab(QtGui.QWidget):
         self.translationY.editingFinished.connect(self.updatePreview)
         self.translationZ.editingFinished.connect(self.updatePreview)
 
+        # set default values
+        self.radioButtonOptions[0].setChecked(True)
+
+        self.wrapperGroupBox.setChecked(True)
+        
+        self.rotationX.setValue(90.0)
+        self.rotationY.setValue(0.0)
+        self.rotationZ.setValue(0.0)
+
+        self.translationX.setValue(0.0)
+        self.translationY.setValue(0.0)
+        self.translationZ.setValue(0.0)
+
+        self.hdriPathLineEdit.setText("") # at the end to avoid updatePreview to early
+
         # check FreeCAD Background
         self.radioButtonOptions[0].setChecked(True)
         self.hdriWidget.setEnabled(False)
@@ -2144,38 +2159,22 @@ class EnvironmentTab(QtGui.QWidget):
         csvReader = csv.reader(csvLines, delimiter=',')
         for row in csvReader:
             if row[0] == "environment":
+                self.wrapperGroupBox.setChecked(strToBool(row[1]))
 
-                if row[3] == "" or row[3] == "None":
-                    self.radioButtonOptions[0].setChecked(True)
+                for radioButton in self.radioButtonOptions:
+                    if row[2] == radioButton.text():
+                        radioButton.setChecked(True)
+                        break
 
-                    self.wrapperGroupBox.setChecked(True)
-                    
-                    self.rotationX.setValue(90.0)
-                    self.rotationY.setValue(0.0)
-                    self.rotationZ.setValue(0.0)
+                self.translationX.setValue(float(row[4]))
+                self.translationY.setValue(float(row[5]))
+                self.translationZ.setValue(float(row[6]))
 
-                    self.translationX.setValue(0.0)
-                    self.translationY.setValue(0.0)
-                    self.translationZ.setValue(0.0)
+                self.rotationX.setValue(float(row[7]))
+                self.rotationY.setValue(float(row[8]))
+                self.rotationZ.setValue(float(row[9]))
 
-                    self.hdriPathLineEdit.setText("") # at the end to avoid updatePreview to early
-                else:
-                    self.wrapperGroupBox.setChecked(strToBool(row[1]))
-
-                    for radioButton in self.radioButtonOptions:
-                        if row[2] == radioButton.text():
-                            radioButton.setChecked(True)
-                            break
-
-                    self.translationX.setValue(float(row[4]))
-                    self.translationY.setValue(float(row[5]))
-                    self.translationZ.setValue(float(row[6]))
-
-                    self.rotationX.setValue(float(row[7]))
-                    self.rotationY.setValue(float(row[8]))
-                    self.rotationZ.setValue(float(row[9]))
-
-                    self.hdriPathLineEdit.setText(row[3]) # at the end to avoid updatePreview to early
+                self.hdriPathLineEdit.setText(row[3]) # at the end to avoid updatePreview to early
 
     def settingsToIniFormat(self):
         """Convert the settings from the tab to CSV.
