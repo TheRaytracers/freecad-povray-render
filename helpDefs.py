@@ -88,7 +88,7 @@ def setDefaultPovRayExe():
 class RenderSettings:
     """Class to store all settings from the dialog, passed to Exporter as argument."""
 
-    def __init__(self, directory, projectName, width, height, expBg, expLight, repRot, expFcView, radiosity, hdriDict):
+    def __init__(self, directory, projectName, width, height, expLight, repRot, expFcView, radiosity, hdriDict):
         self.projectName = projectName
         self.directory = directory
 
@@ -129,7 +129,6 @@ class RenderSettings:
         self.width = width
         self.height = height
 
-        self.expBg = expBg
         self.expLight = expLight
         self.repRot = repRot
         self.expFcView = expFcView

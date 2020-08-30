@@ -231,7 +231,6 @@ class Dialog(QtGui.QDialog):
             projectName,
             self.generalTab.getImageWidth(),
             self.generalTab.getImageHeight(),
-            self.generalTab.isExpBgChecked(),
             self.generalTab.isExpFcLightChecked(),
             self.generalTab.isRepRotChecked(),
             self.generalTab.isExpFcViewChecked(),
@@ -325,11 +324,6 @@ class GeneralTab(QtGui.QWidget):
         self.WHImageGroup.setLayout(self.WHImageLayout)
 
         # Options
-        self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
-        self.expBg.setToolTip(
-            "Export the FreeCAD background like you see it (editable via FreeCAD settings)\n"
-            "Define your own background if you unchecked this option")
-
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
         self.expLight.setToolTip(
             "Export the light FreeCAD uses. Define your own light via a light object in FreeCAD "
@@ -346,7 +340,6 @@ class GeneralTab(QtGui.QWidget):
             "Take a screenshot of the scene view and save it with the same resolution as the image")
 
         self.optionLayout = QtGui.QVBoxLayout()
-        self.optionLayout.addWidget(self.expBg)
         self.optionLayout.addWidget(self.expLight)
         self.optionLayout.addWidget(self.repRot)
         self.optionLayout.addWidget(self.expFcView)
@@ -455,9 +448,6 @@ class GeneralTab(QtGui.QWidget):
     def getImageHeight(self):
         return self.imageHeight.value()
 
-    def isExpBgChecked(self):
-        return self.expBg.isChecked()
-
     def isExpFcLightChecked(self):
         return self.expLight.isChecked()
 
@@ -515,7 +505,6 @@ class GeneralTab(QtGui.QWidget):
         # add render settings
         csv += ";stg_width," + str(self.getImageWidth()) + "\n"
         csv += ";stg_height," + str(self.getImageHeight()) + "\n"
-        csv += ";stg_expBg," + str(self.isExpBgChecked()) + "\n"
         csv += ";stg_expLight," + str(self.isExpFcLightChecked()) + "\n"
         csv += ";stg_repRot," + str(self.isRepRotChecked()) + "\n"
         csv += ";stg_expFcView," + str(self.isExpFcViewChecked()) + "\n"
@@ -542,8 +531,6 @@ class GeneralTab(QtGui.QWidget):
                     self.imageWidth.setValue(int(row[1]))
                 elif name == "height":
                     self.imageHeight.setValue(int(row[1]))
-                elif name == "expBg":
-                    self.expBg.setChecked(strToBool(row[1]))
                 elif name == "expLight":
                     self.expLight.setChecked(strToBool(row[1]))
                 elif name == "repRot":
@@ -575,7 +562,6 @@ class GeneralTab(QtGui.QWidget):
         self.imageWidth.setValue(800)
         self.imageHeight.setValue(600)
 
-        self.expBg.setChecked(True)
         self.expLight.setChecked(True)
         self.expFcView.setChecked(False)
         self.repRot.setChecked(False)
@@ -1781,8 +1767,7 @@ class EnvironmentTab(QtGui.QWidget):
         self.wrapperLayout.addWidget(self.wrapperGroupBox)
 
         # Radio Buttons
-        self.options = ["Transparent Background",
-            "FreeCAD Background",
+        self.options = ["FreeCAD Background",
             "HDRI Environment"]
         self.radioButtonOptions = []
 
@@ -1903,7 +1888,7 @@ class EnvironmentTab(QtGui.QWidget):
         self.setLayout(self.wrapperLayout)
 
         # Connect Signals
-        self.radioButtonOptions[2].toggled.connect(self.hdriWidget.setEnabled)
+        self.radioButtonOptions[1].toggled.connect(self.hdriWidget.setEnabled)
 
         self.openFileDialogButton.clicked.connect(self.handleFileDialog)
         self.hdriPathLineEdit.textChanged.connect(self.handleFileName)
@@ -1915,7 +1900,7 @@ class EnvironmentTab(QtGui.QWidget):
         self.translationZ.editingFinished.connect(self.updatePreview)
 
         # check FreeCAD Background
-        self.radioButtonOptions[1].setChecked(True)
+        self.radioButtonOptions[0].setChecked(True)
         self.hdriWidget.setEnabled(False)
 
     def handleFileDialog(self):
@@ -1958,7 +1943,8 @@ class EnvironmentTab(QtGui.QWidget):
                 option = radioButton.text()
                 break
 
-        return {"option": option,
+        return {"enabled": self.wrapperGroupBox.isChecked(),
+            "option": option,
             "hdrPath": self.hdriPathLineEdit.text(),
             "transX": self.translationX.value(),
             "transY": self.translationY.value(),
@@ -1969,7 +1955,7 @@ class EnvironmentTab(QtGui.QWidget):
 
     def updatePreview(self):
         return 
-        
+
         hdriPath = self.hdriPathLineEdit.text()
 
         if hdriPath == "" or hdriPath == u'':
@@ -2152,12 +2138,11 @@ class EnvironmentTab(QtGui.QWidget):
         for row in csvReader:
             if row[0] == "environment":
 
-                for radioButton in self.radioButtonOptions:
-                    if row[1] == radioButton.text():
-                        radioButton.setChecked(True)
-                        break
+                if row[3] == "" or row[3] == "None":
+                    self.radioButtonOptions[0].setChecked(True)
 
-                if row[2] == "" or row[2] == "None":
+                    self.wrapperGroupBox.setChecked(True)
+                    
                     self.rotationX.setValue(90.0)
                     self.rotationY.setValue(0.0)
                     self.rotationZ.setValue(0.0)
@@ -2168,17 +2153,24 @@ class EnvironmentTab(QtGui.QWidget):
 
                     self.hdriPathLineEdit.setText("") # at the end to avoid updatePreview to early
                 else:
-                    self.radioButtonOptions[1].setChecked(True)
+                    self.wrapperGroupBox.setChecked(strToBool(row[1]))
 
-                    self.translationX.setValue(float(row[3]))
-                    self.translationY.setValue(float(row[4]))
-                    self.translationZ.setValue(float(row[5]))
+                    for radioButton in self.radioButtonOptions:
+                        if row[2] == radioButton.text():
+                            radioButton.setChecked(True)
+                            print(row[2])
+                            print("ini checked")
+                            break
 
-                    self.rotationX.setValue(float(row[6]))
-                    self.rotationY.setValue(float(row[7]))
-                    self.rotationZ.setValue(float(row[8]))
+                    self.translationX.setValue(float(row[4]))
+                    self.translationY.setValue(float(row[5]))
+                    self.translationZ.setValue(float(row[6]))
 
-                    self.hdriPathLineEdit.setText(row[2]) # at the end to avoid updatePreview to early
+                    self.rotationX.setValue(float(row[7]))
+                    self.rotationY.setValue(float(row[8]))
+                    self.rotationZ.setValue(float(row[9]))
+
+                    self.hdriPathLineEdit.setText(row[3]) # at the end to avoid updatePreview to early
 
     def settingsToIniFormat(self):
         """Convert the settings from the tab to CSV.
@@ -2193,7 +2185,7 @@ class EnvironmentTab(QtGui.QWidget):
 
         hdriDict = self.getHdriDict()
 
-        csv += "," + hdriDict["option"] + "," + hdriDict["hdrPath"] + "," + str(hdriDict["transX"]) + "," + str(hdriDict["transY"]) + "," + str(hdriDict["transZ"]) + "," + str(hdriDict["rotX"]) + "," + str(
+        csv += "," + str(hdriDict["enabled"]) + "," + hdriDict["option"] + "," + hdriDict["hdrPath"] + "," + str(hdriDict["transX"]) + "," + str(hdriDict["transY"]) + "," + str(hdriDict["transZ"]) + "," + str(hdriDict["rotX"]) + "," + str(
             hdriDict["rotY"]) + "," + str(hdriDict["rotZ"])
 
         return csv + "\n"
