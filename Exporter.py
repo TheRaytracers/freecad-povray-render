@@ -72,13 +72,23 @@ class ExportToPovRay:
         self.width = renderSettings.width
         self.height = renderSettings.height
 
-        self.expBg = renderSettings.expBg
         self.expLight = renderSettings.expLight
         self.repRot = renderSettings.repRot
         self.expFcView = renderSettings.expFcView
 
         #radiosity
         self.radiosity = renderSettings.radiosity
+
+        #environment
+        self.expEnvironment = renderSettings.hdriDict["enabled"]
+        self.environmentOption = renderSettings.hdriDict["option"]
+        self.hdriPath = renderSettings.hdriDict["hdrPath"]
+        self.hdriRotX = renderSettings.hdriDict["rotX"]
+        self.hdriRotY = renderSettings.hdriDict["rotY"]
+        self.hdriRotZ = renderSettings.hdriDict["rotZ"]
+        self.hdriTransX = renderSettings.hdriDict["transX"]
+        self.hdriTransY = renderSettings.hdriDict["transY"]
+        self.hdriTransZ = renderSettings.hdriDict["transZ"]
 
         #get camera
         self.CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
@@ -150,7 +160,7 @@ class ExportToPovRay:
             objPovCode += self.createPovCode(obj, True, True, True, True, True, True)
 
         #add general pov code / "header"
-        finalPovCode = "#version 3.6; // 3.7\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
+        finalPovCode = "#version 3.7; // 3.6\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
 
         finalPovCode += "#default { pigment { rgb " + self.uintColorToRGB(self.DefaultShapeColor) + " } }\n"
 
@@ -185,7 +195,7 @@ class ExportToPovRay:
             finalPovCode += "\n// FreeCAD Light -------------------------------------\n"
             finalPovCode += self.getFCLight()
 
-        if self.expBg:
+        if self.expEnvironment:
             finalPovCode += "\n// Background ------------------------------\n"
             finalPovCode += self.getBackground()
 
@@ -1149,69 +1159,86 @@ class ExportToPovRay:
     def getBackground(self):
         """Return the FreeCAD background as pov code."""
 
-        bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
-        bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
-        bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
-        bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
-        ViewDir = Gui.ActiveDocument.ActiveView.getViewDirection()
-
-        AspectRatio = self.width / float(self.height)
         povBg = ""
 
-        if self.CamType == "Orthographic":
-            if AspectRatio >= 1:
-                up = self.CamNode.height.getValue()
-                right = up * AspectRatio
-            else:
-                right = self.CamNode.height.getValue()
-                up = right/AspectRatio
-            povBg += "\npolygon {\n"
-            povBg += "\t5, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
-            povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2)
-            povBg += ">, <" + str(-right/2) + ", " + str(-up/2) + ">\n"
-            povBg += "\tpigment {"
+        if self.environmentOption == "HDRI Environment":
+            if self.hdriPath != None and self.hdriPath != "":
+                povBg = "// HDRI Environment ----------------------------------\n"
+                povBg += "sky_sphere {\n"
+                povBg += "\tpigment {\n"
+                povBg += "\t\timage_map { hdr \"" + self.hdriPath + "\"\n"
+                povBg += "\t\t\tgamma 1.1\n"
+                povBg += "\t\t\tmap_type 1 interpolate 2\n"
+                povBg += "\t\t}\n"
+                povBg += "\t}\n"
+                povBg += "\trotate <" + str(self.hdriRotX) + ", " + str(self.hdriRotY) + ", " + str(self.hdriRotZ) + ">\n"
+                povBg += "\ttranslate <" + str(self.hdriTransX) + ", " + str(self.hdriTransY) + ", " + str(self.hdriTransZ) + ">\n"
+                povBg += "}\n"
+
+                return povBg
+        else:
+            bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
+            bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
+            bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
+            bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
+            ViewDir = Gui.ActiveDocument.ActiveView.getViewDirection()
+
+            AspectRatio = self.width / float(self.height)
+
+            if self.CamType == "Orthographic":
+                if AspectRatio >= 1:
+                    up = self.CamNode.height.getValue()
+                    right = up * AspectRatio
+                else:
+                    right = self.CamNode.height.getValue()
+                    up = right/AspectRatio
+                povBg += "\npolygon {\n"
+                povBg += "\t5, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
+                povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2)
+                povBg += ">, <" + str(-right/2) + ", " + str(-up/2) + ">\n"
+                povBg += "\tpigment {"
+                if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
+                    povBg += " color rgb" + self.uintColorToRGB(bgColor1) + " }\n"
+                elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
+                    povBg += "\n\t\tgradient y\n"
+                    povBg += "\t\tcolor_map {\n"
+                    povBg += "\t\t\t[ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
+                    povBg += "\t\t\t[ 0.05  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
+                    if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
+                        povBg += "\t\t\t[ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
+                    povBg += "\t\t\t[ 0.95  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+                    povBg += "\t\t\t[ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+                    povBg += "\t\t}\n"
+                    povBg += "\t\tscale <1," + str(up) + ",1>\n"
+                    povBg += "\t\ttranslate <0," + str(-up/2) + ",0>\n"
+                    povBg += "\t}\n"
+                #color rgb<0,0,1>}\n"
+                povBg += "\tfinish { ambient 1 diffuse 0 }\n"
+                povBg += "\trotate <" + str(self.EulerCam[2]) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
+                povBg += "\ttranslate <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + ">\n"
+                povBg += "\ttranslate <" + str(ViewDir[0]*100000) + ", " + str(ViewDir[1]*100000) + ", " + str(ViewDir[2]*100000) + ">\n"
+                povBg += "}\n"
+
+            povBg += "sky_sphere {\n\tpigment {\n"
             if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
-                povBg += " color rgb" + self.uintColorToRGB(bgColor1) + " }\n"
+                povBg += "\t\tcolor rgb" + self.uintColorToRGB(bgColor1) + "\n"
+
             elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
-                povBg += "\n\t\tgradient y\n"
+                povBg += "\t\tgradient z\n"
                 povBg += "\t\tcolor_map {\n"
                 povBg += "\t\t\t[ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
-                povBg += "\t\t\t[ 0.05  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
+                povBg += "\t\t\t[ 0.30  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
                 if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
                     povBg += "\t\t\t[ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
-                povBg += "\t\t\t[ 0.95  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+                povBg += "\t\t\t[ 0.70  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
                 povBg += "\t\t\t[ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
                 povBg += "\t\t}\n"
-                povBg += "\t\tscale <1," + str(up) + ",1>\n"
-                povBg += "\t\ttranslate <0," + str(-up/2) + ",0>\n"
-                povBg += "\t}\n"
-            #color rgb<0,0,1>}\n"
-            povBg += "\tfinish { ambient 1 diffuse 0 }\n"
-            povBg += "\trotate <" + str(self.EulerCam[2]) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
-            povBg += "\ttranslate <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + ">\n"
-            povBg += "\ttranslate <" + str(ViewDir[0]*100000) + ", " + str(ViewDir[1]*100000) + ", " + str(ViewDir[2]*100000) + ">\n"
-            povBg += "}\n"
+                povBg += "\t\tscale 2\n"
+                povBg += "\t\ttranslate -1\n"
+                povBg += "\t\trotate<" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
+            povBg += "\t}\n}\n"
 
-        povBg += "sky_sphere {\n\tpigment {\n"
-        if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
-            povBg += "\t\tcolor rgb" + self.uintColorToRGB(bgColor1) + "\n"
-
-        elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
-            povBg += "\t\tgradient z\n"
-            povBg += "\t\tcolor_map {\n"
-            povBg += "\t\t\t[ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
-            povBg += "\t\t\t[ 0.30  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
-            if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
-                povBg += "\t\t\t[ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
-            povBg += "\t\t\t[ 0.70  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
-            povBg += "\t\t\t[ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
-            povBg += "\t\t}\n"
-            povBg += "\t\tscale 2\n"
-            povBg += "\t\ttranslate -1\n"
-            povBg += "\t\trotate<" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
-        povBg += "\t}\n}\n"
-
-        return povBg
+            return povBg
 
     def getCam(self):
         """Return the current FreeCAD model as pov code."""

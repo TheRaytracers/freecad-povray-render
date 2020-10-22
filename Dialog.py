@@ -55,12 +55,14 @@ class Dialog(QtGui.QDialog):
         # create tabs
         self.generalTab = GeneralTab()
         self.textureTab = TextureTab()
+        self.environmentTab = EnvironmentTab()
         self.radiosityTab = RadiosityTab()
         self.helpTab = HelpTab()
 
         self.tabs = QtGui.QTabWidget(self)
         self.tabs.addTab(self.generalTab, "General")
         self.tabs.addTab(self.textureTab, "Textures")
+        self.tabs.addTab(self.environmentTab, "Environment (beta)")
         self.tabs.addTab(self.radiosityTab, "Indirect Lighting")
         self.tabs.addTab(self.helpTab, "Help")
 
@@ -88,6 +90,9 @@ class Dialog(QtGui.QDialog):
         self.generalTab.iniPathValidityChanged.connect(
             self.setDialogAcceptable)
 
+        self.environmentTab.hdrPathValidityChanged.connect(
+            self.setDialogAcceptable)
+
 
     def setDialogAcceptable(self, acceptable):
         """Set if the "Start Rendering" button should be enabled.
@@ -111,6 +116,7 @@ class Dialog(QtGui.QDialog):
 
         self.generalTab.saveQSettings(settings)
         self.textureTab.saveQSettings(settings)
+        self.environmentTab.saveQSettings(settings)
         self.radiosityTab.saveQSettings(settings)
         self.helpTab.saveQSettings(settings)
 
@@ -122,6 +128,7 @@ class Dialog(QtGui.QDialog):
             "Usb Hub, DerUhrmacher", "Export to POV-Ray")
 
         self.textureTab.applyQSettings(settings)
+        self.environmentTab.applyQSettings(settings)
         self.radiosityTab.applyQSettings(settings)
         self.helpTab.applyQSettings(settings)
         # general tab as last one to avoid conflicts with order
@@ -135,6 +142,7 @@ class Dialog(QtGui.QDialog):
 
         csv += self.generalTab.settingsToIniFormat()
         csv += self.textureTab.settingsToIniFormat()
+        csv += self.environmentTab.settingsToIniFormat()
         csv += self.radiosityTab.settingsToIniFormat()
         csv += self.helpTab.settingsToIniFormat()
 
@@ -167,6 +175,7 @@ class Dialog(QtGui.QDialog):
 
             self.generalTab.applyIniSettings(csvLines)
             self.textureTab.applyIniSettings(csvLines)
+            self.environmentTab.applyIniSettings(csvLines)
             self.radiosityTab.applyIniSettings(csvLines)
             self.helpTab.applyIniSettings(csvLines)
 
@@ -222,11 +231,11 @@ class Dialog(QtGui.QDialog):
             projectName,
             self.generalTab.getImageWidth(),
             self.generalTab.getImageHeight(),
-            self.generalTab.isExpBgChecked(),
             self.generalTab.isExpFcLightChecked(),
             self.generalTab.isRepRotChecked(),
             self.generalTab.isExpFcViewChecked(),
-            self.radiosityTab.getRadiosity())
+            self.radiosityTab.getRadiosity(),
+            self.environmentTab.getHdriDict())
 
         self.textureTab.createTextureInc(self.renderSettings)
 
@@ -315,11 +324,6 @@ class GeneralTab(QtGui.QWidget):
         self.WHImageGroup.setLayout(self.WHImageLayout)
 
         # Options
-        self.expBg = QtGui.QCheckBox("Export FreeCAD Background")
-        self.expBg.setToolTip(
-            "Export the FreeCAD background like you see it (editable via FreeCAD settings)\n"
-            "Define your own background if you unchecked this option")
-
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
         self.expLight.setToolTip(
             "Export the light FreeCAD uses. Define your own light via a light object in FreeCAD "
@@ -336,7 +340,6 @@ class GeneralTab(QtGui.QWidget):
             "Take a screenshot of the scene view and save it with the same resolution as the image")
 
         self.optionLayout = QtGui.QVBoxLayout()
-        self.optionLayout.addWidget(self.expBg)
         self.optionLayout.addWidget(self.expLight)
         self.optionLayout.addWidget(self.repRot)
         self.optionLayout.addWidget(self.expFcView)
@@ -445,9 +448,6 @@ class GeneralTab(QtGui.QWidget):
     def getImageHeight(self):
         return self.imageHeight.value()
 
-    def isExpBgChecked(self):
-        return self.expBg.isChecked()
-
     def isExpFcLightChecked(self):
         return self.expLight.isChecked()
 
@@ -505,7 +505,6 @@ class GeneralTab(QtGui.QWidget):
         # add render settings
         csv += ";stg_width," + str(self.getImageWidth()) + "\n"
         csv += ";stg_height," + str(self.getImageHeight()) + "\n"
-        csv += ";stg_expBg," + str(self.isExpBgChecked()) + "\n"
         csv += ";stg_expLight," + str(self.isExpFcLightChecked()) + "\n"
         csv += ";stg_repRot," + str(self.isRepRotChecked()) + "\n"
         csv += ";stg_expFcView," + str(self.isExpFcViewChecked()) + "\n"
@@ -532,8 +531,6 @@ class GeneralTab(QtGui.QWidget):
                     self.imageWidth.setValue(int(row[1]))
                 elif name == "height":
                     self.imageHeight.setValue(int(row[1]))
-                elif name == "expBg":
-                    self.expBg.setChecked(strToBool(row[1]))
                 elif name == "expLight":
                     self.expLight.setChecked(strToBool(row[1]))
                 elif name == "repRot":
@@ -565,7 +562,6 @@ class GeneralTab(QtGui.QWidget):
         self.imageWidth.setValue(800)
         self.imageHeight.setValue(600)
 
-        self.expBg.setChecked(True)
         self.expLight.setChecked(True)
         self.expFcView.setChecked(False)
         self.repRot.setChecked(False)
@@ -597,7 +593,7 @@ class TextureTab(QtGui.QWidget):
         # add the menu for scaling and rotating at the bottom
         self.addScaleRotateTranslate()
 
-        self.preview = Preview()  # preview widget
+        self.preview = Preview("texture")  # preview widget
 
         # signals and slots
         self.connectSignals()
@@ -1237,9 +1233,11 @@ class TextureTab(QtGui.QWidget):
 class Preview(QtGui.QWidget):
     """Class for the preview. It is derived by QWidget."""
 
-    def __init__(self):
+    def __init__(self, name):
         super(Preview, self).__init__()
         self.qSettingsGroup = "preview"
+        self.name = name
+        self.povCode = ""
         self.initUIElements()
         self.connectSignals()
 
@@ -1260,7 +1258,7 @@ class Preview(QtGui.QWidget):
         self.settingsLayout.addWidget(self.zoomOut)
 
         # preview image
-        self.imageLabel = QtGui.QLabel()
+        self.imageLabel = QtGui.QLabel("No Preview to show")
         self.imageLabel.setStyleSheet("QLabel { color : #ff0000; }")
 
         # main layout
@@ -1315,6 +1313,7 @@ class Preview(QtGui.QWidget):
         """
 
         self.imageLabel.setText(text)
+        self.povCode = ""
 
     def connectSignals(self):
         """Connect all necessary signals to all slots."""
@@ -1327,9 +1326,12 @@ class Preview(QtGui.QWidget):
         """Slot, called when the state of the disable checkbox changes."""
 
         if self.disableCheckBox.isChecked():
-            self.imageLabel.setText(" ")
+            self.imageLabel.setVisible(False)
         else:
-            self.render(self.povCode)
+            self.imageLabel.setVisible(True)
+
+            if self.povCode != "" and self.imageLabel.pixmap() == None:
+                self.render(self.povCode)
 
     def largerPreview(self):
         """Increase the size of the preview image. Called when the "Larger" button is pressed."""
@@ -1358,7 +1360,7 @@ class Preview(QtGui.QWidget):
         """
 
         # get saved input
-        settingsObject.beginGroup(self.qSettingsGroup)
+        settingsObject.beginGroup(self.qSettingsGroup + self.name)
 
         # set preview disable checkbox
         previewDisable = settingsObject.value("previewDisable")
@@ -1387,7 +1389,7 @@ class Preview(QtGui.QWidget):
         Args:
             settingsObject (QSettings Object): QSettings object to store the data
         """
-        settingsObject.beginGroup(self.qSettingsGroup)
+        settingsObject.beginGroup(self.qSettingsGroup + self.name)
         settingsObject.setValue(
             "previewDisable", self.disableCheckBox.isChecked())
         settingsObject.setValue("previewWidth", self.previewWidth)
@@ -1741,3 +1743,488 @@ class RadiosityTab(QtGui.QWidget):
         """
 
         pass
+
+
+#######################
+### Environment Tab ###
+#######################
+
+class EnvironmentTab(QtGui.QWidget):
+    """The class for the environment tab (derived by QWidget)."""
+
+    # emitted when the validity of the hdr path changed
+    hdrPathValidityChanged = QtCore.Signal(bool)
+
+    def __init__(self):
+        super(EnvironmentTab, self).__init__()
+        self.qSettingsGroup = "environmentTab"
+        self.exporter = ExportToPovRay()
+        self.initUIElements()
+
+    def initUIElements(self):
+        """Create all UI elements for the tab."""
+
+        self.wrapperLayout = QtGui.QVBoxLayout()
+
+        self.wrapperGroupBox = QtGui.QGroupBox("Export Environment")
+        self.wrapperGroupBox.setCheckable(True)
+        self.wrapperGroupBoxLayout = QtGui.QVBoxLayout()
+        self.wrapperGroupBox.setLayout(self.wrapperGroupBoxLayout)
+        self.wrapperLayout.addWidget(self.wrapperGroupBox)
+
+        # Radio Buttons
+        self.options = ["FreeCAD Background",
+            "HDRI Environment"]
+        self.radioButtonOptions = []
+
+        for option in self.options:
+            radioButton = QtGui.QRadioButton(option)
+            radioButton.toggled.connect(self.checkTabValidity)
+            self.wrapperGroupBoxLayout.addWidget(radioButton)
+            self.radioButtonOptions.append(radioButton)
+
+        # HDRI Widget
+        self.hdriWidget = QtGui.QWidget()
+        self.hdriLayout = QtGui.QVBoxLayout()
+        self.hdriWidget.setLayout(self.hdriLayout)
+        self.wrapperGroupBoxLayout.addWidget(self.hdriWidget)
+
+        # Help Label
+        helpText = """<div>
+            HDRI images are 360° images with min 10 bits per color (but 32 bits are very 
+            common for HDRI images) and not 8 as usual pictures like JPG. So the contrast 
+            is a lot better and the images can be used to do the lightning of the scene.
+            <h4>Tips</h4>
+            <ul>
+                <li>turn on indirect lightning (other tab)</li>
+                <li>turn of every global light, only flash lights (the HDRI environment <i>is</i> the global light)</li>
+            </ul>
+        </div>"""
+
+        self.helpLabel = QtGui.QLabel()
+        self.helpLabel.setWordWrap(True)
+        self.helpLabel.setText(helpText)
+        self.hdriLayout.addWidget(self.helpLabel)
+
+        # HDR File Choosing
+        self.fileChoosingLayout = QtGui.QGridLayout()
+
+        self.hdriPathLabel = QtGui.QLabel("HDRI Path (*.hdr)")
+
+        self.hdriPathLineEdit = QtGui.QLineEdit()
+        self.hdriPathLineEdit.setPlaceholderText("Path to the *.hdr file")
+
+        self.openFileDialogButton = QtGui.QPushButton("...")
+
+        self.invalidPathLabel = QtGui.QLabel()
+        self.invalidPathLabel.setStyleSheet("QLabel { color : #ff0000; }")
+        self.invalidPathLabel.setWordWrap(True)
+
+        self.fileChoosingLayout.addWidget(self.hdriPathLabel, 0, 0, 1, 2)
+        self.fileChoosingLayout.addWidget(self.hdriPathLineEdit, 1, 0)
+        self.fileChoosingLayout.addWidget(self.openFileDialogButton, 1, 1)
+        self.fileChoosingLayout.addWidget(self.invalidPathLabel, 2, 0, 1, 2)
+
+        self.hdriLayout.addLayout(self.fileChoosingLayout)
+
+        # Translation
+        self.translationLayout = QtGui.QHBoxLayout()
+
+        self.translationLabel = QtGui.QLabel("Translation")
+        self.translationLayout.addWidget(self.translationLabel)
+
+        self.translationX = QtGui.QDoubleSpinBox()
+        self.translationX.setMaximum(999999)
+        self.translationX.setMinimum(-999999)
+        self.translationX.setDecimals(3)
+        self.translationX.setPrefix("x: ")
+        self.translationLayout.addWidget(self.translationX)
+
+        self.translationY = QtGui.QDoubleSpinBox()
+        self.translationY.setMaximum(999999)
+        self.translationY.setMinimum(-999999)
+        self.translationY.setDecimals(3)
+        self.translationY.setPrefix("y: ")
+        self.translationLayout.addWidget(self.translationY)
+
+        self.translationZ = QtGui.QDoubleSpinBox()
+        self.translationZ.setMaximum(999999)
+        self.translationZ.setMinimum(-999999)
+        self.translationZ.setDecimals(3)
+        self.translationZ.setPrefix("z: ")
+        self.translationLayout.addWidget(self.translationZ)
+
+        self.hdriLayout.addLayout(self.translationLayout)
+
+        # Rotation
+        self.rotationLayout = QtGui.QHBoxLayout()
+
+        self.rotationLabel = QtGui.QLabel("Rotation")
+        self.rotationLayout.addWidget(self.rotationLabel)
+
+        self.rotationX = QtGui.QDoubleSpinBox()
+        self.rotationX.setMaximum(360)
+        self.rotationX.setMinimum(-360)
+        self.rotationX.setDecimals(3)
+        self.rotationX.setPrefix("x: ")
+        self.rotationX.setSuffix(" deg")
+        self.rotationLayout.addWidget(self.rotationX)
+
+        self.rotationY = QtGui.QDoubleSpinBox()
+        self.rotationY.setMaximum(360)
+        self.rotationY.setMinimum(-360)
+        self.rotationY.setDecimals(3)
+        self.rotationY.setPrefix("y: ")
+        self.rotationY.setSuffix(" deg")
+        self.rotationLayout.addWidget(self.rotationY)
+
+        self.rotationZ = QtGui.QDoubleSpinBox()
+        self.rotationZ.setMaximum(360)
+        self.rotationZ.setMinimum(-360)
+        self.rotationZ.setDecimals(3)
+        self.rotationZ.setPrefix("z: ")
+        self.rotationZ.setSuffix(" deg")
+        self.rotationLayout.addWidget(self.rotationZ)
+
+        self.hdriLayout.addLayout(self.rotationLayout)
+
+        # Preview Warning
+        self.previewWarning = QtGui.QLabel("Warning: Large HDR files can lead to long freezes with turned preview on because POV-Ray takes long to load the file.")
+        self.previewWarning.setStyleSheet("QLabel { color : #ff6600; }")
+        self.previewWarning.setWordWrap(True)
+        self.wrapperGroupBoxLayout.addWidget(self.previewWarning)
+
+        # Preview
+        self.preview = Preview("environment")
+        self.wrapperGroupBoxLayout.addWidget(self.preview)
+
+        self.setLayout(self.wrapperLayout)
+
+        # Connect Signals
+        self.radioButtonOptions[1].toggled.connect(self.hdriWidget.setEnabled)
+        self.radioButtonOptions[1].toggled.connect(self.updatePreview)
+
+        self.wrapperGroupBox.toggled.connect(self.checkTabValidity)
+        self.wrapperGroupBox.toggled.connect(self.updatePreview)
+
+        self.openFileDialogButton.clicked.connect(self.handleFileDialog)
+        self.hdriPathLineEdit.textChanged.connect(self.handleFileName)
+        self.rotationX.editingFinished.connect(self.updatePreview)
+        self.rotationY.editingFinished.connect(self.updatePreview)
+        self.rotationZ.editingFinished.connect(self.updatePreview)
+        self.translationX.editingFinished.connect(self.updatePreview)
+        self.translationY.editingFinished.connect(self.updatePreview)
+        self.translationZ.editingFinished.connect(self.updatePreview)
+
+        # set default values
+        self.radioButtonOptions[0].setChecked(True)
+
+        self.wrapperGroupBox.setChecked(True)
+        
+        self.rotationX.setValue(90.0)
+        self.rotationY.setValue(0.0)
+        self.rotationZ.setValue(0.0)
+
+        self.translationX.setValue(0.0)
+        self.translationY.setValue(0.0)
+        self.translationZ.setValue(0.0)
+
+        self.hdriPathLineEdit.setText("") # at the end to avoid updatePreview to early
+
+        # check FreeCAD Background
+        self.radioButtonOptions[0].setChecked(True)
+        self.hdriWidget.setEnabled(False)
+
+    def checkTabValidity(self):
+        fileName = self.hdriPathLineEdit.text()
+        radioButton = self.radioButtonOptions[0]
+        enabled = self.wrapperGroupBox.isChecked()
+
+        if radioButton.isChecked() or (isAscii(fileName) and os.path.isfile(fileName) and fileName != "") or not enabled:
+            self.hdrPathValidityChanged.emit(True)
+        else:
+            self.hdrPathValidityChanged.emit(False)
+
+    def handleFileDialog(self):
+        defaultPath = self.hdriPathLineEdit.text()
+
+        fileName = QtGui.QFileDialog.getOpenFileName(
+            self, "Select a HDRI File", defaultPath, "HDR Images (*.hdr)")[0]
+
+        if fileName and fileName != u'' and fileName != '':
+            self.hdriPathLineEdit.setText(fileName)
+
+    def handleFileName(self, fileName):
+        self.checkTabValidity()
+
+        if isAscii(fileName) and os.path.isfile(fileName):
+            self.invalidPathLabel.setText("")
+        else:
+            self.invalidPathLabel.setText("The name of the *.hdr file contains mutated vowels,"\
+                "POV-Ray isn't able to handle, you typed no path or the file doesn't exist."\
+                "Please rename / create the file and open it again.")
+
+        self.updatePreview()
+
+    def getHdriDict(self):
+        """Return dictionary with path to *.hdr file and the rotation.
+
+        Returns:
+            str: Dictionary with path to *.hdr ("hdrPath") file and the rotation ("rotX", "rotY", "rotZ")
+        """
+
+        option = "FreeCAD Background"
+        for radioButton in self.radioButtonOptions:
+            if radioButton.isChecked():
+                option = radioButton.text()
+                break
+
+        return {"enabled": self.wrapperGroupBox.isChecked(),
+            "option": option,
+            "hdrPath": self.hdriPathLineEdit.text(),
+            "transX": self.translationX.value(),
+            "transY": self.translationY.value(),
+            "transZ": self.translationZ.value(),
+            "rotX": self.rotationX.value(),
+            "rotY": self.rotationY.value(),
+            "rotZ": self.rotationZ.value()}
+
+    def updatePreview(self):
+        hdriPath = self.hdriPathLineEdit.text()
+        radioButton = self.radioButtonOptions[0]
+        enabled = self.wrapperGroupBox.isChecked()
+
+        if not enabled:
+            self.preview.setErrorText("No Preview to Show.")
+
+        elif radioButton.isChecked():
+            # show FreeCAD Background
+
+            povCode = '''#version 3.7;
+                global_settings { assumed_gamma 1.0 }
+                #default { finish { ambient 0.2 diffuse 0.9 } }
+                #default { pigment { rgb <0.800, 0.800, 0.800> } }
+
+                #include "colors.inc"
+                #include "textures.inc"
+
+                // Camera ----------------------------------
+                #declare CamUp = <0, 0, 1>;
+                #declare CamRight = <1.33, 0, 0>;
+                #declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;
+                #declare CamPosition = <12.0710725784, -12.0710668564, 12.0710678101>;
+                camera {
+                    location <0, 0, 0>
+                    direction <0, 1, 0>
+                    up CamUp
+                    right CamRight
+                    rotate CamRotation
+                    translate CamPosition
+                    angle 57.82
+                }
+
+                // Background ------------------------------
+                sky_sphere {
+                    pigment {
+                        gradient z
+                        color_map {
+                            [ 0.00  color rgb<0.592, 0.592, 0.667> ]
+                            [ 0.30  color rgb<0.592, 0.592, 0.667> ]
+                            [ 0.70  color rgb<0.200, 0.200, 0.396> ]
+                            [ 1.00  color rgb<0.200, 0.200, 0.396> ]
+                        }
+                        scale 2
+                        translate -1
+                        rotate<-35.264390534, 1.9538003485e-05, 45.0000026303>
+                    }
+                }'''
+
+            bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
+            bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
+            bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
+            bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
+
+            povCode += "sky_sphere {\n\tpigment {\n"
+            if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
+                povCode += "\t\tcolor rgb" + self.exporter.uintColorToRGB(bgColor1) + "\n"
+
+            elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
+                povCode += "\t\tgradient z\n"
+                povCode += "\t\tcolor_map {\n"
+                povCode += "\t\t\t[ 0.00  color rgb" + \
+                    self.exporter.uintColorToRGB(bgColor3) + " ]\n"
+                povCode += "\t\t\t[ 0.30  color rgb" + \
+                    self.exporter.uintColorToRGB(bgColor3) + " ]\n"
+                if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
+                    povCode += "\t\t\t[ 0.50  color rgb" + \
+                        self.exporter.uintColorToRGB(bgColor4) + " ]\n"
+                povCode += "\t\t\t[ 0.70  color rgb" + \
+                    self.exporter.uintColorToRGB(bgColor2) + " ]\n"
+                povCode += "\t\t\t[ 1.00  color rgb" + \
+                    self.exporter.uintColorToRGB(bgColor2) + " ]\n"
+                povCode += "\t\t}\n"
+                povCode += "\t\tscale 2\n"
+                povCode += "\t\ttranslate -1\n"
+                povCode += "\t\trotate CamRotation\n"
+            povCode += "\t}\n}\n"
+
+            self.preview.render(povCode)
+
+        elif isAscii(hdriPath) and os.path.isfile(hdriPath):
+            # preview HDRI environment
+            hdriDict = self.getHdriDict()
+
+            povCode = '''#version 3.7;
+                global_settings { assumed_gamma 1.0 }
+                #default { finish { ambient 0.2 diffuse 0.9 } }
+                #default { pigment { rgb <0.800, 0.800, 0.800> } }
+
+                #include "colors.inc"
+                #include "textures.inc"
+
+                #declare CamUp = <0, 0, 1>;
+                #declare CamRight = <1.33, 0, 0>;
+                #declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;
+                #declare CamPosition = <15.3931512833, -12.0864868164, 16.4180793762>;
+                camera {
+                    location <0, 0, 0>
+                    direction <0, 1, 0>
+                    up CamUp
+                    right CamRight
+                    rotate CamRotation
+                    translate CamPosition
+                    angle 57.82
+                }
+
+                //----- z -----
+                union {
+
+                    cone { <0, 0, 0>, 0.2
+                        <0, 0, 0.5>, 0.0
+                        translate <0.0, 0.0, 10.0>
+                    }
+                    
+                    cylinder { <0, 0, 0>, <0, 0, 10.0>, 0.1
+                    }
+                    
+                    pigment { color rgb <0.000, 0.000, 1.000> }
+                    
+                }
+
+                //----- y -----
+                union {
+
+                    cone { <0, 0, 0>, 0.2
+                        <0, 0, 0.5>, 0.0
+                        translate <0.0, 0.0, 10.0>
+                    }
+                    
+                    cylinder { <0, 0, 0>, <0, 0, 10.0>, 0.1
+                    }
+                    
+                    rotate <-90.0, -0.0, 0.0>
+                    pigment { color rgb <0.000, 0.670, 0.000> }
+                    
+                }
+
+                //----- x -----
+                union {
+
+                    cone { <0, 0, 0>, 0.2
+                        <0, 0, 0.5>, 0.0
+                        translate <0.0, 0.0, 10.0>
+                    }
+                    
+                    cylinder { <0, 0, 0>, <0, 0, 10.0>, 0.1
+                    }
+                    
+                    rotate <0.0, 90.0, 0.0>
+                    pigment { color rgb <1.000, 0.000, 0.000> }
+                    
+                }'''
+
+            povCode += "sky_sphere {\n"
+            povCode += "\tpigment {\n"
+            povCode += "\t\timage_map { hdr \"" + hdriDict["hdrPath"] + "\"\n"
+            povCode += "\t\t\tgamma 1.1\n"
+            povCode += "\t\t\tmap_type 1 interpolate 2\n"
+            povCode += "\t\t}\n"
+            povCode += "\t}\n"
+            povCode += "\trotate <" + \
+                str(hdriDict["rotX"]) + ", " + str(hdriDict["rotY"]) + \
+                ", " + str(hdriDict["rotZ"]) + ">\n"
+            povCode += "\ttranslate <" + \
+                str(hdriDict["transX"]) + ", " + str(hdriDict["transY"]) + \
+                ", " + str(hdriDict["transZ"]) + ">\n"
+            povCode += "}\n"
+
+            self.preview.render(povCode)
+        else:
+            # show error text because it is an invalid path
+            self.preview.setErrorText("Without a valid path, it is not possible "\
+                "to preview the environment.")
+
+    def applyIniSettings(self, csvLines):
+        """Apply the settings from the given lines from the ini file
+        to the tab.
+
+        Args:
+            csvLines (Array): Array of lines for the CSV parser
+        """
+
+        # parse CSV
+        csvReader = csv.reader(csvLines, delimiter=',')
+        for row in csvReader:
+            if row[0] == "environment":
+                self.wrapperGroupBox.setChecked(strToBool(row[1]))
+
+                for radioButton in self.radioButtonOptions:
+                    if row[2] == radioButton.text():
+                        radioButton.setChecked(True)
+                        break
+
+                self.translationX.setValue(float(row[4]))
+                self.translationY.setValue(float(row[5]))
+                self.translationZ.setValue(float(row[6]))
+
+                self.rotationX.setValue(float(row[7]))
+                self.rotationY.setValue(float(row[8]))
+                self.rotationZ.setValue(float(row[9]))
+
+                self.hdriPathLineEdit.setText(row[3]) # at the end to avoid updatePreview to early
+
+    def settingsToIniFormat(self):
+        """Convert the settings from the tab to CSV.
+
+        Returns:
+            str: The created CSV with ";" for the ini file at the
+            beginning
+        """
+
+        csv = ";"
+        csv += "environment"
+
+        hdriDict = self.getHdriDict()
+
+        csv += "," + str(hdriDict["enabled"]) + "," + hdriDict["option"] + "," + hdriDict["hdrPath"] + "," + str(hdriDict["transX"]) + "," + str(hdriDict["transY"]) + "," + str(hdriDict["transZ"]) + "," + str(hdriDict["rotX"]) + "," + str(
+            hdriDict["rotY"]) + "," + str(hdriDict["rotZ"])
+
+        return csv + "\n"
+
+    def applyQSettings(self, settingsObject):
+        """Apply the settings stored with QSettings to the tab.
+
+        Args:
+            settingsObject (QSettings Object): The QSettings Object to read the data from
+        """
+
+        self.preview.applyQSettings(settingsObject)
+
+    def saveQSettings(self, settingsObject):
+        """Save the settings from the tab with QSettings.
+
+        Args:
+            settingsObject (QSettings Object): QSettings object to store the data
+        """
+
+        self.preview.saveQSettings(settingsObject)
