@@ -105,8 +105,12 @@ class ExportToPovRay:
                 App.Console.PrintError("Can't open the pov file\n\n")
                 return -1
 
-            #open inc file
+            # create inc file if necessary
             file = open(self.incPath, "a+")
+            file.close()
+
+            #open inc file
+            file = open(self.incPath, "r")
             self.incContent = file.read()
             file.close()
 
@@ -713,6 +717,16 @@ class ExportToPovRay:
 
         povCode += "\n"
 
+        if expPigment:
+            pigment = self.getPigment(fcObj)
+            if pigment != "":  # test if the object has the standard pigment
+                povCode += pigment.replace("\n", "\n\t") + "\n"
+
+        if expPhotons:
+            photons = self.getPhotons(fcObj)
+            if photons != "":
+                povCode += photons.replace("\n", "\n\t") + "\n"
+
         if expPlacement:
             rotation = self.getRotation(fcObj)
             if rotation != "": #test if the object is rotated
@@ -721,16 +735,6 @@ class ExportToPovRay:
             translation = self.getTranslation(fcObj)
             if translation != "": #test if the object is translated
                 povCode += "\t" + translation + "\n"
-
-        if expPigment:
-            pigment = self.getPigment(fcObj)
-            if pigment != "": #test if the object has the standard pigment
-                povCode += pigment.replace("\n", "\n\t") + "\n"
-
-        if expPhotons:
-            photons = self.getPhotons(fcObj)
-            if photons != "":
-                povCode += photons.replace("\n", "\n\t") + "\n"
 
         if expClose:
             povCode += "}\n"
@@ -1564,13 +1568,13 @@ class ExportToPovRay:
             error = file.read()
             file.close()
         #is there any content in the file
-        if error != "": #error occured
+        if error != "": #error occurred
             #show error message
             errorText = ""
-            errorText += "An error occured while rendering:\n-----------------------------------------\n"
+            errorText += "An error occurred while rendering:\n-----------------------------------------\n"
             errorText += error
             errorText += "\n-----------------------------------------\n"
-            errorText += "If the error occured in the pov file or the mesh file, please report a bug to us."
+            errorText += "If the error occurred in the pov file or the mesh file, please report a bug to us."
             errorText += "(See the wiki, link is in the help tab of the dialog)\n\n"
             errorText += "You can see the error message in the error file too."
             showError(errorText, "An error ocurred while rendering")
