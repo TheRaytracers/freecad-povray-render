@@ -617,6 +617,10 @@ class TextureTab(QtGui.QWidget):
     def addTextureList(self):
         """Add the nested list with the predefined textures on the right side."""
 
+        # category list
+        self.categories = []
+        self.categoryCombo = QtGui.QComboBox()
+
         # texture list
         self.textureList = QtGui.QTreeWidget()
         self.textureList.setHeaderLabel("Predefined")
@@ -625,8 +629,7 @@ class TextureTab(QtGui.QWidget):
 
         self.predefines = []
         # add FreeCAD texture
-        self.fcTexItem = QtGui.QTreeWidgetItem(
-            self.textureList, ["FreeCAD Texture"])
+        self.fcTexItem = QtGui.QListWidgetItem("FreeCAD Texture")
         self.predefines.append(
             Predefined(
                 "FreeCAD Texture",
@@ -640,22 +643,25 @@ class TextureTab(QtGui.QWidget):
                 "",
                 "",
                 self.fcTexItem))
-        self.fcTexItem.setSelected(True)
+        #self.fcTexItem.setSelected(True)
 
         # get the predefined.xml
         predefinedPath = os.path.join(os.path.dirname(
-            __file__), "predefined.xml")  # get workbench path
+            __file__), "predefined.xml")
 
         predefined = xml.parse(predefinedPath).getroot()
         categories = predefined.getchildren()
 
+        self.wrapperCategory = Category(None, [], [], -1)
+
         # read the predefined.xml and add the predefined defined in the XML
         for category in categories:
-            self.predefXmlToList(category, self.textureList)
+            self.predefXmlToList(category, self.wrapperCategory, 0)
 
         # add the list to the layouts and widgets
         self.listsLayout.addWidget(self.textureListHeading, 0, 1)
-        self.listsLayout.addWidget(self.textureList, 1, 1)
+        self.listsLayout.addWidget(self.categoryCombo, 1, 1)
+        self.listsLayout.addWidget(self.textureList, 2, 1)
 
         self.listsWidget.setLayout(self.listsLayout)
 
@@ -713,13 +719,13 @@ class TextureTab(QtGui.QWidget):
 
         # add the object list to the layouts
         self.listsLayout.addWidget(self.objectListHeading, 0, 0)
-        self.listsLayout.addWidget(self.objectList, 1, 0)
+        self.listsLayout.addWidget(self.objectList, 1, 0, 2, 1)
 
         # add comment label
         self.commentLabel = QtGui.QLabel()
         self.commentLabel.setStyleSheet("QLabel { font-weight : bold;}")
         self.commentLabel.setWordWrap(True)
-        self.listsLayout.addWidget(self.commentLabel, 2, 0, 1, 2)
+        self.listsLayout.addWidget(self.commentLabel, 3, 0, 1, 2)
 
     def addScaleRotateTranslate(self):
         """Add the scale, rotate, translate menu."""
@@ -807,18 +813,18 @@ class TextureTab(QtGui.QWidget):
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
-    def predefXmlToList(self, xmlNode, parentNode):
+    def predefXmlToList(self, xmlNode, parentCategory, layer):
         """Convert the given XML node to a predefined object and add an item to the predef list (recursive method).
 
         Args:
             xmlNode (xmlNode Object): The XML node that should be converted.
-            parentNode (QTreeWidgetItem): QTreeWidgetItem to which the newly created item should be added as a child.
+            parentCategory (Category): Category to which the newly created predefined/category should be added as a child.
         """
 
         childNodes = xmlNode.getchildren()
 
         if childNodes == []:
-            treeItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.text])
+            listItem = QtGui.QListWidgetItem(xmlNode.text)
             # get all attributes
             attr = xmlNode.attrib
             if "material" in attr:
@@ -866,25 +872,36 @@ class TextureTab(QtGui.QWidget):
             else:
                 comment = ""
 
-            self.predefines.append(
-                Predefined(
-                    xmlNode.text,
-                    material,
-                    texture,
-                    pigment,
-                    finish,
-                    normal,
-                    interior,
-                    media,
-                    inc,
-                    comment,
-                    treeItem))
+            newPredefined = Predefined(
+                xmlNode.text,
+                material,
+                texture,
+                pigment,
+                finish,
+                normal,
+                interior,
+                media,
+                inc,
+                comment,
+                listItem)
+
+            self.predefines.append(newPredefined)
+
+            parentCategory.predefines.append(newPredefined)
 
         else:
-            categoryItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
+            # create new category
+            newCategory = Category(parentCategory, [], [], self.categoryCombo.count())
+            parentCategory.subCategories.append(newCategory)
+            indentation = ""
+            for i in range(layer):
+                indentation += "--"
+            self.categoryCombo.addItem(indentation + " " + xmlNode.tag)
+            self.categories.append(newCategory)
+
             for node in childNodes:
                 # call method for child nodes
-                self.predefXmlToList(node, categoryItem)
+                self.predefXmlToList(node, newCategory, layer + 1)
 
     def connectSignals(self):
         """Connect all necessary signals for the texture tab."""
@@ -1397,6 +1414,16 @@ class Preview(QtGui.QWidget):
         settingsObject.endGroup()
 
 
+class Category:
+    """Class to store all stuff for a category of predefined textures."""
+
+    def __init__(self, parent, subCategories, predefines, index):
+        self.parent = parent
+        self.subCategories = subCategories
+        self.predefines = predefines
+        self.index = index
+
+
 class Predefined:
     """Class to store all stuff from a predefined (stored in predefined.xml)."""
 
@@ -1412,7 +1439,7 @@ class Predefined:
             media,
             inc,
             comment,
-            treeItem):
+            listItem):
         self.identifier = identifier
         self.material = material
         self.texture = texture
@@ -1423,7 +1450,7 @@ class Predefined:
         self.media = media
         self.inc = inc
         self.comment = comment
-        self.treeItem = treeItem
+        self.listItem = listItem
 
     def getHash(self):
         """Create a hash from all parts of the predefined (for identifying the predefined later).
@@ -1431,7 +1458,7 @@ class Predefined:
         Returns:
             str: The hash
         """
-        predefName = self.treeItem.text(0)
+        predefName = self.listItem.text()
 
         stgStr = (str(self.identifier) +
                   str(self.material) +
