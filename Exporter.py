@@ -22,6 +22,7 @@ import FreeCADGui as Gui
 
 from FreeCAD import Base
 from FreeCAD import Part
+import Part
 from pivy import coin
 import os
 import math
