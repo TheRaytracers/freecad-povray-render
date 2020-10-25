@@ -1085,7 +1085,7 @@ class TextureTab(QtGui.QWidget):
         fileContent += '\t\t}\n'
         fileContent += '}\n'
 
-        fileContent += self.exporter.listObjectToPov(listObj, "predef")
+        fileContent += listObj.toPov("predef")
 
         fileContent += 'box { <0,0,0>, <10.0, 10.0, 10.0>\n'
         fileContent += '\ttranslate <5.0, 5.0, -5.0>\n'
@@ -1152,7 +1152,7 @@ class TextureTab(QtGui.QWidget):
         self.texIncContent = ""
 
         for obj in self.listObjects:  # iterate over all listObjects
-            self.texIncContent += self.exporter.listObjectToPov(obj)
+            self.texIncContent += obj.toPov()
 
     def createTextureInc(self, renderSettings):
         """Do the stuff for the texture inc file.
@@ -1474,6 +1474,136 @@ class Predefined:
 
         return stringCorrection(predefName) + hashStr
 
+    def toPovMaterial(self, closeBracket=True):
+        povCode = ""
+
+        povCode += "material { "
+
+        povCode += self.material + "\n"
+
+        #pigment and texture
+        if self.texture != "" or self.pigment != "" or self.normal != "" or self.finish != "":
+            povCode += "\ttexture { " + self.texture + "\n"
+
+            #pigment
+            if self.pigment != "":
+                povCode += "\t\tpigment { " + \
+                    self.pigment + " }\n"
+
+            #finish
+            if self.finish != "":
+                povCode += "\tfinish {\n\t" + \
+                    self.finish + "\t}\n"
+
+            #normal
+            if self.normal != "":
+                povCode += "\tnormal {\n\t" + \
+                    self.normal + "\t}\n"
+
+            povCode += "\t}\n"
+
+        #interior and media
+        if self.interior != "" or self.media != "":
+            povCode += "\tinterior {\n\t" + self.interior + "\n"
+
+            #media
+            if self.media != "":
+                povCode += "\t\tmedia { " + self.media + " }\n"
+
+            povCode += "\t}\n"
+
+        if closeBracket:
+            povCode += "}\n\n"
+
+        return povCode
+
+    def renderThumbnail(self):
+        # pov code
+        povCode = ""
+
+        headerCode = """
+            #version 3.7;
+            global_settings { assumed_gamma 1.0 }
+            #default { finish { ambient 0.2 diffuse 0.9 } }
+            #default { pigment { rgb <0.800, 0.800, 0.800> } }
+
+            //------------------------------------------
+            #include "colors.inc"
+            #include "textures.inc"
+
+            //------------------------------------------
+            // Camera ----------------------------------
+            #declare CamUp = <0, 0, 1>;
+            #declare CamRight = <1.00, 0, 0>;
+            #declare CamRotation = <0.0, 0.0, 0.0>;
+            #declare CamPosition = <-1.2289743423461914, -9.092948913574219, 0.01562744379043579>;
+            camera {
+                location <0, 0, 0>
+                direction <0, 1, 0>
+                up CamUp
+                right CamRight
+                rotate CamRotation
+                translate CamPosition
+                angle 45.00
+            }
+
+            light_source { CamPosition color rgb <0.5, 0.5, 0.5> }
+
+            sky_sphere {
+                pigment {
+                    gradient z
+                    color_map {
+                        [ 0.00  color rgb<0.592, 0.592, 0.667> ]
+                        [ 0.30  color rgb<0.592, 0.592, 0.667> ]
+                        [ 0.70  color rgb<0.200, 0.200, 0.396> ]
+                        [ 1.00  color rgb<0.200, 0.200, 0.396> ]
+                    }
+                    scale 2
+                    translate -1
+                    rotate<0.0, 0.0, 0.0>
+                }
+            }
+            """
+
+        objectCode = """
+            sphere { <0, 0, 0> 2.0
+                material { predef_material }
+            }
+            box { <0,0,0>, <1.0, 20.0, 4.0>
+                material { predef_material }
+                translate <-3.5, -2.0, -2.0>
+            }"""
+
+        povCode += headerCode
+        
+        if self.inc != None and self.inc != "":  # only if include file is necessary
+            povCode += "#include \"" + self.inc + "\"\n"
+            
+        povCode += "#declare predef_material = " + self.toPovMaterial() + objectCode
+
+        povFile = open(os.path.join(
+            thumbnailPath, self.getHash() + ".pov"), "w")
+        povFile.write(povCode)
+        povFile.close()
+
+        # render
+        povExec = App.ParamGet(
+            preferences.prefPath).GetString("PovRayExe", "")
+        if os.path.isfile(povExec) == False:
+            errorText = "To get a preview of the texture settings you must\n"
+            errorText += "set the path to the POV-Ray executable\n"
+            errorText += "either in the settings of Render workbench\n"
+            errorText += "or in the settings of Raytracing workbench\n"
+            print(errorText)
+            return -1
+
+        # start povray
+        subprocess.call([povExec, "-d", "width=256", "height=256",
+                            os.path.join(thumbnailPath, self.getHash() + ".pov")])
+
+        print("Rendering thumbnail for predefined " +
+                self.identifier + " ... done")
+
 
 class ListObject:
     """Class to store all stuff of an object in the object list of the texture tab."""
@@ -1509,6 +1639,55 @@ class ListObject:
 
         self.listItem = listItem
         self.predefObject = predefObject
+
+    def toPov(self, label=None):
+        """Convert the predefined object from this ListObject into pov code.
+
+        Args:
+            label (str, optional): Other label for the identifier. Defaults to None.
+
+        Returns:
+            str: pov code
+        """
+
+        if label == None:
+            label = self.fcObj.label
+
+        if self.predefObject.material == None:  # for FreeCAD materials
+            return ""  # texture will be applied in the exporter class
+
+        povCode = ""
+
+        if self.predefObject.inc != None and self.predefObject.inc != "":  # only if include file is necessary
+            povCode += "#include \"" + self.predefObject.inc + "\"\n"
+
+        povCode += "#declare " + label + "_material"
+        if self.predefObject.media != "":
+            povCode += "_hollow"
+
+        povCode += " = " + self.predefObject.toPovMaterial(False)
+
+        #scale
+        if self.scaleX != 1 or self.scaleY != 1 or self.scaleZ != 1:
+            povCode += "\tscale <" + \
+                str(self.scaleX) + ", " + str(self.scaleY) + \
+                ", " + str(self.scaleZ) + ">\n"
+        #rotate
+        if self.rotationX != 0 or self.rotationY != 0 or self.rotationZ != 0:
+            povCode += "\trotate <" + \
+                str(self.rotationX) + ", " + str(self.rotationY) + \
+                ", " + str(self.rotationZ) + ">\n"
+        #translate
+        if self.translationX != 0 or self.translationY != 0 or self.translationZ != 0:
+            povCode += "\ttranslate <" + str(self.translationX) + ", " + str(
+                self.translationY) + ", " + str(self.translationZ) + ">\n"
+
+        povCode += "}\n\n"
+
+        if platform.system() == "Windows":
+            povCode.replace("\n", "\r\n")
+
+        return povCode
 
 
 ################

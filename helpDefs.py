@@ -143,3 +143,7 @@ class RenderSettings:
 initGui__iconPath = os.path.join(os.path.dirname(__file__), "icons")
 initGui__logoPath = os.path.join(os.path.dirname(__file__), "icons", "logo.svg")
 initGui__prefPagePath = os.path.join(os.path.dirname(__file__), "prefPage.ui")
+
+# path to thumbnails
+thumbnailPath = os.path.join(os.path.dirname(__file__), "thumbnails")
+print(thumbnailPath)
