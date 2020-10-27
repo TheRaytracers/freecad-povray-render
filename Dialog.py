@@ -984,8 +984,8 @@ class TextureTab(QtGui.QWidget):
         # set comment
         self.commentLabel.setText(selectedListObj.predefObject.comment)
 
-        # update preview XXX
-        # self.updatePreview(selectedListObj)
+        # update preview
+        self.updatePreview(selectedListObj)
 
     def updateSelectedListObject(self):
         """Update the listObject of the currently selected FreeCAD
@@ -1016,7 +1016,7 @@ class TextureTab(QtGui.QWidget):
         self.commentLabel.setText(selectedListObj.predefObject.comment)
 
         # update preview
-        #self.updatePreview(selectedListObj)
+        self.updatePreview(selectedListObj)
 
     def updatePredefinedList(self):
         """Update the shown predefines when the category changed."""
@@ -1694,7 +1694,7 @@ class ListObject:
         """
 
         if label == None:
-            label = self.fcObj.label
+            label = self.label
 
         if self.predefObject.material == None:  # for FreeCAD materials
             return ""  # texture will be applied in the exporter class
