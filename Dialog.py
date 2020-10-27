@@ -974,21 +974,22 @@ class TextureTab(QtGui.QWidget):
 
         # unselect all textures
         for predefine in self.predefines:
-            predefine.treeItem.setSelected(False)
+            predefine.listItem.setSelected(False)
 
         # select the right predefined
-        selectedListObj.predefObject.treeItem.setSelected(True)
+        selectedListObj.predefObject.listItem.setSelected(True)
 
-        # expand categories
-        self.expandParentItems(selectedListObj.predefObject.treeItem)
+        self.connectSignals()
+
+        # select right category
+        category = self.getCategoryOfPredef(selectedListObj.predefObject)
+        self.categoryCombo.setCurrentIndex(category.index)
 
         # set comment
         self.commentLabel.setText(selectedListObj.predefObject.comment)
 
-        # update preview
-        self.updatePreview(selectedListObj)
-
-        self.connectSignals()
+        # update preview XXX
+        # self.updatePreview(selectedListObj)
 
     def updateSelectedListObject(self):
         """Update the listObject of the currently selected FreeCAD
@@ -996,18 +997,7 @@ class TextureTab(QtGui.QWidget):
 
         selectedListObj = self.getSelectedListObject()
         selectedPredefine = self.getSelectedPredefined()
-        if selectedListObj == -1 or selectedPredefine == -1:  # is no object or predefine selected
-            if selectedPredefine == -1:  # is only a category selected
-                # expand and select predef under the category
-                self.disconnectSignals()
-                selectedItems = self.textureList.selectedItems()
-                selected = selectedItems[0]
-                selected.setSelected(False)
-                selected.setExpanded(True)
-                childItem = selected.child(0)
-                self.connectSignals()
-                childItem.setSelected(True)
-
+        if selectedListObj == -1 or selectedPredefine == -1: # no object selected
             return -1  # abort
 
         # get the values for scaling and rotating
@@ -1030,10 +1020,12 @@ class TextureTab(QtGui.QWidget):
         self.commentLabel.setText(selectedListObj.predefObject.comment)
 
         # update preview
-        self.updatePreview(selectedListObj)
+        #self.updatePreview(selectedListObj)
 
     def updatePredefinedList(self):
         """Update the shown predefines when the category changed."""
+
+        self.disconnectSignals()
 
         currentCategory = self.getSelectedCategory()
 
@@ -1048,18 +1040,43 @@ class TextureTab(QtGui.QWidget):
         for predef in newPredefines:
             self.textureList.addItem(predef.listItem)
 
+        # unselect all items
+        for predefine in self.predefines:
+            predefine.listItem.setSelected(False)
+
+        # select the right predef
+        selectedListObj = self.getSelectedListObject()
+        selectedListObj.predefObject.listItem.setSelected(True)
+
+        self.connectSignals()
+
     def getAllPredefines(self, category):
-        ownPredefines = category.predefines
+        ownPredefines = category.predefines[:] # clone array
 
         if category.subCategories is not []:
             predefs = ownPredefines
             for subCat in category.subCategories:
-                print(subCat.index)
                 predefs.extend(self.getAllPredefines(subCat))
 
             return predefs
         else:
             return ownPredefines
+
+    def getCategoryOfPredef(self, predef):
+        """Get the category of a predefined object.
+
+        Args:
+            predef (Predefined): Predefined Object you want to get the category from.
+
+        Returns:
+            Category: Category of the predefined (-1 if predefined not assigned).
+        """
+        
+        for category in self.categories:
+            if predef in category.predefines:
+                return category
+        
+        return -1
 
     def updatePreview(self, listObj):
         """Render the preview for the given FreeCAD listObject.
@@ -1160,22 +1177,10 @@ class TextureTab(QtGui.QWidget):
         """
 
         for predefine in self.predefines:
-            if predefine.treeItem.isSelected():
+            if predefine.listItem.isSelected():
                 return predefine
 
         return -1
-
-    def expandParentItems(self, item):
-        """Expand the parent item (recursive method).
-
-        Args:
-            item (QTreeWidgetItem): Child item
-        """
-
-        parent = item.parent()
-        if isinstance(parent, QtGui.QTreeWidgetItem):
-            parent.setExpanded(True)
-            self.expandParentItems(parent)
 
 
     ### Stuff done at the end ###
@@ -1636,14 +1641,14 @@ class Predefined:
             errorText += "set the path to the POV-Ray executable\n"
             errorText += "either in the settings of Render workbench\n"
             errorText += "or in the settings of Raytracing workbench\n"
-            print(errorText)
+            App.Console.PrintWarning(errorText)
             return -1
 
         # start povray
         subprocess.call([povExec, "-d", "width=256", "height=256",
                             os.path.join(thumbnailPath, self.getHash() + ".pov")])
 
-        print("Rendering thumbnail for predefined " +
+        App.Console.PrintMessage("Rendering thumbnail for predefined " +
                 self.identifier + " ... done")
 
 
