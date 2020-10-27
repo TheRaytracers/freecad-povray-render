@@ -622,8 +622,8 @@ class TextureTab(QtGui.QWidget):
         self.categoryCombo = QtGui.QComboBox()
 
         # texture list
-        self.textureList = QtGui.QTreeWidget()
-        self.textureList.setHeaderLabel("Predefined")
+        self.textureList = QtGui.QListWidget()
+        #self.textureList.setHeaderLabel("Predefined")
 
         self.textureListHeading = QtGui.QLabel("<b>Texture</b>")
 
@@ -652,7 +652,10 @@ class TextureTab(QtGui.QWidget):
         predefined = xml.parse(predefinedPath).getroot()
         categories = predefined.getchildren()
 
-        self.wrapperCategory = Category(None, [], [], -1)
+        # self.predefines[0] is the FreeCAD texture
+        self.wrapperCategory = Category(None, [], [self.predefines[0]], 0)
+        self.categories.append(self.wrapperCategory)
+        self.categoryCombo.addItem("All Textures")
 
         # read the predefined.xml and add the predefined defined in the XML
         for category in categories:
@@ -906,10 +909,9 @@ class TextureTab(QtGui.QWidget):
     def connectSignals(self):
         """Connect all necessary signals for the texture tab."""
 
-        self.objectList.itemSelectionChanged.connect(
-            self.updateTextureSettings)
-        self.textureList.itemSelectionChanged.connect(
-            self.updateSelectedListObject)
+        self.objectList.itemSelectionChanged.connect(self.updateTextureSettings)
+        self.textureList.itemSelectionChanged.connect(self.updateSelectedListObject)
+        self.categoryCombo.currentIndexChanged.connect(self.updatePredefinedList)
 
         self.scaleX.editingFinished.connect(self.updateSelectedListObject)
         self.scaleY.editingFinished.connect(self.updateSelectedListObject)
@@ -919,18 +921,16 @@ class TextureTab(QtGui.QWidget):
         self.rotationY.editingFinished.connect(self.updateSelectedListObject)
         self.rotationZ.editingFinished.connect(self.updateSelectedListObject)
 
-        self.translationX.editingFinished.connect(
-            self.updateSelectedListObject)
-        self.translationY.editingFinished.connect(
-            self.updateSelectedListObject)
-        self.translationZ.editingFinished.connect(
-            self.updateSelectedListObject)
+        self.translationX.editingFinished.connect(self.updateSelectedListObject)
+        self.translationY.editingFinished.connect(self.updateSelectedListObject)
+        self.translationZ.editingFinished.connect(self.updateSelectedListObject)
 
     def disconnectSignals(self):
         """Connect all necessary signals for the texture tab."""
 
         self.objectList.itemSelectionChanged.disconnect()
         self.textureList.itemSelectionChanged.disconnect()
+        self.categoryCombo.currentIndexChanged.disconnect()
 
         self.scaleX.editingFinished.disconnect()
         self.scaleY.editingFinished.disconnect()
@@ -1032,6 +1032,35 @@ class TextureTab(QtGui.QWidget):
         # update preview
         self.updatePreview(selectedListObj)
 
+    def updatePredefinedList(self):
+        """Update the shown predefines when the category changed."""
+
+        currentCategory = self.getSelectedCategory()
+
+        # remove all items
+        while self.textureList.count() > 0:
+            self.textureList.takeItem(0)
+
+        # get new predefines
+        newPredefines = self.getAllPredefines(currentCategory)
+
+        # add new items to list
+        for predef in newPredefines:
+            self.textureList.addItem(predef.listItem)
+
+    def getAllPredefines(self, category):
+        ownPredefines = category.predefines
+
+        if category.subCategories is not []:
+            predefs = ownPredefines
+            for subCat in category.subCategories:
+                print(subCat.index)
+                predefs.extend(self.getAllPredefines(subCat))
+
+            return predefs
+        else:
+            return ownPredefines
+
     def updatePreview(self, listObj):
         """Render the preview for the given FreeCAD listObject.
 
@@ -1096,6 +1125,19 @@ class TextureTab(QtGui.QWidget):
         fileContent += '}\n'
 
         self.preview.render(fileContent)
+
+    def getSelectedCategory(self):
+        """Get the currently selected category.
+
+        Returns:
+            Category: Currently selected Category Object.
+        """
+
+        for categoryObj in self.categories:
+            if self.categoryCombo.currentIndex() == categoryObj.index:
+                return categoryObj
+
+        return -1
 
     def getSelectedListObject(self):
         """Get the currently selected listObject.
