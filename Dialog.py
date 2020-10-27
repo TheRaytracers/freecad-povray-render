@@ -972,18 +972,14 @@ class TextureTab(QtGui.QWidget):
         self.translationY.setValue(selectedListObj.translationY)
         self.translationZ.setValue(selectedListObj.translationZ)
 
-        # unselect all textures
-        for predefine in self.predefines:
-            predefine.listItem.setSelected(False)
-
-        # select the right predefined
-        selectedListObj.predefObject.listItem.setSelected(True)
-
-        self.connectSignals()
-
         # select right category
         category = self.getCategoryOfPredef(selectedListObj.predefObject)
         self.categoryCombo.setCurrentIndex(category.index)
+
+        # update shown predefines
+        # slot won't be called if both objects are in the same category
+        self.connectSignals()
+        self.updatePredefinedList()
 
         # set comment
         self.commentLabel.setText(selectedListObj.predefObject.comment)
