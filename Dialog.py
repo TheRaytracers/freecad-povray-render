@@ -623,7 +623,12 @@ class TextureTab(QtGui.QWidget):
 
         # texture list
         self.textureList = QtGui.QListWidget()
-        #self.textureList.setHeaderLabel("Predefined")
+        self.textureList.setFlow(QtGui.QListView.LeftToRight)
+        self.textureList.setResizeMode(QtGui.QListView.Adjust)
+        self.textureList.setGridSize(QtCore.QSize(128, 128))
+        self.textureList.setIconSize(QtCore.QSize(100, 100))
+        self.textureList.setViewMode(QtGui.QListView.IconMode)
+        self.textureList.setMovement(QtGui.QListView.Static)
 
         self.textureListHeading = QtGui.QLabel("<b>Texture</b>")
 
@@ -643,7 +648,9 @@ class TextureTab(QtGui.QWidget):
                 "",
                 "",
                 self.fcTexItem))
-        #self.fcTexItem.setSelected(True)
+
+        self.fcTexItem.setIcon(QtGui.QIcon(
+            thumbnailPath + os.sep + self.predefines[0].getHash() + ".png"))
 
         # get the predefined.xml
         predefinedPath = os.path.join(os.path.dirname(
@@ -887,6 +894,8 @@ class TextureTab(QtGui.QWidget):
                 inc,
                 comment,
                 listItem)
+
+            newPredefined.listItem.setIcon(QtGui.QIcon(thumbnailPath + os.sep + newPredefined.getHash() + ".png"))
 
             self.predefines.append(newPredefined)
 
