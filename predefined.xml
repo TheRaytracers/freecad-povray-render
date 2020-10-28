@@ -7,6 +7,7 @@
         <Predef inc="glass.inc" material="M_Glass3" pigment="Col_Glass_Winebottle" interior="I_Glass_Dispersion1">Winebottle glass</Predef>
         <Predef inc="glass.inc" material="M_Glass" pigment="Col_Glass_Beerbottle">Beerbottle glass</Predef>
         <Predef inc="glass.inc" texture="T_Glass3" normal="bumps 1" interior="ior 1.5">Milky glass</Predef>
+        <Predef texture="Polished_Chrome" finish="diffuse 0.85  phong 1">Mirror</Predef>
     </Glass>
     <Metal>
         <polished>
@@ -31,16 +32,125 @@
         </oxidized>
     </Metal>
     <Stone>
-        <Predef pigment="White_Marble">White Marble</Predef>
+        <Marble>
+            <Predef pigment="White_Marble">White Marble</Predef>
+            <Predef inc="textures.inc" pigment="Blood_Marble">Blood Marble</Predef>
+            <Predef inc="textures.inc" pigment="Red_Marble" normal="bumps 0.5 scale 0.05">Red Marble</Predef>
+        </Marble>
+        <Agate>
+            <Predef inc="textures.inc" pigment="Blue_Agate">Blue Agate</Predef>
+            <Predef inc="textures.inc" pigment="Brown_Agate" normal="bumps 0.5 scale 0.015">Brown Agate</Predef>
+            <Predef inc="textures.inc" pigment="Sapphire_Agate">Sapphire Agate</Predef>
+        </Agate>
+        <Granite>
+            <Predef inc="stones.inc" texture="T_Grnt1">Granite 1</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt2">Granite 2</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt3">Granite 3</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt4">Granite 4</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt5">Granite 5</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt6">Granite 6</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt7">Granite 7</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt8">Granite 8</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt9">Granite 9</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt10">Granite 10</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt11">Granite 11</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt12">Granite 12</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt13">Granite 13</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt14">Granite 14</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt15">Granite 15</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt16">Granite 16</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt17">Granite 17</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt18">Granite 18</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt19">Granite 19</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt20">Granite 20</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt21">Granite 21</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt22">Granite 22</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt23">Granite 23</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt24">Granite 24</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt25">Granite 25</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt26">Granite 26</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt27">Granite 27</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt28">Granite 28</Predef>
+            <Predef inc="stones.inc" texture="T_Grnt29">Granite 29</Predef>
+        </Granite>
+        
+
+        <Predef inc="textures.inc" pigment="Pink_Granite">Pink Granite</Predef>
+        <Predef inc="textures.inc" texture="PinkAlabaster">Pink Alabaster</Predef>
+        <Predef inc="textures.inc" pigment="Jade" normal="bumps 0.5 scale 0.05">Jade</Predef>
         <Predef pigment="color Black" finish="ambient 0.35&#10;brilliance 2&#10;diffuse 0.3&#10;metallic&#10;specular 0.80&#10;roughness 1/20&#10;reflection 0.1">Shungit</Predef>
     </Stone>
     <Wood>
-        <Predef inc="woods.inc" texture="T_Wood7">Generic Wood</Predef>
-        <Predef texture="EMBWood1">Walnut</Predef>
-        <Predef texture="Cherry_Wood">Cherry</Predef>
-        <Predef texture="Pine_Wood">Pine</Predef>
+        <Predef texture="Cherry_Wood">Cherry Wood</Predef>
+        <Predef texture="Dark_Wood">Dark Wood</Predef>
+        <Predef texture="Tan_Wood">Tan Wood</Predef>
+        <Predef texture="White_Wood">White Wood</Predef>
+        <Predef texture="Tom_Wood">Tom Wood</Predef>
         <Predef texture="Rosewood">Rosewood</Predef>
-        <Predef texture="DMFLightOak">Oak</Predef>
+        <Predef texture="Sandalwood">Sandal Wood</Predef>
+        <Predef texture="Cork">Cork</Predef>
+        <Predef texture="Cork" normal="bumps 0.75 scale 0.015">Bumped Cork</Predef>
+
+        <Pine>
+            <Predef texture="Pine_Wood">Pine Wood</Predef>
+            <Predef texture="Yellow_Pine">Yellow Pine</Predef>
+            <Predef pigment="wood turbulence 0.02 octaves 4 lambda 3 scale 0.175  rotate &lt;2, 3, 0> color_map { [0.0 color rgb &lt;1.00, 0.88, 0.54>] [0.1 color rgb &lt;1.00, 0.80, 0.54>] [0.5 color rgb &lt;0.70, 0.42, 0.23>] [0.7 color rgb &lt;0.70, 0.42, 0.23>] [1.0 color rgb &lt;1.00, 0.88, 0.54>]}">Pine Wood 1</Predef>
+            <Predef pigment="wood turbulence 0.02 octaves 4 lambda 3 scale 0.175  rotate &lt;2, 3, 0> color_map { [0.0 color rgb &lt;1.30, 0.99, 0.64>] [0.5 color rgb &lt;0.75, 0.39, 0.17>] [0.7 color rgb &lt;0.75, 0.39, 0.17>] [1.0 color rgb &lt;1.30, 0.99, 0.64>]}">Pine Wood 2</Predef>
+            <Predef pigment="wood turbulence 0.02 octaves 4 lambda 3 scale 0.175  rotate &lt;2, 3, 0> color_map { [0.0 color rgb &lt;1.30, 0.99, 0.64>] [0.5 color rgb &lt;0.75, 0.39, 0.17>] [0.7 color rgb &lt;0.75, 0.39, 0.17>] [1.0 color rgb &lt;1.30, 0.99, 0.64>]}">Pine Wood 3</Predef>
+        </Pine>
+
+        <EMB>
+            <Predef texture="EMBWood1">EMB Wood 1</Predef>
+        </EMB>
+
+        <DMF>
+            <Predef texture="DMFDarkOak">DMF Dark Oak</Predef>
+            <Predef texture="DMFLightOak">DMF Light Oak</Predef>
+            <Predef texture="DMFWood1">DMF Wood 1</Predef>
+            <Predef texture="DMFWood2">DMF Wood 2</Predef>
+            <Predef texture="DMFWood3">DMF Wood 3</Predef>
+            <Predef texture="DMFWood4">DMF Wood 4</Predef>
+            <Predef texture="DMFWood5">DMF Wood 5</Predef>
+            <Predef texture="DMFWood6">DMF Wood 6</Predef>
+        </DMF>
+
+        <OtherWoods>
+            <Predef inc="woods.inc" texture="T_Wood1">Wood 1</Predef>
+            <Predef inc="woods.inc" texture="T_Wood2">Wood 2</Predef>
+            <Predef inc="woods.inc" texture="T_Wood3">Wood 3</Predef>
+            <Predef inc="woods.inc" texture="T_Wood4">Wood 4</Predef>
+            <Predef inc="woods.inc" texture="T_Wood5">Wood 5</Predef>
+            <Predef inc="woods.inc" texture="T_Wood6">Wood 6</Predef>
+            <Predef inc="woods.inc" texture="T_Wood7">Wood 7</Predef>
+            <Predef inc="woods.inc" texture="T_Wood8">Wood 8</Predef>
+            <Predef inc="woods.inc" texture="T_Wood9">Wood 9</Predef>
+            <Predef inc="woods.inc" texture="T_Wood10">Wood 10</Predef>
+            <Predef inc="woods.inc" texture="T_Wood11">Wood 11</Predef>
+            <Predef inc="woods.inc" texture="T_Wood12">Wood 12</Predef>
+            <Predef inc="woods.inc" texture="T_Wood13">Wood 13</Predef>
+            <Predef inc="woods.inc" texture="T_Wood14">Wood 14</Predef>
+            <Predef inc="woods.inc" texture="T_Wood15">Wood 15</Predef>
+            <Predef inc="woods.inc" texture="T_Wood16">Wood 16</Predef>
+            <Predef inc="woods.inc" texture="T_Wood17">Wood 17</Predef>
+            <Predef inc="woods.inc" texture="T_Wood18">Wood 18</Predef>
+            <Predef inc="woods.inc" texture="T_Wood19">Wood 19</Predef>
+            <Predef inc="woods.inc" texture="T_Wood20">Wood 20</Predef>
+            <Predef inc="woods.inc" texture="T_Wood21">Wood 21</Predef>
+            <Predef inc="woods.inc" texture="T_Wood22">Wood 22</Predef>
+            <Predef inc="woods.inc" texture="T_Wood23">Wood 23</Predef>
+            <Predef inc="woods.inc" texture="T_Wood24">Wood 24</Predef>
+            <Predef inc="woods.inc" texture="T_Wood25">Wood 25</Predef>
+            <Predef inc="woods.inc" texture="T_Wood26">Wood 26</Predef>
+            <Predef inc="woods.inc" texture="T_Wood27">Wood 27</Predef>
+            <Predef inc="woods.inc" texture="T_Wood28">Wood 28</Predef>
+            <Predef inc="woods.inc" texture="T_Wood29">Wood 29</Predef>
+            <Predef inc="woods.inc" texture="T_Wood30">Wood 30</Predef>
+            <Predef inc="woods.inc" texture="T_Wood31">Wood 31</Predef>
+            <Predef inc="woods.inc" texture="T_Wood32">Wood 32</Predef>
+            <Predef inc="woods.inc" texture="T_Wood33">Wood 33</Predef>
+            <Predef inc="woods.inc" texture="T_Wood34">Wood 34</Predef>
+            <Predef inc="woods.inc" texture="T_Wood35">Wood 35</Predef>
+        </OtherWoods>
     </Wood>
     <Floor>
         <!-- We used the parquet texture for the floor from https://wiki.freecadweb.org/Tutorial_FreeCAD_POV_ray and adapted it for this specific syntax. Thanks to the creators of the tutorial. The tutorial is licensed under CC 3.0: https://creativecommons.org/licenses/by/3.0/ -->
@@ -63,4 +173,3 @@
         <Predef media="emission&#10;&#9;&#9;&#9;color rgb&lt;1.0, 0.25, 1,0>&#10;&#9;&#9;&#9;intervals 3&#10;&#9;&#9;&#9;samples 32&#10;&#9;&#9;&#9;method 3&#10;&#9;&#9;&#9;aa_threshold 0.1&#10;&#9;&#9;&#9;aa_level 5&#10;&#9;&#9;&#9;density {&#10;&#9;&#9;&#9;&#9;spherical&#10;&#9;&#9;&#9;&#9;color_map {&#10;&#9;&#9;&#9;&#9;&#9;[0 rgb 0]&#10;&#9;&#9;&#9;&#9;&#9;[0.7 rgb 0.4]&#10;&#9;&#9;&#9;&#9;&#9;[1 rgb 0.5]&#10;&#9;&#9;&#9;&#9;}&#10;&#9;&#9;&#9;}&#10;&#9;&#9;" pigment="color rgbf&lt;1,1,1,1>">Plasma</Predef>
     </Media>
 </Predefined>
-

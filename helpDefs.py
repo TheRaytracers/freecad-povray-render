@@ -146,4 +146,3 @@ initGui__prefPagePath = os.path.join(os.path.dirname(__file__), "prefPage.ui")
 
 # path to thumbnails
 thumbnailPath = os.path.join(os.path.dirname(__file__), "thumbnails")
-print(thumbnailPath)

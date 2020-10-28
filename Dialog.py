@@ -832,87 +832,86 @@ class TextureTab(QtGui.QWidget):
         """
 
         childNodes = xmlNode.getchildren()
+        
+        # create new category
+        newCategory = Category(parentCategory, [], [], self.categoryCombo.count())
+        parentCategory.subCategories.append(newCategory)
+        indentation = ""
+        for i in range(layer):
+            indentation += "--"
+        self.categoryCombo.addItem(indentation + " " + xmlNode.tag)
+        self.categories.append(newCategory)
 
-        if childNodes == []:
-            listItem = QtGui.QListWidgetItem(xmlNode.text)
-            # get all attributes
-            attr = xmlNode.attrib
-            if "material" in attr:
-                material = attr["material"]
+        for node in childNodes:
+            if node.tag == "Predef":
+                listItem = QtGui.QListWidgetItem(node.text)
+                # get all attributes
+                attr = node.attrib
+                if "material" in attr:
+                    material = attr["material"]
+                else:
+                    material = ""
+
+                if "texture" in attr:
+                    texture = attr["texture"]
+                else:
+                    texture = ""
+
+                if "pigment" in attr:
+                    pigment = attr["pigment"]
+                else:
+                    pigment = ""
+
+                if "finish" in attr:
+                    finish = attr["finish"]
+                else:
+                    finish = ""
+
+                if "normal" in attr:
+                    normal = attr["normal"]
+                else:
+                    normal = ""
+
+                if "interior" in attr:
+                    interior = attr["interior"]
+                else:
+                    interior = ""
+
+                if "media" in attr:
+                    media = attr["media"]
+                else:
+                    media = ""
+
+                if "inc" in attr:
+                    inc = attr["inc"]
+                else:
+                    inc = ""
+
+                if "comment" in attr:
+                    comment = attr["comment"]
+                else:
+                    comment = ""
+
+                newPredefined = Predefined(
+                    node.text,
+                    material,
+                    texture,
+                    pigment,
+                    finish,
+                    normal,
+                    interior,
+                    media,
+                    inc,
+                    comment,
+                    listItem)
+
+                newPredefined.listItem.setIcon(QtGui.QIcon(thumbnailPath + os.sep + newPredefined.getHash() + ".png"))
+
+                self.predefines.append(newPredefined)
+
+                newCategory.predefines.append(newPredefined)
+            
             else:
-                material = ""
-
-            if "texture" in attr:
-                texture = attr["texture"]
-            else:
-                texture = ""
-
-            if "pigment" in attr:
-                pigment = attr["pigment"]
-            else:
-                pigment = ""
-
-            if "finish" in attr:
-                finish = attr["finish"]
-            else:
-                finish = ""
-
-            if "normal" in attr:
-                normal = attr["normal"]
-            else:
-                normal = ""
-
-            if "interior" in attr:
-                interior = attr["interior"]
-            else:
-                interior = ""
-
-            if "media" in attr:
-                media = attr["media"]
-            else:
-                media = ""
-
-            if "inc" in attr:
-                inc = attr["inc"]
-            else:
-                inc = ""
-
-            if "comment" in attr:
-                comment = attr["comment"]
-            else:
-                comment = ""
-
-            newPredefined = Predefined(
-                xmlNode.text,
-                material,
-                texture,
-                pigment,
-                finish,
-                normal,
-                interior,
-                media,
-                inc,
-                comment,
-                listItem)
-
-            newPredefined.listItem.setIcon(QtGui.QIcon(thumbnailPath + os.sep + newPredefined.getHash() + ".png"))
-
-            self.predefines.append(newPredefined)
-
-            parentCategory.predefines.append(newPredefined)
-
-        else:
-            # create new category
-            newCategory = Category(parentCategory, [], [], self.categoryCombo.count())
-            parentCategory.subCategories.append(newCategory)
-            indentation = ""
-            for i in range(layer):
-                indentation += "--"
-            self.categoryCombo.addItem(indentation + " " + xmlNode.tag)
-            self.categories.append(newCategory)
-
-            for node in childNodes:
-                # call method for child nodes
                 self.predefXmlToList(node, newCategory, layer + 1)
 
     def connectSignals(self):
@@ -1627,8 +1626,10 @@ class Predefined:
             }"""
 
         povCode += headerCode
+        print(self.identifier + " : " + self.inc)
         
-        if self.inc != None and self.inc != "":  # only if include file is necessary
+        if self.inc is not None and self.inc is not "":  # only if include file is necessary
+            print("add inc file")
             povCode += "#include \"" + self.inc + "\"\n"
             
         povCode += "#declare predef_material = " + self.toPovMaterial() + objectCode
