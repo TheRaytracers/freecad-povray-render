@@ -1437,7 +1437,7 @@ class Preview(QtGui.QWidget):
         if previewDisable is not None:
             self.disableCheckBox.setChecked(strToBool(previewDisable))
         else:
-            self.disableCheckBox.setChecked(False)
+            self.disableCheckBox.setChecked(True)
 
         previewWidth = settingsObject.value("previewWidth")
         if previewWidth is not None and previewWidth != 0 and previewWidth != -1:
@@ -1460,8 +1460,7 @@ class Preview(QtGui.QWidget):
             settingsObject (QSettings Object): QSettings object to store the data
         """
         settingsObject.beginGroup(self.qSettingsGroup + self.name)
-        settingsObject.setValue(
-            "previewDisable", self.disableCheckBox.isChecked())
+        settingsObject.setValue("previewDisable", self.disableCheckBox.isChecked())
         settingsObject.setValue("previewWidth", self.previewWidth)
         settingsObject.setValue("previewHeight", self.previewHeight)
         settingsObject.endGroup()
