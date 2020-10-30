@@ -1052,7 +1052,8 @@ class TextureTab(QtGui.QWidget):
 
         # select the right predef
         selectedListObj = self.getSelectedListObject()
-        selectedListObj.predefObject.listItem.setSelected(True)
+        if selectedListObj != -1:
+            selectedListObj.predefObject.listItem.setSelected(True)
 
         self.connectSignals()
 
