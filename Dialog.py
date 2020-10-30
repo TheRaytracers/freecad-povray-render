@@ -625,8 +625,10 @@ class TextureTab(QtGui.QWidget):
         self.textureList = QtGui.QListWidget()
         self.textureList.setFlow(QtGui.QListView.LeftToRight)
         self.textureList.setResizeMode(QtGui.QListView.Adjust)
-        self.textureList.setGridSize(QtCore.QSize(128, 128))
-        self.textureList.setIconSize(QtCore.QSize(100, 100))
+        gridSize = App.ParamGet(preferences.prefPath).GetInt("ThumbnailGridSize", 128)
+        iconSize = App.ParamGet(preferences.prefPath).GetInt("ThumbnailIconSize", 100)
+        self.textureList.setGridSize(QtCore.QSize(gridSize, gridSize))
+        self.textureList.setIconSize(QtCore.QSize(iconSize, iconSize))
         self.textureList.setViewMode(QtGui.QListView.IconMode)
         self.textureList.setMovement(QtGui.QListView.Static)
 
