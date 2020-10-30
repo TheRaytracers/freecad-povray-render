@@ -598,6 +598,9 @@ class TextureTab(QtGui.QWidget):
         # signals and slots
         self.connectSignals()
 
+        # show predefines
+        self.updatePredefinedList()
+
         # set layouts
         self.wrapperLayout.addWidget(self.listsWidget)
         self.wrapperLayout.addWidget(self.textureSettingsWidget)
