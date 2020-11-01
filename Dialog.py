@@ -1057,6 +1057,7 @@ class TextureTab(QtGui.QWidget):
         selectedListObj = self.getSelectedListObject()
         if selectedListObj != -1:
             selectedListObj.predefObject.listItem.setSelected(True)
+            self.textureList.scrollToItem(selectedListObj.predefObject.listItem)
 
         self.connectSignals()
 
