@@ -157,10 +157,10 @@
         <Predef inc="woods.inc" pigment="wood color_map { M_Wood8A }turbulence 0.5 scale&lt;200, 20, 20>" finish="ambient 0.0 reflection 0.1 specular 0.2" normal="average normal_map {[1 gradient y 2 slope_map { [0&lt;0,1>][0.05 &lt;1,0>][0.95 &lt;1,0>][1 &lt;0,-1>] } scale 80][1 wood 0.5 slope_map { [0 &lt;0,0>][0.5 &lt;0.5,1>][1 &lt;1,0>] }turbulence 0.5 scale &lt;200, 20, 20>]}" comment="You have to put this texture on a big object to see how it really looks (e.g. 1mx1m surface)">Parquet</Predef>
     </Floor>
     <Water>
-        <predef texture="Polished_Chrome" inc="textures.inc">Opaque, flat, reflecting water</predef>
-        <predef texture="Polished_Chrome" normal="bumps 0.03 scale &lt;1,0.25,0.25>*1 turbulence 0.6" inc="textures.inc">Moderatly moved reflecting water</predef>
-        <predef texture="Polished_Chrome" normal="crackle 0.15 scale 0.75 turbulence 0.3 translate &lt;-1,0,5>" inc="textures.inc">Moved, reflecting water</predef>
-        <predef texture="Polished_Chrome" normal="bozo 1.75 scale &lt;2.0,1,0.3>*0.20 rotate &lt;0,10,0> turbulence 0.9 translate &lt;0,0,-2>" inc="textures.inc">By wind moved, reflecting water</predef>
+        <Predef texture="Polished_Chrome" inc="textures.inc">Opaque, flat, reflecting water</Predef>
+        <Predef texture="Polished_Chrome" normal="bumps 0.03 scale &lt;1,0.25,0.25>*1 turbulence 0.6" inc="textures.inc">Moderatly moved reflecting water</Predef>
+        <Predef texture="Polished_Chrome" normal="crackle 0.15 scale 0.75 turbulence 0.3 translate &lt;-1,0,5>" inc="textures.inc">Moved, reflecting water</Predef>
+        <Predef texture="Polished_Chrome" normal="bozo 1.75 scale &lt;2.0,1,0.3>*0.20 rotate &lt;0,10,0> turbulence 0.9 translate &lt;0,0,-2>" inc="textures.inc">By wind moved, reflecting water</Predef>
     </Water>
     <Pattern>
         <Predef pigment="checker color White color Black">Checker</Predef>
