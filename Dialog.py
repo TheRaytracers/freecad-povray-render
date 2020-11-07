@@ -1643,10 +1643,8 @@ class Predefined:
             }"""
 
         povCode += headerCode
-        print(self.identifier + " : " + self.inc)
         
         if self.inc is not None and self.inc is not "":  # only if include file is necessary
-            print("add inc file")
             povCode += "#include \"" + self.inc + "\"\n"
             
         povCode += "#declare predef_material = " + self.toPovMaterial() + objectCode
