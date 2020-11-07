@@ -668,6 +668,10 @@ class TextureTab(QtGui.QWidget):
         self.wrapperCategory = Category(None, [], [self.predefines[0]], 0)
         self.categories.append(self.wrapperCategory)
         self.categoryCombo.addItem("All Textures")
+        # set bold "All Textures"
+        font = QtGui.QFont()
+        font.setBold(True)
+        self.categoryCombo.setItemData(0, font, QtCore.Qt.FontRole)
 
         # read the predefined.xml and add the predefined defined in the XML
         for category in categories:
@@ -844,8 +848,15 @@ class TextureTab(QtGui.QWidget):
         indentation = ""
         for i in range(layer):
             indentation += "--"
+
         self.categoryCombo.addItem(indentation + " " + xmlNode.tag)
         self.categories.append(newCategory)
+
+        # set bold text
+        if layer == 0:
+            font = QtGui.QFont()
+            font.setBold(True)
+            self.categoryCombo.setItemData(self.categoryCombo.count()-1, font, QtCore.Qt.FontRole)
 
         for node in childNodes:
             if node.tag == "Predef":
