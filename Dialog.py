@@ -598,6 +598,9 @@ class TextureTab(QtGui.QWidget):
         # signals and slots
         self.connectSignals()
 
+        # show predefines
+        self.updatePredefinedList()
+
         # set layouts
         self.wrapperLayout.addWidget(self.listsWidget)
         self.wrapperLayout.addWidget(self.textureSettingsWidget)
@@ -617,16 +620,26 @@ class TextureTab(QtGui.QWidget):
     def addTextureList(self):
         """Add the nested list with the predefined textures on the right side."""
 
+        # category list
+        self.categories = []
+        self.categoryCombo = QtGui.QComboBox()
+
         # texture list
-        self.textureList = QtGui.QTreeWidget()
-        self.textureList.setHeaderLabel("Predefined")
+        self.textureList = QtGui.QListWidget()
+        self.textureList.setFlow(QtGui.QListView.LeftToRight)
+        self.textureList.setResizeMode(QtGui.QListView.Adjust)
+        gridSize = App.ParamGet(preferences.prefPath).GetInt("ThumbnailGridSize", 128)
+        iconSize = App.ParamGet(preferences.prefPath).GetInt("ThumbnailIconSize", 100)
+        self.textureList.setGridSize(QtCore.QSize(gridSize, gridSize))
+        self.textureList.setIconSize(QtCore.QSize(iconSize, iconSize))
+        self.textureList.setViewMode(QtGui.QListView.IconMode)
+        self.textureList.setMovement(QtGui.QListView.Static)
 
         self.textureListHeading = QtGui.QLabel("<b>Texture</b>")
 
         self.predefines = []
         # add FreeCAD texture
-        self.fcTexItem = QtGui.QTreeWidgetItem(
-            self.textureList, ["FreeCAD Texture"])
+        self.fcTexItem = QtGui.QListWidgetItem("FreeCAD Texture")
         self.predefines.append(
             Predefined(
                 "FreeCAD Texture",
@@ -640,22 +653,34 @@ class TextureTab(QtGui.QWidget):
                 "",
                 "",
                 self.fcTexItem))
-        self.fcTexItem.setSelected(True)
+
+        self.fcTexItem.setIcon(QtGui.QIcon(
+            thumbnailPath + os.sep + self.predefines[0].getHash() + ".png"))
 
         # get the predefined.xml
         predefinedPath = os.path.join(os.path.dirname(
-            __file__), "predefined.xml")  # get workbench path
+            __file__), "predefined.xml")
 
         predefined = xml.parse(predefinedPath).getroot()
         categories = predefined.getchildren()
 
+        # self.predefines[0] is the FreeCAD texture
+        self.wrapperCategory = Category(None, [], [self.predefines[0]], 0)
+        self.categories.append(self.wrapperCategory)
+        self.categoryCombo.addItem("All Textures")
+        # set bold "All Textures"
+        font = QtGui.QFont()
+        font.setBold(True)
+        self.categoryCombo.setItemData(0, font, QtCore.Qt.FontRole)
+
         # read the predefined.xml and add the predefined defined in the XML
         for category in categories:
-            self.predefXmlToList(category, self.textureList)
+            self.predefXmlToList(category, self.wrapperCategory, 0)
 
         # add the list to the layouts and widgets
         self.listsLayout.addWidget(self.textureListHeading, 0, 1)
-        self.listsLayout.addWidget(self.textureList, 1, 1)
+        self.listsLayout.addWidget(self.categoryCombo, 1, 1)
+        self.listsLayout.addWidget(self.textureList, 2, 1)
 
         self.listsWidget.setLayout(self.listsLayout)
 
@@ -713,13 +738,13 @@ class TextureTab(QtGui.QWidget):
 
         # add the object list to the layouts
         self.listsLayout.addWidget(self.objectListHeading, 0, 0)
-        self.listsLayout.addWidget(self.objectList, 1, 0)
+        self.listsLayout.addWidget(self.objectList, 1, 0, 2, 1)
 
         # add comment label
         self.commentLabel = QtGui.QLabel()
         self.commentLabel.setStyleSheet("QLabel { font-weight : bold;}")
         self.commentLabel.setWordWrap(True)
-        self.listsLayout.addWidget(self.commentLabel, 2, 0, 1, 2)
+        self.listsLayout.addWidget(self.commentLabel, 3, 0, 1, 2)
 
     def addScaleRotateTranslate(self):
         """Add the scale, rotate, translate menu."""
@@ -807,68 +832,84 @@ class TextureTab(QtGui.QWidget):
 
         self.textureSettingsWidget.setLayout(self.textureSettingsLayout)
 
-    def predefXmlToList(self, xmlNode, parentNode):
+    def predefXmlToList(self, xmlNode, parentCategory, layer):
         """Convert the given XML node to a predefined object and add an item to the predef list (recursive method).
 
         Args:
             xmlNode (xmlNode Object): The XML node that should be converted.
-            parentNode (QTreeWidgetItem): QTreeWidgetItem to which the newly created item should be added as a child.
+            parentCategory (Category): Category to which the newly created predefined/category should be added as a child.
         """
 
         childNodes = xmlNode.getchildren()
+        
+        # create new category
+        newCategory = Category(parentCategory, [], [], self.categoryCombo.count())
+        parentCategory.subCategories.append(newCategory)
+        indentation = ""
+        for i in range(layer):
+            indentation += "--"
 
-        if childNodes == []:
-            treeItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.text])
-            # get all attributes
-            attr = xmlNode.attrib
-            if "material" in attr:
-                material = attr["material"]
-            else:
-                material = ""
+        self.categoryCombo.addItem(indentation + " " + xmlNode.tag)
+        self.categories.append(newCategory)
 
-            if "texture" in attr:
-                texture = attr["texture"]
-            else:
-                texture = ""
+        # set bold text
+        if layer == 0:
+            font = QtGui.QFont()
+            font.setBold(True)
+            self.categoryCombo.setItemData(self.categoryCombo.count()-1, font, QtCore.Qt.FontRole)
 
-            if "pigment" in attr:
-                pigment = attr["pigment"]
-            else:
-                pigment = ""
+        for node in childNodes:
+            if node.tag == "Predef":
+                listItem = QtGui.QListWidgetItem(node.text)
+                # get all attributes
+                attr = node.attrib
+                if "material" in attr:
+                    material = attr["material"]
+                else:
+                    material = ""
 
-            if "finish" in attr:
-                finish = attr["finish"]
-            else:
-                finish = ""
+                if "texture" in attr:
+                    texture = attr["texture"]
+                else:
+                    texture = ""
 
-            if "normal" in attr:
-                normal = attr["normal"]
-            else:
-                normal = ""
+                if "pigment" in attr:
+                    pigment = attr["pigment"]
+                else:
+                    pigment = ""
 
-            if "interior" in attr:
-                interior = attr["interior"]
-            else:
-                interior = ""
+                if "finish" in attr:
+                    finish = attr["finish"]
+                else:
+                    finish = ""
 
-            if "media" in attr:
-                media = attr["media"]
-            else:
-                media = ""
+                if "normal" in attr:
+                    normal = attr["normal"]
+                else:
+                    normal = ""
 
-            if "inc" in attr:
-                inc = attr["inc"]
-            else:
-                inc = ""
+                if "interior" in attr:
+                    interior = attr["interior"]
+                else:
+                    interior = ""
 
-            if "comment" in attr:
-                comment = attr["comment"]
-            else:
-                comment = ""
+                if "media" in attr:
+                    media = attr["media"]
+                else:
+                    media = ""
 
-            self.predefines.append(
-                Predefined(
-                    xmlNode.text,
+                if "inc" in attr:
+                    inc = attr["inc"]
+                else:
+                    inc = ""
+
+                if "comment" in attr:
+                    comment = attr["comment"]
+                else:
+                    comment = ""
+
+                newPredefined = Predefined(
+                    node.text,
                     material,
                     texture,
                     pigment,
@@ -878,21 +919,23 @@ class TextureTab(QtGui.QWidget):
                     media,
                     inc,
                     comment,
-                    treeItem))
+                    listItem)
 
-        else:
-            categoryItem = QtGui.QTreeWidgetItem(parentNode, [xmlNode.tag])
-            for node in childNodes:
-                # call method for child nodes
-                self.predefXmlToList(node, categoryItem)
+                newPredefined.listItem.setIcon(QtGui.QIcon(thumbnailPath + os.sep + newPredefined.getHash() + ".png"))
+
+                self.predefines.append(newPredefined)
+
+                newCategory.predefines.append(newPredefined)
+            
+            else:
+                self.predefXmlToList(node, newCategory, layer + 1)
 
     def connectSignals(self):
         """Connect all necessary signals for the texture tab."""
 
-        self.objectList.itemSelectionChanged.connect(
-            self.updateTextureSettings)
-        self.textureList.itemSelectionChanged.connect(
-            self.updateSelectedListObject)
+        self.objectList.itemSelectionChanged.connect(self.updateTextureSettings)
+        self.textureList.itemSelectionChanged.connect(self.updateSelectedListObject)
+        self.categoryCombo.currentIndexChanged.connect(self.updatePredefinedList)
 
         self.scaleX.editingFinished.connect(self.updateSelectedListObject)
         self.scaleY.editingFinished.connect(self.updateSelectedListObject)
@@ -902,18 +945,16 @@ class TextureTab(QtGui.QWidget):
         self.rotationY.editingFinished.connect(self.updateSelectedListObject)
         self.rotationZ.editingFinished.connect(self.updateSelectedListObject)
 
-        self.translationX.editingFinished.connect(
-            self.updateSelectedListObject)
-        self.translationY.editingFinished.connect(
-            self.updateSelectedListObject)
-        self.translationZ.editingFinished.connect(
-            self.updateSelectedListObject)
+        self.translationX.editingFinished.connect(self.updateSelectedListObject)
+        self.translationY.editingFinished.connect(self.updateSelectedListObject)
+        self.translationZ.editingFinished.connect(self.updateSelectedListObject)
 
     def disconnectSignals(self):
         """Connect all necessary signals for the texture tab."""
 
         self.objectList.itemSelectionChanged.disconnect()
         self.textureList.itemSelectionChanged.disconnect()
+        self.categoryCombo.currentIndexChanged.disconnect()
 
         self.scaleX.editingFinished.disconnect()
         self.scaleY.editingFinished.disconnect()
@@ -955,15 +996,14 @@ class TextureTab(QtGui.QWidget):
         self.translationY.setValue(selectedListObj.translationY)
         self.translationZ.setValue(selectedListObj.translationZ)
 
-        # unselect all textures
-        for predefine in self.predefines:
-            predefine.treeItem.setSelected(False)
+        # select right category
+        category = self.getCategoryOfPredef(selectedListObj.predefObject)
+        self.categoryCombo.setCurrentIndex(category.index)
 
-        # select the right predefined
-        selectedListObj.predefObject.treeItem.setSelected(True)
-
-        # expand categories
-        self.expandParentItems(selectedListObj.predefObject.treeItem)
+        # update shown predefines
+        # slot won't be called if both objects are in the same category
+        self.connectSignals()
+        self.updatePredefinedList()
 
         # set comment
         self.commentLabel.setText(selectedListObj.predefObject.comment)
@@ -971,26 +1011,13 @@ class TextureTab(QtGui.QWidget):
         # update preview
         self.updatePreview(selectedListObj)
 
-        self.connectSignals()
-
     def updateSelectedListObject(self):
         """Update the listObject of the currently selected FreeCAD
         object when a predefined setting changed."""
 
         selectedListObj = self.getSelectedListObject()
         selectedPredefine = self.getSelectedPredefined()
-        if selectedListObj == -1 or selectedPredefine == -1:  # is no object or predefine selected
-            if selectedPredefine == -1:  # is only a category selected
-                # expand and select predef under the category
-                self.disconnectSignals()
-                selectedItems = self.textureList.selectedItems()
-                selected = selectedItems[0]
-                selected.setSelected(False)
-                selected.setExpanded(True)
-                childItem = selected.child(0)
-                self.connectSignals()
-                childItem.setSelected(True)
-
+        if selectedListObj == -1 or selectedPredefine == -1: # no object selected
             return -1  # abort
 
         # get the values for scaling and rotating
@@ -1014,6 +1041,64 @@ class TextureTab(QtGui.QWidget):
 
         # update preview
         self.updatePreview(selectedListObj)
+
+    def updatePredefinedList(self):
+        """Update the shown predefines when the category changed."""
+
+        self.disconnectSignals()
+
+        currentCategory = self.getSelectedCategory()
+
+        # remove all items
+        while self.textureList.count() > 0:
+            self.textureList.takeItem(0)
+
+        # get new predefines
+        newPredefines = self.getAllPredefines(currentCategory)
+
+        # add new items to list
+        for predef in newPredefines:
+            self.textureList.addItem(predef.listItem)
+
+        # unselect all items
+        for predefine in self.predefines:
+            predefine.listItem.setSelected(False)
+
+        # select the right predef
+        selectedListObj = self.getSelectedListObject()
+        if selectedListObj != -1:
+            selectedListObj.predefObject.listItem.setSelected(True)
+            self.textureList.scrollToItem(selectedListObj.predefObject.listItem)
+
+        self.connectSignals()
+
+    def getAllPredefines(self, category):
+        ownPredefines = category.predefines[:] # clone array
+
+        if category.subCategories is not []:
+            predefs = ownPredefines
+            for subCat in category.subCategories:
+                predefs.extend(self.getAllPredefines(subCat))
+
+            return predefs
+        else:
+            return ownPredefines
+
+    def getCategoryOfPredef(self, predef):
+        """Get the category of a predefined object.
+
+        Args:
+            predef (Predefined): Predefined Object you want to get the category from.
+
+        Returns:
+            Category: Category of the predefined (-1 if predefined not assigned).
+        """
+        
+        for category in self.categories:
+            if predef in category.predefines:
+                return category
+        
+        return -1
 
     def updatePreview(self, listObj):
         """Render the preview for the given FreeCAD listObject.
@@ -1068,7 +1153,7 @@ class TextureTab(QtGui.QWidget):
         fileContent += '\t\t}\n'
         fileContent += '}\n'
 
-        fileContent += self.exporter.listObjectToPov(listObj, "predef")
+        fileContent += listObj.toPov("predef")
 
         fileContent += 'box { <0,0,0>, <10.0, 10.0, 10.0>\n'
         fileContent += '\ttranslate <5.0, 5.0, -5.0>\n'
@@ -1079,6 +1164,19 @@ class TextureTab(QtGui.QWidget):
         fileContent += '}\n'
 
         self.preview.render(fileContent)
+
+    def getSelectedCategory(self):
+        """Get the currently selected category.
+
+        Returns:
+            Category: Currently selected Category Object.
+        """
+
+        for categoryObj in self.categories:
+            if self.categoryCombo.currentIndex() == categoryObj.index:
+                return categoryObj
+
+        return -1
 
     def getSelectedListObject(self):
         """Get the currently selected listObject.
@@ -1101,22 +1199,10 @@ class TextureTab(QtGui.QWidget):
         """
 
         for predefine in self.predefines:
-            if predefine.treeItem.isSelected():
+            if predefine.listItem.isSelected():
                 return predefine
 
         return -1
-
-    def expandParentItems(self, item):
-        """Expand the parent item (recursive method).
-
-        Args:
-            item (QTreeWidgetItem): Child item
-        """
-
-        parent = item.parent()
-        if isinstance(parent, QtGui.QTreeWidgetItem):
-            parent.setExpanded(True)
-            self.expandParentItems(parent)
 
 
     ### Stuff done at the end ###
@@ -1135,7 +1221,7 @@ class TextureTab(QtGui.QWidget):
         self.texIncContent = ""
 
         for obj in self.listObjects:  # iterate over all listObjects
-            self.texIncContent += self.exporter.listObjectToPov(obj)
+            self.texIncContent += obj.toPov()
 
     def createTextureInc(self, renderSettings):
         """Do the stuff for the texture inc file.
@@ -1367,7 +1453,7 @@ class Preview(QtGui.QWidget):
         if previewDisable is not None:
             self.disableCheckBox.setChecked(strToBool(previewDisable))
         else:
-            self.disableCheckBox.setChecked(False)
+            self.disableCheckBox.setChecked(True)
 
         previewWidth = settingsObject.value("previewWidth")
         if previewWidth is not None and previewWidth != 0 and previewWidth != -1:
@@ -1390,11 +1476,20 @@ class Preview(QtGui.QWidget):
             settingsObject (QSettings Object): QSettings object to store the data
         """
         settingsObject.beginGroup(self.qSettingsGroup + self.name)
-        settingsObject.setValue(
-            "previewDisable", self.disableCheckBox.isChecked())
+        settingsObject.setValue("previewDisable", self.disableCheckBox.isChecked())
         settingsObject.setValue("previewWidth", self.previewWidth)
         settingsObject.setValue("previewHeight", self.previewHeight)
         settingsObject.endGroup()
+
+
+class Category:
+    """Class to store all stuff for a category of predefined textures."""
+
+    def __init__(self, parent, subCategories, predefines, index):
+        self.parent = parent
+        self.subCategories = subCategories
+        self.predefines = predefines
+        self.index = index
 
 
 class Predefined:
@@ -1412,7 +1507,7 @@ class Predefined:
             media,
             inc,
             comment,
-            treeItem):
+            listItem):
         self.identifier = identifier
         self.material = material
         self.texture = texture
@@ -1423,7 +1518,7 @@ class Predefined:
         self.media = media
         self.inc = inc
         self.comment = comment
-        self.treeItem = treeItem
+        self.listItem = listItem
 
     def getHash(self):
         """Create a hash from all parts of the predefined (for identifying the predefined later).
@@ -1431,7 +1526,7 @@ class Predefined:
         Returns:
             str: The hash
         """
-        predefName = self.treeItem.text(0)
+        predefName = self.listItem.text()
 
         stgStr = (str(self.identifier) +
                   str(self.material) +
@@ -1446,6 +1541,136 @@ class Predefined:
         hashStr = hashlib.md5(stgStr.encode("UTF-8")).hexdigest()[:4]
 
         return stringCorrection(predefName) + hashStr
+
+    def toPovMaterial(self, closeBracket=True):
+        povCode = ""
+
+        povCode += "material { "
+
+        povCode += self.material + "\n"
+
+        #pigment and texture
+        if self.texture != "" or self.pigment != "" or self.normal != "" or self.finish != "":
+            povCode += "\ttexture { " + self.texture + "\n"
+
+            #pigment
+            if self.pigment != "":
+                povCode += "\t\tpigment { " + \
+                    self.pigment + " }\n"
+
+            #finish
+            if self.finish != "":
+                povCode += "\tfinish {\n\t" + \
+                    self.finish + "\t}\n"
+
+            #normal
+            if self.normal != "":
+                povCode += "\tnormal {\n\t" + \
+                    self.normal + "\t}\n"
+
+            povCode += "\t}\n"
+
+        #interior and media
+        if self.interior != "" or self.media != "":
+            povCode += "\tinterior {\n\t" + self.interior + "\n"
+
+            #media
+            if self.media != "":
+                povCode += "\t\tmedia { " + self.media + " }\n"
+
+            povCode += "\t}\n"
+
+        if closeBracket:
+            povCode += "}\n\n"
+
+        return povCode
+
+    def renderThumbnail(self):
+        # pov code
+        povCode = ""
+
+        headerCode = """
+            #version 3.7;
+            global_settings { assumed_gamma 1.0 }
+            #default { finish { ambient 0.2 diffuse 0.9 } }
+            #default { pigment { rgb <0.800, 0.800, 0.800> } }
+
+            //------------------------------------------
+            #include "colors.inc"
+            #include "textures.inc"
+
+            //------------------------------------------
+            // Camera ----------------------------------
+            #declare CamUp = <0, 0, 1>;
+            #declare CamRight = <1.00, 0, 0>;
+            #declare CamRotation = <0.0, 0.0, 0.0>;
+            #declare CamPosition = <-1.2289743423461914, -9.092948913574219, 0.01562744379043579>;
+            camera {
+                location <0, 0, 0>
+                direction <0, 1, 0>
+                up CamUp
+                right CamRight
+                rotate CamRotation
+                translate CamPosition
+                angle 45.00
+            }
+
+            light_source { CamPosition color rgb <0.5, 0.5, 0.5> }
+
+            sky_sphere {
+                pigment {
+                    gradient z
+                    color_map {
+                        [ 0.00  color rgb<0.592, 0.592, 0.667> ]
+                        [ 0.30  color rgb<0.592, 0.592, 0.667> ]
+                        [ 0.70  color rgb<0.200, 0.200, 0.396> ]
+                        [ 1.00  color rgb<0.200, 0.200, 0.396> ]
+                    }
+                    scale 2
+                    translate -1
+                    rotate<0.0, 0.0, 0.0>
+                }
+            }
+            """
+
+        objectCode = """
+            sphere { <0, 0, 0> 2.0
+                material { predef_material }
+            }
+            box { <0,0,0>, <1.0, 20.0, 4.0>
+                material { predef_material }
+                translate <-3.5, -2.0, -2.0>
+            }"""
+
+        povCode += headerCode
+        
+        if self.inc is not None and self.inc is not "":  # only if include file is necessary
+            povCode += "#include \"" + self.inc + "\"\n"
+            
+        povCode += "#declare predef_material = " + self.toPovMaterial() + objectCode
+
+        povFile = open(os.path.join(
+            thumbnailPath, self.getHash() + ".pov"), "w")
+        povFile.write(povCode)
+        povFile.close()
+
+        # render
+        povExec = App.ParamGet(
+            preferences.prefPath).GetString("PovRayExe", "")
+        if os.path.isfile(povExec) == False:
+            errorText = "To get a preview of the texture settings you must\n"
+            errorText += "set the path to the POV-Ray executable\n"
+            errorText += "either in the settings of Render workbench\n"
+            errorText += "or in the settings of Raytracing workbench\n"
+            App.Console.PrintWarning(errorText)
+            return -1
+
+        # start povray
+        subprocess.call([povExec, "-d", "width=256", "height=256",
+                            os.path.join(thumbnailPath, self.getHash() + ".pov")])
+
+        App.Console.PrintMessage("Rendering thumbnail for predefined " +
+                self.identifier + " ... done")
 
 
 class ListObject:
@@ -1482,6 +1707,55 @@ class ListObject:
 
         self.listItem = listItem
         self.predefObject = predefObject
+
+    def toPov(self, label=None):
+        """Convert the predefined object from this ListObject into pov code.
+
+        Args:
+            label (str, optional): Other label for the identifier. Defaults to None.
+
+        Returns:
+            str: pov code
+        """
+
+        if label == None:
+            label = self.label
+
+        if self.predefObject.material == None:  # for FreeCAD materials
+            return ""  # texture will be applied in the exporter class
+
+        povCode = ""
+
+        if self.predefObject.inc != None and self.predefObject.inc != "":  # only if include file is necessary
+            povCode += "#include \"" + self.predefObject.inc + "\"\n"
+
+        povCode += "#declare " + label + "_material"
+        if self.predefObject.media != "":
+            povCode += "_hollow"
+
+        povCode += " = " + self.predefObject.toPovMaterial(False)
+
+        #scale
+        if self.scaleX != 1 or self.scaleY != 1 or self.scaleZ != 1:
+            povCode += "\tscale <" + \
+                str(self.scaleX) + ", " + str(self.scaleY) + \
+                ", " + str(self.scaleZ) + ">\n"
+        #rotate
+        if self.rotationX != 0 or self.rotationY != 0 or self.rotationZ != 0:
+            povCode += "\trotate <" + \
+                str(self.rotationX) + ", " + str(self.rotationY) + \
+                ", " + str(self.rotationZ) + ">\n"
+        #translate
+        if self.translationX != 0 or self.translationY != 0 or self.translationZ != 0:
+            povCode += "\ttranslate <" + str(self.translationX) + ", " + str(
+                self.translationY) + ", " + str(self.translationZ) + ">\n"
+
+        povCode += "}\n\n"
+
+        if platform.system() == "Windows":
+            povCode.replace("\n", "\r\n")
+
+        return povCode
 
 
 ################
