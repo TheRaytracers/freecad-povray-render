@@ -4,6 +4,8 @@
 
 ![Logo and Renderings](README_img.png)
 
+![Screencast of the Rendering](Workbench_Demo.gif)
+
 In contrast to the other rendering solutions of FreeCAD we are focused on using POV-Ray as the only renderer.
 The workbench is intended to map the FreeCAD model on the POV-Ray equivalent as good as possible.
 Besides the rendered image the result will be a well organized file structure that gives the user a chance to understand and manipulate the content. For that, the render project is divided into different files for a better overview. Until now most objects from the "Part Workbench" and some important featuers vom "Part design" are supported and the tree structure with the boolean operations can be found in the POV-Ray file. Not supported objects will be simulated with meshes and outsourced to an include file. (see [Supported Objects](doc/Supported.md) and [Project Files](doc/Projectfiles.md)).
@@ -12,7 +14,7 @@ To give the user the full control, you can define extra things or another surfac
 
 ## Installation
 
-**Automatic Installation**(currently not working, because it's not published already)  
+**Automatic Installation**(currently not working, because it's not in the Addon Manager already)  
 The recommended way of installing this workbench is to use the addon manager (Tools / Addon Manager). In the addon manager in the workbenches tab, select the POV-Ray-Workbench and click install.
 
 **Manual Installation**  
@@ -37,7 +39,9 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 * very good readability of the created files → easy editing of these files
 * WYSIWYG - You can pan your model and render and you will get this point of view from FreeCAD
 
-## Get your first image
+## Usage
+
+### Get your first image
 
 1. open your model you want to render
 2. go to the POV-Ray workbench
@@ -58,12 +62,12 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 
 The rendered image will look nearly the same than the FreeCAD view. The following steps will change this dramatically:
 
-## Add textures
+### Add textures
 
 Adding Textures is easy: Go to the dialog window again and switch to the texture tab. In the left list you will find all objects to which you can apply textures. **First** select an object in the left list. **Second** select a texture in the right list. These two steps can be repeated.
 Start the rendering again.
 
-## Add lights
+### Add lights
 
 Lights are Objects and can be added via the workbench. You can move them to the desired position as you are used to do with other FreeCAD objects.
 Want to know more about lights? Look in the [Light properties chapter](doc/LightProperties.md). The effects of light to your scene are explained in [Realistic.md](doc/Realistic.md).
@@ -71,3 +75,12 @@ Want to know more about lights? Look in the [Light properties chapter](doc/Light
 ## Wiki
 
 The workbench have a lot of features that cannot explained all in the README. So we created a wiki with tutorials and a explanation of all features: [POV-Ray Workbench Wiki](doc/)
+
+## Forum Thread
+
+We have a thread in the FreeCAD Forum about this workbench. You can ask question there, give feedback, report bugs, etc.:  
+[New Raytracing Workbench for POV-Ray](https://forum.freecadweb.org/viewtopic.php?f=9&t=48629)
+
+## License
+
+We're using the GLGPL2+ license, see [LICENSE.md](LICENSE.md) for details.
