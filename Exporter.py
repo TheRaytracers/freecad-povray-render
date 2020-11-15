@@ -1576,21 +1576,21 @@ class ExportToPovRay:
         """Delete the comments in the given code (pov syntax)."""
 
         #delete big comments
-        while code.find("/*") is not -1:
+        while code.find("/*") != -1:
             comStart = code.find("/*")
             comEnd = code.find("*/", comStart + 2)
 
-            if comEnd is -1:
+            if comEnd == -1:
                 App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is an unclosed multi line comment.\n")
                 return
             code = code[0:comStart] + code[comEnd + 2:]
 
         #delete little comments
-        while code.find("//") is not -1:
+        while code.find("//") != -1:
             comStart = code.find("//")
             comEnd = code.find("\n", comStart + 2)
 
-            if comEnd is -1:
+            if comEnd == -1:
                 App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is a misstake in a one line comment")
                 return
             code = code[0:comStart] + code[comEnd:]

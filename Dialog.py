@@ -1644,7 +1644,7 @@ class Predefined:
 
         povCode += headerCode
         
-        if self.inc is not None and self.inc is not "":  # only if include file is necessary
+        if self.inc is not None and self.inc != "":  # only if include file is necessary
             povCode += "#include \"" + self.inc + "\"\n"
             
         povCode += "#declare predef_material = " + self.toPovMaterial() + objectCode
