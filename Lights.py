@@ -120,8 +120,8 @@ class AreaLight:
         if not "Jitter" in obj.PropertiesList:
             obj.addProperty("App::PropertyBool", "Jitter", "AreaLight", "Random shadow softening").Jitter = True
 
-        if not "Area Illumination" in obj.PropertiesList:
-            obj.addProperty("App::PropertyBool", "Area Illumination", "AreaLight", "TOOLTIP NEEDED").Area_Illumination = False
+        if not "AreaIllumination" in obj.PropertiesList:
+            obj.addProperty("App::PropertyBool", "AreaIllumination", "AreaLight", "TOOLTIP NEEDED").AreaIllumination = False
 
     def execute(self, obj):
         return True

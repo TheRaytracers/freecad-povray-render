@@ -678,7 +678,7 @@ class ExportToPovRay:
 
             povLight += "\n\tadaptive " + str(fcObj.Adaptive)
 
-            if fcObj.Area_Illumination:
+            if fcObj.AreaIllumination:
                 povLight += "\n\tarea_illumination on"
 
             if fcObj.Jitter:
