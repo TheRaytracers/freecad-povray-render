@@ -29,9 +29,11 @@ class PovRay (Workbench):
 		Log ("Loading Export to POV-Ray... done\n")
 
 	def Activated(self):
-		Msg ("PovRay.Activated()\n")
+		# Msg ("PovRay.Activated()\n")
+		pass
 
 	def Deactivated(self):
-		Msg ("PovRay.Deactivated()\n")
+		# Msg ("PovRay.Deactivated()\n")
+		pass
 
 Gui.addWorkbench(PovRay)
