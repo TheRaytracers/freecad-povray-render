@@ -1,31 +1,10 @@
-# Workbench for exporting a FreeCAD model to POV-Ray
+# Workbench for Rendering a FreeCAD model with POV-Ray
 
-**With this workbench you will be able to create easily photorealistic pictures of your model, even if you're a beginner in raytracing. If you're an advanced users with more knowledge, you can get the full control about all detailed settings.**
+**With this workbench you will be able to create photorealistic pictures of your model easily, even if you're a beginner in raytracing. If you're an advanced users with more knowledge, you can get the full control about all detailed settings.**
 
 ![Logo and Renderings](README_img.png)
 
 ![Screencast of the Rendering](Workbench_Demo.gif)
-
-In contrast to the other rendering solutions of FreeCAD we are focused on using POV-Ray as the only renderer.
-The workbench is intended to map the FreeCAD model on the POV-Ray equivalent as good as possible.
-Besides the rendered image the result will be a well organized file structure that gives the user a chance to understand and manipulate the content. For that, the render project is divided into different files for a better overview. Until now most objects from the "Part Workbench" and some important featuers vom "Part design" are supported and the tree structure with the boolean operations can be found in the POV-Ray file. Not supported objects will be simulated with meshes and outsourced to an include file. (see [Supported Objects](doc/Supported.md) and [Project Files](doc/Projectfiles.md)).
-
-To give the user the full control, you can define extra things or another surface as in FreeCAD (Please visit the [Wiki](doc/index.md) for more information).
-
-## Installation
-
-**Automatic Installation**(currently not working, because it's not in the Addon Manager already)  
-The recommended way of installing this workbench is to use the addon manager (Tools / Addon Manager). In the addon manager in the workbenches tab, select the POV-Ray-Workbench and click install.
-
-**Manual Installation**  
-Download the repository from [gitlab.com/usbhub/exporttopovray](https://gitlab.com/usbhub/exporttopovray) and unpack the zip in the `Mod` folder of your FreeCAD config folder (for Linux by default `~/.FreeCAD/Mod`, Mac `~/⁨Library⁩/⁨Preferences/⁨FreeCAD⁩/⁨Mod`, Windows `C:\Program Files\FreeCAD 0.18\Mod`.
-
-**Install POV-Ray**  
-In the background, POV-Ray is used to create the images. So you have to install POV-Ray too:
-How you can do this on your system is explained in the [POV-Ray Wiki](http://wiki.povray.org/content/HowTo:Install_POV)
-
-**Set the POV-Ray Executable Path**  
-After installing POV-Ray, you have to tell the workbench, where you installed POV-Ray. To do this, go into the POV-Ray workbench and go to Edit/Preferences/POV-Ray. Under "POV-Ray Executable" you can define, where you installed POV-Ray. After that, restart FreeCAD and have fun with our workbench :)
 
 ## Features
 
@@ -38,6 +17,18 @@ After installing POV-Ray, you have to tell the workbench, where you installed PO
 * the model is not converted into meshes, the model will be converted into a mathematical way of describing the object shape, so you will get a better object and a better picture
 * very good readability of the created files → easy editing of these files
 * WYSIWYG - You can pan your model and render and you will get this point of view from FreeCAD
+
+## Installation
+
+**Automatic Installation**  
+The recommended way of installing this workbench is to use the addon manager (Tools / Addon Manager). In the addon manager in the workbenches tab, select the POV-Ray-Workbench and click install.
+
+**Install POV-Ray**  
+In the background, POV-Ray is used to create the images. So you have to install POV-Ray too:
+How you can do this on your system is explained in the [POV-Ray Wiki](http://wiki.povray.org/content/HowTo:Install_POV)
+
+**Set the POV-Ray Executable Path**  
+After installing POV-Ray, you have to tell the workbench, where you installed POV-Ray. To do this, go into the POV-Ray workbench and go to Edit/Preferences/POV-Ray. Under "POV-Ray Executable" you can define, where you installed POV-Ray. After that, restart FreeCAD and have fun with our workbench :)
 
 ## Usage
 
@@ -75,11 +66,16 @@ Want to know more about lights? Look in the [Light properties chapter](doc/Light
 ## Wiki
 
 The workbench have a lot of features that cannot explained all in the README. So we created a wiki with tutorials and a explanation of all features: [POV-Ray Workbench Wiki](doc/)
+The FreeCAD Wiki page is here: [POV-Ray Workbench Wiki](https://wiki.freecadweb.org/POV-Ray-Rendering_Workbench)
 
 ## Forum Thread
 
 We have a thread in the FreeCAD Forum about this workbench. You can ask question there, give feedback, report bugs, etc.:  
 [New Raytracing Workbench for POV-Ray](https://forum.freecadweb.org/viewtopic.php?f=9&t=48629)
+
+## Idea of the Workbench on Contrast to others
+
+In contrast to the other rendering solutions of FreeCAD we are focused on using POV-Ray as the only renderer. We decided to support only one renderer, but that one as good as possible. If you implement several renderers like the Render Workbench, you always have to do compromises and therefore less detailed settings. In addition, this workbench exports a mathematically perfect representation of the model and use meshes only if the used feature isn't fully supported (the number of supported objects is growing constantly; see [Supported Objects](doc/Supported.md).
 
 ## License
 
