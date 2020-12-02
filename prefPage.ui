@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>POV-Ray Workbench Settings</string>
+   <string>POV-Ray-Rendering Workbench Settings</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <item row="0" column="0">
@@ -27,7 +27,7 @@
       <cstring>PovRayExe</cstring>
      </property>
      <property name="prefPath" stdset="0">
-      <cstring>Mod/POV-Ray</cstring>
+      <cstring>Mod/POV-Ray-Rendering</cstring>
      </property>
     </widget>
    </item>
@@ -47,7 +47,7 @@
       <cstring>ExecMode</cstring>
      </property>
      <property name="prefPath" stdset="0">
-      <cstring>Mod/POV-Ray</cstring>
+      <cstring>Mod/POV-Ray-Rendering</cstring>
      </property>
      <item>
       <property name="text">
@@ -80,7 +80,7 @@
       <cstring>RenderParameters</cstring>
      </property>
      <property name="prefPath" stdset="0">
-      <cstring>Mod/POV-Ray</cstring>
+      <cstring>Mod/POV-Ray-Rendering</cstring>
      </property>
     </widget>
    </item>
@@ -109,7 +109,7 @@
       <cstring>LightIconSize</cstring>
      </property>
      <property name="prefPath" stdset="0">
-      <cstring>Mod/POV-Ray</cstring>
+      <cstring>Mod/POV-Ray-Rendering</cstring>
      </property>
     </widget>
    </item>
@@ -157,7 +157,7 @@
          <cstring>ThumbnailGridSize</cstring>
         </property>
         <property name="prefPath" stdset="0">
-         <cstring>Mod/POV-Ray</cstring>
+         <cstring>Mod/POV-Ray-Rendering</cstring>
         </property>
        </widget>
       </item>
@@ -186,7 +186,7 @@
          <cstring>ThumbnailIconSize</cstring>
         </property>
         <property name="prefPath" stdset="0">
-         <cstring>Mod/POV-Ray</cstring>
+         <cstring>Mod/POV-Ray-Rendering</cstring>
         </property>
        </widget>
       </item>

@@ -1,11 +1,11 @@
 import FreeCADGui as Gui
 import FreeCAD as App
 
-class PovRay (Workbench):
+class PovRayRendering (Workbench):
 	"Workbench object to export models to POV-Ray"
 				
-	MenuText = "POV-Ray"
-	ToolTip = "Export FreeCAD Models to POV-Ray"
+	MenuText = "POV-Ray-Rendering"
+	ToolTip = "Render your models easily with POV-Ray"
 
 	def __init__(self):
 		import helpDefs
@@ -17,16 +17,16 @@ class PovRay (Workbench):
 	def Initialize(self):
 		import ExportCommand, LightCommands, helpDefs
 
-		self.appendToolbar("POV-Ray", ["Export", "PointLightCommand", "AreaLightCommand", "SpotLightCommand"])
-		self.appendMenu("&POV-Ray", ["Export", "PointLightCommand", "AreaLightCommand", "SpotLightCommand"])
+		self.appendToolbar("POV-Ray-Rendering", ["Export", "PointLightCommand", "AreaLightCommand", "SpotLightCommand"])
+		self.appendMenu("&POV-Ray-Rendering", ["Export", "PointLightCommand", "AreaLightCommand", "SpotLightCommand"])
 
 		Gui.addIconPath(helpDefs.initGui__iconPath)
 		
-		Gui.addPreferencePage(helpDefs.initGui__prefPagePath, "POV-Ray")
+		Gui.addPreferencePage(helpDefs.initGui__prefPagePath, "POV-Ray-Rendering")
 
 		helpDefs.setDefaultPovRayExe()
 
-		Log ("Loading Export to POV-Ray... done\n")
+		Log ("Loading POV-Ray-Rendering ... done\n")
 
 	def Activated(self):
 		# Msg ("PovRay.Activated()\n")
@@ -36,4 +36,4 @@ class PovRay (Workbench):
 		# Msg ("PovRay.Deactivated()\n")
 		pass
 
-Gui.addWorkbench(PovRay)
+Gui.addWorkbench(PovRayRendering)

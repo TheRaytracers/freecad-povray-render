@@ -67,7 +67,7 @@ def strToBool(str):
 
 class __Preferences__:
     def __init__(self):
-        self.prefPath = "User parameter:BaseApp/Preferences/Mod/POV-Ray"
+        self.prefPath = "User parameter:BaseApp/Preferences/Mod/POV-Ray-Rendering"
 
 preferences = __Preferences__()
 
