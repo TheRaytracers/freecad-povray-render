@@ -1473,7 +1473,7 @@ class ExportToPovRay:
         if os.path.isfile(povExec) == False:
             errorText = "To start the rendering you must\n"
             errorText += "set the path to the POV-Ray executable\n"
-            errorText += "in the settings of POV-Ray workbench\n"
+            errorText += "in the settings of the workbench\n"
             showError(errorText, "POV-Ray executable not found")
             return -1
 
