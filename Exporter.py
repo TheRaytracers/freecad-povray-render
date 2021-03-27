@@ -749,10 +749,18 @@ class ExportToPovRay:
         try:
             povSpline = "\n"
 
-            unsortedLines = sketch.Geometry #unordered lines / original order
+            unsortedFacadeLines = sketch.GeometryFacadeList #unordered lines / original order
 
             #delete construction geometry and points
-            unsortedLines = [line for line in unsortedLines if not (line.Construction or type(line) == Part.Point)]
+            unsortedLines = []
+            for facadeLine in sketch.GeometryFacadeList:
+                try:
+                    construction = facadeLine.Geometry.Construction # old versions of FC
+                except:
+                    construction = facadeLine.Construction # recent versions of FC
+
+                if (not construction or type(facadeLine.Geometry) == Part.Point):
+                    unsortedLines.append(facadeLine.Geometry)
 
             numOfPoints = 0 #counter for povray bezier points
 
