@@ -713,6 +713,14 @@ class TextureTab(QtGui.QWidget):
                 except:
                     shape = False
 
+                # is object a mesh
+                try:
+                    obj.Mesh
+
+                    mesh = True
+                except:
+                    mesh = False
+
                 # is it child of Body
                 childOfBody = False
                 for parent in obj.InList:
@@ -720,7 +728,7 @@ class TextureTab(QtGui.QWidget):
                         childOfBody = True
 
                 # test for the conditions for a object for the object list
-                if shapeColor and shape and not childOfBody:
+                if shapeColor and (shape or mesh) and not childOfBody:
                     self.listFcObjects.append(obj)
 
         self.listObjects = []
