@@ -29,6 +29,7 @@ import xml.etree.ElementTree as xml
 import csv
 import hashlib
 import tempfile
+import platform
 
 from helpDefs import *
 from Exporter import ExportToPovRay
@@ -849,7 +850,7 @@ class TextureTab(QtGui.QWidget):
         """
 
         childNodes = xmlNode.getchildren()
-        
+
         # create new category
         newCategory = Category(parentCategory, [], [], self.categoryCombo.count())
         parentCategory.subCategories.append(newCategory)
@@ -934,7 +935,7 @@ class TextureTab(QtGui.QWidget):
                 self.predefines.append(newPredefined)
 
                 newCategory.predefines.append(newPredefined)
-            
+
             else:
                 self.predefXmlToList(node, newCategory, layer + 1)
 
@@ -1101,11 +1102,11 @@ class TextureTab(QtGui.QWidget):
         Returns:
             Category: Category of the predefined (-1 if predefined not assigned).
         """
-        
+
         for category in self.categories:
             if predef in category.predefines:
                 return category
-        
+
         return -1
 
     def updatePreview(self, listObj):
@@ -1391,9 +1392,16 @@ class Preview(QtGui.QWidget):
             showError(errorText, "POV-Ray executable not found")
             return -1
 
+        # get the OS
+        operatingSystem = platform.system()
+
         # start povray
-        subprocess.call([povExec, "-d", "width=" + str(self.previewWidth),
-                         "height=" + str(self.previewHeight), povName])
+        if operatingSystem == "Windows": # use other command line options for windows
+            subprocess.call([povExec, "/EXIT", "/RENDER", "width=" + str(self.previewWidth),
+                             "height=" + str(self.previewHeight), povName])
+        else:
+            subprocess.call([povExec, "-d", "width=" + str(self.previewWidth),
+                             "height=" + str(self.previewHeight), povName])
 
         # update image
         pixmap = QtGui.QPixmap(povName[:-4])
@@ -1651,10 +1659,10 @@ class Predefined:
             }"""
 
         povCode += headerCode
-        
+
         if self.inc is not None and self.inc != "":  # only if include file is necessary
             povCode += "#include \"" + self.inc + "\"\n"
-            
+
         povCode += "#declare predef_material = " + self.toPovMaterial() + objectCode
 
         povFile = open(os.path.join(
@@ -2073,8 +2081,8 @@ class EnvironmentTab(QtGui.QWidget):
 
         # Help Label
         helpText = """<div>
-            HDRI images are 360° images with min 10 bits per color (but 32 bits are very 
-            common for HDRI images) and not 8 as usual pictures like JPG. So the contrast 
+            HDRI images are 360° images with min 10 bits per color (but 32 bits are very
+            common for HDRI images) and not 8 as usual pictures like JPG. So the contrast
             is a lot better and the images can be used to do the lightning of the scene.
             <h4>Tips</h4>
             <ul>
@@ -2202,7 +2210,7 @@ class EnvironmentTab(QtGui.QWidget):
         self.radioButtonOptions[0].setChecked(True)
 
         self.wrapperGroupBox.setChecked(True)
-        
+
         self.rotationX.setValue(90.0)
         self.rotationY.setValue(0.0)
         self.rotationZ.setValue(0.0)
@@ -2385,12 +2393,12 @@ class EnvironmentTab(QtGui.QWidget):
                         <0, 0, 0.5>, 0.0
                         translate <0.0, 0.0, 10.0>
                     }
-                    
+
                     cylinder { <0, 0, 0>, <0, 0, 10.0>, 0.1
                     }
-                    
+
                     pigment { color rgb <0.000, 0.000, 1.000> }
-                    
+
                 }
 
                 //----- y -----
@@ -2400,13 +2408,13 @@ class EnvironmentTab(QtGui.QWidget):
                         <0, 0, 0.5>, 0.0
                         translate <0.0, 0.0, 10.0>
                     }
-                    
+
                     cylinder { <0, 0, 0>, <0, 0, 10.0>, 0.1
                     }
-                    
+
                     rotate <-90.0, -0.0, 0.0>
                     pigment { color rgb <0.000, 0.670, 0.000> }
-                    
+
                 }
 
                 //----- x -----
@@ -2416,13 +2424,13 @@ class EnvironmentTab(QtGui.QWidget):
                         <0, 0, 0.5>, 0.0
                         translate <0.0, 0.0, 10.0>
                     }
-                    
+
                     cylinder { <0, 0, 0>, <0, 0, 10.0>, 0.1
                     }
-                    
+
                     rotate <0.0, 90.0, 0.0>
                     pigment { color rgb <1.000, 0.000, 0.000> }
-                    
+
                 }'''
 
             povCode += "sky_sphere {\n"
