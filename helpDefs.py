@@ -31,7 +31,7 @@ def showError(text, title): #show an error box
 def isAscii(string): #test whether the string is an ASCII string
     return all(ord(c) < 128 for c in string)
 
-def stringCorrection(inputString): # String correction for compatibility with POV-Ray 
+def stringCorrection(inputString): # String correction for compatibility with POV-Ray
         utfString = inputString.encode("utf8", "replace")     # conversion from ??? to utf8
         uniString = utfString.decode("utf8", "replace")       # conversion from utf8 to unicode
         firstchar = ord(uniString[0])                         # POV-Ray doesn't like numbers as first character
@@ -77,7 +77,7 @@ def setDefaultPovRayExe():
             "User parameter:BaseApp/Preferences/Mod/Render").GetString("PovRayPath", "")
         if renderWbExe == "":
             raytracingWbExe = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Raytracing").GetString("PovrayExecutable", "")
-            
+
             if raytracingWbExe != "":
                 App.ParamGet(preferences.prefPath).SetString(
                     "PovRayExe", raytracingWbExe)
@@ -90,7 +90,7 @@ class RenderSettings:
 
     def __init__(self, directory, projectName, width, height, expLight, repRot, expFcView, radiosity, hdriDict):
         self.projectName = projectName
-        self.directory = directory
+        self.directory = os.path.join(directory, "")
 
         self.iniName = self.projectName + ".ini"
         self.iniPath = self.directory + self.iniName
