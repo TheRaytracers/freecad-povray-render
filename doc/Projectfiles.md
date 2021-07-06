@@ -42,7 +42,7 @@ This is a screenshot of the view in FreeCAD but with the same dimensions as the 
 
 ### .FCStd
 
-No need to mention that this is your FreCAD model. Name and directory of this file are independent of your render project. In case you whant to create more than one rendering from your FreeCAD model we recommend to create a subfolder for each.
+No need to mention that this is your FreCAD model. Name and directory of this file are independent of your render project. In case you want to create more than one rendering from your FreeCAD model we recommend to create a subfolder for each.
 
 ### .predefined.xml
 
