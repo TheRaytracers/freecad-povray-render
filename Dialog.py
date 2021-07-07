@@ -223,7 +223,7 @@ class Dialog(QtGui.QDialog):
         self.saveQSettings()
 
         iniPath = self.generalTab.getIniPath()
-        directory = os.path.dirname(iniPath) + os.sep
+        directory = os.path.join(os.path.dirname(iniPath), "")
         projectName = os.path.basename(iniPath)[:-4]
 
         # create renderSettings object
@@ -655,8 +655,11 @@ class TextureTab(QtGui.QWidget):
                 "",
                 self.fcTexItem))
 
-        self.fcTexItem.setIcon(QtGui.QIcon(
-            thumbnailPath + os.sep + self.predefines[0].getHash() + ".png"))
+        self.fcTexItem.setIcon(
+            QtGui.QIcon(
+                os.path.join(thumbnailPath, self.predefines[0].getHash() + ".png")
+            )
+        )
 
         # get the predefined.xml
         predefinedPath = os.path.join(os.path.dirname(
@@ -930,7 +933,11 @@ class TextureTab(QtGui.QWidget):
                     comment,
                     listItem)
 
-                newPredefined.listItem.setIcon(QtGui.QIcon(thumbnailPath + os.sep + newPredefined.getHash() + ".png"))
+                newPredefined.listItem.setIcon(QtGui.QIcon(
+                    os.path.join(thumbnailPath, newPredefined.getHash() + ".png")
+                ))
+
+
 
                 self.predefines.append(newPredefined)
 
