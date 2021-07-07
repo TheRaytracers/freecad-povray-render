@@ -1081,7 +1081,7 @@ class ExportToPovRay:
         povCode += "\nobject { " + stringCorrection(fcObj.Label) + "_mesh\n"
         pigment = self.getPigment(fcObj)
 
-        if expPlacement == False: #meshes are already translated, so if they shouldnt translated, they translated back
+        if expPlacement == False: #meshes are already translated, so if they shouldn't translated, they translated back
             translation = self.getTranslation(fcObj)
             if translation != "": #test if the object is translated
                 povCode += "\t" + translation + " * (-1)\n"
@@ -1340,7 +1340,7 @@ class ExportToPovRay:
             x -= 90
 
         if x != 0 or y != 0 or z != 0:
-            rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create roation vector
+            rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create rotation vector
 
         return rotate
 
@@ -1520,7 +1520,7 @@ class ExportToPovRay:
             errorText += "If the error occurred in the pov file or the mesh file, please report a bug to us."
             errorText += "(See the wiki, link is in the help tab of the dialog)\n\n"
             errorText += "You can see the error message in the error file too."
-            showError(errorText, "An error ocurred while rendering")
+            showError(errorText, "An error occurred while rendering")
         else:
             self.delErrorFile()
 
@@ -1599,7 +1599,7 @@ class ExportToPovRay:
             comEnd = code.find("\n", comStart + 2)
 
             if comEnd == -1:
-                App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is a misstake in a one line comment")
+                App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is a mistake in a one line comment")
                 return
             code = code[0:comStart] + code[comEnd:]
         return code
