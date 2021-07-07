@@ -20,25 +20,29 @@
 import FreeCAD as App
 import FreeCADGui as Gui
 
+
 class ExportCommand:
-	"Open dialog and start export"
+    "Open dialog and start export"
 
-	def GetResources(self):
-		return {"MenuText": "Export Model",
-				"Accel": "Ctrl+E",
-				"ToolTip": "Open Settings Dialog and start Export",
-				"Pixmap"  : "logo.svg"}
+    def GetResources(self):
+        return {
+            "MenuText": "Export Model",
+            "Accel": "Ctrl+E",
+            "ToolTip": "Open Settings Dialog and start Export",
+            "Pixmap": "logo.svg",
+        }
 
-	def IsActive(self):
-		if App.ActiveDocument == None:
-			return False
-		else:
-			return True
+    def IsActive(self):
+        if App.ActiveDocument == None:
+            return False
+        else:
+            return True
 
-	def Activated(self):
-		from Dialog import Dialog
-		
-		dialog = Dialog()
-		dialog.exec_()
+    def Activated(self):
+        from Dialog import Dialog
 
-Gui.addCommand('Export', ExportCommand())
+        dialog = Dialog()
+        dialog.exec_()
+
+
+Gui.addCommand("Export", ExportCommand())

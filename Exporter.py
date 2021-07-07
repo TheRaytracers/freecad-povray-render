@@ -32,14 +32,17 @@ import subprocess
 
 from helpDefs import *
 
+
 class ExportToPovRay:
     """Export a FreeCAD model to POV-Ray"""
 
     def __init__(self):
-        #get default shape color (editable in FreeCAD settings) (default rgb(0.8, 0.8, 0.8))
-        self.DefaultShapeColor = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('DefaultShapeColor')
+        # get default shape color (editable in FreeCAD settings) (default rgb(0.8, 0.8, 0.8))
+        self.DefaultShapeColor = App.ParamGet(
+            "User parameter:BaseApp/Preferences/View"
+        ).GetUnsigned("DefaultShapeColor")
 
-        self.os = platform.system() #get system information
+        self.os = platform.system()  # get system information
 
     def initExport(self, renderSettings):
         """Export the current FreeCAD model with the settings given by the Settings object (defined in helpDefs.py)."""
@@ -47,7 +50,7 @@ class ExportToPovRay:
         self.doc = App.ActiveDocument
         self.objs = self.doc.Objects
 
-        #get all paths, file names, directories, etc.
+        # get all paths, file names, directories, etc.
         self.projectName = renderSettings.projectName
         self.directory = renderSettings.directory
 
@@ -69,7 +72,7 @@ class ExportToPovRay:
 
         self.meshFileContent = ""
 
-        #get all output options
+        # get all output options
         self.width = renderSettings.width
         self.height = renderSettings.height
 
@@ -77,10 +80,10 @@ class ExportToPovRay:
         self.repRot = renderSettings.repRot
         self.expFcView = renderSettings.expFcView
 
-        #radiosity
+        # radiosity
         self.radiosity = renderSettings.radiosity
 
-        #environment
+        # environment
         self.expEnvironment = renderSettings.hdriDict["enabled"]
         self.environmentOption = renderSettings.hdriDict["option"]
         self.hdriPath = renderSettings.hdriDict["hdrPath"]
@@ -91,16 +94,18 @@ class ExportToPovRay:
         self.hdriTransY = renderSettings.hdriDict["transY"]
         self.hdriTransZ = renderSettings.hdriDict["transZ"]
 
-        #get camera
+        # get camera
         self.CamOri = Gui.ActiveDocument.ActiveView.getCameraOrientation()
         self.CamType = Gui.ActiveDocument.ActiveView.getCameraType()
         self.CamPos = Gui.ActiveDocument.ActiveView.viewPosition()
         self.CamNode = Gui.ActiveDocument.ActiveView.getCameraNode()
         self.EulerCam = Gui.ActiveDocument.ActiveView.getCameraOrientation().toEuler()
 
-        if self.povPath != -1 and self.povPath != "" and self.povPath != " ": #is there a pov file
-            try: #try to open pov file
-                file = open(self.povPath, "w+") #XXX really "w+"?
+        if (
+            self.povPath != -1 and self.povPath != "" and self.povPath != " "
+        ):  # is there a pov file
+            try:  # try to open pov file
+                file = open(self.povPath, "w+")  # XXX really "w+"?
                 file.close()
             except:
                 App.Console.PrintError("Can't open the pov file\n\n")
@@ -110,14 +115,14 @@ class ExportToPovRay:
             file = open(self.incPath, "a+")
             file.close()
 
-            #open inc file
+            # open inc file
             file = open(self.incPath, "r")
             self.incContent = file.read()
             file.close()
 
             self.incContent = self.delComments(self.incContent)
 
-            #open texture inc file
+            # open texture inc file
             file = open(self.texIncPath, "r")
             self.texIncContent = file.read()
             file.close()
@@ -125,52 +130,60 @@ class ExportToPovRay:
             App.Console.PrintMessage("\n\nCanceled\n\n")
             return -1
 
-        #get statistics
+        # get statistics
         objs = App.ActiveDocument.Objects
         self.statistics = self.getStatistics(objs)
         App.Console.PrintMessage(self.statistics)
 
-        #clear old mesh file
+        # clear old mesh file
         try:
             file = open(self.meshPath, "w")
             file.close()
         except:
             pass
 
-
-        self.startExport() #start the export
+        self.startExport()  # start the export
 
     def startExport(self):
         """Start the export to POV-Ray by using the settings did in initExport()."""
 
-        firstLayer = [] #the highest objects in the model tree
+        firstLayer = []  # the highest objects in the model tree
 
-        #repair rotation (see documentation)
+        # repair rotation (see documentation)
         if self.repRot:
             self.repairRotation(self.objs)
 
-        #export FreeCAD view
+        # export FreeCAD view
         if self.expFcView:
             self.exportFcView()
 
-        #get the first layer and check visibility of parent objects
+        # get the first layer and check visibility of parent objects
         for obj in self.objs:
             guiObject = obj.ViewObject
-            if guiObject.Visibility and obj.TypeId != "App::DocumentObjectGroup" and not self.hasBodyAsParent(obj) and not self.hasPartAsParent(obj):
+            if (
+                guiObject.Visibility
+                and obj.TypeId != "App::DocumentObjectGroup"
+                and not self.hasBodyAsParent(obj)
+                and not self.hasPartAsParent(obj)
+            ):
                 firstLayer.append(obj)
 
-        #create pov code of objects
+        # create pov code of objects
         objPovCode = ""
         for obj in firstLayer:
             objPovCode += self.createPovCode(obj, True, True, True, True, True, True)
 
-        #add general pov code / "header"
+        # add general pov code / "header"
         finalPovCode = "#version 3.7; // 3.6\nglobal_settings { assumed_gamma 1.0 }\n#default { finish { ambient 0.2 diffuse 0.9 } }\n"
 
-        finalPovCode += "#default { pigment { rgb " + self.uintColorToRGB(self.DefaultShapeColor) + " } }\n"
+        finalPovCode += (
+            "#default { pigment { rgb "
+            + self.uintColorToRGB(self.DefaultShapeColor)
+            + " } }\n"
+        )
 
         finalPovCode += "\n//------------------------------------------\n"
-        finalPovCode += "#include \"colors.inc\"\n#include \"textures.inc\"\n"
+        finalPovCode += '#include "colors.inc"\n#include "textures.inc"\n'
 
         if self.radiosity["radiosityName"] != -1:
             finalPovCode += '\n#include "rad_def.inc"'
@@ -185,12 +198,12 @@ class ExportToPovRay:
 
         finalPovCode += "\n//------------------------------------------\n"
 
-        #add textures inc include
-        finalPovCode += "#include \"" + self.texIncName + "\"\n"
+        # add textures inc include
+        finalPovCode += '#include "' + self.texIncName + '"\n'
 
-        #if model contains mesh objects, a mesh file will be included
+        # if model contains mesh objects, a mesh file will be included
         if self.meshFileContent != "":
-            finalPovCode += "#include \"" + self.meshName + "\"\n"
+            finalPovCode += '#include "' + self.meshName + '"\n'
 
         finalPovCode += "\n//------------------------------------------\n"
         finalPovCode += "// Camera ----------------------------------\n"
@@ -206,29 +219,37 @@ class ExportToPovRay:
 
         finalPovCode += "\n//------------------------------------------\n"
 
-        #include user inc file
-        finalPovCode += "\n#include \"" + self.incName + "\"\n\n"
+        # include user inc file
+        finalPovCode += '\n#include "' + self.incName + '"\n\n'
 
         finalPovCode += "// Objects in Scene ------------------------\n"
 
         finalPovCode += objPovCode
 
-        #change line breaks for windows
+        # change line breaks for windows
         if self.os == "Windows":
             finalPovCode.replace("\n", "\r\n")
             self.meshFileContent.replace("\n", "\r\n")
 
-        #write mesh file
+        # write mesh file
         if self.meshFileContent != "":
             self.meshFile = open(self.meshPath, "w")
             self.meshFile.write(self.meshFileContent)
             self.meshFile.close()
 
-        self.writeFile(finalPovCode) #write the final code to the output file
-        self.openPovRay() #start povray
+        self.writeFile(finalPovCode)  # write the final code to the output file
+        self.openPovRay()  # start povray
 
-
-    def createPovCode(self, fcObj, expPlacement, expPigment, expPhotons, expClose, expLabel, expMeshDef):
+    def createPovCode(
+        self,
+        fcObj,
+        expPlacement,
+        expPigment,
+        expPhotons,
+        expClose,
+        expLabel,
+        expMeshDef
+    ):
         """
         Return the POV-Ray code for the given FreeCAD object.
 
@@ -250,18 +271,23 @@ class ExportToPovRay:
         else:
             povCode = ""
 
-        if fcObj.TypeId == "Part::Box": #Box
-            povBox = "\nbox { <0,0,0>, <" + str(float(fcObj.Length)) + ", " + str(float(fcObj.Width)) + ", " + str(float(fcObj.Height)) + ">"
+        if fcObj.TypeId == "Part::Box":  # Box
+            povBox = (
+                "\nbox { <0,0,0>, <"
+                + str(float(fcObj.Length)) + ", "
+                + str(float(fcObj.Width))  + ", "
+                + str(float(fcObj.Height)) + ">"
+            )
             povCode += povBox
 
-        elif fcObj.TypeId == "Part::Sphere": # Sphere
+        elif fcObj.TypeId == "Part::Sphere":  # Sphere
             radius = fcObj.Radius.getValueAs("mm")
 
             povSphere = "\nsphere { <0, 0, 0> " + str(radius)
 
             povCode += povSphere
 
-        elif fcObj.TypeId == "Part::Ellipsoid": # Ellipsoid
+        elif fcObj.TypeId == "Part::Ellipsoid":  # Ellipsoid
             r1 = fcObj.Radius1.getValueAs("mm").Value
             r2 = fcObj.Radius2.getValueAs("mm").Value
             r3 = fcObj.Radius3.getValueAs("mm").Value
@@ -272,7 +298,7 @@ class ExportToPovRay:
 
             povCode += povSphere
 
-        elif fcObj.TypeId == "Part::Cone": #Cone
+        elif fcObj.TypeId == "Part::Cone":  # Cone
             r1 = fcObj.Radius1.getValueAs("mm").Value
             c1 = "<0, 0, 0>"
             r2 = fcObj.Radius2.getValueAs("mm").Value
@@ -284,7 +310,7 @@ class ExportToPovRay:
 
             povCode += povCone
 
-        elif fcObj.TypeId == "Part::Cylinder": #Cylinder
+        elif fcObj.TypeId == "Part::Cylinder":  # Cylinder
             r = fcObj.Radius.getValueAs("mm").Value
             baseP = "<0, 0, 0>"
             CapP = "<0, 0, " + str(fcObj.Height.getValueAs("mm").Value) + ">"
@@ -294,7 +320,7 @@ class ExportToPovRay:
 
             povCode += povCylinder
 
-        elif fcObj.TypeId == "Part::Torus": #Torus
+        elif fcObj.TypeId == "Part::Torus":  # Torus
             r1 = fcObj.Radius1.getValueAs("mm").Value
             r2 = fcObj.Radius2.getValueAs("mm").Value
 
@@ -303,65 +329,91 @@ class ExportToPovRay:
 
             povCode += povTorus
 
-        elif fcObj.TypeId == "Part::Plane": #Plane
+        elif fcObj.TypeId == "Part::Plane":  # Plane
             width = fcObj.Width.getValueAs("mm").Value
             length = fcObj.Length.getValueAs("mm").Value
 
             povPlane = "\npolygon { "
-            povPlane += "5, <0, 0>, <" + str(length) + ", 0>, <" + str(length) + ", " + str(width) + ">, <0, " + str(width) + ">, <0, 0>"
+            povPlane += (
+                "5, <0, 0>, <"
+                + str(length) + ", 0>, <"
+                + str(length) + ", "
+                + str(width)  + ">, <0, "
+                + str(width)  + ">, <0, 0>"
+            )
 
             povCode += povPlane
 
-        elif fcObj.TypeId == "Part::Cut":  #Cut
+        elif fcObj.TypeId == "Part::Cut":  # Cut
             children = fcObj.OutList
             povCut = "\ndifference {\n"
             for child in children:
-                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
-                povCut += childCode.replace("\n", "\n\t") #add the indents
+                childCode = self.createPovCode(
+                    child, True, expPigment, expPhotons, True, expLabel, expMeshDef
+                )  # call createPovCode for the child
+                povCut += childCode.replace("\n", "\n\t")  # add the indents
 
             povCode += povCut
 
-        elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse" or fcObj.TypeId == "Part::Compound": #Fusion
+        elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse" or fcObj.TypeId == "Part::Compound":  # Fusion
             children = fcObj.OutList
             povFusion = "\nunion {\n"
             for child in children:
-                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
-                povFusion += childCode.replace("\n", "\n\t") #add the indents
+                childCode = self.createPovCode(
+                    child, True, expPigment, expPhotons, True, expLabel, expMeshDef
+                )  # call createPovCode for the child
+                povFusion += childCode.replace("\n", "\n\t")  # add the indents
 
             povCode += povFusion
 
-        elif fcObj.TypeId == "Part::MultiCommon" or fcObj.TypeId == "Part::Common": #Common
+        elif fcObj.TypeId == "Part::MultiCommon" or fcObj.TypeId == "Part::Common":  # Common
             children = fcObj.OutList
             povCommon = "\nintersection {\n"
             for child in children:
-                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
-                povCommon += childCode.replace("\n", "\n\t") #add the indents
+                childCode = self.createPovCode(
+                    child, True, expPigment, expPhotons, True, expLabel, expMeshDef
+                )  # call createPovCode for the child
+                povCommon += childCode.replace("\n", "\n\t")  # add the indents
 
             povCode += povCommon
 
-        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Array"): #Array from Draft workbench
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Array"):  # Array from Draft workbench
             povArr = ""
             if fcObj.ArrayType == "polar":
                 child = fcObj.Base
-                #for child in children:
-                center = "<" + str(fcObj.Center.x) + ", " + str(fcObj.Center.y) + ", " + str(fcObj.Center.z) + ">"
+                # for child in children:
+                center = (
+                    "<"
+                    + str(fcObj.Center.x) + ", "
+                    + str(fcObj.Center.y) + ", "
+                    + str(fcObj.Center.z) + ">"
+                )
                 axisX = fcObj.Axis.x
                 axisY = fcObj.Axis.y
                 axisZ = fcObj.Axis.z
-                highestAxis = max(axisX, axisY, axisZ) #get highest value
+                highestAxis = max(axisX, axisY, axisZ)  # get highest value
                 axisX /= highestAxis
                 axisY /= highestAxis
                 axisZ /= highestAxis
 
 
                 axis = "<" + str(axisX) + ", " + str(axisY) + ", " + str(axisZ) + ">"
-                intervalAxis = "<" + str(fcObj.IntervalAxis.x) + ", " + str(fcObj.IntervalAxis.y) + ", " + str(fcObj.IntervalAxis.z) + ">"
+                intervalAxis = (
+                    "<"
+                    + str(fcObj.IntervalAxis.x) + ", "
+                    + str(fcObj.IntervalAxis.y) + ", "
+                    + str(fcObj.IntervalAxis.z) + ">"
+                )
                 number = fcObj.NumberPolar
                 angle = fcObj.Angle.getValueAs("deg").Value
 
-                declareName = stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                declareName = (
+                    stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                )
                 povArr += "\n#declare " + declareName + " = "
-                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
+                childCode = self.createPovCode(
+                    child, True, expPigment, expPhotons, True, expLabel, expMeshDef
+                )  # call createPovCode for the child
                 povArr += childCode
 
                 povArr += "\n#declare i = 0;\n"
@@ -386,7 +438,7 @@ class ExportToPovRay:
 
                 if expPlacement:
                     rotation = self.getRotation(fcObj)
-                    if rotation != "": #test if the object is rotated
+                    if rotation != "":  # test if the object is rotated
                         povArr += "        " + rotation + "\n"
 
                 if fcObj.IntervalAxis.x != 0 or fcObj.IntervalAxis.y != 0 or fcObj.IntervalAxis.z != 0:
@@ -394,12 +446,12 @@ class ExportToPovRay:
 
                 if expPlacement:
                     translation = self.getTranslation(fcObj)
-                    if translation != "": #test if the object is translated
+                    if translation != "":  # test if the object is translated
                         povArr += "\t" + translation + "\n"
 
                 if expPigment:
                     pigment = self.getPigment(fcObj)
-                    if pigment != "": #test if the object has the standard pigment
+                    if pigment != "":  # test if the object has the standard pigment
                         povArr += "\t" + pigment + "\n"
 
                 if expPhotons:
@@ -412,10 +464,25 @@ class ExportToPovRay:
 
             elif fcObj.ArrayType == "ortho":
                 child = fcObj.Base
-                #for child in children:
-                intervalX = "<" + str(fcObj.IntervalX.x) + ", " + str(fcObj.IntervalX.y) + ", " + str(fcObj.IntervalX.z) + ">"
-                intervalY = "<" + str(fcObj.IntervalY.x) + ", " + str(fcObj.IntervalY.y) + ", " + str(fcObj.IntervalY.z) + ">"
-                intervalZ = "<" + str(fcObj.IntervalZ.x) + ", " + str(fcObj.IntervalZ.y) + ", " + str(fcObj.IntervalZ.z) + ">"
+                # for child in children:
+                intervalX = (
+                    "<"
+                    + str(fcObj.IntervalX.x) + ", "
+                    + str(fcObj.IntervalX.y) + ", "
+                    + str(fcObj.IntervalX.z) + ">"
+                )
+                intervalY = (
+                    "<"
+                    + str(fcObj.IntervalY.x) + ", "
+                    + str(fcObj.IntervalY.y) + ", "
+                    + str(fcObj.IntervalY.z) + ">"
+                )
+                intervalZ = (
+                    "<"
+                    + str(fcObj.IntervalZ.x) + ", "
+                    + str(fcObj.IntervalZ.y) + ", "
+                    + str(fcObj.IntervalZ.z) + ">"
+                )
 
                 numX = fcObj.NumberX
                 if numX == 0:
@@ -429,9 +496,13 @@ class ExportToPovRay:
                 if numZ == 0:
                     numZ = 1
 
-                declareName = stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                declareName = (
+                    stringCorrection(child.Label.capitalize()) + "_" + child.Name
+                )
                 povArr += "\n#declare " + declareName + " = "
-                childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, True) #call createPovCode for the child
+                childCode = self.createPovCode(
+                    child, True, expPigment, expPhotons, True, expLabel, True
+                )  # call createPovCode for the child
                 povArr += childCode
 
                 povArr += "#declare intervalX = " + intervalX + ";\n"
@@ -457,16 +528,16 @@ class ExportToPovRay:
 
                 if expPlacement:
                     translation = self.getTranslation(fcObj)
-                    if translation != "": #test if the object is translated
+                    if translation != "":  # test if the object is translated
                         povArr += "\t\t\t\t" + translation + "\n"
 
                     rotation = self.getRotation(fcObj)
-                    if rotation != "": #test if the object is rotated
+                    if rotation != "":  # test if the object is rotated
                         povArr += "\t\t\t\t" + rotation + "\n"
 
                 if expPigment:
                     pigment = self.getPigment(fcObj)
-                    if pigment != "": #test if the object has the standard pigment
+                    if pigment != "":  # test if the object has the standard pigment
                         povArr += "\t\t\t\t" + pigment + "\n"
 
                 if expPhotons:
@@ -484,7 +555,9 @@ class ExportToPovRay:
                 povArr += "#end\n"
 
             else:
-                povCode += self.createMesh(fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef)
+                povCode += self.createMesh(
+                    fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef
+                )
 
             povArr = povArr.replace("\n", "\n\t")
             povCode += "\nunion {\n"
@@ -493,15 +566,22 @@ class ExportToPovRay:
             expPlacement = False
             expPhotons = False
 
-        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"): #Clone from Draft workbench
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"):  # Clone from Draft workbench
             povClone = ""
 
             children = fcObj.Objects
             for child in children:
-                povClone += self.createPovCode(child, False, False, False, False, False, True)
+                povClone += self.createPovCode(
+                    child, False, False, False, False, False, True
+                )
 
             if fcObj.Scale.x != 1 or fcObj.Scale.y != 1 or fcObj.Scale.z != 1:
-                povClone += "\n\tscale <" + str(fcObj.Scale.x) + ", " + str(fcObj.Scale.y) + ", " + str(fcObj.Scale.z) + ">"
+                povClone += (
+                    "\n\tscale <"
+                    + str(fcObj.Scale.x) + ", "
+                    + str(fcObj.Scale.y) + ", "
+                    + str(fcObj.Scale.z) + ">"
+                )
 
             povCode += povClone
 
@@ -509,8 +589,10 @@ class ExportToPovRay:
             spline = self.sketchToBezier(fcObj.Base)
 
             if not self.isExtrudeSupported(fcObj) or spline == -1:
-                povCode += self.createMesh(fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef)
-                return povCode #return because the mesh may not translated and rotated
+                povCode += self.createMesh(
+                    fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef
+                )
+                return povCode  # return because the mesh may not translated and rotated
 
             startHeight = 0
             endHeight = fcObj.LengthFwd.getValueAs("mm").Value
@@ -529,14 +611,14 @@ class ExportToPovRay:
             povPad += "\nprism {\n"
             povPad += "\tbezier_spline\n"
             povPad += "\t" + str(startHeight) + ", " + str(endHeight) + ", " + str(spline[1])
-            povPad += spline[0].replace("\n", "\n\t") + "\n" #add the indents
+            povPad += spline[0].replace("\n", "\n\t") + "\n"  # add the indents
 
             rotation = self.getRotation(fcObj.Base)
-            if rotation != "": #test if the object is rotated
+            if rotation != "":  # test if the object is rotated
                 povPad += "\t" + rotation + "\n"
 
             translation = self.getTranslation(fcObj.Base)
-            if translation != "": #test if the object is translated
+            if translation != "":  # test if the object is translated
                 povPad += "\t" + translation + "\n"
 
             povCode += povPad
@@ -549,7 +631,13 @@ class ExportToPovRay:
             height = fcObj.YSize.getValueAs("mm").Value
 
             povImg = "\npolygon { "
-            povImg += "5, <0, 0>, <" + str(width) + ", 0>, <" + str(width) + ", " + str(height) + ">, <0, " + str(height) + ">, <0, 0>"
+            povImg += (
+                "5, <0, 0>, <"
+                + str(width)  + ", 0>, <"
+                + str(width)  + ", "
+                + str(height) + ">, <0, "
+                + str(height) + ">, <0, 0>"
+            )
 
             povPigment = "\npigment {\n"
             povPigment += "\timage_map {\n"
@@ -560,43 +648,58 @@ class ExportToPovRay:
             povPigment += "}\n"
 
             povImg += povPigment.replace("\n", "\n\t")
-            povImg += "\ttranslate -<" + str(width / 2) + ", " + str(height / 2) + ", 0>\n"
+            povImg += (
+                "\ttranslate -<" + str(width / 2) + ", " + str(height / 2) + ", 0>\n"
+            )
 
             expPigment = False
             povCode += povImg
 
-        elif fcObj.TypeId == "App::Part": #Part
+        elif fcObj.TypeId == "App::Part":  # Part
             povPart = "\nunion {\n"
 
             children = fcObj.OutList
             for child in children:
                 guiChild = child.ViewObject
                 if guiChild.Visibility:
-                    childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
-                    povPart += childCode.replace("\n", "\n\t") #add the indents
+                    childCode = self.createPovCode(
+                        child, True, expPigment, expPhotons, True, expLabel, expMeshDef
+                    )  # call createPovCode for the child
+                    povPart += childCode.replace("\n", "\n\t")  # add the indents
 
             povCode += povPart
-            expPigment = False #part has no pigment
+            expPigment = False  # part has no pigment
 
-
-        elif fcObj.TypeId == "PartDesign::Body": #Body from PartDesign
+        elif fcObj.TypeId == "PartDesign::Body":  # Body from PartDesign
             if not self.isBodySupported(fcObj):
-                povCode += self.createMesh(fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef)
-                return povCode #return because the mesh may not translated and rotated
+                povCode += self.createMesh(
+                    fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef
+                )
+                return povCode  # return because the mesh may not translated and rotated
 
             povBody = "\nunion {\n"
             if fcObj.Tip != None:
-                povBody += self.createPovCode(fcObj.Tip, True, True, True, True, True, True).replace("\n", "\n\t") #add child code and indents
+                povBody += self.createPovCode(
+                    fcObj.Tip, True, True, True, True, True, True
+                ).replace(
+                    "\n", "\n\t"
+                )  # add child code and indents
                 povCode += povBody
             else:
                 return ""
 
-        elif fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket": #Pad or Pocket from PartDesign
+        elif fcObj.TypeId == "PartDesign::Pad" or fcObj.TypeId == "PartDesign::Pocket":  # Pad or Pocket from PartDesign
             povPad = ""
             spline = self.sketchToBezier(fcObj.Profile[0])
 
-            if (self.isSketchSupported(fcObj.Profile[0]) == False) or spline == -1 or (self.isPadPocketSupported(fcObj) == False):
-                povPad += self.createMesh(fcObj, expPlacement, True, expPhotons, expClose, expMeshDef)
+            if (
+                (self.isSketchSupported(fcObj.Profile[0]) == False)
+                or spline == -1
+                or (self.isPadPocketSupported(fcObj) == False)
+            ):
+                povPad += self.createMesh(
+                    fcObj, expPlacement, True, expPhotons, expClose, expMeshDef
+                )
                 povCode += povPad
                 return povCode
 
@@ -623,21 +726,28 @@ class ExportToPovRay:
                 povPad += "\nunion {\n"
 
             if fcObj.BaseFeature != None:
-                povBase = self.createPovCode(fcObj.BaseFeature, True, True, True, True, True, True)
-                povPad += povBase.replace("\n", "\n\t") #add the indents
+                povBase = self.createPovCode(
+                    fcObj.BaseFeature, True, True, True, True, True, True
+                )
+                povPad += povBase.replace("\n", "\n\t")  # add the indents
 
             povPad += "\n\tprism {\n"
             povPad += "\t\tbezier_spline\n"
-            povPad += "\t\t" + str(startHeight) + ", " + str(endHeight) + ", " + str(spline[1])
-            povPad += spline[0].replace("\n", "\n\t\t") + "\n" #add the indents
+            povPad += (
+                "\t\t"
+                + str(startHeight) + ", "
+                + str(endHeight) + ", "
+                + str(spline[1])
+            )
+            povPad += spline[0].replace("\n", "\n\t\t") + "\n"  # add the indents
 
             if expPlacement:
                 rotation = self.getRotation(fcObj.Profile[0])
-                if rotation != "": #test if the object is rotated
+                if rotation != "":  # test if the object is rotated
                     povPad += "\t\t" + rotation + "\n"
 
                 translation = self.getTranslation(fcObj.Profile[0])
-                if translation != "": #test if the object is translated
+                if translation != "":  # test if the object is translated
                     povPad += "\t\t" + translation + "\n"
             else:
                 rotation = "\t\trotate <-90, 0, 0>"
@@ -652,23 +762,35 @@ class ExportToPovRay:
             return povCode
 
 
-        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("PointLight"):
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("PointLight"):  # PointLight
             povLight = "\nlight_source { "
             povLight += "<0, 0, 0>"
-            povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
+            povLight += (
+                "\n\tcolor rgb<"
+                + str(fcObj.Color[0]) + ", "
+                + str(fcObj.Color[1]) + ", "
+                + str(fcObj.Color[2]) + ">"
+            )
 
             if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
-                povLight += "\n\tfade_distance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
+                povLight += "\n\tfade_distance " + str(
+                    fcObj.FadeDistance.getValueAs("mm").Value
+                )
                 povLight += "\n\tfade_power " + str(fcObj.FadePower)
 
             povCode += povLight
 
             expPigment = False
 
-        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("AreaLight"):
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("AreaLight"):  # AreaLight
             povLight = "\nlight_source { "
             povLight += "<0, 0, 0>"
-            povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
+            povLight += (
+                "\n\tcolor rgb<"
+                + str(fcObj.Color[0]) + ", "
+                + str(fcObj.Color[1]) + ", "
+                + str(fcObj.Color[2]) + ">"
+            )
             povLight += "\n\tarea_light"
 
             povLight += "\n\t<" + str(fcObj.Length.getValueAs("mm").Value) + ", 0, 0>, "
@@ -685,17 +807,24 @@ class ExportToPovRay:
                 povLight += "\n\tjitter"
 
             if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
-                povLight += "\n\tfade_distance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
+                povLight += "\n\tfade_distance " + str(
+                    fcObj.FadeDistance.getValueAs("mm").Value
+                )
                 povLight += "\n\tfade_power " + str(fcObj.FadePower)
 
             povCode += povLight
 
             expPigment = False
 
-        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("SpotLight"):
+        elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("SpotLight"):  # SpotLight
             povLight = "\nlight_source { "
             povLight += "<0, 0, 0>"
-            povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
+            povLight += (
+                "\n\tcolor rgb<"
+                + str(fcObj.Color[0]) + ", "
+                + str(fcObj.Color[1]) + ", "
+                + str(fcObj.Color[2]) + ">"
+            )
             povLight += "\n\tspotlight"
             povLight += "\n\tpoint_at <0, -1, 0>"
 
@@ -704,17 +833,20 @@ class ExportToPovRay:
             povLight += "\n\ttightness " + str(fcObj.Tightness)
 
             if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
-                povLight += "\n\tfade_distance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
+                povLight += "\n\tfade_distance " + str(
+                    fcObj.FadeDistance.getValueAs("mm").Value
+                )
                 povLight += "\n\tfade_power " + str(fcObj.FadePower)
 
             povCode += povLight
 
             expPigment = False
 
-
-        else: #not a supported object
-            povCode += self.createMesh(fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef)
-            return povCode #return because the mesh may not translated and rotated
+        else:  # not a supported object
+            povCode += self.createMesh(
+                fcObj, expPlacement, expPigment, expPhotons, expClose, expMeshDef
+            )
+            return povCode  # return because the mesh may not translated and rotated
 
         povCode += "\n"
 
@@ -730,11 +862,11 @@ class ExportToPovRay:
 
         if expPlacement:
             rotation = self.getRotation(fcObj)
-            if rotation != "": #test if the object is rotated
+            if rotation != "":  # test if the object is rotated
                 povCode += "\t" + rotation + "\n"
 
             translation = self.getTranslation(fcObj)
-            if translation != "": #test if the object is translated
+            if translation != "":  # test if the object is translated
                 povCode += "\t" + translation + "\n"
 
         if expClose:
@@ -751,33 +883,43 @@ class ExportToPovRay:
 
             unsortedFacadeLines = sketch.GeometryFacadeList #unordered lines / original order
 
-            #delete construction geometry and points
+            # delete construction geometry and points
             unsortedLines = []
             for facadeLine in sketch.GeometryFacadeList:
                 try:
                     construction = facadeLine.Geometry.Construction # old versions of FC
                 except:
-                    construction = facadeLine.Construction # recent versions of FC
+                    construction = facadeLine.Construction  # recent versions of FC
 
-                if (not construction or type(facadeLine.Geometry) == Part.Point):
+                if not construction or type(facadeLine.Geometry) == Part.Point:
                     unsortedLines.append(facadeLine.Geometry)
 
-            numOfPoints = 0 #counter for povray bezier points
+            numOfPoints = 0  # counter for povray bezier points
 
-            sortedLines = [] #lines in the right order
+            sortedLines = []  # lines in the right order
 
             while unsortedLines: #until the unsortedLines array is empty
                 sortedLines.append(unsortedLines[0]) # put first line in sorted lines array
                 startLine = unsortedLines[0]         # and
                 del unsortedLines[0]                 # delete from unsorted lines array
 
-                if type(startLine) != Part.Circle and type(sortedLines[len(sortedLines) - 1]) != Part.Circle:
-                    while not self.isSamePoint(startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint): # search for matching line
+                if (
+                    type(startLine) != Part.Circle
+                    and type(sortedLines[len(sortedLines) - 1]) != Part.Circle
+                ):
+                    while not self.isSamePoint(
+                        startLine.StartPoint, sortedLines[len(sortedLines) - 1].EndPoint
+                    ):  # search for matching line
                         # handling of -1 missing
-                        nextLineI = self.getNextLine(unsortedLines, sortedLines[len(sortedLines) - 1])
+                        nextLineI = self.getNextLine(
+                            unsortedLines, sortedLines[len(sortedLines) - 1]
+                        )
 
-                        #change direction
-                        if self.isSamePoint(sortedLines[len(sortedLines) - 1].EndPoint, unsortedLines[nextLineI].EndPoint):
+                        # change direction
+                        if self.isSamePoint(
+                            sortedLines[len(sortedLines) - 1].EndPoint,
+                            unsortedLines[nextLineI].EndPoint,
+                        ):
                             unsortedLines[nextLineI].reverse()
 
                         sortedLines.append(unsortedLines[nextLineI])
@@ -786,13 +928,29 @@ class ExportToPovRay:
         except:
             return -1
 
-        #create povSpline
+        # create povSpline
         for line in sortedLines:
             if type(line) == Part.LineSegment:
-                povSpline += "<" + str(round(line.StartPoint.x, 3)) + ", " + str(round(line.StartPoint.y, 3)) + ">, "
-                povSpline += "<" + str(round(line.StartPoint.x, 3)) + ", " + str(round(line.StartPoint.y, 3)) + ">, "
-                povSpline += "<" + str(round(line.EndPoint.x, 3)) + ", " + str(round(line.EndPoint.y, 3)) + ">, "
-                povSpline += "<" + str(round(line.EndPoint.x, 3)) + ", " + str(round(line.EndPoint.y, 3)) + ">//line\n"
+                povSpline += (
+                    "<"
+                    + str(round(line.StartPoint.x, 3)) + ", "
+                    + str(round(line.StartPoint.y, 3)) + ">, "
+                )
+                povSpline += (
+                    "<"
+                    + str(round(line.StartPoint.x, 3)) + ", "
+                    + str(round(line.StartPoint.y, 3)) + ">, "
+                )
+                povSpline += (
+                    "<"
+                    + str(round(line.EndPoint.x, 3)) + ", "
+                    + str(round(line.EndPoint.y, 3)) + ">, "
+                )
+                povSpline += (
+                    "<"
+                    + str(round(line.EndPoint.x, 3)) + ", "
+                    + str(round(line.EndPoint.y, 3)) + ">//line\n"
+                )
 
                 numOfPoints += 4
 
@@ -800,7 +958,9 @@ class ExportToPovRay:
                 r = line.Radius
                 cx = round(line.Center.x, 3)
                 cy = round(line.Center.y, 3)
-                dTC = round((4.0/3.0) * math.tan(math.pi / 8.0) * r, 3) #distance to control point
+                dTC = round(
+                    (4.0 / 3.0) * math.tan(math.pi / 8.0) * r, 3
+                )  # distance to control point
 
                 posP0 = "<" + str(cx) + ", " + str(cy + r) + ">"
                 controlP0_0 = "<" + str(cx - dTC) + ", " + str(cy + r) + ">"
@@ -818,10 +978,30 @@ class ExportToPovRay:
                 controlP3_0 = "<" + str(cx - r) + ", " + str(cy - dTC) + ">"
                 controlP3_1 = "<" + str(cx - r) + ", " + str(cy + dTC) + ">"
 
-                povSpline += posP0 + ", " + controlP0_1 + ", " + controlP1_0 + ", " + posP1 + "//circle\n"
-                povSpline += posP1 + ", " + controlP1_1 + ", " + controlP2_0 + ", " + posP2 + "//circle\n"
-                povSpline += posP2 + ", " + controlP2_1 + ", " + controlP3_0 + ", " + posP3 + "//circle\n"
-                povSpline += posP3 + ", " + controlP3_1 + ", " + controlP0_0 + ", " + posP0 + "//circle\n"
+                povSpline += (
+                    posP0 + ", "
+                    + controlP0_1 + ", "
+                    + controlP1_0 + ", "
+                    + posP1 + "//circle\n"
+                )
+                povSpline += (
+                    posP1 + ", "
+                    + controlP1_1 + ", "
+                    + controlP2_0 + ", "
+                    + posP2 + "//circle\n"
+                )
+                povSpline += (
+                    posP2 + ", "
+                    + controlP2_1 + ", "
+                    + controlP3_0 + ", "
+                    + posP3 + "//circle\n"
+                )
+                povSpline += (
+                    posP3 + ", "
+                    + controlP3_1 + ", "
+                    + controlP0_0 + ", "
+                    + posP0 + "//circle\n"
+                )
 
                 numOfPoints += 16
 
@@ -829,14 +1009,14 @@ class ExportToPovRay:
                 arc = line
                 a = arc.LastParameter - arc.FirstParameter
 
-                #correct direction of arc if necessary
+                # correct direction of arc if necessary
                 if arc.Axis.z < 0:
                     arc.reverse()
                     reversed = True
                 else:
                     reversed = False
 
-                #split arc in segments <90deg
+                # split arc in segments <90deg
                 if a % math.pi / 2 == 0:
                     numOfSegments = a / (math.pi / 2)
                 else:
@@ -851,30 +1031,57 @@ class ExportToPovRay:
                 segments = []
                 for i in range(numOfSegments):
                     if reversed:
-                        segment = {"startAngle": arc.LastParameter - i * angleOfSegment,
-                                   "endAngle": arc.LastParameter - (i+1) * angleOfSegment,
-                                   "direction": "clockwise"}
+                        segment = {
+                            "startAngle": arc.LastParameter - i * angleOfSegment,
+                            "endAngle": arc.LastParameter - (i + 1) * angleOfSegment,
+                            "direction": "clockwise",
+                        }
                     else:
-                        segment = {"startAngle": arc.FirstParameter + i * angleOfSegment,
-                                   "endAngle": arc.FirstParameter + (i+1) * angleOfSegment,
-                                   "direction": "anticlockwise"}
+                        segment = {
+                            "startAngle": arc.FirstParameter + i * angleOfSegment,
+                            "endAngle": arc.FirstParameter + (i + 1) * angleOfSegment,
+                            "direction": "anticlockwise",
+                        }
 
                     segments.append(segment)
 
-                #segment to bezier
+                # segment to bezier
                 for segment in segments:
                     numOfSegmentsPerCircle = (2 * math.pi) / angleOfSegment
-                    controlDistance = (4.0/3.0) * math.tan(math.pi / (2 * numOfSegmentsPerCircle)) * arc.Radius
+                    controlDistance = (
+                        (4.0 / 3.0)
+                        * math.tan(math.pi / (2 * numOfSegmentsPerCircle))
+                        * arc.Radius
+                    )
 
-                    startX = round(math.cos(segment["startAngle"]) * arc.Radius + arc.Location.x, 3)
-                    startY = round(math.sin(segment["startAngle"]) * arc.Radius + arc.Location.y, 3)
-                    startControlX = round(-math.cos(math.pi/2 - segment["startAngle"]) * controlDistance, 3)
-                    startControlY = round(math.sin(math.pi/2 - segment["startAngle"]) * controlDistance, 3)
+                    startX = round(
+                        math.cos(segment["startAngle"]) * arc.Radius + arc.Location.x, 3
+                    )
+                    startY = round(
+                        math.sin(segment["startAngle"]) * arc.Radius + arc.Location.y, 3
+                    )
+                    startControlX = round(
+                        -math.cos(math.pi / 2 - segment["startAngle"])
+                        * controlDistance,
+                        3,
+                    )
+                    startControlY = round(
+                        math.sin(math.pi / 2 - segment["startAngle"]) * controlDistance,
+                        3,
+                    )
 
-                    endX = round(math.cos(segment["endAngle"]) * arc.Radius + arc.Location.x, 3)
-                    endY = round(math.sin(segment["endAngle"]) * arc.Radius + arc.Location.y, 3)
-                    endControlX = round(math.cos(math.pi/2 - segment["endAngle"]) * controlDistance, 3)
-                    endControlY = round(-math.sin(math.pi/2 - segment["endAngle"]) * controlDistance, 3)
+                    endX = round(
+                        math.cos(segment["endAngle"]) * arc.Radius + arc.Location.x, 3
+                    )
+                    endY = round(
+                        math.sin(segment["endAngle"]) * arc.Radius + arc.Location.y, 3
+                    )
+                    endControlX = round(
+                        math.cos(math.pi / 2 - segment["endAngle"]) * controlDistance, 3
+                    )
+                    endControlY = round(
+                        -math.sin(math.pi / 2 - segment["endAngle"]) * controlDistance, 3
+                    )
 
                     if reversed:
                         startControlX *= -1
@@ -899,7 +1106,7 @@ class ExportToPovRay:
     def getNextLine(self, lines, lastLine):
         """Get index of next line for the given last line."""
 
-        #returns index
+        # returns index
         i = 0
         for line in lines:
             if self.isSamePoint(line.EndPoint, lastLine.EndPoint) or self.isSamePoint(line.StartPoint, lastLine.EndPoint):
@@ -910,8 +1117,12 @@ class ExportToPovRay:
     def isSamePoint(self, point1, point2):
         """Check if two points are equal."""
 
-        #round because FreeCAD has rounding mistakes
-        if round(point1.x, 3) == round(point2.x, 3) and round(point1.y, 3) == round(point2.y, 3) and round(point1.z, 3) == round(point2.z, 3):
+        # round because FreeCAD has rounding mistakes
+        if (
+            round(point1.x, 3) == round(point2.x, 3)
+            and round(point1.y, 3) == round(point2.y, 3)
+            and round(point1.z, 3) == round(point2.z, 3)
+        ):
             return True
         return False
 
@@ -926,42 +1137,44 @@ class ExportToPovRay:
     def isBodySupported(self, body):
         """Is the given body fully supported."""
 
-        supportedTypeIds = ["App::Origin",
-                            "App::Line",
-                            "App::Plane",
-                            "Sketcher::SketchObject",
-                            "PartDesign::Pad",
-                            "PartDesign::Pocket",
-                            "PartDesign::Point",
-                            "PartDesign::Line",
-                            "PartDesign::Plane"]
+        supportedTypeIds = [
+            "App::Origin",
+            "App::Line",
+            "App::Plane",
+            "Sketcher::SketchObject",
+            "PartDesign::Pad",
+            "PartDesign::Pocket",
+            "PartDesign::Point",
+            "PartDesign::Line",
+            "PartDesign::Plane"
+        ]
 
         children = body.OutListRecursive
 
-        #are objects supported
+        # are objects supported
         for obj in children:
             if not obj.TypeId in supportedTypeIds:
                 return False
 
-        #get sketches
+        # get sketches
         sketches = []
         for obj in children:
             if obj.TypeId == "Sketcher::SketchObject":
                 sketches.append(obj)
 
-        #test sketches
+        # test sketches
         for sketch in sketches:
             if not self.isSketchSupported(sketch):
                 return False
 
         supportedTypes = ["Length"]
-        #get pads and pockets
+        # get pads and pockets
         padsPockets = []
         for obj in children:
             if obj.TypeId == "PartDesign::Pad" or obj.TypeId == "PartDesign::Pocket":
                 padsPockets.append(obj)
 
-        #test types
+        # test types
         for obj in padsPockets:
             if not obj.Type in supportedTypes:
                 return False
@@ -987,19 +1200,22 @@ class ExportToPovRay:
     def isExtrudeSupported(self, fcObj):
         """Check if the given extrude from Part is fully supported."""
 
-        #test mode of direction
+        # test mode of direction
         if fcObj.DirMode != "Normal":
             return False
 
-        #test TaperAngle and TaperAngleRev
-        if fcObj.TaperAngle.getValueAs("deg").Value != 0 or fcObj.TaperAngleRev.getValueAs("deg").Value:
+        # test TaperAngle and TaperAngleRev
+        if (
+            fcObj.TaperAngle.getValueAs("deg").Value != 0
+            or fcObj.TaperAngleRev.getValueAs("deg").Value
+        ):
             return False
 
-        #test base shape (only sketches are supported)
+        # test base shape (only sketches are supported)
         if fcObj.Base.TypeId != "Sketcher::SketchObject":
             return False
 
-        #test sketch
+        # test sketch
         if not self.isSketchSupported(fcObj.Base):
             return False
 
@@ -1008,7 +1224,12 @@ class ExportToPovRay:
     def isSketchSupported(self, sketch):
         """Check if the given sketch is fully supported."""
 
-        supportedGeometryTypes = [Part.LineSegment, Part.Circle, Part.Point, Part.ArcOfCircle]
+        supportedGeometryTypes = [
+            Part.LineSegment,
+            Part.Circle,
+            Part.Point,
+            Part.ArcOfCircle
+        ]
         for line in sketch.Geometry:
             if not type(line) in supportedGeometryTypes and not line.Construction:
                 return False
@@ -1023,7 +1244,7 @@ class ExportToPovRay:
         if expMeshDef:
             mesh = 0
 
-            if fcObj.isDerivedFrom("Mesh::Feature"): #is fcObj a mesh
+            if fcObj.isDerivedFrom("Mesh::Feature"):  # is fcObj a mesh
                 mesh = fcObj.Mesh
             else:
                 try:
@@ -1035,9 +1256,16 @@ class ExportToPovRay:
                     deviation = fcObj.ViewObject.Deviation
 
                     try:
-                        mesh = MeshPart.meshFromShape(Shape=shape, LinearDeflection=deviation, AngularDeflection=angularDeflection, Relative=False)
+                        mesh = MeshPart.meshFromShape(
+                            Shape=shape,
+                            LinearDeflection=deviation,
+                            AngularDeflection=angularDeflection,
+                            Relative=False,
+                        )
                     except:
-                        mesh = MeshPart.meshFromShape(shape, deviation, angularDeflection)
+                        mesh = MeshPart.meshFromShape(
+                            shape, deviation, angularDeflection
+                        )
 
                 except:
                     return ""
@@ -1048,49 +1276,59 @@ class ExportToPovRay:
                 #App.Console.PrintWarning(warningMessage)
                 return ""
 
-            #create mesh2 object
+            # create mesh2 object
             povMesh = "#declare " + stringCorrection(fcObj.Label) + "_mesh ="
             povMesh += "\nmesh2 {\n\tvertex_vectors {\n"
 
-            #create vertex_vectors
+            # create vertex_vectors
             numOfVertex = len(mesh.Topology[0])
             povMesh += "\t\t" + str(numOfVertex)
 
             for point in mesh.Topology[0]:
-                povMesh += ",\n\t\t<" + str(point.x) + ", " + str(point.y) + ", " + str(point.z) + ">"
+                povMesh += (
+                    ",\n\t\t<"
+                    + str(point.x) + ", "
+                    + str(point.y) + ", "
+                    + str(point.z) + ">"
+                )
             povMesh += "\n\t}\n\n"
 
-            #create face_indices
+            # create face_indices
             povMesh += "\tface_indices {\n"
             numOfTriangles = len(mesh.Topology[1])
             povMesh += "\t\t" + str(numOfTriangles)
 
             for triangle in mesh.Topology[1]:
-                povMesh += ",\n\t\t<" + str(triangle[0]) + ", " + str(triangle[1]) + ", " + str(triangle[2]) + ">"
+                povMesh += (
+                    ",\n\t\t<"
+                    + str(triangle[0]) + ", "
+                    + str(triangle[1]) + ", "
+                    + str(triangle[2]) + ">"
+                )
             povMesh += "\n\t}\n\n"
 
-            #add inside vector
+            # add inside vector
             povMesh += "\tinside_vector <1, 1, 1>\n"
 
             povMesh += "}\n\n"
 
-            #write mesh in inc file
+            # write mesh in inc file
             self.meshFileContent += povMesh
 
-        #return pov code
+        # return pov code
         povCode += "\nobject { " + stringCorrection(fcObj.Label) + "_mesh\n"
         pigment = self.getPigment(fcObj)
 
         if expPlacement == False: #meshes are already translated, so if they shouldn't translated, they translated back
             translation = self.getTranslation(fcObj)
-            if translation != "": #test if the object is translated
+            if translation != "":  # test if the object is translated
                 povCode += "\t" + translation + " * (-1)\n"
 
             rotation = self.getInvertedRotation(fcObj)
-            if rotation != "": #test if the object is rotated
+            if rotation != "":  # test if the object is rotated
                 povCode += rotation.replace("\n", "\t\n")
 
-        if pigment != "": #test if the object has the standard pigment
+        if pigment != "":  # test if the object has the standard pigment
             povCode += "\t" + pigment + "\n"
 
         if expPhotons:
@@ -1111,29 +1349,34 @@ class ExportToPovRay:
         noCsgCount = 0
         CsgCount = 0
         ParentCount = 0
-        supportedTypeIds = ["Part::Sphere",
-                            "Part::Box",
-                            "Part::Torus",
-                            "Part::Cylinder",
-                            "Part::Cone",
-                            "Part::Ellipsoid",
-                            "Part::Plane",
-                            "Part::Cut",
-                            "Part::MultiFuse", "Part::Fuse",
-                            "Part::MultiCommon", "Part::Common",
-                            "Part::Extrusion",
-                            "PartDesign::Body"
-                            "PartDesign::Pad",
-                            "PartDesign::Pocket",
-                            "Sketcher::SketchObject",
-                            "App::DocumentObjectGroup",
-                            "App:Part",
-                            "Part::Compound",
-                            "Image::ImagePlane"]
+        supportedTypeIds = [
+            "Part::Sphere",
+            "Part::Box",
+            "Part::Torus",
+            "Part::Cylinder",
+            "Part::Cone",
+            "Part::Ellipsoid",
+            "Part::Plane",
+            "Part::Cut",
+            "Part::MultiFuse",
+            "Part::Fuse",
+            "Part::MultiCommon",
+            "Part::Common",
+            "Part::Extrusion",
+            "PartDesign::Body" "PartDesign::Pad",
+            "PartDesign::Pocket",
+            "Sketcher::SketchObject",
+            "App::DocumentObjectGroup",
+            "App:Part",
+            "Part::Compound",
+            "Image::ImagePlane"
+        ]
         supportedNames = ["Array", "Clone", "PointLight", "AreaLight", "SpotLight"]
 
         for obj in objs:
-            if not obj.TypeId in supportedTypeIds and not self.isNameSupported(obj.Name, supportedNames):
+            if not obj.TypeId in supportedTypeIds and not self.isNameSupported(
+                obj.Name, supportedNames
+            ):
                 noCsgCount = noCsgCount + 1
             else:
                 CsgCount = CsgCount + 1
@@ -1144,7 +1387,11 @@ class ExportToPovRay:
         statistics += str(ParentCount) + " parent objects found in highest layer\n"
         statistics += "containing totally " + str(CsgCount + noCsgCount) + " objects\n"
         if noCsgCount != 0:
-            statistics += "Your model contains " + str(noCsgCount) + " objects which aren't supported (will be represented as mesh).\n"
+            statistics += (
+                "Your model contains "
+                + str(noCsgCount)
+                + " objects which aren't supported (will be represented as mesh).\n"
+            )
 
         if self.CamType == "Perspective":
             camInfo = "Perspective Camera\n"
@@ -1179,13 +1426,23 @@ class ExportToPovRay:
                 povBg = "// HDRI Environment ----------------------------------\n"
                 povBg += "sky_sphere {\n"
                 povBg += "\tpigment {\n"
-                povBg += "\t\timage_map { hdr \"" + self.hdriPath + "\"\n"
+                povBg += '\t\timage_map { hdr "' + self.hdriPath + '"\n'
                 povBg += "\t\t\tgamma 1.1\n"
                 povBg += "\t\t\tmap_type 1 interpolate 2\n"
                 povBg += "\t\t}\n"
                 povBg += "\t}\n"
-                povBg += "\trotate <" + str(self.hdriRotX) + ", " + str(self.hdriRotY) + ", " + str(self.hdriRotZ) + ">\n"
-                povBg += "\ttranslate <" + str(self.hdriTransX) + ", " + str(self.hdriTransY) + ", " + str(self.hdriTransZ) + ">\n"
+                povBg += (
+                    "\trotate <"
+                    + str(self.hdriRotX) + ", "
+                    + str(self.hdriRotY) + ", "
+                    + str(self.hdriRotZ) + ">\n"
+                )
+                povBg += (
+                    "\ttranslate <"
+                    + str(self.hdriTransX) + ", "
+                    + str(self.hdriTransY) + ", "
+                    + str(self.hdriTransZ) + ">\n"
+                )
                 povBg += "}\n"
 
                 return povBg
@@ -1204,32 +1461,80 @@ class ExportToPovRay:
                     right = up * AspectRatio
                 else:
                     right = self.CamNode.height.getValue()
-                    up = right/AspectRatio
+                    up = right / AspectRatio
                 povBg += "\npolygon {\n"
-                povBg += "\t5, <" + str(-right/2) + ", " + str(-up/2) + ">, <" + str(-right/2) + ", "
-                povBg += str(up/2) + ">, <" + str(right/2) + ", " + str(up/2) + ">, <" + str(right/2) + ", " + str(-up/2)
-                povBg += ">, <" + str(-right/2) + ", " + str(-up/2) + ">\n"
+                povBg += (
+                    "\t5, <"
+                    + str(-right / 2) + ", "
+                    + str(-up / 2)    + ">, <"
+                    + str(-right / 2) + ", "
+                )
+                povBg += (
+                    str(up / 2)      + ">, <"
+                    + str(right / 2) + ", "
+                    + str(up / 2)    + ">, <"
+                    + str(right / 2) + ", "
+                    + str(-up / 2)
+                )
+                povBg += ">, <" + str(-right / 2) + ", " + str(-up / 2) + ">\n"
                 povBg += "\tpigment {"
                 if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
                     povBg += " color rgb" + self.uintColorToRGB(bgColor1) + " }\n"
                 elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
                     povBg += "\n\t\tgradient y\n"
                     povBg += "\t\tcolor_map {\n"
-                    povBg += "\t\t\t[ 0.00  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
-                    povBg += "\t\t\t[ 0.05  color rgb" + self.uintColorToRGB(bgColor3) +" ]\n"
-                    if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
-                        povBg += "\t\t\t[ 0.50  color rgb" + self.uintColorToRGB(bgColor4) +" ]\n"
-                    povBg += "\t\t\t[ 0.95  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
-                    povBg += "\t\t\t[ 1.00  color rgb" + self.uintColorToRGB(bgColor2) +" ]\n"
+                    povBg += (
+                        "\t\t\t[ 0.00  color rgb"
+                        + self.uintColorToRGB(bgColor3)
+                        + " ]\n"
+                    )
+                    povBg += (
+                        "\t\t\t[ 0.05  color rgb"
+                        + self.uintColorToRGB(bgColor3)
+                        + " ]\n"
+                    )
+                    if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool(
+                        "UseBackgroundColorMid"
+                    ):
+                        povBg += (
+                            "\t\t\t[ 0.50  color rgb"
+                            + self.uintColorToRGB(bgColor4)
+                            + " ]\n"
+                        )
+                    povBg += (
+                        "\t\t\t[ 0.95  color rgb"
+                        + self.uintColorToRGB(bgColor2)
+                        + " ]\n"
+                    )
+                    povBg += (
+                        "\t\t\t[ 1.00  color rgb"
+                        + self.uintColorToRGB(bgColor2)
+                        + " ]\n"
+                    )
                     povBg += "\t\t}\n"
                     povBg += "\t\tscale <1," + str(up) + ",1>\n"
-                    povBg += "\t\ttranslate <0," + str(-up/2) + ",0>\n"
+                    povBg += "\t\ttranslate <0," + str(-up / 2) + ",0>\n"
                     povBg += "\t}\n"
                 #color rgb<0,0,1>}\n"
                 povBg += "\tfinish { ambient 1 diffuse 0 }\n"
-                povBg += "\trotate <" + str(self.EulerCam[2]) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
-                povBg += "\ttranslate <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + ">\n"
-                povBg += "\ttranslate <" + str(ViewDir[0]*100000) + ", " + str(ViewDir[1]*100000) + ", " + str(ViewDir[2]*100000) + ">\n"
+                povBg += (
+                    "\trotate <"
+                    + str(self.EulerCam[2]) + ", "
+                    + str(self.EulerCam[1]) + ", "
+                    + str(self.EulerCam[0]) + ">\n"
+                )
+                povBg += (
+                    "\ttranslate <"
+                    + str(self.CamPos.Base.x) + ", "
+                    + str(self.CamPos.Base.y) + ", "
+                    + str(self.CamPos.Base.z) + ">\n"
+                )
+                povBg += (
+                    "\ttranslate <"
+                    + str(ViewDir[0] * 100000) + ", "
+                    + str(ViewDir[1] * 100000) + ", "
+                    + str(ViewDir[2] * 100000) + ">\n"
+                )
                 povBg += "}\n"
 
             povBg += "sky_sphere {\n\tpigment {\n"
@@ -1248,7 +1553,12 @@ class ExportToPovRay:
                 povBg += "\t\t}\n"
                 povBg += "\t\tscale 2\n"
                 povBg += "\t\ttranslate -1\n"
-                povBg += "\t\trotate<" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">\n"
+                povBg += (
+                    "\t\trotate<"
+                    + str(self.EulerCam[2] - 90) + ", "
+                    + str(self.EulerCam[1]) + ", "
+                    + str(self.EulerCam[0]) + ">\n"
+                )
             povBg += "\t}\n}\n"
 
             return povBg
@@ -1273,24 +1583,34 @@ class ExportToPovRay:
             if AspectRatio <= 1:
                 CamAngle = 45
             else:
-                CamAngle = math.degrees(math.atan2(AspectRatio/2, 1.2071067812))*2
+                CamAngle = math.degrees(math.atan2(AspectRatio / 2, 1.2071067812)) * 2
             PovCamAngle = "\tangle {0:1.2f}".format(CamAngle) + "\n"
 
         elif self.CamType == "Orthographic":
             if AspectRatio >= 1:
                 up = up = self.CamNode.height.getValue()
-                right = up*AspectRatio
+                right = up * AspectRatio
             else:
                 right = self.CamNode.height.getValue()
-                up = right/AspectRatio
+                up = right / AspectRatio
             PovCamType = "\torthographic\n"
             PovCamUp = "< 0, 0, " + "{0:1.2f}".format(up) + ">"
-            PovCamRight = "<" + "{0:1.2f}".format(right) +", 0, 0>"
+            PovCamRight = "<" + "{0:1.2f}".format(right) + ", 0, 0>"
 
         PovCam += "#declare CamUp = " + PovCamUp + ";\n"
         PovCam += "#declare CamRight = " + PovCamRight + ";\n"
-        PovCam += "#declare CamRotation = <" + str(self.EulerCam[2]-90) + ", " + str(self.EulerCam[1]) + ", " + str(self.EulerCam[0]) + ">;\n"
-        PovCam += "#declare CamPosition = <" + str(self.CamPos.Base.x) + ", " + str(self.CamPos.Base.y) + ", " + str(self.CamPos.Base.z) + ">;\n"
+        PovCam += (
+            "#declare CamRotation = <"
+            + str(self.EulerCam[2] - 90) + ", "
+            + str(self.EulerCam[1]) + ", "
+            + str(self.EulerCam[0]) + ">;\n"
+        )
+        PovCam += (
+            "#declare CamPosition = <"
+            + str(self.CamPos.Base.x) + ", "
+            + str(self.CamPos.Base.y) + ", "
+            + str(self.CamPos.Base.z) + ">;\n"
+        )
 
         if self.incContent.find("camera") != -1:
             incCamera = True
@@ -1316,7 +1636,7 @@ class ExportToPovRay:
         """Return the translation of the given FreeCAD object in pov code."""
 
         translation = ""
-        x = fcObj.Placement.Base.x #get the position in every axis
+        x = fcObj.Placement.Base.x  # get the position in every axis
         y = fcObj.Placement.Base.y
         z = fcObj.Placement.Base.z
         if x != 0 or y != 0 or z != 0: #test whether the position is 0,0,0
@@ -1328,32 +1648,36 @@ class ExportToPovRay:
         """Return the rotation of the given FreeCAD object in pov code."""
 
         rotate = ""
-        eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
-        x = eulerRot[2] #get rotation in every axis
+        eulerRot = fcObj.Placement.Rotation.toEuler()  # convert the rotation to euler angles
+        x = eulerRot[2]  # get rotation in every axis
         y = eulerRot[1]
         z = eulerRot[0]
 
-        #if fcObj is a torus it is necessary to rotate it in x axis
+        # if fcObj is a torus it is necessary to rotate it in x axis
         if fcObj.TypeId == "Part::Torus" or (fcObj.Name.startswith("Clone") and fcObj.OutList[0].TypeId == "Part::Torus"):
             x += 90
         elif fcObj.TypeId == "Sketcher::SketchObject":
             x -= 90
 
         if x != 0 or y != 0 or z != 0:
-            rotate = "rotate <" + str(x) + ", " + str(y)+ ", "  + str(z) + ">" #create rotation vector
+            rotate = (
+                "rotate <" + str(x) + ", " + str(y) + ", " + str(z) + ">"
+            )  # create rotation vector
 
         return rotate
 
     def getInvertedRotation(self, fcObj):
         """Return the inverted rotation of the given FreeCAD object in pov code."""
         rotate = ""
-        eulerRot = fcObj.Placement.Rotation.toEuler() #convert the rotation to euler angles
-        x = eulerRot[2] #get rotation in every axis
+        eulerRot = fcObj.Placement.Rotation.toEuler()  # convert the rotation to euler angles
+        x = eulerRot[2]  # get rotation in every axis
         y = eulerRot[1]
         z = eulerRot[0]
 
-        #if fcObj is a torus it is necessary to rotate it in x axis
-        if fcObj.TypeId == "Part::Torus" or (fcObj.Name.startswith("Clone") and fcObj.OutList[0].TypeId == "Part::Torus"):
+        # if fcObj is a torus it is necessary to rotate it in x axis
+        if fcObj.TypeId == "Part::Torus" or (
+            fcObj.Name.startswith("Clone") and fcObj.OutList[0].TypeId == "Part::Torus"
+        ):
             x += 90
         elif fcObj.TypeId == "Sketcher::SketchObject":
             x -= 90
@@ -1382,31 +1706,49 @@ class ExportToPovRay:
         phong = ""
         if appObject.Transparency != 0:
             transparency += " transmit " + str(appObject.Transparency / float(100))
-        ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(appObject.ShapeColor[0], appObject.ShapeColor[1], appObject.ShapeColor[2])
-        if transparency != "" or ShapeColorRGB != self.uintColorToRGB(self.DefaultShapeColor):
+        ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(
+            appObject.ShapeColor[0], appObject.ShapeColor[1], appObject.ShapeColor[2]
+        )
+        if transparency != "" or ShapeColorRGB != self.uintColorToRGB(
+            self.DefaultShapeColor
+        ):
             pigment += "\tpigment { color rgb " + ShapeColorRGB + transparency + " }\n"
         material += pigment
-        if appObject.ShapeMaterial.AmbientColor != (0.20000000298023224, 0.20000000298023224, 0.20000000298023224, 0):
+        if appObject.ShapeMaterial.AmbientColor != (
+            0.20000000298023224,
+            0.20000000298023224,
+            0.20000000298023224,
+            0,
+        ):
             ambient += "ambient rgb<"
-            ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.AmbientColor[0],
-                                                             appObject.ShapeMaterial.AmbientColor[1],
-                                                             appObject.ShapeMaterial.AmbientColor[2])
+            ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(
+                appObject.ShapeMaterial.AmbientColor[0],
+                appObject.ShapeMaterial.AmbientColor[1],
+                appObject.ShapeMaterial.AmbientColor[2],
+            )
             ambient += ">"
         if appObject.ShapeMaterial.EmissiveColor != (0, 0, 0, 0):
             emission += "emission rgb<"
-            emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(appObject.ShapeMaterial.EmissiveColor[0],
-                                                              appObject.ShapeMaterial.EmissiveColor[1],
-                                                              appObject.ShapeMaterial.EmissiveColor[2])
+            emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(
+                appObject.ShapeMaterial.EmissiveColor[0],
+                appObject.ShapeMaterial.EmissiveColor[1],
+                appObject.ShapeMaterial.EmissiveColor[2],
+            )
             emission += ">"
         if appObject.ShapeMaterial.SpecularColor != (0, 0, 0, 0):
             phong += "phong "
-            phong += "{0:1.2f}".format((appObject.ShapeMaterial.SpecularColor[0] +
-                                        appObject.ShapeMaterial.SpecularColor[1] +
-                                        appObject.ShapeMaterial.SpecularColor[2]) / 3)
+            phong += "{0:1.2f}".format(
+                (
+                    appObject.ShapeMaterial.SpecularColor[0]
+                    + appObject.ShapeMaterial.SpecularColor[1]
+                    + appObject.ShapeMaterial.SpecularColor[2]
+                )
+                / 3
+            )
             phong += " phong_size "
             phong += str(appObject.ShapeMaterial.Shininess * 50)
             phong += " "
-        if ambient != "" or emission != "" or  phong != "":
+        if ambient != "" or emission != "" or phong != "":
             finish = "finish {"
             finish += "\n\t" + ambient
             finish += "\n\t" + emission
@@ -1414,8 +1756,17 @@ class ExportToPovRay:
             finish += "\n}\n"
         material += finish
 
-        if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_material_hollow") != -1:
-            material = "\nhollow\nmaterial {" + stringCorrection(fcObj.Label) + "_material_hollow }\n"
+        if (
+            self.texIncContent.find(
+                "#declare " + stringCorrection(fcObj.Label) + "_material_hollow"
+            )
+            != -1
+        ):
+            material = (
+                "\nhollow\nmaterial {"
+                + stringCorrection(fcObj.Label)
+                + "_material_hollow }\n"
+            )
 
         elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_") != -1:
             if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
@@ -1427,7 +1778,12 @@ class ExportToPovRay:
             else:
                 return ""
 
-        if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
+        if (
+            self.incContent.find(
+                "#declare " + stringCorrection(fcObj.Label) + "_material"
+            )
+            != -1
+        ):
             material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
 
         return material
@@ -1437,23 +1793,50 @@ class ExportToPovRay:
 
         photons = "\nphotons {"
 
-        if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons") == -1:
+        if (
+            self.incContent.find(
+                "#declare " + stringCorrection(fcObj.Label) + "_photons"
+            )
+            == -1
+        ):
             return ""
         else:
-            if fcObj.Name.find("Light") == -1: #light objects shouldn't get a target
+            if fcObj.Name.find("Light") == -1:  # light objects shouldn't get a target
                 photons += "\n\ttarget"
 
-            if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons_reflection") != -1:
-                photons += "\n\treflection " + \
-                    stringCorrection(fcObj.Label) + "_photons_reflection"
+            if (
+                self.incContent.find(
+                    "#declare " + stringCorrection(fcObj.Label) + "_photons_reflection"
+                )
+                != -1
+            ):
+                photons += (
+                    "\n\treflection "
+                    + stringCorrection(fcObj.Label)
+                    + "_photons_reflection"
+                )
 
-            if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons_refraction") != -1:
-                photons += "\n\trefraction " + \
-                    stringCorrection(fcObj.Label) + "_photons_refraction"
+            if (
+                self.incContent.find(
+                    "#declare " + stringCorrection(fcObj.Label) + "_photons_refraction"
+                )
+                != -1
+            ):
+                photons += (
+                    "\n\trefraction "
+                    + stringCorrection(fcObj.Label)
+                    + "_photons_refraction"
+                )
 
-            if self.incContent.find("#declare " + stringCorrection(fcObj.Label) + "_photons_collect") != -1:
-                photons += "\n\tcollect " + \
-                    stringCorrection(fcObj.Label) + "_photons_collect"
+            if (
+                self.incContent.find(
+                    "#declare " + stringCorrection(fcObj.Label) + "_photons_collect"
+                )
+                != -1
+            ):
+                photons += (
+                    "\n\tcollect " + stringCorrection(fcObj.Label) + "_photons_collect"
+                )
 
         photons += "\n}\n"
 
@@ -1463,11 +1846,11 @@ class ExportToPovRay:
     def writeFile(self, povText):
         """Write the final pov file."""
 
-        #povText: the code for POV-Ray
+        # povText: the code for POV-Ray
         try:
-            file = open(self.povPath, "w+") #XXX open file (Really "w+"?)
-            file.write(povText) #write code
-            file.close() #close file
+            file = open(self.povPath, "w+")  # XXX open file (Really "w+"?)
+            file.write(povText)  # write code
+            file.close()  # close file
         except:
             return -1
 
@@ -1485,16 +1868,16 @@ class ExportToPovRay:
             showError(errorText, "POV-Ray executable not found")
             return -1
 
-        #create output directory
+        # create output directory
         os.chdir(str(self.directory))
 
-        #write user options to ini file
+        # write user options to ini file
         iniHandler = open(self.iniPath, "a")
         iniHandler.write("\n;User Options from FreeCAD Settings\n" + povOptions)
         iniHandler.close()
 
-        #start povray
-        if execMode == 0: #wait until finished
+        # start povray
+        if execMode == 0:  # wait until finished
             subprocess.call([povExec, self.iniName])
             self.checkErrFile()
         else:
@@ -1504,15 +1887,15 @@ class ExportToPovRay:
         """Check error file for errors and show info box."""
 
         error = ""
-        #open error file
+        # open error file
         if os.path.isfile(self.errorPath) == True:
             file = open(self.errorPath, "r")
-            #read error file
+            # read error file
             error = file.read()
             file.close()
-        #is there any content in the file
-        if error != "": #error occurred
-            #show error message
+        # is there any content in the file
+        if error != "":  # error occurred
+            # show error message
             errorText = ""
             errorText += "An error occurred while rendering:\n-----------------------------------------\n"
             errorText += error
@@ -1533,7 +1916,7 @@ class ExportToPovRay:
         """Repair the rotation of objects (likely a bug in FreeCAD)."""
 
         for obj in objs:
-            if hasattr(obj, 'Placement'):
+            if hasattr(obj, "Placement"):
                 ObjLocation = obj.Placement
                 posX = ObjLocation.Base.x
                 posY = ObjLocation.Base.y
@@ -1542,14 +1925,19 @@ class ExportToPovRay:
                 rotY = ObjLocation.Rotation.Axis[1]
                 rotZ = ObjLocation.Rotation.Axis[2]
                 rotAngle = math.degrees(ObjLocation.Rotation.Angle)
-                obj.Placement = App.Placement(App.Vector(posX, posY, posZ), App.Rotation(App.Vector(rotX, rotY, rotZ), rotAngle), App.Vector(0, 0, 0))
+                obj.Placement = App.Placement(
+                    App.Vector(posX, posY, posZ),
+                    App.Rotation(App.Vector(rotX, rotY, rotZ), rotAngle),
+                    App.Vector(0, 0, 0),
+                )
 
     def exportFcView(self):
         """Write the current FreeCAD view like Tools / Save Picture... to the file."""
 
         try:
             Gui.ActiveDocument.ActiveView.saveImage(
-                self.fcViewPath, self.width, self.height)
+                self.fcViewPath, self.width, self.height
+            )
         except:
             App.Console.PrintError("\nExport of FreeCAD view failed!\n")
 
@@ -1577,29 +1965,35 @@ class ExportToPovRay:
         Blue = (uintColor >> 8) & 255
         Green = (uintColor >> 16) & 255
         Red = (uintColor >> 24) & 255
-        rgbString = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(Red / float(255), Green / float(255), Blue / float(255))
+        rgbString = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(
+            Red / float(255), Green / float(255), Blue / float(255)
+        )
         return rgbString
 
     def delComments(self, code):
         """Delete the comments in the given code (pov syntax)."""
 
-        #delete big comments
+        # delete big comments
         while code.find("/*") != -1:
             comStart = code.find("/*")
             comEnd = code.find("*/", comStart + 2)
 
             if comEnd == -1:
-                App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is an unclosed multi line comment.\n")
+                App.Console.PrintError(
+                    "Unable to delete all comments in the inc file!\nThere is an unclosed multi line comment.\n"
+                )
                 return
-            code = code[0:comStart] + code[comEnd + 2:]
+            code = code[0:comStart] + code[comEnd + 2 :]
 
-        #delete little comments
+        # delete little comments
         while code.find("//") != -1:
             comStart = code.find("//")
             comEnd = code.find("\n", comStart + 2)
 
             if comEnd == -1:
-                App.Console.PrintError("Unable to delete all comments in the inc file!\nThere is a mistake in a one line comment")
+                App.Console.PrintError(
+                    "Unable to delete all comments in the inc file!\nThere is a mistake in a one line comment"
+                )
                 return
             code = code[0:comStart] + code[comEnd:]
         return code

@@ -20,82 +20,92 @@
 import FreeCAD as App
 import FreeCADGui as Gui
 
+
 class PointLightCommand:
     "Insert a point light"
 
     def GetResources(self):
-        return {"MenuText": "Insert Point Light",
-				"Accel": "L,P",
-				"ToolTip": "Insert a point light (shining in every direction)",
-				"Pixmap"  : "pointLight.svg"}
-                
+        return {
+            "MenuText": "Insert Point Light",
+            "Accel": "L,P",
+            "ToolTip": "Insert a point light (shining in every direction)",
+            "Pixmap": "pointLight.svg",
+        }
+
     def IsActive(self):
         if App.ActiveDocument == None:
             return False
         else:
             return True
-            
+
     def Activated(self):
         from Lights import PointLight
         from Lights import ViewProviderPointLight
 
-        light = App.ActiveDocument.addObject("Part::FeaturePython","PointLight")
+        light = App.ActiveDocument.addObject("Part::FeaturePython", "PointLight")
         PointLight(light)
         ViewProviderPointLight(light.ViewObject)
         App.ActiveDocument.recompute()
 
-Gui.addCommand('PointLightCommand', PointLightCommand())
+
+Gui.addCommand("PointLightCommand", PointLightCommand())
 
 
 class AreaLightCommand:
     "Insert an area light"
 
     def GetResources(self):
-        return {"MenuText": "Insert an Area Light",
-				"Accel": "L,A",
-				"ToolTip": "Insert an area light (array of lights)",
-				"Pixmap"  : "areaLight.svg"}
-                
+        return {
+            "MenuText": "Insert an Area Light",
+            "Accel": "L,A",
+            "ToolTip": "Insert an area light (array of lights)",
+            "Pixmap": "areaLight.svg",
+        }
+
     def IsActive(self):
         if App.ActiveDocument == None:
             return False
         else:
             return True
-            
+
     def Activated(self):
         from Lights import AreaLight
         from Lights import ViewProviderAreaLight
 
-        light = App.ActiveDocument.addObject("Part::FeaturePython","AreaLight")
+        light = App.ActiveDocument.addObject("Part::FeaturePython", "AreaLight")
         AreaLight(light)
         ViewProviderAreaLight(light.ViewObject)
         App.ActiveDocument.recompute()
 
-Gui.addCommand('AreaLightCommand', AreaLightCommand())
+
+Gui.addCommand("AreaLightCommand", AreaLightCommand())
 
 
 class SpotLightCommand:
     "Insert a spot light"
 
     def GetResources(self):
-        return {"MenuText": "Insert a Spot Light",
-				"Accel": "L,S",
-				"ToolTip": "Insert a spot light",
-				"Pixmap"  : "spotLight.svg"}
-                
+        return {
+            "MenuText": "Insert a Spot Light",
+            "Accel": "L,S",
+            "ToolTip": "Insert a spot light",
+            "Pixmap": "spotLight.svg",
+        }
+
     def IsActive(self):
         if App.ActiveDocument == None:
             return False
         else:
             return True
-            
+
     def Activated(self):
         from Lights import SpotLight
         from Lights import ViewProviderSpotLight
 
-        light = App.ActiveDocument.addObject("Part::FeaturePython","SpotLight")
+        light = App.ActiveDocument.addObject("Part::FeaturePython", "SpotLight")
         SpotLight(light)
         ViewProviderSpotLight(light.ViewObject)
         App.ActiveDocument.recompute()
 
-Gui.addCommand('SpotLightCommand', SpotLightCommand())
+
+Gui.addCommand("SpotLightCommand", SpotLightCommand())

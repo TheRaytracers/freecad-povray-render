@@ -72,12 +72,8 @@ class Dialog(QtGui.QDialog):
         self.cancelButton = QtGui.QPushButton("Cancel")
 
         self.buttonBox = QtGui.QDialogButtonBox()
-        self.buttonBox.addButton(
-            self.renderButton,
-            QtGui.QDialogButtonBox.AcceptRole)
-        self.buttonBox.addButton(
-            self.cancelButton,
-            QtGui.QDialogButtonBox.RejectRole)
+        self.buttonBox.addButton(self.renderButton, QtGui.QDialogButtonBox.AcceptRole)
+        self.buttonBox.addButton(self.cancelButton, QtGui.QDialogButtonBox.RejectRole)
         self.buttonBox.accepted.connect(self.onOk)
         self.buttonBox.rejected.connect(self.onCancel)
 
@@ -88,12 +84,9 @@ class Dialog(QtGui.QDialog):
         self.show()
 
         self.generalTab.iniPathChanged.connect(self.applyIniSettings)
-        self.generalTab.iniPathValidityChanged.connect(
-            self.setDialogAcceptable)
+        self.generalTab.iniPathValidityChanged.connect(self.setDialogAcceptable)
 
-        self.environmentTab.hdrPathValidityChanged.connect(
-            self.setDialogAcceptable)
-
+        self.environmentTab.hdrPathValidityChanged.connect(self.setDialogAcceptable)
 
     def setDialogAcceptable(self, acceptable):
         """Set if the "Start Rendering" button should be enabled.
@@ -112,8 +105,7 @@ class Dialog(QtGui.QDialog):
         """Call the saveQSettings() method from the tab classes to save
         the project independent settings with QSettings."""
 
-        settings = QtCore.QSettings(
-            "Usb Hub, DerUhrmacher", "Export to POV-Ray")
+        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
 
         self.generalTab.saveQSettings(settings)
         self.textureTab.saveQSettings(settings)
@@ -125,8 +117,7 @@ class Dialog(QtGui.QDialog):
         """Call the applyQSettings() method from the tab classes to read
         the project independent settings and apply them to the UI."""
 
-        settings = QtCore.QSettings(
-            "Usb Hub, DerUhrmacher", "Export to POV-Ray")
+        settings = QtCore.QSettings("Usb Hub, DerUhrmacher", "Export to POV-Ray")
 
         self.textureTab.applyQSettings(settings)
         self.environmentTab.applyQSettings(settings)
@@ -236,7 +227,8 @@ class Dialog(QtGui.QDialog):
             self.generalTab.isRepRotChecked(),
             self.generalTab.isExpFcViewChecked(),
             self.radiosityTab.getRadiosity(),
-            self.environmentTab.getHdriDict())
+            self.environmentTab.getHdriDict()
+        )
 
         self.textureTab.createTextureInc(self.renderSettings)
 
@@ -277,16 +269,15 @@ class GeneralTab(QtGui.QWidget):
         # ini file selection
         self.iniPathLineEdit = QtGui.QLineEdit()
         self.iniPathLineEdit.setPlaceholderText("Path to INI File")
-        self.iniPathLineEdit.setToolTip(
-            "Path to the INI file (kind of a project file)")
+        self.iniPathLineEdit.setToolTip("Path to the INI file (kind of a project file)")
         self.iniPathLineEdit.setEnabled(False)
 
-        self.openFileDialogButton = QtGui.QPushButton(
-            "Select Project File (*.ini)")
+        self.openFileDialogButton = QtGui.QPushButton("Select Project File (*.ini)")
         self.openFileDialogButton.clicked.connect(self.openFileDialog)
         self.openFileDialogButton.setToolTip(
             "Open file dialog for choosing a INI file.\n"
-            "Be careful to not use spaces or special chars in pathname for POV-Ray compatibility.")
+            "Be careful to not use spaces or special chars in pathname for POV-Ray compatibility."
+        )
 
         self.warnLabel = QtGui.QLabel("")
         self.warnLabel.setStyleSheet("QLabel { color : #ff0000; }")
@@ -320,25 +311,27 @@ class GeneralTab(QtGui.QWidget):
         self.WHImageLayout.addWidget(self.imageWidth)
         self.WHImageLayout.addWidget(self.imageHeightLabel)
         self.WHImageLayout.addWidget(self.imageHeight)
-        self.WHImageGroup = QtGui.QGroupBox(
-            "Width and Height of rendered Image")
+        self.WHImageGroup = QtGui.QGroupBox("Width and Height of rendered Image")
         self.WHImageGroup.setLayout(self.WHImageLayout)
 
         # Options
         self.expLight = QtGui.QCheckBox("Export FreeCAD Light")
         self.expLight.setToolTip(
             "Export the light FreeCAD uses. Define your own light via a light object in FreeCAD "
-            "or a light in the user inc file if you unchecked this option")
+            "or a light in the user inc file if you unchecked this option"
+        )
 
         self.repRot = QtGui.QCheckBox("Repair Rotation")
         self.repRot.setToolTip(
             "Repair the rotation of all objects.\n"
             "Use this option if objects in your scene appear in a wrong rotation.\n"
-            "This is a workaround for a FreeCAD bug. Visit the Help tab for more information.")
+            "This is a workaround for a FreeCAD bug. Visit the Help tab for more information."
+        )
 
         self.expFcView = QtGui.QCheckBox("Export FreeCAD View")
         self.expFcView.setToolTip(
-            "Take a screenshot of the scene view and save it with the same resolution as the image")
+            "Take a screenshot of the scene view and save it with the same resolution as the image"
+        )
 
         self.optionLayout = QtGui.QVBoxLayout()
         self.optionLayout.addWidget(self.expLight)
@@ -377,7 +370,7 @@ class GeneralTab(QtGui.QWidget):
         else:
             fileName = None
 
-        if fileName and fileName != (u'', u''):
+        if fileName and fileName != (u"", u""):
             self.iniPath = str(fileName[0])
             self.iniPathLineEdit.setText(self.iniPath)
             self.handlePath(self.iniPath)
@@ -401,7 +394,8 @@ class GeneralTab(QtGui.QWidget):
                 QtGui.QMessageBox.Question,
                 "Apply settings from file?",
                 content,
-                QtGui.QMessageBox.Apply | QtGui.QMessageBox.No)
+                QtGui.QMessageBox.Apply | QtGui.QMessageBox.No
+            )
             dialog.setWindowModality(QtCore.Qt.ApplicationModal)
             answer = dialog.exec_()
 
@@ -418,8 +412,12 @@ class GeneralTab(QtGui.QWidget):
             bool: False: not valid; True: valid
         """
 
-        if path.find(
-                " ") == -1 and isAscii(path) and path != "" and path[-4:].lower() == ".ini":
+        if (
+            path.find(" ") == -1
+            and isAscii(path)
+            and path != ""
+            and path[-4:].lower() == ".ini"
+        ):
             self.iniPathValidityChanged.emit(True)
 
             self.warnLabel.setText("")
@@ -429,10 +427,12 @@ class GeneralTab(QtGui.QWidget):
 
             if path == "" or os.path.isdir(path):
                 self.warnLabel.setText(
-                    "Please type a path or get one with clicking on '...'")
+                    "Please type a path or get one with clicking on '...'"
+                )
             else:
                 self.warnLabel.setText(
-                    "Your path contains a space or a mutated vowel or is not a .ini file")
+                    "Your path contains a space or a mutated vowel or is not a .ini file"
+                )
 
             return False
 
@@ -474,8 +474,7 @@ class GeneralTab(QtGui.QWidget):
         # next opening.
 
         settingsObject.beginGroup(self.qSettingsGroup)
-        settingsObject.setValue(App.ActiveDocument.Name,
-                                self.iniPathLineEdit.text())
+        settingsObject.setValue(App.ActiveDocument.Name, self.iniPathLineEdit.text())
         settingsObject.endGroup()
 
     def applyQSettings(self, settingsObject):
@@ -520,7 +519,7 @@ class GeneralTab(QtGui.QWidget):
         """
 
         # parse CSV
-        csvReader = csv.reader(csvLines, delimiter=',')
+        csvReader = csv.reader(csvLines, delimiter=",")
 
         self.iniPathLineEdit.setText(self.iniPath)
 
@@ -554,8 +553,7 @@ class GeneralTab(QtGui.QWidget):
                 self.iniPath = ""
         else:
             # create ini path from FreeCAD file
-            self.iniPath = os.path.splitext(
-                App.ActiveDocument.FileName)[0] + ".ini"
+            self.iniPath = os.path.splitext(App.ActiveDocument.FileName)[0] + ".ini"
 
         self.iniPathLineEdit.setText(self.iniPath)
         self.checkPath(self.iniPath)
@@ -653,7 +651,9 @@ class TextureTab(QtGui.QWidget):
                 None,
                 "",
                 "",
-                self.fcTexItem))
+                self.fcTexItem
+            )
+        )
 
         self.fcTexItem.setIcon(
             QtGui.QIcon(
@@ -662,8 +662,7 @@ class TextureTab(QtGui.QWidget):
         )
 
         # get the predefined.xml
-        predefinedPath = os.path.join(os.path.dirname(
-            __file__), "predefined.xml")
+        predefinedPath = os.path.join(os.path.dirname(__file__), "predefined.xml")
 
         predefined = xml.parse(predefinedPath).getroot()
         categories = predefined.getchildren()
@@ -743,8 +742,9 @@ class TextureTab(QtGui.QWidget):
             except:
                 listItem = QtGui.QListWidgetItem(obj.Label)
 
-            self.listObjects.append(ListObject(
-                obj, listItem, self.predefines[0], 1, 1, 1, 0, 0, 0, 0, 0, 0))
+            self.listObjects.append(
+                ListObject(obj, listItem, self.predefines[0], 1, 1, 1, 0, 0, 0, 0, 0, 0)
+            )
 
             self.objectList.addItem(listItem)
 
@@ -868,7 +868,9 @@ class TextureTab(QtGui.QWidget):
         if layer == 0:
             font = QtGui.QFont()
             font.setBold(True)
-            self.categoryCombo.setItemData(self.categoryCombo.count()-1, font, QtCore.Qt.FontRole)
+            self.categoryCombo.setItemData(
+                self.categoryCombo.count() - 1, font, QtCore.Qt.FontRole
+            )
 
         for node in childNodes:
             if node.tag == "Predef":
@@ -931,13 +933,14 @@ class TextureTab(QtGui.QWidget):
                     media,
                     inc,
                     comment,
-                    listItem)
+                    listItem
+                )
 
-                newPredefined.listItem.setIcon(QtGui.QIcon(
-                    os.path.join(thumbnailPath, newPredefined.getHash() + ".png")
-                ))
-
-
+                newPredefined.listItem.setIcon(
+                    QtGui.QIcon(
+                        os.path.join(thumbnailPath, newPredefined.getHash() + ".png")
+                    )
+                )
 
                 self.predefines.append(newPredefined)
 
@@ -993,7 +996,9 @@ class TextureTab(QtGui.QWidget):
         object, when the object selection changed."""
 
         self.disconnectSignals()  # disconnect to avoid infinite recursive calls
-        selectedListObj = self.getSelectedListObject()  # get the current selected object
+        selectedListObj = (
+            self.getSelectedListObject()
+        )  # get the current selected object
 
         if selectedListObj == -1:  # is an object selected
             self.connectSignals()
@@ -1033,7 +1038,7 @@ class TextureTab(QtGui.QWidget):
 
         selectedListObj = self.getSelectedListObject()
         selectedPredefine = self.getSelectedPredefined()
-        if selectedListObj == -1 or selectedPredefine == -1: # no object selected
+        if selectedListObj == -1 or selectedPredefine == -1:  # no object selected
             return -1  # abort
 
         # get the values for scaling and rotating
@@ -1089,7 +1094,7 @@ class TextureTab(QtGui.QWidget):
         self.connectSignals()
 
     def getAllPredefines(self, category):
-        ownPredefines = category.predefines[:] # clone array
+        ownPredefines = category.predefines[:]  # clone array
 
         if category.subCategories is not []:
             predefs = ownPredefines
@@ -1125,59 +1130,65 @@ class TextureTab(QtGui.QWidget):
 
         if listObj.predefObject.material is None:  # for FreeCAD materials
             self.preview.setErrorText(
-                "The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled.")
+                "The FreeCAD texture is just like you see it in the FreeCAD scene\n so this texture is disabled."
+            )
             return
         elif listObj.predefObject.media != "":
             self.preview.setErrorText(
-                "The texture is too complex for a preview and would need a lot of time\nso this texture is disabled.")
+                "The texture is too complex for a preview and would need a lot of time\nso this texture is disabled."
+            )
             return
 
         # create content of pov file
         fileContent = ""
-        fileContent += '#version 3.6; // 3.7\n'
-        fileContent += 'global_settings { assumed_gamma 1.0 }\n'
-        fileContent += '#default { finish { ambient 0.2 diffuse 0.9 } }\n'
-        fileContent += '#default { pigment { rgb <0.871, 0.871, 0.871> } }\n'
-        fileContent += '//------------------------------------------\n'
+        fileContent += "#version 3.6; // 3.7\n"
+        fileContent += "global_settings { assumed_gamma 1.0 }\n"
+        fileContent += "#default { finish { ambient 0.2 diffuse 0.9 } }\n"
+        fileContent += "#default { pigment { rgb <0.871, 0.871, 0.871> } }\n"
+        fileContent += "//------------------------------------------\n"
         fileContent += '#include "colors.inc"\n'
         fileContent += '#include "textures.inc"\n'
-        fileContent += '#declare CamUp = <0, 0, 1>;\n'
-        fileContent += '#declare CamRight = <1.33, 0, 0>;\n'
-        fileContent += '#declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;\n'
-        fileContent += '#declare CamPosition = <25.9077129364, -15.9076957703, 20.907699585>;\n'
-        fileContent += 'camera {\n'
-        fileContent += '\tlocation <0, 0, 0>\n'
-        fileContent += '\tdirection <0, 1, 0>\n'
-        fileContent += '\tup CamUp\n'
-        fileContent += '\tright CamRight\n'
-        fileContent += '\trotate CamRotation\n'
-        fileContent += '\ttranslate CamPosition\n'
-        fileContent += '\tangle 57.82\n'
-        fileContent += '}\n'
-        fileContent += 'light_source { CamPosition color rgb <0.5, 0.5, 0.5> }\n'
-        fileContent += 'sky_sphere {\n'
-        fileContent += '\t\tpigment {\n'
-        fileContent += '\t\tgradient z\n'
-        fileContent += '\t\tcolor_map {\n'
-        fileContent += '\t\t\t[0 rgb<0,0,0>]\n'
-        fileContent += '\t\t\t[0.2 rgb<0,0,0>]\n'
-        fileContent += '\t\t\t[0.75 rgb<1,1,1>]\n'
-        fileContent += '\t\t\t[1 rgb<1,1,1>]\n'
-        fileContent += '\t\t\t}\n'
-        fileContent += '\t\tscale 2\n'
-        fileContent += '\t\ttranslate -1\n'
-        fileContent += '\t\t}\n'
-        fileContent += '}\n'
+        fileContent += "#declare CamUp = <0, 0, 1>;\n"
+        fileContent += "#declare CamRight = <1.33, 0, 0>;\n"
+        fileContent += (
+            "#declare CamRotation = <-35.264390534, 1.9538003485e-05, 45.0000026303>;\n"
+        )
+        fileContent += (
+            "#declare CamPosition = <25.9077129364, -15.9076957703, 20.907699585>;\n"
+        )
+        fileContent += "camera {\n"
+        fileContent += "\tlocation <0, 0, 0>\n"
+        fileContent += "\tdirection <0, 1, 0>\n"
+        fileContent += "\tup CamUp\n"
+        fileContent += "\tright CamRight\n"
+        fileContent += "\trotate CamRotation\n"
+        fileContent += "\ttranslate CamPosition\n"
+        fileContent += "\tangle 57.82\n"
+        fileContent += "}\n"
+        fileContent += "light_source { CamPosition color rgb <0.5, 0.5, 0.5> }\n"
+        fileContent += "sky_sphere {\n"
+        fileContent += "\t\tpigment {\n"
+        fileContent += "\t\tgradient z\n"
+        fileContent += "\t\tcolor_map {\n"
+        fileContent += "\t\t\t[0 rgb<0,0,0>]\n"
+        fileContent += "\t\t\t[0.2 rgb<0,0,0>]\n"
+        fileContent += "\t\t\t[0.75 rgb<1,1,1>]\n"
+        fileContent += "\t\t\t[1 rgb<1,1,1>]\n"
+        fileContent += "\t\t\t}\n"
+        fileContent += "\t\tscale 2\n"
+        fileContent += "\t\ttranslate -1\n"
+        fileContent += "\t\t}\n"
+        fileContent += "}\n"
 
         fileContent += listObj.toPov("predef")
 
-        fileContent += 'box { <0,0,0>, <10.0, 10.0, 10.0>\n'
-        fileContent += '\ttranslate <5.0, 5.0, -5.0>\n'
-        fileContent += '\tmaterial { predef_material }\n'
-        fileContent += '}\n'
-        fileContent += 'sphere { <0, 0, 0> 5 \n'
-        fileContent += '\tmaterial { predef_material }\n'
-        fileContent += '}\n'
+        fileContent += "box { <0,0,0>, <10.0, 10.0, 10.0>\n"
+        fileContent += "\ttranslate <5.0, 5.0, -5.0>\n"
+        fileContent += "\tmaterial { predef_material }\n"
+        fileContent += "}\n"
+        fileContent += "sphere { <0, 0, 0> 5 \n"
+        fileContent += "\tmaterial { predef_material }\n"
+        fileContent += "}\n"
 
         self.preview.render(fileContent)
 
@@ -1263,7 +1274,7 @@ class TextureTab(QtGui.QWidget):
         """
 
         # parse CSV
-        csvReader = csv.reader(csvLines, delimiter=',')
+        csvReader = csv.reader(csvLines, delimiter=",")
         for row in csvReader:
             if row[0].startswith("obj_"):
                 name = row[0][4:]
@@ -1304,12 +1315,23 @@ class TextureTab(QtGui.QWidget):
         # add settings for every listobject
         for obj in self.listObjects:
             csv += ";obj_" + obj.fcObj.Name + "," + obj.predefObject.getHash() + ","
-            csv += str(obj.scaleX) + "," + str(obj.scaleY) + \
-                "," + str(obj.scaleZ) + ","
-            csv += str(obj.rotationX) + "," + str(obj.rotationY) + \
-                "," + str(obj.rotationZ) + ","
-            csv += str(obj.translationX) + "," + \
-                str(obj.translationY) + "," + str(obj.translationZ) + "\n"
+            csv += str(obj.scaleX) + "," + str(obj.scaleY) + "," + str(obj.scaleZ) + ","
+            csv += (
+                str(obj.rotationX)
+                + ","
+                + str(obj.rotationY)
+                + ","
+                + str(obj.rotationZ)
+                + ","
+            )
+            csv += (
+                str(obj.translationX)
+                + ","
+                + str(obj.translationY)
+                + ","
+                + str(obj.translationZ)
+                + "\n"
+            )
 
         return csv
 
@@ -1383,7 +1405,8 @@ class Preview(QtGui.QWidget):
             return
 
         povFile = tempfile.NamedTemporaryFile(
-            delete=False, suffix=".pov")  # pov file handler
+            delete=False, suffix=".pov"
+        )  # pov file handler
         povFile.write(self.povCode.encode())
 
         povName = povFile.name
@@ -1403,12 +1426,27 @@ class Preview(QtGui.QWidget):
         operatingSystem = platform.system()
 
         # start povray
-        if operatingSystem == "Windows": # use other command line options for windows
-            subprocess.call([povExec, "/EXIT", "/RENDER", "width=" + str(self.previewWidth),
-                             "height=" + str(self.previewHeight), povName])
+        if operatingSystem == "Windows":  # use other command line options for windows
+            subprocess.call(
+                [
+                    povExec,
+                    "/EXIT",
+                    "/RENDER",
+                    "width=" + str(self.previewWidth),
+                    "height=" + str(self.previewHeight),
+                    povName
+                ]
+            )
         else:
-            subprocess.call([povExec, "-d", "width=" + str(self.previewWidth),
-                             "height=" + str(self.previewHeight), povName])
+            subprocess.call(
+                [
+                    povExec,
+                    "-d",
+                    "width=" + str(self.previewWidth),
+                    "height=" + str(self.previewHeight),
+                    povName
+                ]
+            )
 
         # update image
         pixmap = QtGui.QPixmap(povName[:-4])
@@ -1519,18 +1557,19 @@ class Predefined:
     """Class to store all stuff from a predefined (stored in predefined.xml)."""
 
     def __init__(
-            self,
-            identifier,
-            material,
-            texture,
-            pigment,
-            finish,
-            normal,
-            interior,
-            media,
-            inc,
-            comment,
-            listItem):
+        self,
+        identifier,
+        material,
+        texture,
+        pigment,
+        finish,
+        normal,
+        interior,
+        media,
+        inc,
+        comment,
+        listItem
+    ):
         self.identifier = identifier
         self.material = material
         self.texture = texture
@@ -1551,16 +1590,18 @@ class Predefined:
         """
         predefName = self.listItem.text()
 
-        stgStr = (str(self.identifier) +
-                  str(self.material) +
-                  str(self.texture) +
-                  str(self.pigment) +
-                  str(self.finish) +
-                  str(self.normal) +
-                  str(self.interior) +
-                  str(self.media) +
-                  str(self.inc) +
-                  str(self.comment))
+        stgStr = (
+            str(self.identifier)
+            + str(self.material)
+            + str(self.texture)
+            + str(self.pigment)
+            + str(self.finish)
+            + str(self.normal)
+            + str(self.interior)
+            + str(self.media)
+            + str(self.inc)
+            + str(self.comment)
+        )
         hashStr = hashlib.md5(stgStr.encode("UTF-8")).hexdigest()[:4]
 
         return stringCorrection(predefName) + hashStr
@@ -1572,32 +1613,34 @@ class Predefined:
 
         povCode += self.material + "\n"
 
-        #pigment and texture
-        if self.texture != "" or self.pigment != "" or self.normal != "" or self.finish != "":
+        # pigment and texture
+        if (
+            self.texture != ""
+            or self.pigment != ""
+            or self.normal != ""
+            or self.finish != ""
+        ):
             povCode += "\ttexture { " + self.texture + "\n"
 
-            #pigment
+            # pigment
             if self.pigment != "":
-                povCode += "\t\tpigment { " + \
-                    self.pigment + " }\n"
+                povCode += "\t\tpigment { " + self.pigment + " }\n"
 
-            #finish
+            # finish
             if self.finish != "":
-                povCode += "\tfinish {\n\t" + \
-                    self.finish + "\t}\n"
+                povCode += "\tfinish {\n\t" + self.finish + "\t}\n"
 
-            #normal
+            # normal
             if self.normal != "":
-                povCode += "\tnormal {\n\t" + \
-                    self.normal + "\t}\n"
+                povCode += "\tnormal {\n\t" + self.normal + "\t}\n"
 
             povCode += "\t}\n"
 
-        #interior and media
+        # interior and media
         if self.interior != "" or self.media != "":
             povCode += "\tinterior {\n\t" + self.interior + "\n"
 
-            #media
+            # media
             if self.media != "":
                 povCode += "\t\tmedia { " + self.media + " }\n"
 
@@ -1668,18 +1711,16 @@ class Predefined:
         povCode += headerCode
 
         if self.inc is not None and self.inc != "":  # only if include file is necessary
-            povCode += "#include \"" + self.inc + "\"\n"
+            povCode += '#include "' + self.inc + '"\n'
 
         povCode += "#declare predef_material = " + self.toPovMaterial() + objectCode
 
-        povFile = open(os.path.join(
-            thumbnailPath, self.getHash() + ".pov"), "w")
+        povFile = open(os.path.join(thumbnailPath, self.getHash() + ".pov"), "w")
         povFile.write(povCode)
         povFile.close()
 
         # render
-        povExec = App.ParamGet(
-            preferences.prefPath).GetString("PovRayExe", "")
+        povExec = App.ParamGet(preferences.prefPath).GetString("PovRayExe", "")
         if os.path.isfile(povExec) == False:
             errorText = "To get a preview of the texture settings you must\n"
             errorText += "set the path to the POV-Ray executable\n"
@@ -1689,30 +1730,39 @@ class Predefined:
             return -1
 
         # start povray
-        subprocess.call([povExec, "-d", "width=256", "height=256",
-                            os.path.join(thumbnailPath, self.getHash() + ".pov")])
+        subprocess.call(
+            [
+                povExec,
+                "-d",
+                "width=256",
+                "height=256",
+                os.path.join(thumbnailPath, self.getHash() + ".pov")
+            ]
+        )
 
-        App.Console.PrintMessage("Rendering thumbnail for predefined " +
-                self.identifier + " ... done")
+        App.Console.PrintMessage(
+            "Rendering thumbnail for predefined " + self.identifier + " ... done"
+        )
 
 
 class ListObject:
     """Class to store all stuff of an object in the object list of the texture tab."""
 
     def __init__(
-            self,
-            fcObj,
-            listItem,
-            predefObject,
-            scaleX,
-            scaleY,
-            scaleZ,
-            rotationX,
-            rotationY,
-            rotationZ,
-            translationX,
-            translationY,
-            translationZ):
+        self,
+        fcObj,
+        listItem,
+        predefObject,
+        scaleX,
+        scaleY,
+        scaleZ,
+        rotationX,
+        rotationY,
+        rotationZ,
+        translationX,
+        translationY,
+        translationZ
+    ):
         self.fcObj = fcObj
         self.label = stringCorrection(fcObj.Label)
 
@@ -1749,8 +1799,10 @@ class ListObject:
 
         povCode = ""
 
-        if self.predefObject.inc != None and self.predefObject.inc != "":  # only if include file is necessary
-            povCode += "#include \"" + self.predefObject.inc + "\"\n"
+        if (
+            self.predefObject.inc != None and self.predefObject.inc != ""
+        ):  # only if include file is necessary
+            povCode += '#include "' + self.predefObject.inc + '"\n'
 
         povCode += "#declare " + label + "_material"
         if self.predefObject.media != "":
@@ -1758,20 +1810,39 @@ class ListObject:
 
         povCode += " = " + self.predefObject.toPovMaterial(False)
 
-        #scale
+        # scale
         if self.scaleX != 1 or self.scaleY != 1 or self.scaleZ != 1:
-            povCode += "\tscale <" + \
-                str(self.scaleX) + ", " + str(self.scaleY) + \
-                ", " + str(self.scaleZ) + ">\n"
-        #rotate
+            povCode += (
+                "\tscale <"
+                + str(self.scaleX)
+                + ", "
+                + str(self.scaleY)
+                + ", "
+                + str(self.scaleZ)
+                + ">\n"
+            )
+        # rotate
         if self.rotationX != 0 or self.rotationY != 0 or self.rotationZ != 0:
-            povCode += "\trotate <" + \
-                str(self.rotationX) + ", " + str(self.rotationY) + \
-                ", " + str(self.rotationZ) + ">\n"
-        #translate
+            povCode += (
+                "\trotate <"
+                + str(self.rotationX)
+                + ", "
+                + str(self.rotationY)
+                + ", "
+                + str(self.rotationZ)
+                + ">\n"
+            )
+        # translate
         if self.translationX != 0 or self.translationY != 0 or self.translationZ != 0:
-            povCode += "\ttranslate <" + str(self.translationX) + ", " + str(
-                self.translationY) + ", " + str(self.translationZ) + ">\n"
+            povCode += (
+                "\ttranslate <"
+                + str(self.translationX)
+                + ", "
+                + str(self.translationY)
+                + ", "
+                + str(self.translationZ)
+                + ">\n"
+            )
 
         povCode += "}\n\n"
 
@@ -1898,8 +1969,9 @@ class RadiosityTab(QtGui.QWidget):
         self.explanationText.setWordWrap(True)
 
         self.explanationImg = QtGui.QLabel()
-        pixmap = QtGui.QPixmap(os.path.join(os.path.dirname(
-            __file__), "img/radiosityDescription.png"))
+        pixmap = QtGui.QPixmap(
+            os.path.join(os.path.dirname(__file__), "img/radiosityDescription.png")
+        )
         self.explanationImg.setPixmap(pixmap)
 
         self.wrapperLayout.addWidget(self.explanationText)
@@ -1922,7 +1994,8 @@ class RadiosityTab(QtGui.QWidget):
             "OutdoorHQ",
             "OutdoorLight",
             "IndoorLQ",
-            "IndoorHQ"]
+            "IndoorHQ"
+        ]
 
         self.modesComboBox = QtGui.QComboBox()
         self.modesComboBox.insertItems(0, self.radiosityModes)
@@ -1931,7 +2004,8 @@ class RadiosityTab(QtGui.QWidget):
         self.ambientTo0 = QtGui.QCheckBox("Set default Ambient to 0")
         self.ambientTo0.setChecked(True)
         self.ambientTo0.setToolTip(
-            "Set the color of the objects without any light to 0 (black)")
+            "Set the color of the objects without any light to 0 (black)"
+        )
 
         self.groupBoxLayout.addWidget(self.ambientTo0)
 
@@ -1981,7 +2055,7 @@ class RadiosityTab(QtGui.QWidget):
         """
 
         # parse CSV
-        csvReader = csv.reader(csvLines, delimiter=',')
+        csvReader = csv.reader(csvLines, delimiter=",")
         for row in csvReader:
             if row[0] == "radiosity":
                 if row[1] == "on":
@@ -2070,8 +2144,7 @@ class EnvironmentTab(QtGui.QWidget):
         self.wrapperLayout.addWidget(self.wrapperGroupBox)
 
         # Radio Buttons
-        self.options = ["FreeCAD Background",
-            "HDRI Environment"]
+        self.options = ["FreeCAD Background", "HDRI Environment"]
         self.radioButtonOptions = []
 
         for option in self.options:
@@ -2186,7 +2259,9 @@ class EnvironmentTab(QtGui.QWidget):
         self.hdriLayout.addLayout(self.rotationLayout)
 
         # Preview Warning
-        self.previewWarning = QtGui.QLabel("Warning: Large HDR files can lead to long freezes with turned preview on because POV-Ray takes long to load the file.")
+        self.previewWarning = QtGui.QLabel(
+            "Warning: Large HDR files can lead to long freezes with turned preview on because POV-Ray takes long to load the file."
+        )
         self.previewWarning.setStyleSheet("QLabel { color : #ff6600; }")
         self.previewWarning.setWordWrap(True)
         self.wrapperGroupBoxLayout.addWidget(self.previewWarning)
@@ -2226,7 +2301,7 @@ class EnvironmentTab(QtGui.QWidget):
         self.translationY.setValue(0.0)
         self.translationZ.setValue(0.0)
 
-        self.hdriPathLineEdit.setText("") # at the end to avoid updatePreview to early
+        self.hdriPathLineEdit.setText("")  # at the end to avoid updatePreview to early
 
         # check FreeCAD Background
         self.radioButtonOptions[0].setChecked(True)
@@ -2237,7 +2312,11 @@ class EnvironmentTab(QtGui.QWidget):
         radioButton = self.radioButtonOptions[0]
         enabled = self.wrapperGroupBox.isChecked()
 
-        if radioButton.isChecked() or (isAscii(fileName) and os.path.isfile(fileName) and fileName != "") or not enabled:
+        if (
+            radioButton.isChecked()
+            or (isAscii(fileName) and os.path.isfile(fileName) and fileName != "")
+            or not enabled
+        ):
             self.hdrPathValidityChanged.emit(True)
         else:
             self.hdrPathValidityChanged.emit(False)
@@ -2246,9 +2325,10 @@ class EnvironmentTab(QtGui.QWidget):
         defaultPath = self.hdriPathLineEdit.text()
 
         fileName = QtGui.QFileDialog.getOpenFileName(
-            self, "Select a HDRI File", defaultPath, "HDR Images (*.hdr)")[0]
+            self, "Select a HDRI File", defaultPath, "HDR Images (*.hdr)"
+        )[0]
 
-        if fileName and fileName != u'' and fileName != '':
+        if fileName and fileName != u"" and fileName != "":
             self.hdriPathLineEdit.setText(fileName)
 
     def handleFileName(self, fileName):
@@ -2257,9 +2337,11 @@ class EnvironmentTab(QtGui.QWidget):
         if isAscii(fileName) and os.path.isfile(fileName):
             self.invalidPathLabel.setText("")
         else:
-            self.invalidPathLabel.setText("The name of the *.hdr file contains mutated vowels,"\
-                "POV-Ray isn't able to handle, you typed no path or the file doesn't exist."\
-                "Please rename / create the file and open it again.")
+            self.invalidPathLabel.setText(
+                "The name of the *.hdr file contains mutated vowels,"
+                "POV-Ray isn't able to handle, you typed no path or the file doesn't exist."
+                "Please rename / create the file and open it again."
+            )
 
         self.updatePreview()
 
@@ -2276,7 +2358,8 @@ class EnvironmentTab(QtGui.QWidget):
                 option = radioButton.text()
                 break
 
-        return {"enabled": self.wrapperGroupBox.isChecked(),
+        return {
+            "enabled": self.wrapperGroupBox.isChecked(),
             "option": option,
             "hdrPath": self.hdriPathLineEdit.text(),
             "transX": self.translationX.value(),
@@ -2284,7 +2367,8 @@ class EnvironmentTab(QtGui.QWidget):
             "transZ": self.translationZ.value(),
             "rotX": self.rotationX.value(),
             "rotY": self.rotationY.value(),
-            "rotZ": self.rotationZ.value()}
+            "rotZ": self.rotationZ.value()
+        }
 
     def updatePreview(self):
         hdriPath = self.hdriPathLineEdit.text()
@@ -2297,7 +2381,7 @@ class EnvironmentTab(QtGui.QWidget):
         elif radioButton.isChecked():
             # show FreeCAD Background
 
-            povCode = '''#version 3.7;
+            povCode = """#version 3.7;
                 global_settings { assumed_gamma 1.0 }
                 #default { finish { ambient 0.2 diffuse 0.9 } }
                 #default { pigment { rgb <0.800, 0.800, 0.800> } }
@@ -2334,12 +2418,20 @@ class EnvironmentTab(QtGui.QWidget):
                         translate -1
                         rotate<-35.264390534, 1.9538003485e-05, 45.0000026303>
                     }
-                }'''
+                }"""
 
-            bgColor1 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor')
-            bgColor2 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor2')
-            bgColor3 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor3')
-            bgColor4 = App.ParamGet("User parameter:BaseApp/Preferences/View").GetUnsigned('BackgroundColor4')
+            bgColor1 = App.ParamGet(
+                "User parameter:BaseApp/Preferences/View"
+            ).GetUnsigned("BackgroundColor")
+            bgColor2 = App.ParamGet(
+                "User parameter:BaseApp/Preferences/View"
+            ).GetUnsigned("BackgroundColor2")
+            bgColor3 = App.ParamGet(
+                "User parameter:BaseApp/Preferences/View"
+            ).GetUnsigned("BackgroundColor3")
+            bgColor4 = App.ParamGet(
+                "User parameter:BaseApp/Preferences/View"
+            ).GetUnsigned("BackgroundColor4")
 
             povCode += "sky_sphere {\n\tpigment {\n"
             if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Simple'):
@@ -2348,17 +2440,34 @@ class EnvironmentTab(QtGui.QWidget):
             elif App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('Gradient'):
                 povCode += "\t\tgradient z\n"
                 povCode += "\t\tcolor_map {\n"
-                povCode += "\t\t\t[ 0.00  color rgb" + \
-                    self.exporter.uintColorToRGB(bgColor3) + " ]\n"
-                povCode += "\t\t\t[ 0.30  color rgb" + \
-                    self.exporter.uintColorToRGB(bgColor3) + " ]\n"
-                if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool('UseBackgroundColorMid'):
-                    povCode += "\t\t\t[ 0.50  color rgb" + \
-                        self.exporter.uintColorToRGB(bgColor4) + " ]\n"
-                povCode += "\t\t\t[ 0.70  color rgb" + \
-                    self.exporter.uintColorToRGB(bgColor2) + " ]\n"
-                povCode += "\t\t\t[ 1.00  color rgb" + \
-                    self.exporter.uintColorToRGB(bgColor2) + " ]\n"
+                povCode += (
+                    "\t\t\t[ 0.00  color rgb"
+                    + self.exporter.uintColorToRGB(bgColor3)
+                    + " ]\n"
+                )
+                povCode += (
+                    "\t\t\t[ 0.30  color rgb"
+                    + self.exporter.uintColorToRGB(bgColor3)
+                    + " ]\n"
+                )
+                if App.ParamGet("User parameter:BaseApp/Preferences/View").GetBool(
+                    "UseBackgroundColorMid"
+                ):
+                    povCode += (
+                        "\t\t\t[ 0.50  color rgb"
+                        + self.exporter.uintColorToRGB(bgColor4)
+                        + " ]\n"
+                    )
+                povCode += (
+                    "\t\t\t[ 0.70  color rgb"
+                    + self.exporter.uintColorToRGB(bgColor2)
+                    + " ]\n"
+                )
+                povCode += (
+                    "\t\t\t[ 1.00  color rgb"
+                    + self.exporter.uintColorToRGB(bgColor2)
+                    + " ]\n"
+                )
                 povCode += "\t\t}\n"
                 povCode += "\t\tscale 2\n"
                 povCode += "\t\ttranslate -1\n"
@@ -2371,7 +2480,7 @@ class EnvironmentTab(QtGui.QWidget):
             # preview HDRI environment
             hdriDict = self.getHdriDict()
 
-            povCode = '''#version 3.7;
+            povCode = """#version 3.7;
                 global_settings { assumed_gamma 1.0 }
                 #default { finish { ambient 0.2 diffuse 0.9 } }
                 #default { pigment { rgb <0.800, 0.800, 0.800> } }
@@ -2438,28 +2547,42 @@ class EnvironmentTab(QtGui.QWidget):
                     rotate <0.0, 90.0, 0.0>
                     pigment { color rgb <1.000, 0.000, 0.000> }
 
-                }'''
+                }"""
 
             povCode += "sky_sphere {\n"
             povCode += "\tpigment {\n"
-            povCode += "\t\timage_map { hdr \"" + hdriDict["hdrPath"] + "\"\n"
+            povCode += '\t\timage_map { hdr "' + hdriDict["hdrPath"] + '"\n'
             povCode += "\t\t\tgamma 1.1\n"
             povCode += "\t\t\tmap_type 1 interpolate 2\n"
             povCode += "\t\t}\n"
             povCode += "\t}\n"
-            povCode += "\trotate <" + \
-                str(hdriDict["rotX"]) + ", " + str(hdriDict["rotY"]) + \
-                ", " + str(hdriDict["rotZ"]) + ">\n"
-            povCode += "\ttranslate <" + \
-                str(hdriDict["transX"]) + ", " + str(hdriDict["transY"]) + \
-                ", " + str(hdriDict["transZ"]) + ">\n"
+            povCode += (
+                "\trotate <"
+                + str(hdriDict["rotX"])
+                + ", "
+                + str(hdriDict["rotY"])
+                + ", "
+                + str(hdriDict["rotZ"])
+                + ">\n"
+            )
+            povCode += (
+                "\ttranslate <"
+                + str(hdriDict["transX"])
+                + ", "
+                + str(hdriDict["transY"])
+                + ", "
+                + str(hdriDict["transZ"])
+                + ">\n"
+            )
             povCode += "}\n"
 
             self.preview.render(povCode)
         else:
             # show error text because it is an invalid path
-            self.preview.setErrorText("Without a valid path, it is not possible "\
-                "to preview the environment.")
+            self.preview.setErrorText(
+                "Without a valid path, it is not possible "
+                "to preview the environment."
+            )
 
     def applyIniSettings(self, csvLines):
         """Apply the settings from the given lines from the ini file
@@ -2470,7 +2593,7 @@ class EnvironmentTab(QtGui.QWidget):
         """
 
         # parse CSV
-        csvReader = csv.reader(csvLines, delimiter=',')
+        csvReader = csv.reader(csvLines, delimiter=",")
         for row in csvReader:
             if row[0] == "environment":
                 self.wrapperGroupBox.setChecked(strToBool(row[1]))
@@ -2488,7 +2611,9 @@ class EnvironmentTab(QtGui.QWidget):
                 self.rotationY.setValue(float(row[8]))
                 self.rotationZ.setValue(float(row[9]))
 
-                self.hdriPathLineEdit.setText(row[3]) # at the end to avoid updatePreview to early
+                self.hdriPathLineEdit.setText(
+                    row[3]
+                )  # at the end to avoid updatePreview to early
 
     def settingsToIniFormat(self):
         """Convert the settings from the tab to CSV.
@@ -2503,8 +2628,26 @@ class EnvironmentTab(QtGui.QWidget):
 
         hdriDict = self.getHdriDict()
 
-        csv += "," + str(hdriDict["enabled"]) + "," + hdriDict["option"] + "," + hdriDict["hdrPath"] + "," + str(hdriDict["transX"]) + "," + str(hdriDict["transY"]) + "," + str(hdriDict["transZ"]) + "," + str(hdriDict["rotX"]) + "," + str(
-            hdriDict["rotY"]) + "," + str(hdriDict["rotZ"])
+        csv += (
+            ","
+            + str(hdriDict["enabled"])
+            + ","
+            + hdriDict["option"]
+            + ","
+            + hdriDict["hdrPath"]
+            + ","
+            + str(hdriDict["transX"])
+            + ","
+            + str(hdriDict["transY"])
+            + ","
+            + str(hdriDict["transZ"])
+            + ","
+            + str(hdriDict["rotX"])
+            + ","
+            + str(hdriDict["rotY"])
+            + ","
+            + str(hdriDict["rotZ"])
+        )
 
         return csv + "\n"
 
