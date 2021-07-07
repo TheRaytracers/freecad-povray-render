@@ -101,7 +101,7 @@ In the following example we create two boxes from exactly the same size sitting 
 
   ![FreeCAD touching surfaces](img/touchingSurfaceFreeCAD.png "FreeCAD touching surfaces")
 
-...if we render this scene with POV-Ray, including some materials, we can see some funny effects: In the overlapping area a thin holey layer remains. What you can also see, is a dotted area where the bottom of the glassblock touches the checkered plane. If you want to avoid these effects, leave a gap. In the right picture the plane is 0,01mm below zero and the red box is a little bit bigger then the glass block. So now the rendering on the right side is the same as our FreeCAD model.
+...if we render this scene with POV-Ray, including some materials, we can see some funny effects: In the overlapping area a thin holey layer remains. What you can also see, is a dotted area where the bottom of the glass block touches the checkered plane. If you want to avoid these effects, leave a gap. In the right picture the plane is 0,01mm below zero and the red box is a little bit bigger then the glass block. So now the rendering on the right side is the same as our FreeCAD model.
 
   ![POV-Ray touching surfaces](img/touchingSurfacePovRay.png "POV-Ray touching surfaces")
 

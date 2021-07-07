@@ -231,7 +231,7 @@ class ExportToPovRay:
     def createPovCode(self, fcObj, expPlacement, expPigment, expPhotons, expClose, expLabel, expMeshDef):
         """
         Return the POV-Ray code for the given FreeCAD object.
-        
+
         ARGUMENTS
         fcObj              : The FreeCAD App object that will be converted
         expPlacement (bool): Should the placement of the given FreeCAD object be exported.
@@ -313,27 +313,27 @@ class ExportToPovRay:
             povCode += povPlane
 
         elif fcObj.TypeId == "Part::Cut":  #Cut
-            childs = fcObj.OutList
+            children = fcObj.OutList
             povCut = "\ndifference {\n"
-            for child in childs:
+            for child in children:
                 childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
                 povCut += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povCut
 
         elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse" or fcObj.TypeId == "Part::Compound": #Fusion
-            childs = fcObj.OutList
+            children = fcObj.OutList
             povFusion = "\nunion {\n"
-            for child in childs:
+            for child in children:
                 childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
                 povFusion += childCode.replace("\n", "\n\t") #add the indents
 
             povCode += povFusion
 
         elif fcObj.TypeId == "Part::MultiCommon" or fcObj.TypeId == "Part::Common": #Common
-            childs = fcObj.OutList
+            children = fcObj.OutList
             povCommon = "\nintersection {\n"
-            for child in childs:
+            for child in children:
                 childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
                 povCommon += childCode.replace("\n", "\n\t") #add the indents
 
@@ -343,7 +343,7 @@ class ExportToPovRay:
             povArr = ""
             if fcObj.ArrayType == "polar":
                 child = fcObj.Base
-                #for child in childs:
+                #for child in children:
                 center = "<" + str(fcObj.Center.x) + ", " + str(fcObj.Center.y) + ", " + str(fcObj.Center.z) + ">"
                 axisX = fcObj.Axis.x
                 axisY = fcObj.Axis.y
@@ -412,7 +412,7 @@ class ExportToPovRay:
 
             elif fcObj.ArrayType == "ortho":
                 child = fcObj.Base
-                #for child in childs:
+                #for child in children:
                 intervalX = "<" + str(fcObj.IntervalX.x) + ", " + str(fcObj.IntervalX.y) + ", " + str(fcObj.IntervalX.z) + ">"
                 intervalY = "<" + str(fcObj.IntervalY.x) + ", " + str(fcObj.IntervalY.y) + ", " + str(fcObj.IntervalY.z) + ">"
                 intervalZ = "<" + str(fcObj.IntervalZ.x) + ", " + str(fcObj.IntervalZ.y) + ", " + str(fcObj.IntervalZ.z) + ">"
@@ -496,8 +496,8 @@ class ExportToPovRay:
         elif fcObj.TypeId == "Part::FeaturePython" and fcObj.Name.startswith("Clone"): #Clone from Draft workbench
             povClone = ""
 
-            childs = fcObj.Objects
-            for child in childs:
+            children = fcObj.Objects
+            for child in children:
                 povClone += self.createPovCode(child, False, False, False, False, False, True)
 
             if fcObj.Scale.x != 1 or fcObj.Scale.y != 1 or fcObj.Scale.z != 1:
@@ -568,8 +568,8 @@ class ExportToPovRay:
         elif fcObj.TypeId == "App::Part": #Part
             povPart = "\nunion {\n"
 
-            childs = fcObj.OutList
-            for child in childs:
+            children = fcObj.OutList
+            for child in children:
                 guiChild = child.ViewObject
                 if guiChild.Visibility:
                     childCode = self.createPovCode(child, True, expPigment, expPhotons, True, expLabel, expMeshDef) #call createPovCode for the child
@@ -656,7 +656,7 @@ class ExportToPovRay:
             povLight = "\nlight_source { "
             povLight += "<0, 0, 0>"
             povLight += "\n\tcolor rgb<" + str(fcObj.Color[0]) + ", " + str(fcObj.Color[1]) + ", " + str(fcObj.Color[2]) + ">"
-            
+
             if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
                 povLight += "\n\tfade_distance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
                 povLight += "\n\tfade_power " + str(fcObj.FadePower)
@@ -683,7 +683,7 @@ class ExportToPovRay:
 
             if fcObj.Jitter:
                 povLight += "\n\tjitter"
-            
+
             if fcObj.FadeDistance.getValueAs("mm").Value != 0 and fcObj.FadePower != 0:
                 povLight += "\n\tfade_distance " + str(fcObj.FadeDistance.getValueAs("mm").Value)
                 povLight += "\n\tfade_power " + str(fcObj.FadePower)
@@ -881,7 +881,7 @@ class ExportToPovRay:
                         startControlY *= -1
                         endControlX *= -1
                         endControlY *= -1
-                    
+
                     startControlX += startX
                     startControlY += startY
                     endControlX += endX
@@ -893,7 +893,7 @@ class ExportToPovRay:
                     povSpline += "<" + str(endX) + ", " + str(endY) + ">//arc\n"
 
                     numOfPoints += 4
-                
+
         return [povSpline, numOfPoints]
 
     def getNextLine(self, lines, lastLine):
@@ -936,16 +936,16 @@ class ExportToPovRay:
                             "PartDesign::Line",
                             "PartDesign::Plane"]
 
-        childs = body.OutListRecursive
+        children = body.OutListRecursive
 
         #are objects supported
-        for obj in childs:
+        for obj in children:
             if not obj.TypeId in supportedTypeIds:
                 return False
 
         #get sketches
         sketches = []
-        for obj in childs:
+        for obj in children:
             if obj.TypeId == "Sketcher::SketchObject":
                 sketches.append(obj)
 
@@ -957,7 +957,7 @@ class ExportToPovRay:
         supportedTypes = ["Length"]
         #get pads and pockets
         padsPockets = []
-        for obj in childs:
+        for obj in children:
             if obj.TypeId == "PartDesign::Pad" or obj.TypeId == "PartDesign::Pocket":
                 padsPockets.append(obj)
 
@@ -994,7 +994,7 @@ class ExportToPovRay:
         #test TaperAngle and TaperAngleRev
         if fcObj.TaperAngle.getValueAs("deg").Value != 0 or fcObj.TaperAngleRev.getValueAs("deg").Value:
             return False
-        
+
         #test base shape (only sketches are supported)
         if fcObj.Base.TypeId != "Sketcher::SketchObject":
             return False
@@ -1085,7 +1085,7 @@ class ExportToPovRay:
             translation = self.getTranslation(fcObj)
             if translation != "": #test if the object is translated
                 povCode += "\t" + translation + " * (-1)\n"
-            
+
             rotation = self.getInvertedRotation(fcObj)
             if rotation != "": #test if the object is rotated
                 povCode += rotation.replace("\n", "\t\n")
@@ -1416,7 +1416,7 @@ class ExportToPovRay:
 
         if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_material_hollow") != -1:
             material = "\nhollow\nmaterial {" + stringCorrection(fcObj.Label) + "_material_hollow }\n"
-        
+
         elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_") != -1:
             if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
                 material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"

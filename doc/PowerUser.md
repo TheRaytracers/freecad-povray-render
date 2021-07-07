@@ -2,12 +2,12 @@
 
 ## Textures and Materials in the inc file
 
-If the texture tab hasn't enough possibilities for you, you can use another option, where you have the full control about just everything.  
+If the texture tab hasn't enough possibilities for you, you can use another option, where you have the full control about just everything.
 Before we started to implement the texture tab, special textures were only possible with another file: the _user.inc file. This file is a file with the same name plus "_user" and path as the ini file you selected, but not with the ending "ini", but with the ending "inc":
 
 ```
-      ini file: /home/usbhub/Documents/myProject.ini
-_user.inc file: /home/usbhub/Documents/myProject_user.inc
+      ini file: /home/userName/Documents/myProject.ini
+_user.inc file: /home/userName/Documents/myProject_user.inc
 ```
 
 Describing all surface and interior modifying features of POV-Ray would burst this chapter. Our advice for the workflow is to model your objects in FreeCAD without changing any colors and in a second step add textures and materials to the .inc file. The link from a FreeCAD object to its material in the .inc file is the name of the object in the FreeCAD object tree, more accurately: the object label.
@@ -111,7 +111,7 @@ POV-Ray provides a lot of predefined materials. If you want to use them take car
 This is easy for some glasses:
 
 ```pov
-#declare Object_Label_material = material{ M_Glass3 }
+#declare Object_Label_material = material { M_Glass3 }
 ```
 
 You don't need any include file because Glass is included as standard and 'M_Glass3' is toplevel of the material hierarchy.
@@ -167,11 +167,11 @@ The second way should be the preferred way, because then you can also share your
 
 If you look into your FreeCAD config folder, you will find `Mod/exporttopovray/predefined.xml`. This is the file, where all textures, that are shown to you in the tab, are defined. As you can easily see, this XML file is representing the exactly structure you see in the texture tab. Predef-Tag defines an texture and has this following attributes:
 
-* **`inc`**  
+* **`inc`**
   Which file(s) needs to be included
-* **`comment`**  
+* **`comment`**
   Here you can type a comment if something is special with this texture.
-* **`pigment`**  
+* **`pigment`**
   Here you define the content of the `pigment` block. This works the same for the following blocks:
   * `finish`
   * `interior`
