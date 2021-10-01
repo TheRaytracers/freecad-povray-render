@@ -665,7 +665,7 @@ class TextureTab(QtGui.QWidget):
         predefinedPath = os.path.join(os.path.dirname(__file__), "predefined.xml")
 
         predefined = xml.parse(predefinedPath).getroot()
-        categories = predefined.getchildren()
+        categories = list(predefined)
 
         # self.predefines[0] is the FreeCAD texture
         self.wrapperCategory = Category(None, [], [self.predefines[0]], 0)
@@ -852,7 +852,7 @@ class TextureTab(QtGui.QWidget):
             parentCategory (Category): Category to which the newly created predefined/category should be added as a child.
         """
 
-        childNodes = xmlNode.getchildren()
+        childNodes = list(xmlNode)
 
         # create new category
         newCategory = Category(parentCategory, [], [], self.categoryCombo.count())
