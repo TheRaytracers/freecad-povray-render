@@ -357,7 +357,7 @@ class ExportToPovRay:
 
         elif fcObj.TypeId == "Part::MultiFuse" or fcObj.TypeId == "Part::Fuse" or fcObj.TypeId == "Part::Compound":  # Fusion
             children = fcObj.OutList
-            povFusion = "\nunion {\n"
+            povFusion = "\nmerge {\n"
             for child in children:
                 childCode = self.createPovCode(
                     child, True, expPigment, expPhotons, True, expLabel, expMeshDef
