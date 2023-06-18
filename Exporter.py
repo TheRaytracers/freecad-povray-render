@@ -425,7 +425,7 @@ class ExportToPovRay:
                 if fcObj.Center.x != 0 or fcObj.Center.y != 0 or fcObj.Center.z != 0:
                     povArr += "\t\ttranslate -" + center + "\n"
 
-                povArr += "\t\t#declare rotAngle = i * arrAngle / (endNo-1);\n"
+                povArr += "\t\t#declare rotAngle = i * arrAngle / endNo;\n"
                 povArr += "\t\t#local vX = vaxis_rotate(x, axis, rotAngle);\n"
                 povArr += "\t\t#local vY = vaxis_rotate(y, axis, rotAngle);\n"
                 povArr += "\t\t#local vZ = vaxis_rotate(z, axis, rotAngle);\n"
@@ -1697,6 +1697,9 @@ class ExportToPovRay:
         """Return the pigment/material of the given FreeCAD object in pov code."""
 
         appObject = fcObj.ViewObject
+        # for Link objects
+        if isinstance(appObject, Gui.ViewProviderLink):
+            appObject = appObject.LinkView.LinkedView
         material = ""
         pigment = ""
         transparency = ""
