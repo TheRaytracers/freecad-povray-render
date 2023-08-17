@@ -936,10 +936,14 @@ class TextureTab(QtGui.QWidget):
                     listItem
                 )
 
+                iconPath = os.path.join(thumbnailPath, newPredefined.getHash() + ".png")
+
+                if not os.path.isfile(iconPath):
+                    print(f"{newPredefined.identifier} has no thumbnail yet - rendering now...")
+                    newPredefined.renderThumbnail()
+
                 newPredefined.listItem.setIcon(
-                    QtGui.QIcon(
-                        os.path.join(thumbnailPath, newPredefined.getHash() + ".png")
-                    )
+                    QtGui.QIcon(iconPath)
                 )
 
                 self.predefines.append(newPredefined)
@@ -1808,7 +1812,16 @@ class ListObject:
         if self.predefObject.media != "":
             povCode += "_hollow"
 
-        povCode += " = " + self.predefObject.toPovMaterial(False)
+
+        povMaterial = self.predefObject.toPovMaterial(False)
+        
+        # replace variables
+
+        # pigment
+        shapeColorRGB = ExportToPovRay.getShapeColorRGB(ExportToPovRay.getViewObject(self.fcObj))
+        povMaterial = povMaterial.replace("${fcObj.Color}", shapeColorRGB)
+
+        povCode += " = " + povMaterial
 
         # scale
         if self.scaleX != 1 or self.scaleY != 1 or self.scaleZ != 1:

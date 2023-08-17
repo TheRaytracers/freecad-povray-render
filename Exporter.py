@@ -450,7 +450,7 @@ class ExportToPovRay:
                         povArr += "\t" + translation + "\n"
 
                 if expPigment:
-                    pigment = self.getPigment(fcObj)
+                    pigment = self.getMaterial(fcObj)
                     if pigment != "":  # test if the object has the standard pigment
                         povArr += "\t" + pigment + "\n"
 
@@ -536,7 +536,7 @@ class ExportToPovRay:
                         povArr += "\t\t\t\t" + rotation + "\n"
 
                 if expPigment:
-                    pigment = self.getPigment(fcObj)
+                    pigment = self.getMaterial(fcObj)
                     if pigment != "":  # test if the object has the standard pigment
                         povArr += "\t\t\t\t" + pigment + "\n"
 
@@ -851,7 +851,7 @@ class ExportToPovRay:
         povCode += "\n"
 
         if expPigment:
-            pigment = self.getPigment(fcObj)
+            pigment = self.getMaterial(fcObj)
             if pigment != "":  # test if the object has the standard pigment
                 povCode += pigment.replace("\n", "\n\t") + "\n"
 
@@ -1317,7 +1317,7 @@ class ExportToPovRay:
 
         # return pov code
         povCode += "\nobject { " + stringCorrection(fcObj.Label) + "_mesh\n"
-        pigment = self.getPigment(fcObj)
+        pigment = self.getMaterial(fcObj)
 
         if expPlacement == False: #meshes are already translated, so if they shouldn't translated, they translated back
             translation = self.getTranslation(fcObj)
@@ -1693,104 +1693,6 @@ class ExportToPovRay:
 
         return rotate
 
-    def getPigment(self, fcObj):
-        """Return the pigment/material of the given FreeCAD object in pov code."""
-
-        appObject = fcObj.ViewObject
-        # for Link objects
-        if isinstance(appObject, Gui.ViewProviderLink):
-            appObject = appObject.LinkView.LinkedView
-        material = ""
-        pigment = ""
-        transparency = ""
-        finish = ""
-        ambient = ""
-        emission = ""
-        phong = ""
-        if appObject.Transparency != 0:
-            transparency += " transmit " + str(appObject.Transparency / float(100))
-        ShapeColorRGB = "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(
-            appObject.ShapeColor[0], appObject.ShapeColor[1], appObject.ShapeColor[2]
-        )
-        if transparency != "" or ShapeColorRGB != self.uintColorToRGB(
-            self.DefaultShapeColor
-        ):
-            pigment += "\tpigment { color rgb " + ShapeColorRGB + transparency + " }\n"
-        material += pigment
-        if appObject.ShapeMaterial.AmbientColor != (
-            0.20000000298023224,
-            0.20000000298023224,
-            0.20000000298023224,
-            0,
-        ):
-            ambient += "ambient rgb<"
-            ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(
-                appObject.ShapeMaterial.AmbientColor[0],
-                appObject.ShapeMaterial.AmbientColor[1],
-                appObject.ShapeMaterial.AmbientColor[2],
-            )
-            ambient += ">"
-        if appObject.ShapeMaterial.EmissiveColor != (0, 0, 0, 0):
-            emission += "emission rgb<"
-            emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(
-                appObject.ShapeMaterial.EmissiveColor[0],
-                appObject.ShapeMaterial.EmissiveColor[1],
-                appObject.ShapeMaterial.EmissiveColor[2],
-            )
-            emission += ">"
-        if appObject.ShapeMaterial.SpecularColor != (0, 0, 0, 0):
-            phong += "phong "
-            phong += "{0:1.2f}".format(
-                (
-                    appObject.ShapeMaterial.SpecularColor[0]
-                    + appObject.ShapeMaterial.SpecularColor[1]
-                    + appObject.ShapeMaterial.SpecularColor[2]
-                )
-                / 3
-            )
-            phong += " phong_size "
-            phong += str(appObject.ShapeMaterial.Shininess * 50)
-            phong += " "
-        if ambient != "" or emission != "" or phong != "":
-            finish = "finish {"
-            finish += "\n\t" + ambient
-            finish += "\n\t" + emission
-            finish += "\n\t" + phong
-            finish += "\n}\n"
-        material += finish
-
-        if (
-            self.texIncContent.find(
-                "#declare " + stringCorrection(fcObj.Label) + "_material_hollow"
-            )
-            != -1
-        ):
-            material = (
-                "\nhollow\nmaterial {"
-                + stringCorrection(fcObj.Label)
-                + "_material_hollow }\n"
-            )
-
-        elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_") != -1:
-            if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
-                material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
-            elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_texture") != -1:
-                material = "\ntexture {" + stringCorrection(fcObj.Label) + "_texture }\n"
-            elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_pigment") != -1:
-                material = "\npigment {" + stringCorrection(fcObj.Label) + "_pigment }\n"
-            else:
-                return ""
-
-        if (
-            self.incContent.find(
-                "#declare " + stringCorrection(fcObj.Label) + "_material"
-            )
-            != -1
-        ):
-            material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
-
-        return material
-
     def getPhotons(self, fcObj):
         """Return the photons block of the given FreeCAD object in pov code."""
 
@@ -1844,6 +1746,151 @@ class ExportToPovRay:
         photons += "\n}\n"
 
         return photons
+
+
+    def getMaterial(self, fcObj):
+        """Return the pigment/material of the given FreeCAD object in pov code."""
+
+        viewObject = self.getViewObject(fcObj)
+
+        material = ""
+        material += self.getPigment(viewObject)
+        material += self.getFinish(viewObject)
+
+        # material declarations tex.inc
+        if (
+            self.texIncContent.find(
+                "#declare " + stringCorrection(fcObj.Label) + "_material_hollow"
+            )
+            != -1
+        ):
+            material = (
+                "\nhollow\nmaterial {"
+                + stringCorrection(fcObj.Label)
+                + "_material_hollow }\n"
+            )
+
+        elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_") != -1:
+            if self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_material") != -1:
+                material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
+            elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_texture") != -1:
+                material = "\ntexture {" + stringCorrection(fcObj.Label) + "_texture }\n"
+            elif self.texIncContent.find("#declare " + stringCorrection(fcObj.Label) + "_pigment") != -1:
+                material = "\npigment {" + stringCorrection(fcObj.Label) + "_pigment }\n"
+            else:
+                return ""
+
+        # material declarations in _user.inc
+        if (
+            self.incContent.find(
+                "#declare " + stringCorrection(fcObj.Label) + "_material"
+            )
+            != -1
+        ):
+            material = "\nmaterial {" + stringCorrection(fcObj.Label) + "_material }\n"
+
+        return material
+
+    def getPigment(self, viewObject):
+        transparency = ""
+        shapeColorRGB = self.getShapeColorRGB(viewObject)
+
+        if viewObject.Transparency != 0:
+            transparency += self.getTransparency(viewObject)
+
+        if transparency != "" or shapeColorRGB != self.uintColorToRGB(
+            self.DefaultShapeColor
+        ):
+            return "\tpigment { color rgb " + shapeColorRGB + transparency + " }\n"
+
+        return ""
+
+    def getFinish(self, viewObject):
+        finish = ""
+        ambient = ""
+        emission = ""
+        phong = ""
+
+        # ambient color
+        if viewObject.ShapeMaterial.AmbientColor != (
+            0.20000000298023224,
+            0.20000000298023224,
+            0.20000000298023224,
+            0,
+        ):
+            ambient += self.getAmbient(viewObject)
+
+        # emissive color
+        if viewObject.ShapeMaterial.EmissiveColor != (0, 0, 0, 0):
+            emission += self.getEmission(viewObject)
+
+        # specular color / phong
+        if viewObject.ShapeMaterial.SpecularColor != (0, 0, 0, 0):
+            phong += self.getPhong(viewObject)
+
+        # finish
+        if ambient != "" or emission != "" or phong != "":
+            finish = "finish {"
+            finish += "\n\t" + ambient
+            finish += "\n\t" + emission
+            finish += "\n\t" + phong
+            finish += "\n}\n"
+
+        return finish
+
+    @staticmethod
+    def getShapeColorRGB(viewObject):
+        return "<{0:1.3f}, {1:1.3f}, {2:1.3f}>".format(
+            viewObject.ShapeColor[0], viewObject.ShapeColor[1], viewObject.ShapeColor[2]
+        )
+
+    @staticmethod
+    def getTransparency(viewObject):
+        return " transmit " + str(viewObject.Transparency / float(100))
+
+    @staticmethod
+    def getAmbient(viewObject):
+        ambient = ""
+        ambient += "ambient rgb<"
+        ambient += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(
+            viewObject.ShapeMaterial.AmbientColor[0],
+            viewObject.ShapeMaterial.AmbientColor[1],
+            viewObject.ShapeMaterial.AmbientColor[2],
+        )
+        ambient += ">"
+
+        return ambient
+
+    @staticmethod
+    def getEmission(viewObject):
+        emission = ""
+        emission += "emission rgb<"
+        emission += "{0:1.3f}, {1:1.3f}, {2:1.3f}".format(
+            viewObject.ShapeMaterial.EmissiveColor[0],
+            viewObject.ShapeMaterial.EmissiveColor[1],
+            viewObject.ShapeMaterial.EmissiveColor[2],
+        )
+        emission += ">"
+
+        return emission
+
+    @staticmethod
+    def getPhong(viewObject):
+        phong = ""
+        phong += "phong "
+        phong += "{0:1.2f}".format(
+            (
+                viewObject.ShapeMaterial.SpecularColor[0]
+                + viewObject.ShapeMaterial.SpecularColor[1]
+                + viewObject.ShapeMaterial.SpecularColor[2]
+            )
+            / 3
+        )
+        phong += " phong_size "
+        phong += str(viewObject.ShapeMaterial.Shininess * 50)
+        phong += " "
+
+        return phong
 
 
     def writeFile(self, povText):
@@ -2009,3 +2056,12 @@ class ExportToPovRay:
                 return True
 
         return False
+
+    @staticmethod
+    def getViewObject(fcObj):
+        viewObject = fcObj.ViewObject
+        # for Link objects
+        if isinstance(viewObject, Gui.ViewProviderLink):
+            viewObject = viewObject.LinkView.LinkedView
+
+        return viewObject
